@@ -1,0 +1,252 @@
+<?xml version="1.0"?>
+<!-- ClickHouse 集群配置示例 -->
+<!-- 文件路径: /etc/clickhouse-server/config.d/cluster-config.xml -->
+<clickhouse>
+    <!-- ZooKeeper 集群配置 -->
+    <zookeeper>
+        <node index="1">
+            <host>zk1.example.com</host>
+            <port>2181</port>
+        </node>
+        <node index="2">
+            <host>zk2.example.com</host>
+            <port>2181</port>
+        </node>
+        <node index="3">
+            <host>zk3.example.com</host>
+            <port>2181</port>
+        </node>
+        
+        <!-- ZooKeeper 会话超时配置 -->
+        <session_timeout_ms>30000</session_timeout_ms>
+        <operation_timeout_ms>10000</operation_timeout_ms>
+        <root>/clickhouse</root>
+    </zookeeper>
+
+    <!-- 远程服务器集群配置 -->
+    <remote_servers>
+        <!-- 生产集群配置 -->
+        <production_cluster>
+            <!-- 第一个分片 -->
+            <shard>
+                <weight>1</weight>
+                <internal_replication>true</internal_replication>
+                <replica>
+                    <host>ch1.example.com</host>
+                    <port>9000</port>
+                    <user>default</user>
+                    <password></password>
+                    <secure>0</secure>
+                    <compression>true</compression>
+                </replica>
+                <replica>
+                    <host>ch2.example.com</host>
+                    <port>9000</port>
+                    <user>default</user>
+                    <password></password>
+                    <secure>0</secure>
+                    <compression>true</compression>
+                </replica>
+            </shard>
+            
+            <!-- 第二个分片 -->
+            <shard>
+                <weight>1</weight>
+                <internal_replication>true</internal_replication>
+                <replica>
+                    <host>ch3.example.com</host>
+                    <port>9000</port>
+                    <user>default</user>
+                    <password></password>
+                    <secure>0</secure>
+                    <compression>true</compression>
+                </replica>
+                <replica>
+                    <host>ch4.example.com</host>
+                    <port>9000</port>
+                    <user>default</user>
+                    <password></password>
+                    <secure>0</secure>
+                    <compression>true</compression>
+                </replica>
+            </shard>
+            
+            <!-- 第三个分片 -->
+            <shard>
+                <weight>1</weight>
+                <internal_replication>true</internal_replication>
+                <replica>
+                    <host>ch5.example.com</host>
+                    <port>9000</port>
+                    <user>default</user>
+                    <password></password>
+                    <secure>0</secure>
+                    <compression>true</compression>
+                </replica>
+                <replica>
+                    <host>ch6.example.com</host>
+                    <port>9000</port>
+                    <user>default</user>
+                    <password></password>
+                    <secure>0</secure>
+                    <compression>true</compression>
+                </replica>
+            </shard>
+        </production_cluster>
+
+        <!-- 测试集群配置 -->
+        <test_cluster>
+            <shard>
+                <weight>1</weight>
+                <internal_replication>false</internal_replication>
+                <replica>
+                    <host>test1.example.com</host>
+                    <port>9000</port>
+                    <user>default</user>
+                    <password></password>
+                </replica>
+            </shard>
+            <shard>
+                <weight>1</weight>
+                <internal_replication>false</internal_replication>
+                <replica>
+                    <host>test2.example.com</host>
+                    <port>9000</port>
+                    <user>default</user>
+                    <password></password>
+                </replica>
+            </shard>
+        </test_cluster>
+        
+        <!-- 单分片多副本集群 -->
+        <replica_cluster>
+            <shard>
+                <weight>1</weight>
+                <internal_replication>true</internal_replication>
+                <replica>
+                    <host>replica1.example.com</host>
+                    <port>9000</port>
+                    <user>default</user>
+                    <password></password>
+                </replica>
+                <replica>
+                    <host>replica2.example.com</host>
+                    <port>9000</port>
+                    <user>default</user>
+                    <password></password>
+                </replica>
+                <replica>
+                    <host>replica3.example.com</host>
+                    <port>9000</port>
+                    <user>default</user>
+                    <password></password>
+                </replica>
+            </shard>
+        </replica_cluster>
+    </remote_servers>
+
+    <!-- 宏定义 - 每个节点需要不同的配置 -->
+    <macros>
+        <cluster>production_cluster</cluster>
+        <shard>01</shard>
+        <replica>replica1</replica>
+        <layer>01</layer>
+    </macros>
+
+    <!-- 分布式 DDL 配置 -->
+    <distributed_ddl>
+        <path>/clickhouse/task_queue/ddl</path>
+        <cleanup_delay_period>60</cleanup_delay_period>
+        <max_tasks_in_queue>1000</max_tasks_in_queue>
+        <task_max_lifetime>604800</task_max_lifetime>
+    </distributed_ddl>
+
+    <!-- 副本相关配置 -->
+    <merge_tree>
+        <!-- 副本数据获取超时 -->
+        <replicated_fetches_http_connection_timeout>1</replicated_fetches_http_connection_timeout>
+        <replicated_fetches_http_send_timeout>1</replicated_fetches_http_send_timeout>
+        <replicated_fetches_http_receive_timeout>1</replicated_fetches_http_receive_timeout>
+        
+        <!-- 副本队列处理 -->
+        <replicated_max_ratio_of_errors_after_which_replica_is_considered_broken>0.5</replicated_max_ratio_of_errors_after_which_replica_is_considered_broken>
+        <replicated_max_parallel_fetches>3</replicated_max_parallel_fetches>
+        <replicated_max_parallel_sends>3</replicated_max_parallel_sends>
+        
+        <!-- 数据去重配置 -->
+        <replicated_deduplication_window>100</replicated_deduplication_window>
+        <replicated_deduplication_window_seconds>604800</replicated_deduplication_window_seconds>
+    </merge_tree>
+
+    <!-- 分布式查询配置 -->
+    <profiles>
+        <default>
+            <!-- 分布式查询超时 -->
+            <distributed_connections_pool_size>1024</distributed_connections_pool_size>
+            <distributed_aggregation_memory_efficient>1</distributed_aggregation_memory_efficient>
+            <distributed_group_by_no_merge>0</distributed_group_by_no_merge>
+            
+            <!-- 副本延迟容忍度 -->
+            <max_replica_delay_for_distributed_queries>300</max_replica_delay_for_distributed_queries>
+            <fallback_to_stale_replicas_for_distributed_queries>1</fallback_to_stale_replicas_for_distributed_queries>
+            
+            <!-- 并行查询配置 -->
+            <max_distributed_connections>1024</max_distributed_connections>
+            <distributed_product_mode>deny</distributed_product_mode>
+        </default>
+    </profiles>
+
+    <!-- 集群间通信配置 -->
+    <interserver_http_port>9009</interserver_http_port>
+    <interserver_http_host>this_host</interserver_http_host>
+    
+    <!-- 集群认证配置 -->
+    <interserver_http_credentials>
+        <user>interserver</user>
+        <password>secure_password_here</password>
+    </interserver_http_credentials>
+
+    <!-- 网络配置 -->
+    <networks>
+        <ip>::/0</ip>
+    </networks>
+    
+    <!-- 监听配置 -->
+    <listen_host>::</listen_host>
+    <http_port>8123</http_port>
+    <tcp_port>9000</tcp_port>
+    <mysql_port>9004</mysql_port>
+    <postgresql_port>9005</postgresql_port>
+
+    <!-- 日志配置 -->
+    <logger>
+        <level>information</level>
+        <log>/var/log/clickhouse-server/clickhouse-server.log</log>
+        <errorlog>/var/log/clickhouse-server/clickhouse-server.err.log</errorlog>
+        <size>1000M</size>
+        <count>10</count>
+    </logger>
+
+    <!-- 查询日志配置 -->
+    <query_log>
+        <database>system</database>
+        <table>query_log</table>
+        <flush_interval_milliseconds>7500</flush_interval_milliseconds>
+    </query_log>
+
+    <!-- 性能配置 -->
+    <max_connections>4096</max_connections>
+    <keep_alive_timeout>3</keep_alive_timeout>
+    <max_concurrent_queries>100</max_concurrent_queries>
+    <uncompressed_cache_size>8589934592</uncompressed_cache_size>
+    <mark_cache_size>5368709120</mark_cache_size>
+
+    <!-- 数据路径配置 -->
+    <path>/var/lib/clickhouse/</path>
+    <tmp_path>/var/lib/clickhouse/tmp/</tmp_path>
+    <user_files_path>/var/lib/clickhouse/user_files/</user_files_path>
+    <format_schema_path>/var/lib/clickhouse/format_schemas/</format_schema_path>
+
+    <!-- 用户配置文件路径 -->
+    <users_config>users.xml</users_config>
+</clickhouse> 

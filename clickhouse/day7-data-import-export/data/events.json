@@ -1,0 +1,8 @@
+{"user_id": 6001, "event_date": "2024-01-11", "page_views": 45, "session_duration": 2700, "country": "China", "device_type": "mobile", "revenue": 299.99}
+{"user_id": 6002, "event_date": "2024-01-11", "page_views": 28, "session_duration": 1680, "country": "USA", "device_type": "desktop", "revenue": 159.99}
+{"user_id": 6003, "event_date": "2024-01-11", "page_views": 19, "session_duration": 1140, "country": "Japan", "device_type": "tablet", "revenue": 99.99}
+{"user_id": 6004, "event_date": "2024-01-11", "page_views": 52, "session_duration": 3120, "country": "Germany", "device_type": "mobile", "revenue": 399.99}
+{"user_id": 6005, "event_date": "2024-01-11", "page_views": 33, "session_duration": 1980, "country": "UK", "device_type": "desktop", "revenue": 219.99}
+{"user_id": 6006, "event_date": "2024-01-11", "page_views": 41, "session_duration": 2460, "country": "France", "device_type": "mobile", "revenue": 279.99}
+{"user_id": 6007, "event_date": "2024-01-11", "page_views": 24, "session_duration": 1440, "country": "Canada", "device_type": "tablet", "revenue": 139.99}
+{"user_id": 6008, "event_date": "2024-01-11", "page_views": 37, "session_duration": 2220, "country": "Australia", "device_type": "desktop", "revenue": 259.99} 

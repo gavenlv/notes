@@ -1,0 +1,219 @@
+# Prometheus配置文件 - ClickHouse监控
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    cluster: 'clickhouse-production'
+    environment: 'production'
+
+# 告警规则文件
+rule_files:
+  - "alert_rules.yml"
+
+# 告警管理器配置
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+          - alertmanager:9093
+
+# 数据采集配置
+scrape_configs:
+  # ClickHouse 主服务监控
+  - job_name: 'clickhouse'
+    static_configs:
+      - targets: ['localhost:8123']
+    metrics_path: '/metrics'
+    scrape_interval: 30s
+    scrape_timeout: 10s
+    honor_labels: true
+    
+    # 基本认证（如果需要）
+    basic_auth:
+      username: 'monitoring'
+      password: 'your_monitoring_password'
+    
+    # 重新标记规则
+    metric_relabel_configs:
+      - source_labels: [__name__]
+        regex: 'clickhouse_.*'
+        target_label: service
+        replacement: 'clickhouse'
+
+  # ClickHouse 系统指标
+  - job_name: 'clickhouse-system-metrics'
+    static_configs:
+      - targets: ['localhost:8123']
+    metrics_path: '/query'
+    scrape_interval: 60s
+    scrape_timeout: 30s
+    params:
+      query:
+        - |
+          SELECT 
+            'clickhouse_current_metrics' as metric_name,
+            metric,
+            value,
+            'instance=localhost:8123' as labels
+          FROM system.metrics
+          FORMAT Prometheus
+        - |
+          SELECT 
+            'clickhouse_events' as metric_name,
+            event,
+            value,
+            'instance=localhost:8123' as labels
+          FROM system.events
+          FORMAT Prometheus
+        - |
+          SELECT 
+            'clickhouse_async_metrics' as metric_name,
+            metric,
+            value,
+            'instance=localhost:8123' as labels
+          FROM system.asynchronous_metrics
+          FORMAT Prometheus
+
+  # ClickHouse 查询性能监控
+  - job_name: 'clickhouse-query-performance'
+    static_configs:
+      - targets: ['localhost:8123']
+    metrics_path: '/query'
+    scrape_interval: 60s
+    params:
+      query:
+        - |
+          SELECT 
+            'clickhouse_query_duration_seconds' as __name__,
+            query_duration_ms / 1000 as value,
+            'quantile=0.50' as quantile,
+            'instance=localhost:8123' as instance
+          FROM (
+            SELECT quantile(0.50)(query_duration_ms) as query_duration_ms
+            FROM system.query_log 
+            WHERE event_time >= now() - INTERVAL 1 MINUTE
+              AND type = 'QueryFinish'
+          )
+          UNION ALL
+          SELECT 
+            'clickhouse_query_duration_seconds' as __name__,
+            query_duration_ms / 1000 as value,
+            'quantile=0.95' as quantile,
+            'instance=localhost:8123' as instance
+          FROM (
+            SELECT quantile(0.95)(query_duration_ms) as query_duration_ms
+            FROM system.query_log 
+            WHERE event_time >= now() - INTERVAL 1 MINUTE
+              AND type = 'QueryFinish'
+          )
+          UNION ALL
+          SELECT 
+            'clickhouse_query_duration_seconds' as __name__,
+            query_duration_ms / 1000 as value,
+            'quantile=0.99' as quantile,
+            'instance=localhost:8123' as instance
+          FROM (
+            SELECT quantile(0.99)(query_duration_ms) as query_duration_ms
+            FROM system.query_log 
+            WHERE event_time >= now() - INTERVAL 1 MINUTE
+              AND type = 'QueryFinish'
+          )
+
+  # ClickHouse 错误监控
+  - job_name: 'clickhouse-errors'
+    static_configs:
+      - targets: ['localhost:8123']
+    metrics_path: '/query'
+    scrape_interval: 60s
+    params:
+      query:
+        - |
+          SELECT 
+            'clickhouse_query_errors_total' as __name__,
+            count() as value,
+            'instance=localhost:8123' as instance,
+            'type=' || type as type
+          FROM system.query_log 
+          WHERE event_time >= now() - INTERVAL 1 MINUTE
+            AND type IN ('ExceptionBeforeStart', 'ExceptionWhileProcessing')
+          GROUP BY type
+
+  # ClickHouse 存储监控
+  - job_name: 'clickhouse-storage'
+    static_configs:
+      - targets: ['localhost:8123']
+    metrics_path: '/query'
+    scrape_interval: 300s  # 5分钟采集一次
+    params:
+      query:
+        - |
+          SELECT 
+            'clickhouse_table_size_bytes' as __name__,
+            sum(data_compressed_bytes) as value,
+            'instance=localhost:8123' as instance,
+            'database=' || database as database,
+            'table=' || table as table
+          FROM system.parts 
+          WHERE active = 1
+          GROUP BY database, table
+        - |
+          SELECT 
+            'clickhouse_table_rows' as __name__,
+            sum(rows) as value,
+            'instance=localhost:8123' as instance,
+            'database=' || database as database,
+            'table=' || table as table
+          FROM system.parts 
+          WHERE active = 1
+          GROUP BY database, table
+
+  # ClickHouse 连接监控
+  - job_name: 'clickhouse-connections'
+    static_configs:
+      - targets: ['localhost:8123']
+    metrics_path: '/query'
+    scrape_interval: 30s
+    params:
+      query:
+        - |
+          SELECT 
+            'clickhouse_active_connections' as __name__,
+            count() as value,
+            'instance=localhost:8123' as instance,
+            'user=' || user as user
+          FROM system.processes
+          WHERE query != ''
+          GROUP BY user
+        - |
+          SELECT 
+            'clickhouse_running_queries' as __name__,
+            count() as value,
+            'instance=localhost:8123' as instance
+          FROM system.processes
+          WHERE query != ''
+
+  # 系统资源监控（使用node_exporter）
+  - job_name: 'node-exporter'
+    static_configs:
+      - targets: ['localhost:9100']
+    scrape_interval: 30s
+
+  # ClickHouse Exporter（第三方导出器）
+  - job_name: 'clickhouse-exporter'
+    static_configs:
+      - targets: ['localhost:9116']
+    scrape_interval: 30s
+    scrape_timeout: 10s
+
+# 远程写入配置（可选）
+remote_write:
+  - url: "http://prometheus-remote-storage:8086/api/v1/prom/write"
+    queue_config:
+      max_samples_per_send: 1000
+      max_shards: 200
+      capacity: 2500
+
+# 远程读取配置（可选）
+remote_read:
+  - url: "http://prometheus-remote-storage:8086/api/v1/prom/read"
+    read_recent: true 

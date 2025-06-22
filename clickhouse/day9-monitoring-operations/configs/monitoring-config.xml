@@ -1,0 +1,316 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- ClickHouse监控和运维配置文件 -->
+<clickhouse>
+    <!-- 日志配置 -->
+    <logger>
+        <!-- 日志级别: trace, debug, information, warning, error -->
+        <level>information</level>
+        <log>/var/log/clickhouse-server/clickhouse-server.log</log>
+        <errorlog>/var/log/clickhouse-server/clickhouse-server.err.log</errorlog>
+        <size>1000M</size>
+        <count>10</count>
+        <!-- 缓冲区刷新间隔 -->
+        <flush_interval_milliseconds>3000</flush_interval_milliseconds>
+        <!-- 控制台日志 -->
+        <console>1</console>
+    </logger>
+
+    <!-- 查询日志配置 -->
+    <query_log>
+        <!-- 存储查询日志的数据库和表 -->
+        <database>system</database>
+        <table>query_log</table>
+        
+        <!-- 自动刷新设置 -->
+        <flush_interval_milliseconds>7500</flush_interval_milliseconds>
+        
+        <!-- 内存中保留的最大行数 -->
+        <max_size_rows>1048576</max_size_rows>
+        <reserved_size_rows>8192</reserved_size_rows>
+        <buffer_size_rows_flush_threshold>524288</buffer_size_rows_flush_threshold>
+        
+        <!-- 最大内存使用 -->
+        <max_size_bytes>1073741824</max_size_bytes>
+        <reserved_size_bytes>8388608</reserved_size_bytes>
+        
+        <!-- 分区策略 -->
+        <partition_by>toYYYYMM(event_date)</partition_by>
+        
+        <!-- TTL设置：保留30天 -->
+        <ttl>event_date + INTERVAL 30 DAY</ttl>
+    </query_log>
+
+    <!-- 查询线程日志 -->
+    <query_thread_log>
+        <database>system</database>
+        <table>query_thread_log</table>
+        <flush_interval_milliseconds>7500</flush_interval_milliseconds>
+        <max_size_rows>1048576</max_size_rows>
+        <partition_by>toYYYYMM(event_date)</partition_by>
+        <ttl>event_date + INTERVAL 7 DAY</ttl>
+    </query_thread_log>
+
+    <!-- 指标日志 -->
+    <metric_log>
+        <database>system</database>
+        <table>metric_log</table>
+        <flush_interval_milliseconds>7500</flush_interval_milliseconds>
+        <collect_interval_milliseconds>1000</collect_interval_milliseconds>
+        <max_size_rows>1048576</max_size_rows>
+        <partition_by>toYYYYMM(event_date)</partition_by>
+        <ttl>event_date + INTERVAL 7 DAY</ttl>
+    </metric_log>
+
+    <!-- 异步指标日志 -->
+    <asynchronous_metric_log>
+        <database>system</database>
+        <table>asynchronous_metric_log</table>
+        <flush_interval_milliseconds>7500</flush_interval_milliseconds>
+        <max_size_rows>1048576</max_size_rows>
+        <partition_by>toYYYYMM(event_date)</partition_by>
+        <ttl>event_date + INTERVAL 7 DAY</ttl>
+    </asynchronous_metric_log>
+
+    <!-- 追踪日志 -->
+    <trace_log>
+        <database>system</database>
+        <table>trace_log</table>
+        <flush_interval_milliseconds>7500</flush_interval_milliseconds>
+        <max_size_rows>1048576</max_size_rows>
+        <partition_by>toYYYYMM(event_date)</partition_by>
+        <ttl>event_date + INTERVAL 3 DAY</ttl>
+    </trace_log>
+
+    <!-- 文本日志 -->
+    <text_log>
+        <database>system</database>
+        <table>text_log</table>
+        <flush_interval_milliseconds>7500</flush_interval_milliseconds>
+        <max_size_rows>1048576</max_size_rows>
+        <partition_by>toYYYYMM(event_date)</partition_by>
+        <ttl>event_date + INTERVAL 7 DAY</ttl>
+        <level>information</level>
+    </text_log>
+
+    <!-- 崩溃日志 -->
+    <crash_log>
+        <database>system</database>
+        <table>crash_log</table>
+        <flush_interval_milliseconds>1000</flush_interval_milliseconds>
+        <max_size_rows>1024</max_size_rows>
+        <partition_by>toYYYYMM(event_date)</partition_by>
+        <ttl>event_date + INTERVAL 30 DAY</ttl>
+    </crash_log>
+
+    <!-- 会话日志 -->
+    <session_log>
+        <database>system</database>
+        <table>session_log</table>
+        <flush_interval_milliseconds>7500</flush_interval_milliseconds>
+        <max_size_rows>1048576</max_size_rows>
+        <partition_by>toYYYYMM(event_date)</partition_by>
+        <ttl>event_date + INTERVAL 7 DAY</ttl>
+    </session_log>
+
+    <!-- 监控和告警配置 -->
+    <monitoring>
+        <!-- 慢查询阈值（毫秒） -->
+        <slow_query_threshold_ms>10000</slow_query_threshold_ms>
+        
+        <!-- 内存使用告警阈值（百分比） -->
+        <memory_usage_alert_threshold>0.9</memory_usage_alert_threshold>
+        
+        <!-- 磁盘使用告警阈值（百分比） -->
+        <disk_usage_alert_threshold>0.85</disk_usage_alert_threshold>
+        
+        <!-- 错误率告警阈值（百分比） -->
+        <error_rate_alert_threshold>0.05</error_rate_alert_threshold>
+        
+        <!-- 监控数据收集间隔（秒） -->
+        <metrics_collection_interval>60</metrics_collection_interval>
+    </monitoring>
+
+    <!-- HTTP接口配置 -->
+    <http_port>8123</http_port>
+    <tcp_port>9000</tcp_port>
+    <mysql_port>9004</mysql_port>
+    <postgresql_port>9005</postgresql_port>
+
+    <!-- 监控端点配置 -->
+    <http_handlers>
+        <!-- 健康检查端点 -->
+        <health>
+            <url>/health</url>
+            <method>GET</method>
+            <handler>
+                <type>static</type>
+                <status>200</status>
+                <response_content>OK</response_content>
+            </handler>
+        </health>
+
+        <!-- 指标端点 -->
+        <metrics>
+            <url>/metrics</url>
+            <method>GET</method>
+            <handler>
+                <type>prometheus</type>
+            </handler>
+        </metrics>
+
+        <!-- 状态端点 -->
+        <status>
+            <url>/status</url>
+            <method>GET</method>
+            <handler>
+                <type>static</type>
+                <status>200</status>
+                <response_content>
+                {
+                    "status": "ok",
+                    "timestamp": "{{ currentTime }}",
+                    "version": "{{ version }}",
+                    "uptime": "{{ uptime }}"
+                }
+                </response_content>
+            </handler>
+        </status>
+    </http_handlers>
+
+    <!-- 性能监控配置 -->
+    <performance>
+        <!-- 查询性能监控 -->
+        <query_profiler>
+            <enabled>1</enabled>
+            <sample_rate>0.01</sample_rate>
+            <stack_trace_depth>32</stack_trace_depth>
+        </query_profiler>
+
+        <!-- 内存分析器 -->
+        <memory_profiler>
+            <enabled>1</enabled>
+            <sample_rate>0.001</sample_rate>
+        </memory_profiler>
+    </performance>
+
+    <!-- 限制配置 -->
+    <limits>
+        <!-- 最大查询执行时间（秒） -->
+        <max_execution_time>300</max_execution_time>
+        
+        <!-- 最大内存使用（字节） -->
+        <max_memory_usage>10000000000</max_memory_usage>
+        
+        <!-- 最大并发查询数 -->
+        <max_concurrent_queries>100</max_concurrent_queries>
+        
+        <!-- 最大网络带宽（字节/秒） -->
+        <max_network_bandwidth>1000000000</max_network_bandwidth>
+        
+        <!-- 最大读取行数 -->
+        <max_rows_to_read>1000000000</max_rows_to_read>
+        
+        <!-- 最大结果行数 -->
+        <max_result_rows>1000000</max_result_rows>
+    </limits>
+
+    <!-- 自动清理配置 -->
+    <cleanup>
+        <!-- 自动优化表 -->
+        <auto_optimize>
+            <enabled>1</enabled>
+            <interval_hours>24</interval_hours>
+        </auto_optimize>
+
+        <!-- 自动清理临时文件 -->
+        <temp_file_cleanup>
+            <enabled>1</enabled>
+            <interval_hours>6</interval_hours>
+            <max_age_hours>24</max_age_hours>
+        </temp_file_cleanup>
+
+        <!-- 日志文件轮转 -->
+        <log_rotation>
+            <enabled>1</enabled>
+            <interval_hours>24</interval_hours>
+            <keep_days>30</keep_days>
+        </log_rotation>
+    </cleanup>
+
+    <!-- Prometheus导出器配置 -->
+    <prometheus>
+        <enabled>1</enabled>
+        <endpoint>/metrics</endpoint>
+        <port>9363</port>
+        
+        <!-- 自定义指标 -->
+        <custom_metrics>
+            <query_duration_histogram>
+                <enabled>1</enabled>
+                <buckets>0.1,0.5,1,5,10,30,60,300</buckets>
+            </query_duration_histogram>
+            
+            <memory_usage_gauge>
+                <enabled>1</enabled>
+                <update_interval>30</update_interval>
+            </memory_usage_gauge>
+            
+            <disk_usage_gauge>
+                <enabled>1</enabled>
+                <update_interval>60</update_interval>
+            </disk_usage_gauge>
+        </custom_metrics>
+    </prometheus>
+
+    <!-- 集群监控配置（如果使用集群） -->
+    <cluster_monitoring>
+        <enabled>1</enabled>
+        
+        <!-- 副本延迟监控 -->
+        <replica_lag_monitoring>
+            <enabled>1</enabled>
+            <check_interval>60</check_interval>
+            <alert_threshold>300</alert_threshold>
+        </replica_lag_monitoring>
+        
+        <!-- 分片健康检查 -->
+        <shard_health_check>
+            <enabled>1</enabled>
+            <check_interval>30</check_interval>
+            <timeout>10</timeout>
+        </shard_health_check>
+    </cluster_monitoring>
+
+    <!-- 告警配置 -->
+    <alerting>
+        <enabled>1</enabled>
+        
+        <!-- Webhook告警 -->
+        <webhook>
+            <url>http://your-alertmanager:9093/api/v1/alerts</url>
+            <timeout>5</timeout>
+            <retry_count>3</retry_count>
+        </webhook>
+        
+        <!-- 邮件告警 -->
+        <email>
+            <smtp_server>smtp.your-domain.com</smtp_server>
+            <smtp_port>587</smtp_port>
+            <username>your-email@your-domain.com</username>
+            <password>your-password</password>
+            <recipients>
+                <recipient>admin@your-domain.com</recipient>
+                <recipient>ops@your-domain.com</recipient>
+            </recipients>
+        </email>
+    </alerting>
+
+    <!-- 备份和恢复监控 -->
+    <backup_monitoring>
+        <enabled>1</enabled>
+        <backup_directory>/var/lib/clickhouse/backup</backup_directory>
+        <check_interval>3600</check_interval>
+        <retention_days>30</retention_days>
+    </backup_monitoring>
+
+</clickhouse> 

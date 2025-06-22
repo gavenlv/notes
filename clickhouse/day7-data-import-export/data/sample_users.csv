@@ -1,0 +1,11 @@
+user_id,event_date,page_views,session_duration,country,device_type,revenue
+5001,2024-01-10,15,900,China,mobile,59.99
+5002,2024-01-10,22,1320,USA,desktop,129.99
+5003,2024-01-10,8,480,Japan,tablet,39.99
+5004,2024-01-10,31,1860,Germany,mobile,199.99
+5005,2024-01-10,18,1080,UK,desktop,79.99
+5006,2024-01-10,25,1500,France,mobile,149.99
+5007,2024-01-10,12,720,Canada,tablet,69.99
+5008,2024-01-10,29,1740,Australia,desktop,189.99
+5009,2024-01-10,16,960,China,mobile,89.99
+5010,2024-01-10,35,2100,USA,desktop,249.99 

@@ -1,0 +1,504 @@
+<?xml version="1.0"?>
+<!-- ClickHouse Day 11: 安全用户配置 -->
+<clickhouse>
+    <!-- ===================================== -->
+    <!-- 安全配置文件定义 -->
+    <!-- ===================================== -->
+    <profiles>
+        <!-- 默认安全配置 -->
+        <default>
+            <!-- 内存和执行限制 -->
+            <max_memory_usage>5000000000</max_memory_usage> <!-- 5GB -->
+            <max_execution_time>300</max_execution_time> <!-- 5分钟 -->
+            <max_rows_to_read>100000000</max_rows_to_read>
+            <max_bytes_to_read>5000000000</max_bytes_to_read>
+            
+            <!-- 结果集限制 -->
+            <max_result_rows>1000000</max_result_rows>
+            <max_result_bytes>100000000</max_result_bytes>
+            
+            <!-- 网络限制 -->
+            <max_network_bandwidth>50000000</max_network_bandwidth>
+            <max_network_bytes>500000000</max_network_bytes>
+            
+            <!-- 安全设置 -->
+            <readonly>0</readonly>
+            <allow_ddl>0</allow_ddl>
+            <allow_introspection_functions>0</allow_introspection_functions>
+            
+            <!-- 查询优化 -->
+            <use_uncompressed_cache>1</use_uncompressed_cache>
+            <load_balancing>random</load_balancing>
+            <prefer_localhost_replica>0</prefer_localhost_replica>
+        </default>
+        
+        <!-- 只读用户配置 -->
+        <readonly_user>
+            <max_memory_usage>2000000000</max_memory_usage> <!-- 2GB -->
+            <max_execution_time>120</max_execution_time> <!-- 2分钟 -->
+            <max_rows_to_read>50000000</max_rows_to_read>
+            <max_bytes_to_read>2000000000</max_bytes_to_read>
+            
+            <max_result_rows>500000</max_result_rows>
+            <max_result_bytes>50000000</max_result_bytes>
+            
+            <!-- 严格只读 -->
+            <readonly>1</readonly>
+            <allow_ddl>0</allow_ddl>
+            <allow_introspection_functions>0</allow_introspection_functions>
+            
+            <!-- 禁止系统表访问 -->
+            <allow_system_table_functions>0</allow_system_table_functions>
+            
+            <!-- 网络限制 -->
+            <max_network_bandwidth>25000000</max_network_bandwidth>
+            <max_network_bytes>250000000</max_network_bytes>
+        </readonly_user>
+        
+        <!-- 分析师配置 -->
+        <analyst>
+            <max_memory_usage>10000000000</max_memory_usage> <!-- 10GB -->
+            <max_execution_time>1800</max_execution_time> <!-- 30分钟 -->
+            <max_rows_to_read>500000000</max_rows_to_read>
+            <max_bytes_to_read>20000000000</max_bytes_to_read>
+            
+            <max_result_rows>5000000</max_result_rows>
+            <max_result_bytes>500000000</max_result_bytes>
+            
+            <!-- 允许查看数据，但不允许修改结构 -->
+            <readonly>0</readonly>
+            <allow_ddl>0</allow_ddl>
+            <allow_introspection_functions>0</allow_introspection_functions>
+            
+            <!-- 允许创建临时表和视图 -->
+            <allow_create_temporary_table>1</allow_create_temporary_table>
+            
+            <!-- 网络限制 -->
+            <max_network_bandwidth>100000000</max_network_bandwidth>
+            <max_network_bytes>1000000000</max_network_bytes>
+        </analyst>
+        
+        <!-- 数据工程师配置 -->
+        <data_engineer>
+            <max_memory_usage>20000000000</max_memory_usage> <!-- 20GB -->
+            <max_execution_time>3600</max_execution_time> <!-- 1小时 -->
+            <max_rows_to_read>1000000000</max_rows_to_read>
+            <max_bytes_to_read>50000000000</max_bytes_to_read>
+            
+            <max_result_rows>10000000</max_result_rows>
+            <max_result_bytes>1000000000</max_result_bytes>
+            
+            <!-- 允许数据操作但限制系统操作 -->
+            <readonly>0</readonly>
+            <allow_ddl>1</allow_ddl>
+            <allow_introspection_functions>0</allow_introspection_functions>
+            
+            <!-- 允许创建和删除表 -->
+            <allow_drop_detached>1</allow_drop_detached>
+            
+            <!-- 网络限制 -->
+            <max_network_bandwidth>200000000</max_network_bandwidth>
+            <max_network_bytes>2000000000</max_network_bytes>
+        </data_engineer>
+        
+        <!-- 系统管理员配置 -->
+        <system_admin>
+            <max_memory_usage>50000000000</max_memory_usage> <!-- 50GB -->
+            <max_execution_time>7200</max_execution_time> <!-- 2小时 -->
+            <max_rows_to_read>10000000000</max_rows_to_read>
+            <max_bytes_to_read>100000000000</max_bytes_to_read>
+            
+            <max_result_rows>100000000</max_result_rows>
+            <max_result_bytes>10000000000</max_result_bytes>
+            
+            <!-- 完全权限 -->
+            <readonly>0</readonly>
+            <allow_ddl>1</allow_ddl>
+            <allow_introspection_functions>1</allow_introspection_functions>
+            
+            <!-- 系统管理权限 -->
+            <allow_experimental_function_name>1</allow_experimental_function_name>
+            <allow_nondeterministic_mutations>1</allow_nondeterministic_mutations>
+            
+            <!-- 网络限制 -->
+            <max_network_bandwidth>1000000000</max_network_bandwidth>
+            <max_network_bytes>10000000000</max_network_bytes>
+        </system_admin>
+        
+        <!-- API用户配置（低延迟） -->
+        <api_user>
+            <max_memory_usage>1000000000</max_memory_usage> <!-- 1GB -->
+            <max_execution_time>30</max_execution_time> <!-- 30秒 -->
+            <max_rows_to_read>10000000</max_rows_to_read>
+            <max_bytes_to_read>500000000</max_bytes_to_read>
+            
+            <max_result_rows>100000</max_result_rows>
+            <max_result_bytes>10000000</max_result_bytes>
+            
+            <!-- 严格限制 -->
+            <readonly>1</readonly>
+            <allow_ddl>0</allow_ddl>
+            <allow_introspection_functions>0</allow_introspection_functions>
+            
+            <!-- 优化设置 -->
+            <use_uncompressed_cache>1</use_uncompressed_cache>
+            <prefer_localhost_replica>1</prefer_localhost_replica>
+            
+            <!-- 网络优化 -->
+            <max_network_bandwidth>100000000</max_network_bandwidth>
+            <max_network_bytes>100000000</max_network_bytes>
+        </api_user>
+        
+        <!-- 监控用户配置 -->
+        <monitoring_user>
+            <max_memory_usage>500000000</max_memory_usage> <!-- 500MB -->
+            <max_execution_time>10</max_execution_time> <!-- 10秒 -->
+            <max_rows_to_read>1000000</max_rows_to_read>
+            <max_bytes_to_read>100000000</max_bytes_to_read>
+            
+            <max_result_rows>10000</max_result_rows>
+            <max_result_bytes>1000000</max_result_bytes>
+            
+            <!-- 只读系统表 -->
+            <readonly>1</readonly>
+            <allow_ddl>0</allow_ddl>
+            <allow_introspection_functions>0</allow_introspection_functions>
+            
+            <!-- 高优先级 -->
+            <priority>0</priority>
+            
+            <!-- 网络限制 -->
+            <max_network_bandwidth>50000000</max_network_bandwidth>
+            <max_network_bytes>50000000</max_network_bytes>
+        </monitoring_user>
+    </profiles>
+    
+    <!-- ===================================== -->
+    <!-- 配额定义 -->
+    <!-- ===================================== -->
+    <quotas>
+        <!-- 默认配额 -->
+        <default>
+            <interval>
+                <duration>3600</duration> <!-- 1小时 -->
+                <queries>1000</queries>
+                <errors>100</errors>
+                <result_rows>10000000</result_rows>
+                <read_rows>100000000</read_rows>
+                <execution_time>3600</execution_time>
+            </interval>
+            <!-- 每日配额 -->
+            <interval>
+                <duration>86400</duration> <!-- 1天 -->
+                <queries>10000</queries>
+                <errors>1000</errors>
+                <result_rows>100000000</result_rows>
+                <read_rows>1000000000</read_rows>
+                <execution_time>36000</execution_time>
+            </interval>
+        </default>
+        
+        <!-- 受限配额 -->
+        <limited>
+            <interval>
+                <duration>3600</duration>
+                <queries>100</queries>
+                <errors>10</errors>
+                <result_rows>1000000</result_rows>
+                <read_rows>10000000</read_rows>
+                <execution_time>600</execution_time>
+            </interval>
+            <interval>
+                <duration>86400</duration>
+                <queries>1000</queries>
+                <errors>100</errors>
+                <result_rows>10000000</result_rows>
+                <read_rows>100000000</read_rows>
+                <execution_time>7200</execution_time>
+            </interval>
+        </limited>
+        
+        <!-- 分析师配额 -->
+        <analyst_quota>
+            <interval>
+                <duration>3600</duration>
+                <queries>500</queries>
+                <errors>50</errors>
+                <result_rows>50000000</result_rows>
+                <read_rows>500000000</read_rows>
+                <execution_time>7200</execution_time>
+            </interval>
+            <interval>
+                <duration>86400</duration>
+                <queries>5000</queries>
+                <errors>500</errors>
+                <result_rows>500000000</result_rows>
+                <read_rows>5000000000</read_rows>
+                <execution_time>43200</execution_time>
+            </interval>
+        </analyst_quota>
+        
+        <!-- 工程师配额 -->
+        <engineer_quota>
+            <interval>
+                <duration>3600</duration>
+                <queries>200</queries>
+                <errors>20</errors>
+                <result_rows>100000000</result_rows>
+                <read_rows>1000000000</read_rows>
+                <execution_time>14400</execution_time>
+            </interval>
+            <interval>
+                <duration>86400</duration>
+                <queries>2000</queries>
+                <errors>200</errors>
+                <result_rows>1000000000</result_rows>
+                <read_rows>10000000000</read_rows>
+                <execution_time>86400</execution_time>
+            </interval>
+        </engineer_quota>
+        
+        <!-- 管理员配额 -->
+        <admin_quota>
+            <interval>
+                <duration>3600</duration>
+                <queries>10000</queries>
+                <errors>1000</errors>
+                <result_rows>1000000000</result_rows>
+                <read_rows>10000000000</read_rows>
+                <execution_time>28800</execution_time>
+            </interval>
+            <interval>
+                <duration>86400</duration>
+                <queries>100000</queries>
+                <errors>10000</errors>
+                <result_rows>10000000000</result_rows>
+                <read_rows>100000000000</read_rows>
+                <execution_time>172800</execution_time>
+            </interval>
+        </admin_quota>
+        
+        <!-- API配额 -->
+        <api_quota>
+            <interval>
+                <duration>3600</duration>
+                <queries>10000</queries>
+                <errors>100</errors>
+                <result_rows>10000000</result_rows>
+                <read_rows>100000000</read_rows>
+                <execution_time>1800</execution_time>
+            </interval>
+            <interval>
+                <duration>86400</duration>
+                <queries>100000</queries>
+                <errors>1000</errors>
+                <result_rows>100000000</result_rows>
+                <read_rows>1000000000</read_rows>
+                <execution_time>14400</execution_time>
+            </interval>
+        </api_quota>
+        
+        <!-- 监控配额 -->
+        <monitoring_quota>
+            <interval>
+                <duration>3600</duration>
+                <queries>100000</queries>
+                <errors>1000</errors>
+                <result_rows>1000000</result_rows>
+                <read_rows>10000000</read_rows>
+                <execution_time>600</execution_time>
+            </interval>
+            <interval>
+                <duration>86400</duration>
+                <queries>1000000</queries>
+                <errors>10000</errors>
+                <result_rows>10000000</result_rows>
+                <read_rows>100000000</read_rows>
+                <execution_time>3600</execution_time>
+            </interval>
+        </monitoring_quota>
+    </quotas>
+    
+    <!-- ===================================== -->
+    <!-- 用户定义 -->
+    <!-- ===================================== -->
+    <users>
+        <!-- 默认用户（开发测试用） -->
+        <default>
+            <password></password>
+            <networks>
+                <ip>::1</ip>
+                <ip>127.0.0.1</ip>
+            </networks>
+            <profile>default</profile>
+            <quota>default</quota>
+            <databases>
+                <database>default</database>
+            </databases>
+        </default>
+        
+        <!-- 只读用户示例 -->
+        <readonly_demo>
+            <password_sha256_hex>e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855</password_sha256_hex>
+            <networks>
+                <ip>192.168.0.0/16</ip>
+                <ip>10.0.0.0/8</ip>
+            </networks>
+            <profile>readonly_user</profile>
+            <quota>limited</quota>
+            <databases>
+                <database>public</database>
+                <database>reporting</database>
+            </databases>
+        </readonly_demo>
+        
+        <!-- 分析师用户示例 -->
+        <analyst_demo>
+            <password_sha256_hex>5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8</password_sha256_hex>
+            <networks>
+                <ip>192.168.1.0/24</ip>
+                <ip>10.0.1.0/24</ip>
+            </networks>
+            <profile>analyst</profile>
+            <quota>analyst_quota</quota>
+            <databases>
+                <database>analytics</database>
+                <database>reporting</database>
+                <database>public</database>
+            </databases>
+        </analyst_demo>
+        
+        <!-- 数据工程师用户示例 -->
+        <engineer_demo>
+            <password_sha256_hex>ef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f</password_sha256_hex>
+            <networks>
+                <ip>10.0.2.0/24</ip>
+                <ip>172.16.0.0/16</ip>
+            </networks>
+            <profile>data_engineer</profile>
+            <quota>engineer_quota</quota>
+            <databases>
+                <database>staging</database>
+                <database>analytics</database>
+                <database>etl</database>
+            </databases>
+            <access_management>0</access_management>
+        </engineer_demo>
+        
+        <!-- 系统管理员用户示例 -->
+        <admin_demo>
+            <password_sha256_hex>5994471abb01112afcc18159f6cc74b4f511b99806da59b3caf5a9c173cacfc5</password_sha256_hex>
+            <networks>
+                <ip>10.0.0.0/8</ip>
+                <ip>172.16.0.0/12</ip>
+                <ip>192.168.0.0/16</ip>
+            </networks>
+            <profile>system_admin</profile>
+            <quota>admin_quota</quota>
+            <databases>
+                <database>system</database>
+            </databases>
+            <access_management>1</access_management>
+        </admin_demo>
+        
+        <!-- API用户示例 -->
+        <api_demo>
+            <password_sha256_hex>9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08</password_sha256_hex>
+            <networks>
+                <ip>10.0.3.0/24</ip>
+                <ip>192.168.100.0/24</ip>
+            </networks>
+            <profile>api_user</profile>
+            <quota>api_quota</quota>
+            <databases>
+                <database>api_data</database>
+                <database>public</database>
+            </databases>
+        </api_demo>
+        
+        <!-- 监控用户示例 -->
+        <monitoring_demo>
+            <password_sha256_hex>2c26b46b68ffc68ff99b453c1d30413413422d706483bfa0f98a5e886266e7ae</password_sha256_hex>
+            <networks>
+                <ip>127.0.0.1</ip>
+                <ip>10.0.4.0/24</ip>
+            </networks>
+            <profile>monitoring_user</profile>
+            <quota>monitoring_quota</quota>
+            <databases>
+                <database>system</database>
+            </databases>
+        </monitoring_demo>
+        
+        <!-- LDAP用户示例 -->
+        <ldap_demo>
+            <ldap>
+                <server>company_ldap</server>
+            </ldap>
+            <networks>
+                <ip>10.0.0.0/8</ip>
+                <ip>172.16.0.0/12</ip>
+            </networks>
+            <profile>default</profile>
+            <quota>default</quota>
+        </ldap_demo>
+        
+        <!-- Kerberos用户示例 -->
+        <kerberos_demo>
+            <kerberos>
+                <realm>COMPANY.COM</realm>
+            </kerberos>
+            <networks>
+                <ip>10.0.0.0/8</ip>
+            </networks>
+            <profile>default</profile>
+            <quota>default</quota>
+        </kerberos_demo>
+        
+        <!-- 应用程序用户（证书认证） -->
+        <app_user>
+            <ssl_certificates>
+                <common_name>app.company.com</common_name>
+            </ssl_certificates>
+            <networks>
+                <ip>10.0.5.0/24</ip>
+            </networks>
+            <profile>api_user</profile>
+            <quota>api_quota</quota>
+            <databases>
+                <database>app_data</database>
+            </databases>
+        </app_user>
+    </users>
+    
+    <!-- ===================================== -->
+    <!-- 网络访问控制 -->
+    <!-- ===================================== -->
+    <networks>
+        <!-- 内网地址 -->
+        <internal_networks>
+            <ip>10.0.0.0/8</ip>
+            <ip>172.16.0.0/12</ip>
+            <ip>192.168.0.0/16</ip>
+        </internal_networks>
+        
+        <!-- 管理网络 -->
+        <admin_networks>
+            <ip>10.0.0.0/24</ip>
+            <ip>192.168.1.0/24</ip>
+        </admin_networks>
+        
+        <!-- API网络 -->
+        <api_networks>
+            <ip>10.0.3.0/24</ip>
+            <ip>192.168.100.0/24</ip>
+        </api_networks>
+        
+        <!-- 监控网络 -->
+        <monitoring_networks>
+            <ip>127.0.0.1</ip>
+            <ip>10.0.4.0/24</ip>
+        </monitoring_networks>
+    </networks>
+    
+</clickhouse> 

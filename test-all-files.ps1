@@ -1,47 +1,81 @@
-# ClickHouse Learning Tutorial - File Integrity Check
+# 技术学习教程 - 文件完整性检查
 Write-Host "============================================================" -ForegroundColor Cyan
-Write-Host "  ClickHouse Learning Tutorial - File Integrity Check" -ForegroundColor Yellow
+Write-Host "  技术学习教程 - 文件完整性检查" -ForegroundColor Yellow
 Write-Host "============================================================" -ForegroundColor Cyan
 Write-Host ""
 
 # Define required files list
 $requiredFiles = @(
-    # Day 1: Environment Setup
-    "day1/notes/installation.md",
-    "day1/code/docker-install.sh",
-    "day1/code/install-native.sh", 
-    "day1/code/benchmark.sh",
-    "day1/code/check-config.sh",
-    "day1/configs/config.xml",
-    "day1/configs/users.xml",
-    "day1/examples/quick-start.sql",
+    # ClickHouse Day 1: Environment Setup
+    "clickhouse/day1/notes/installation.md",
+    "clickhouse/day1/code/docker-install.sh",
+    "clickhouse/day1/code/install-native.sh", 
+    "clickhouse/day1/code/benchmark.sh",
+    "clickhouse/day1/code/check-config.sh",
+    "clickhouse/day1/configs/config.xml",
+    "clickhouse/day1/configs/users.xml",
+    "clickhouse/day1/examples/quick-start.sql",
     
-    # Day 2: Core Concepts
-    "day2/notes/introduction.md",
-    "day2/examples/basic-queries.sql",
-    "day2/cheatsheets/clickhouse-commands.md",
+    # ClickHouse Day 2: Core Concepts
+    "clickhouse/day2/notes/introduction.md",
+    "clickhouse/day2/examples/basic-queries.sql",
+    "clickhouse/day2/cheatsheets/clickhouse-commands.md",
     
-    # Day 3: Cloud Deployment
-    "day3/notes/aliyun-deployment.md",
-    "day3/terraform/main.tf",
-    "day3/terraform/variables.tf", 
-    "day3/terraform/outputs.tf",
-    "day3/terraform/user_data.sh",
-    "day3/terraform/zookeeper_user_data.sh",
-    "day3/terraform/setup_aliyun.ps1",
-    "day3/terraform/generate-ssh-key.ps1",
+    # ClickHouse Day 3: Cloud Deployment
+    "clickhouse/day3/notes/aliyun-deployment.md",
+    "clickhouse/day3/terraform/main.tf",
+    "clickhouse/day3/terraform/variables.tf", 
+    "clickhouse/day3/terraform/outputs.tf",
+    "clickhouse/day3/terraform/user_data.sh",
+    "clickhouse/day3/terraform/zookeeper_user_data.sh",
+    "clickhouse/day3/terraform/setup_aliyun.ps1",
+    "clickhouse/day3/terraform/generate-ssh-key.ps1",
     
-    # Day 4: SQL Syntax and Data Types
-    "day4/notes/sql-syntax.md",
-    "day4/examples/data-types-demo.sql",
+    # ClickHouse Day 4: SQL Syntax and Data Types
+    "clickhouse/day4/notes/sql-syntax.md",
+    "clickhouse/day4/examples/data-types-demo.sql",
     
-    # Day 5: Table Engines
-    "day5/notes/table-engines.md",
-    "day5/examples/table-engines-demo.sql",
+    # ClickHouse Day 5: Table Engines
+    "clickhouse/day5/notes/table-engines.md",
+    "clickhouse/day5/examples/table-engines-demo.sql",
     
-    # Day 6: Query Optimization and Indexes
-    "day6/notes/query-optimization.md",
-    "day6/examples/optimization-demo.sql",
+    # ClickHouse Day 6: Query Optimization and Indexes
+    "clickhouse/day6/notes/query-optimization.md",
+    "clickhouse/day6/examples/optimization-demo.sql",
+    
+    # ClickHouse Day 7: Data Import/Export
+    "clickhouse/day7/notes/data-import-export.md",
+    "clickhouse/day7/examples/import-export-demo.sql",
+    "clickhouse/day7/data/sample_users.csv",
+    "clickhouse/day7/data/events.json",
+    "clickhouse/day7/code/import-export-tools.ps1",
+    
+    # ClickHouse Day 8: Cluster Management and Distributed
+    "clickhouse/day8/notes/cluster-management.md",
+    "clickhouse/day8/examples/cluster-demo.sql",
+    "clickhouse/day8/configs/cluster-config.xml",
+    "clickhouse/day8/configs/docker-compose.yml",
+    "clickhouse/day8/scripts/test-cluster.ps1",
+    
+    # ClickHouse Day 9: Monitoring and Operations
+    "clickhouse/day9/notes/monitoring-operations.md",
+    "clickhouse/day9/examples/monitoring-demo.sql",
+    "clickhouse/day9/configs/monitoring-config.xml",
+    "clickhouse/day9/configs/prometheus.yml",
+    "clickhouse/day9/scripts/monitoring-check.ps1",
+    
+    # ClickHouse Day 11: Security and Access Control
+    "clickhouse/day11/notes/security-access-control.md",
+    "clickhouse/day11/examples/security-demo.sql",
+    "clickhouse/day11/configs/security-config.xml",
+    "clickhouse/day11/scripts/security-setup.ps1",
+    
+    # Technology directories (planned)
+    "technologies/docker/.gitkeep",
+    "technologies/k8s/.gitkeep", 
+    "technologies/doris/.gitkeep",
+    "technologies/flink/.gitkeep",
+    "technologies/airflow/.gitkeep",
     
     # Project root files
     "README.md",
@@ -94,82 +128,153 @@ if ($completionPercentage -eq 100) {
 Write-Host ""
 
 # Display learning path status
-Write-Host "Learning Path Status" -ForegroundColor Yellow
+Write-Host "ClickHouse Learning Path Status" -ForegroundColor Yellow
 Write-Host "============================================================" -ForegroundColor Cyan
 
-# Day 1 status check
+# ClickHouse Day 1 status check
 $day1Files = @(
-    "day1/notes/installation.md",
-    "day1/code/docker-install.sh", 
-    "day1/code/install-native.sh",
-    "day1/examples/quick-start.sql"
+    "clickhouse/day1/notes/installation.md",
+    "clickhouse/day1/code/docker-install.sh", 
+    "clickhouse/day1/code/install-native.sh",
+    "clickhouse/day1/examples/quick-start.sql"
 )
 $day1Complete = ($day1Files | ForEach-Object { Test-Path $_ }) -notcontains $false
 if($day1Complete) {
-    Write-Host "Day 1 - Environment Setup:     COMPLETE" -ForegroundColor Green
+    Write-Host "Day 1 - Environment Setup:        COMPLETE" -ForegroundColor Green
 } else {
-    Write-Host "Day 1 - Environment Setup:     PENDING" -ForegroundColor Red
+    Write-Host "Day 1 - Environment Setup:        PENDING" -ForegroundColor Red
 }
 
-# Day 2 status check  
+# ClickHouse Day 2 status check  
 $day2Files = @(
-    "day2/notes/introduction.md",
-    "day2/examples/basic-queries.sql"
+    "clickhouse/day2/notes/introduction.md",
+    "clickhouse/day2/examples/basic-queries.sql"
 )
 $day2Complete = ($day2Files | ForEach-Object { Test-Path $_ }) -notcontains $false
 if($day2Complete) {
-    Write-Host "Day 2 - Core Concepts:         COMPLETE" -ForegroundColor Green
+    Write-Host "Day 2 - Core Concepts:            COMPLETE" -ForegroundColor Green
 } else {
-    Write-Host "Day 2 - Core Concepts:         PENDING" -ForegroundColor Red
+    Write-Host "Day 2 - Core Concepts:            PENDING" -ForegroundColor Red
 }
 
-# Day 3 status check
+# ClickHouse Day 3 status check
 $day3Files = @(
-    "day3/notes/aliyun-deployment.md",
-    "day3/terraform/main.tf",
-    "day3/terraform/setup_aliyun.ps1"
+    "clickhouse/day3/notes/aliyun-deployment.md",
+    "clickhouse/day3/terraform/main.tf",
+    "clickhouse/day3/terraform/setup_aliyun.ps1"
 )
 $day3Complete = ($day3Files | ForEach-Object { Test-Path $_ }) -notcontains $false  
 if($day3Complete) {
-    Write-Host "Day 3 - Cloud Deployment:      COMPLETE" -ForegroundColor Green  
+    Write-Host "Day 3 - Cloud Deployment:         COMPLETE" -ForegroundColor Green  
 } else {
-    Write-Host "Day 3 - Cloud Deployment:      PENDING" -ForegroundColor Red
+    Write-Host "Day 3 - Cloud Deployment:         PENDING" -ForegroundColor Red
 }
 
-# Day 4 status check
+# ClickHouse Day 4 status check
 $day4Files = @(
-    "day4/notes/sql-syntax.md",
-    "day4/examples/data-types-demo.sql"
+    "clickhouse/day4/notes/sql-syntax.md",
+    "clickhouse/day4/examples/data-types-demo.sql"
 )
 $day4Complete = ($day4Files | ForEach-Object { Test-Path $_ }) -notcontains $false  
 if($day4Complete) {
-    Write-Host "Day 4 - SQL Syntax & Data Types: COMPLETE" -ForegroundColor Green  
+    Write-Host "Day 4 - SQL Syntax & Data Types:  COMPLETE" -ForegroundColor Green  
 } else {
-    Write-Host "Day 4 - SQL Syntax & Data Types: PENDING" -ForegroundColor Red
+    Write-Host "Day 4 - SQL Syntax & Data Types:  PENDING" -ForegroundColor Red
 }
 
-# Day 5 status check
+# ClickHouse Day 5 status check
 $day5Files = @(
-    "day5/notes/table-engines.md",
-    "day5/examples/table-engines-demo.sql"
+    "clickhouse/day5/notes/table-engines.md",
+    "clickhouse/day5/examples/table-engines-demo.sql"
 )
 $day5Complete = ($day5Files | ForEach-Object { Test-Path $_ }) -notcontains $false  
 if($day5Complete) {
-    Write-Host "Day 5 - Table Engines:           COMPLETE" -ForegroundColor Green  
+    Write-Host "Day 5 - Table Engines:            COMPLETE" -ForegroundColor Green  
 } else {
-    Write-Host "Day 5 - Table Engines:           PENDING" -ForegroundColor Red
+    Write-Host "Day 5 - Table Engines:            PENDING" -ForegroundColor Red
 }
 
-# Day 6 status check
+# ClickHouse Day 6 status check
 $day6Files = @(
-    "day6/notes/query-optimization.md",
-    "day6/examples/optimization-demo.sql"
+    "clickhouse/day6/notes/query-optimization.md",
+    "clickhouse/day6/examples/optimization-demo.sql"
 )
 $day6Complete = ($day6Files | ForEach-Object { Test-Path $_ }) -notcontains $false  
 if($day6Complete) {
-    Write-Host "Day 6 - Query Optimization:      COMPLETE" -ForegroundColor Green  
+    Write-Host "Day 6 - Query Optimization:       COMPLETE" -ForegroundColor Green  
 } else {
-    Write-Host "Day 6 - Query Optimization:      PENDING" -ForegroundColor Red
+    Write-Host "Day 6 - Query Optimization:       PENDING" -ForegroundColor Red
+}
+
+# ClickHouse Day 7 status check
+$day7Files = @(
+    "clickhouse/day7/notes/data-import-export.md",
+    "clickhouse/day7/examples/import-export-demo.sql",
+    "clickhouse/day7/data/sample_users.csv",
+    "clickhouse/day7/code/import-export-tools.ps1"
+)
+$day7Complete = ($day7Files | ForEach-Object { Test-Path $_ }) -notcontains $false  
+if($day7Complete) {
+    Write-Host "Day 7 - Data Import/Export:       COMPLETE" -ForegroundColor Green  
+} else {
+    Write-Host "Day 7 - Data Import/Export:       PENDING" -ForegroundColor Red
+}
+
+# ClickHouse Day 8 status check
+$day8Files = @(
+    "clickhouse/day8/notes/cluster-management.md",
+    "clickhouse/day8/examples/cluster-demo.sql",
+    "clickhouse/day8/configs/cluster-config.xml",
+    "clickhouse/day8/scripts/test-cluster.ps1"
+)
+$day8Complete = ($day8Files | ForEach-Object { Test-Path $_ }) -notcontains $false  
+if($day8Complete) {
+    Write-Host "Day 8 - Cluster Management:       COMPLETE" -ForegroundColor Green  
+} else {
+    Write-Host "Day 8 - Cluster Management:       PENDING" -ForegroundColor Red
+}
+
+# ClickHouse Day 9 status check
+$day9Files = @(
+    "clickhouse/day9/notes/monitoring-operations.md",
+    "clickhouse/day9/examples/monitoring-demo.sql",
+    "clickhouse/day9/configs/monitoring-config.xml",
+    "clickhouse/day9/scripts/monitoring-check.ps1"
+)
+$day9Complete = ($day9Files | ForEach-Object { Test-Path $_ }) -notcontains $false  
+if($day9Complete) {
+    Write-Host "Day 9 - Monitoring & Operations:  COMPLETE" -ForegroundColor Green  
+} else {
+    Write-Host "Day 9 - Monitoring & Operations:  PENDING" -ForegroundColor Red
+}
+
+# ClickHouse Day 11 status check
+$day11Files = @(
+    "clickhouse/day11/notes/security-access-control.md",
+    "clickhouse/day11/examples/security-demo.sql",
+    "clickhouse/day11/configs/security-config.xml",
+    "clickhouse/day11/scripts/security-setup.ps1"
+)
+$day11Complete = ($day11Files | ForEach-Object { Test-Path $_ }) -notcontains $false  
+if($day11Complete) {
+    Write-Host "Day 11 - Security & Access Control: COMPLETE" -ForegroundColor Green  
+} else {
+    Write-Host "Day 11 - Security & Access Control: PENDING" -ForegroundColor Red
+}
+
+Write-Host ""
+
+# Technology Stack Status
+Write-Host "Technology Stack Status" -ForegroundColor Yellow
+Write-Host "============================================================" -ForegroundColor Cyan
+
+$techDirs = @("docker", "k8s", "doris", "flink", "airflow")
+foreach ($tech in $techDirs) {
+    if (Test-Path "technologies/$tech") {
+        Write-Host "$tech - Directory Created:       READY" -ForegroundColor Cyan
+    } else {
+        Write-Host "$tech - Directory Created:       MISSING" -ForegroundColor Red
+    }
 }
 
 Write-Host ""
@@ -178,17 +283,19 @@ Write-Host ""
 Write-Host "Next Steps Recommendation" -ForegroundColor Yellow
 Write-Host "============================================================" -ForegroundColor Cyan
 
-if ($completionPercentage -eq 100) {
-    Write-Host "1. Start Day 1 learning: Read day1/notes/installation.md" -ForegroundColor Green
-    Write-Host "2. Run environment setup: Execute day1/code/docker-install.sh" -ForegroundColor Green  
-    Write-Host "3. Verify installation: Run day1/examples/quick-start.sql" -ForegroundColor Green
-    Write-Host "4. Learn core concepts: Read day2/notes/introduction.md" -ForegroundColor Green
-    Write-Host "5. Deploy cloud cluster: Execute day3/terraform/setup_aliyun.ps1" -ForegroundColor Green
+if ($day11Complete) {
+    Write-Host "1. Continue with Day 12: Data Backup & Recovery" -ForegroundColor Green
+    Write-Host "2. Practice Day 11 security configurations" -ForegroundColor Green
+} elseif ($day9Complete) {
+    Write-Host "1. Start Day 11 learning: Security and Access Control" -ForegroundColor Green
+    Write-Host "2. Review monitoring configurations from Day 9" -ForegroundColor Green
 } else {
-    Write-Host "Please ensure all required files are properly generated first" -ForegroundColor Yellow
+    Write-Host "1. Start ClickHouse learning: Read clickhouse/day1/notes/installation.md" -ForegroundColor Green
+    Write-Host "2. Setup environment: Execute clickhouse/day1/code/docker-install.sh" -ForegroundColor Green  
+    Write-Host "3. Verify installation: Run clickhouse/day1/examples/quick-start.sql" -ForegroundColor Green
 }
 
 Write-Host ""
 Write-Host "============================================================" -ForegroundColor Cyan
-Write-Host "Check completed! Start your ClickHouse learning journey!" -ForegroundColor Green
+Write-Host "Check completed! Continue your learning journey!" -ForegroundColor Green
 Write-Host "============================================================" -ForegroundColor Cyan 

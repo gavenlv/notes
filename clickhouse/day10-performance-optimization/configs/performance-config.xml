@@ -1,0 +1,311 @@
+<?xml version="1.0"?>
+<!-- ClickHouse Day 10: 性能优化配置 -->
+<clickhouse>
+    <!-- ===================================== -->
+    <!-- CPU 和线程配置 -->
+    <!-- ===================================== -->
+    
+    <!-- 最大线程数，通常设置为CPU核心数 -->
+    <max_threads>16</max_threads>
+    
+    <!-- 最大并发查询数 -->
+    <max_concurrent_queries>100</max_concurrent_queries>
+    
+    <!-- 后台任务线程池大小 -->
+    <background_pool_size>16</background_pool_size>
+    <background_move_pool_size>8</background_move_pool_size>
+    <background_schedule_pool_size>16</background_schedule_pool_size>
+    <background_fetches_pool_size>8</background_fetches_pool_size>
+    <background_common_pool_size>8</background_common_pool_size>
+    
+    <!-- ===================================== -->
+    <!-- 内存配置 -->
+    <!-- ===================================== -->
+    
+    <!-- 单个查询最大内存使用 (10GB) -->
+    <max_memory_usage>10000000000</max_memory_usage>
+    
+    <!-- 单个用户最大内存使用 (5GB) -->
+    <max_memory_usage_for_user>5000000000</max_memory_usage_for_user>
+    
+    <!-- 所有查询总内存限制 (20GB) -->
+    <max_memory_usage_for_all_queries>20000000000</max_memory_usage_for_all_queries>
+    
+    <!-- 缓存配置 -->
+    <!-- Mark缓存 - 存储数据标记信息 (5GB) -->
+    <mark_cache_size>5368709120</mark_cache_size>
+    
+    <!-- 未压缩缓存 - 存储解压后的数据块 (8GB) -->
+    <uncompressed_cache_size>8589934592</uncompressed_cache_size>
+    
+    <!-- 内存映射文件缓存 (1GB) -->
+    <mmap_cache_size>1000000000</mmap_cache_size>
+    
+    <!-- 编译表达式缓存 -->
+    <compiled_expression_cache_size>134217728</compiled_expression_cache_size>
+    
+    <!-- ===================================== -->
+    <!-- 查询优化配置 -->
+    <!-- ===================================== -->
+    
+    <!-- 查询复杂度限制 -->
+    <max_rows_to_read>1000000000</max_rows_to_read>
+    <max_bytes_to_read>10000000000</max_bytes_to_read>
+    <max_execution_time>300</max_execution_time>
+    
+    <!-- 结果集大小限制 -->
+    <max_result_rows>1000000</max_result_rows>
+    <max_result_bytes>1000000000</max_result_bytes>
+    
+    <!-- GROUP BY 优化 -->
+    <max_bytes_before_external_group_by>20000000000</max_bytes_before_external_group_by>
+    <max_bytes_before_external_sort>20000000000</max_bytes_before_external_sort>
+    
+    <!-- JOIN 优化 -->
+    <join_algorithm>hash</join_algorithm>
+    <max_bytes_in_join>10000000000</max_bytes_in_join>
+    <join_use_nulls>0</join_use_nulls>
+    
+    <!-- ===================================== -->
+    <!-- 网络和连接配置 -->
+    <!-- ===================================== -->
+    
+    <!-- HTTP 连接配置 -->
+    <http_port>8123</http_port>
+    <tcp_port>9000</tcp_port>
+    <max_connections>2048</max_connections>
+    <keep_alive_timeout>3</keep_alive_timeout>
+    
+    <!-- 网络超时设置 -->
+    <tcp_keep_alive_timeout>300</tcp_keep_alive_timeout>
+    <receive_timeout>300</receive_timeout>
+    <send_timeout>300</send_timeout>
+    
+    <!-- ===================================== -->
+    <!-- 存储配置 -->
+    <!-- ===================================== -->
+    
+    <!-- 合并配置 -->
+    <merge_tree>
+        <!-- 最大合并线程数 -->
+        <max_suspicious_broken_parts>5</max_suspicious_broken_parts>
+        
+        <!-- 数据部分合并设置 -->
+        <parts_to_delay_insert>150</parts_to_delay_insert>
+        <parts_to_throw_insert>300</parts_to_throw_insert>
+        <max_delay_to_insert>1</max_delay_to_insert>
+        
+        <!-- 合并时的最大内存使用 -->
+        <max_bytes_to_merge_at_max_space_in_pool>161061273600</max_bytes_to_merge_at_max_space_in_pool>
+        
+        <!-- 合并选择算法 -->
+        <merge_selecting_sleep_ms>5000</merge_selecting_sleep_ms>
+        <merge_max_block_size>8192</merge_max_block_size>
+        
+        <!-- 索引粒度 -->
+        <index_granularity>8192</index_granularity>
+        <index_granularity_bytes>10485760</index_granularity_bytes>
+        
+        <!-- 压缩设置 -->
+        <min_compress_block_size>65536</min_compress_block_size>
+        <max_compress_block_size>1048576</max_compress_block_size>
+        
+        <!-- 写入优化 -->
+        <min_insert_block_size_rows>1048576</min_insert_block_size_rows>
+        <min_insert_block_size_bytes>268435456</min_insert_block_size_bytes>
+    </merge_tree>
+    
+    <!-- ===================================== -->
+    <!-- 多磁盘存储策略 -->
+    <!-- ===================================== -->
+    
+    <storage_configuration>
+        <disks>
+            <!-- SSD 磁盘配置 -->
+            <ssd>
+                <path>/var/lib/clickhouse/ssd/</path>
+                <keep_free_space_bytes>10737418240</keep_free_space_bytes>
+            </ssd>
+            
+            <!-- HDD 磁盘配置 -->
+            <hdd>
+                <path>/var/lib/clickhouse/hdd/</path>
+                <keep_free_space_bytes>21474836480</keep_free_space_bytes>
+            </hdd>
+            
+            <!-- 备份磁盘 -->
+            <backup>
+                <path>/var/lib/clickhouse/backup/</path>
+                <keep_free_space_bytes>10737418240</keep_free_space_bytes>
+            </backup>
+        </disks>
+        
+        <policies>
+            <!-- 热冷数据分层存储策略 -->
+            <hot_cold>
+                <volumes>
+                    <hot>
+                        <disk>ssd</disk>
+                        <!-- 小于1GB的数据存储在SSD -->
+                        <max_data_part_size_bytes>1073741824</max_data_part_size_bytes>
+                        <prefer_not_to_merge>false</prefer_not_to_merge>
+                    </hot>
+                    <cold>
+                        <disk>hdd</disk>
+                        <prefer_not_to_merge>false</prefer_not_to_merge>
+                    </cold>
+                </volumes>
+                <!-- 当SSD使用率达到80%时，开始移动数据到HDD -->
+                <move_factor>0.2</move_factor>
+                <!-- 数据从hot层移动到cold层的条件 -->
+                <prefer_not_to_merge>false</prefer_not_to_merge>
+            </hot_cold>
+            
+            <!-- 高性能策略 - 全SSD -->
+            <high_performance>
+                <volumes>
+                    <main>
+                        <disk>ssd</disk>
+                    </main>
+                </volumes>
+            </high_performance>
+            
+            <!-- 归档策略 - 全HDD -->
+            <archive>
+                <volumes>
+                    <main>
+                        <disk>hdd</disk>
+                    </main>
+                </volumes>
+            </archive>
+        </policies>
+    </storage_configuration>
+    
+    <!-- ===================================== -->
+    <!-- 日志配置 -->
+    <!-- ===================================== -->
+    
+    <logger>
+        <level>information</level>
+        <log>/var/log/clickhouse-server/clickhouse-server.log</log>
+        <errorlog>/var/log/clickhouse-server/clickhouse-server.err.log</errorlog>
+        <size>1000M</size>
+        <count>10</count>
+        
+        <!-- 查询日志配置 -->
+        <console>1</console>
+        <log_queries>1</log_queries>
+        <log_query_threads>1</log_query_threads>
+        <log_processors_profiles>true</log_processors_profiles>
+    </logger>
+    
+    <!-- ===================================== -->
+    <!-- 系统表配置 -->
+    <!-- ===================================== -->
+    
+    <!-- query_log 表配置 -->
+    <query_log>
+        <database>system</database>
+        <table>query_log</table>
+        <partition_by>toYYYYMM(event_date)</partition_by>
+        <ttl>event_date + INTERVAL 30 DAY</ttl>
+        <flush_interval_milliseconds>7500</flush_interval_milliseconds>
+    </query_log>
+    
+    <!-- part_log 表配置 -->
+    <part_log>
+        <database>system</database>
+        <table>part_log</table>
+        <partition_by>toYYYYMM(event_date)</partition_by>
+        <ttl>event_date + INTERVAL 30 DAY</ttl>
+        <flush_interval_milliseconds>7500</flush_interval_milliseconds>
+    </part_log>
+    
+    <!-- trace_log 表配置 -->
+    <trace_log>
+        <database>system</database>
+        <table>trace_log</table>
+        <partition_by>toYYYYMM(event_date)</partition_by>
+        <ttl>event_date + INTERVAL 7 DAY</ttl>
+        <flush_interval_milliseconds>7500</flush_interval_milliseconds>
+    </trace_log>
+    
+    <!-- ===================================== -->
+    <!-- 性能监控配置 -->
+    <!-- ===================================== -->
+    
+    <!-- 启用性能计数器 -->
+    <asynchronous_metrics_log>
+        <database>system</database>
+        <table>asynchronous_metrics_log</table>
+        <flush_interval_milliseconds>60000</flush_interval_milliseconds>
+    </asynchronous_metrics_log>
+    
+    <!-- 启用指标导出 -->
+    <prometheus>
+        <endpoint>/metrics</endpoint>
+        <port>9363</port>
+        <metrics>true</metrics>
+        <events>true</events>
+        <asynchronous_metrics>true</asynchronous_metrics>
+    </prometheus>
+    
+    <!-- ===================================== -->
+    <!-- 压缩配置 -->
+    <!-- ===================================== -->
+    
+    <!-- 默认压缩设置 -->
+    <compression>
+        <case>
+            <method>zstd</method>
+            <level>3</level>
+        </case>
+        
+        <!-- 对于大的字符串列使用更高压缩比 -->
+        <case>
+            <min_part_size>10000000</min_part_size>
+            <min_part_size_ratio>0.01</min_part_size_ratio>
+            <method>zstd</method>
+            <level>6</level>
+        </case>
+    </compression>
+    
+    <!-- ===================================== -->
+    <!-- 其他性能相关配置 -->
+    <!-- ===================================== -->
+    
+    <!-- 分布式查询配置 -->
+    <distributed_ddl>
+        <path>/clickhouse/task_queue/ddl</path>
+        <profile>default</profile>
+        <pool_size>1</pool_size>
+        <max_tasks_in_queue>1000</max_tasks_in_queue>
+        <task_timeout_ms>180000</task_timeout_ms>
+        <cleanup_delay_period>60</cleanup_delay_period>
+        <max_cleanup_delay_period>300</max_cleanup_delay_period>
+    </distributed_ddl>
+    
+    <!-- 字典配置 -->
+    <dictionaries_config>*_dictionary.xml</dictionaries_config>
+    <dictionaries_lazy_load>true</dictionaries_lazy_load>
+    
+    <!-- 用户文件配置 -->
+    <user_files_path>/var/lib/clickhouse/user_files/</user_files_path>
+    
+    <!-- 临时数据路径 -->
+    <tmp_path>/var/lib/clickhouse/tmp/</tmp_path>
+    
+    <!-- 格式化模式 -->
+    <format_schema_path>/var/lib/clickhouse/format_schemas/</format_schema_path>
+    
+    <!-- ===================================== -->
+    <!-- 配置重载和监控 -->
+    <!-- ===================================== -->
+    
+    <!-- 配置文件重新加载间隔（秒） -->
+    <builtin_dictionaries_reload_interval>3600</builtin_dictionaries_reload_interval>
+    
+    <!-- 最大字典重新加载线程数 -->
+    <max_dictionary_num_to_warn>1000</max_dictionary_num_to_warn>
+    
+</clickhouse> 

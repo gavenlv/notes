@@ -1,0 +1,243 @@
+version: '3.8'
+
+# ClickHouse 集群演示环境
+# 包含 1个ZooKeeper + 4个ClickHouse节点 (2分片,每分片2副本)
+
+services:
+  # ZooKeeper 服务
+  zookeeper:
+    image: zookeeper:3.7
+    container_name: clickhouse-zookeeper
+    hostname: zookeeper
+    ports:
+      - "2181:2181"
+    environment:
+      ZOO_MY_ID: 1
+      ZOO_SERVERS: server.1=0.0.0.0:2888:3888;2181
+      ZOO_4LW_COMMANDS_WHITELIST: mntr,conf,ruok
+    volumes:
+      - zk_data:/data
+      - zk_datalog:/datalog
+    networks:
+      - clickhouse-network
+    restart: unless-stopped
+
+  # ClickHouse 节点 1 (分片1, 副本1)
+  clickhouse-01:
+    image: clickhouse/clickhouse-server:latest
+    container_name: clickhouse-01
+    hostname: clickhouse-01
+    ports:
+      - "8123:8123"   # HTTP端口
+      - "9000:9000"   # TCP端口
+      - "9009:9009"   # 集群间通信端口
+    volumes:
+      - ./configs/clickhouse-01:/etc/clickhouse-server/config.d/
+      - ch01_data:/var/lib/clickhouse
+      - ch01_logs:/var/log/clickhouse-server
+    environment:
+      - CLICKHOUSE_DB=default
+      - CLICKHOUSE_USER=default
+      - CLICKHOUSE_PASSWORD=
+    depends_on:
+      - zookeeper
+    networks:
+      - clickhouse-network
+    restart: unless-stopped
+    ulimits:
+      nofile:
+        soft: 262144
+        hard: 262144
+
+  # ClickHouse 节点 2 (分片1, 副本2)
+  clickhouse-02:
+    image: clickhouse/clickhouse-server:latest
+    container_name: clickhouse-02
+    hostname: clickhouse-02
+    ports:
+      - "8124:8123"   # HTTP端口
+      - "9001:9000"   # TCP端口
+      - "9010:9009"   # 集群间通信端口
+    volumes:
+      - ./configs/clickhouse-02:/etc/clickhouse-server/config.d/
+      - ch02_data:/var/lib/clickhouse
+      - ch02_logs:/var/log/clickhouse-server
+    environment:
+      - CLICKHOUSE_DB=default
+      - CLICKHOUSE_USER=default
+      - CLICKHOUSE_PASSWORD=
+    depends_on:
+      - zookeeper
+    networks:
+      - clickhouse-network
+    restart: unless-stopped
+    ulimits:
+      nofile:
+        soft: 262144
+        hard: 262144
+
+  # ClickHouse 节点 3 (分片2, 副本1)
+  clickhouse-03:
+    image: clickhouse/clickhouse-server:latest
+    container_name: clickhouse-03
+    hostname: clickhouse-03
+    ports:
+      - "8125:8123"   # HTTP端口
+      - "9002:9000"   # TCP端口
+      - "9011:9009"   # 集群间通信端口
+    volumes:
+      - ./configs/clickhouse-03:/etc/clickhouse-server/config.d/
+      - ch03_data:/var/lib/clickhouse
+      - ch03_logs:/var/log/clickhouse-server
+    environment:
+      - CLICKHOUSE_DB=default
+      - CLICKHOUSE_USER=default
+      - CLICKHOUSE_PASSWORD=
+    depends_on:
+      - zookeeper
+    networks:
+      - clickhouse-network
+    restart: unless-stopped
+    ulimits:
+      nofile:
+        soft: 262144
+        hard: 262144
+
+  # ClickHouse 节点 4 (分片2, 副本2)
+  clickhouse-04:
+    image: clickhouse/clickhouse-server:latest
+    container_name: clickhouse-04
+    hostname: clickhouse-04
+    ports:
+      - "8126:8123"   # HTTP端口
+      - "9003:9000"   # TCP端口
+      - "9012:9009"   # 集群间通信端口
+    volumes:
+      - ./configs/clickhouse-04:/etc/clickhouse-server/config.d/
+      - ch04_data:/var/lib/clickhouse
+      - ch04_logs:/var/log/clickhouse-server
+    environment:
+      - CLICKHOUSE_DB=default
+      - CLICKHOUSE_USER=default
+      - CLICKHOUSE_PASSWORD=
+    depends_on:
+      - zookeeper
+    networks:
+      - clickhouse-network
+    restart: unless-stopped
+    ulimits:
+      nofile:
+        soft: 262144
+        hard: 262144
+
+  # 负载均衡器 (HAProxy)
+  haproxy:
+    image: haproxy:2.4
+    container_name: clickhouse-haproxy
+    hostname: haproxy
+    ports:
+      - "8080:8080"   # HAProxy统计页面
+      - "8888:8888"   # ClickHouse HTTP负载均衡
+      - "9999:9999"   # ClickHouse TCP负载均衡
+    volumes:
+      - ./configs/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
+    depends_on:
+      - clickhouse-01
+      - clickhouse-02
+      - clickhouse-03
+      - clickhouse-04
+    networks:
+      - clickhouse-network
+    restart: unless-stopped
+
+  # 监控服务 (Prometheus)
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: clickhouse-prometheus
+    hostname: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./configs/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=200h'
+      - '--web.enable-lifecycle'
+    networks:
+      - clickhouse-network
+    restart: unless-stopped
+
+  # 可视化服务 (Grafana)
+  grafana:
+    image: grafana/grafana:latest
+    container_name: clickhouse-grafana
+    hostname: grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./configs/grafana/datasources:/etc/grafana/provisioning/datasources
+      - ./configs/grafana/dashboards:/etc/grafana/provisioning/dashboards
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+    depends_on:
+      - prometheus
+    networks:
+      - clickhouse-network
+    restart: unless-stopped
+
+# 数据卷定义
+volumes:
+  zk_data:
+    driver: local
+  zk_datalog:
+    driver: local
+  ch01_data:
+    driver: local
+  ch01_logs:
+    driver: local
+  ch02_data:
+    driver: local
+  ch02_logs:
+    driver: local
+  ch03_data:
+    driver: local
+  ch03_logs:
+    driver: local
+  ch04_data:
+    driver: local
+  ch04_logs:
+    driver: local
+  prometheus_data:
+    driver: local
+  grafana_data:
+    driver: local
+
+# 网络定义
+networks:
+  clickhouse-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+
+# 健康检查和启动顺序
+# 使用 docker-compose up -d 启动整个集群
+# 使用 docker-compose down -v 停止并清理数据卷
+
+# 访问地址：
+# - ClickHouse HTTP (通过HAProxy): http://localhost:8888
+# - ClickHouse TCP (通过HAProxy): localhost:9999
+# - ClickHouse-01 直连: http://localhost:8123
+# - ClickHouse-02 直连: http://localhost:8124
+# - ClickHouse-03 直连: http://localhost:8125
+# - ClickHouse-04 直连: http://localhost:8126
+# - HAProxy 统计页面: http://localhost:8080/stats
+# - Prometheus: http://localhost:9090
+# - Grafana: http://localhost:3000 (admin/admin)
+# - ZooKeeper: localhost:2181 
