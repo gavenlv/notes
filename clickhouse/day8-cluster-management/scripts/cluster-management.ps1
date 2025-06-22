@@ -1,5 +1,5 @@
-# ClickHouse 集群管理脚本
-# Day 8: 集群管理和分布式
+# ClickHouse Cluster Management Script
+# Day 8: Cluster Management and Distributed
 # =====================================
 
 param(
@@ -25,7 +25,7 @@ param(
     [string]$Password = ""
 )
 
-# 颜色输出函数
+# Color output function
 function Write-ColorOutput {
     param(
         [string]$Message,
@@ -34,7 +34,7 @@ function Write-ColorOutput {
     Write-Host $Message -ForegroundColor $Color
 }
 
-# 执行ClickHouse查询
+# Execute ClickHouse query
 function Invoke-ClickHouseQuery {
     param(
         [string]$Query,
@@ -55,14 +55,14 @@ function Invoke-ClickHouseQuery {
         return $response
     }
     catch {
-        Write-ColorOutput "查询执行失败: $($_.Exception.Message)" "Red"
+        Write-ColorOutput "Query execution failed: $($_.Exception.Message)" "Red"
         return $null
     }
 }
 
-# 检查集群状态
+# Check cluster status
 function Check-ClusterStatus {
-    Write-ColorOutput "🔍 检查集群状态..." "Cyan"
+    Write-ColorOutput "🔍 Checking cluster status..." "Cyan"
     
     $query = @"
 SELECT 
@@ -90,9 +90,9 @@ ORDER BY cluster, shard_num, replica_num
     }
 }
 
-# 检查副本状态
+# Check replica status
 function Check-ReplicaStatus {
-    Write-ColorOutput "🔄 检查副本状态..." "Cyan"
+    Write-ColorOutput "🔄 Checking replica status..." "Cyan"
     
     $query = @"
 SELECT 
@@ -121,9 +121,9 @@ LIMIT 20
     }
 }
 
-# 检查分布式表
+# Check distributed tables
 function Check-DistributedTables {
-    Write-ColorOutput "📊 检查分布式表..." "Cyan"
+    Write-ColorOutput "📊 Checking distributed tables..." "Cyan"
     
     $query = @"
 SELECT 
@@ -144,9 +144,9 @@ ORDER BY database, name
     }
 }
 
-# 检查ZooKeeper连接
+# Check ZooKeeper connection
 function Check-ZooKeeperConnection {
-    Write-ColorOutput "🐘 检查ZooKeeper连接..." "Cyan"
+    Write-ColorOutput "🐘 Checking ZooKeeper connection..." "Cyan"
     
     $query = @"
 SELECT 
@@ -162,15 +162,15 @@ LIMIT 10
     if ($result) {
         Write-ColorOutput $result "Green"
     } else {
-        Write-ColorOutput "ZooKeeper连接可能存在问题" "Yellow"
+        Write-ColorOutput "ZooKeeper connection may have issues" "Yellow"
     }
 }
 
-# 查看集群性能指标
+# Show cluster performance metrics
 function Show-ClusterMetrics {
-    Write-ColorOutput "📈 集群性能指标..." "Cyan"
+    Write-ColorOutput "📈 Cluster performance metrics..." "Cyan"
     
-    # 查询统计
+    # Query statistics
     $queryStats = @"
 SELECT 
     'Query Statistics' as metric_type,
@@ -190,7 +190,7 @@ WHERE event_date = today()
         Write-ColorOutput $result1 "Green"
     }
     
-    # 系统资源
+    # System resources
     $systemStats = @"
 SELECT 
     'System Resources' as metric_type,
@@ -209,9 +209,9 @@ LIMIT 1
     }
 }
 
-# 执行集群健康检查
+# Run cluster health check
 function Run-HealthCheck {
-    Write-ColorOutput "🏥 执行集群健康检查..." "Yellow"
+    Write-ColorOutput "🏥 Running cluster health check..." "Yellow"
     Write-ColorOutput "=" * 50 "Yellow"
     
     Check-ClusterStatus
@@ -229,54 +229,54 @@ function Run-HealthCheck {
     Show-ClusterMetrics
     
     Write-ColorOutput "=" * 50 "Yellow"
-    Write-ColorOutput "✅ 健康检查完成" "Green"
+    Write-ColorOutput "✅ Health check completed" "Green"
 }
 
-# 同步副本
+# Sync replica
 function Sync-Replica {
     param([string]$TableName)
     
     if (-not $TableName) {
-        Write-ColorOutput "请指定表名" "Red"
+        Write-ColorOutput "Please specify table name" "Red"
         return
     }
     
-    Write-ColorOutput "🔄 同步副本表: $TableName" "Cyan"
+    Write-ColorOutput "🔄 Syncing replica table: $TableName" "Cyan"
     
     $query = "SYSTEM SYNC REPLICA $TableName"
     $result = Invoke-ClickHouseQuery -Query $query
     
     if ($result -ne $null) {
-        Write-ColorOutput "✅ 副本同步完成" "Green"
+        Write-ColorOutput "✅ Replica sync completed" "Green"
     }
 }
 
-# 重启副本队列
+# Restart replica queue
 function Restart-ReplicaQueue {
     param([string]$TableName)
     
     if (-not $TableName) {
-        Write-ColorOutput "请指定表名" "Red"
+        Write-ColorOutput "Please specify table name" "Red"
         return
     }
     
-    Write-ColorOutput "🔄 重启副本队列: $TableName" "Cyan"
+    Write-ColorOutput "🔄 Restarting replica queue: $TableName" "Cyan"
     
     $query = "SYSTEM RESTART REPLICA $TableName"
     $result = Invoke-ClickHouseQuery -Query $query
     
     if ($result -ne $null) {
-        Write-ColorOutput "✅ 副本队列重启完成" "Green"
+        Write-ColorOutput "✅ Replica queue restart completed" "Green"
     }
 }
 
-# 优化表
+# Optimize tables
 function Optimize-ClusterTables {
     param([string]$DatabaseName = "default")
     
-    Write-ColorOutput "🚀 优化集群表..." "Cyan"
+    Write-ColorOutput "🚀 Optimizing cluster tables..." "Cyan"
     
-    # 获取所有MergeTree表
+    # Get all MergeTree tables
     $query = @"
 SELECT 
     database,
@@ -297,19 +297,19 @@ WHERE database = '$DatabaseName'
                     $db = $parts[0]
                     $table = $parts[1]
                     
-                    Write-ColorOutput "优化表: $db.$table" "Yellow"
+                    Write-ColorOutput "Optimizing table: $db.$table" "Yellow"
                     $optimizeQuery = "OPTIMIZE TABLE $db.$table FINAL"
                     Invoke-ClickHouseQuery -Query $optimizeQuery | Out-Null
                 }
             }
         }
-        Write-ColorOutput "✅ 表优化完成" "Green"
+        Write-ColorOutput "✅ Table optimization completed" "Green"
     }
 }
 
-# 查看分布式DDL队列
+# Show distributed DDL queue
 function Show-DDLQueue {
-    Write-ColorOutput "📋 分布式DDL队列..." "Cyan"
+    Write-ColorOutput "📋 Distributed DDL queue..." "Cyan"
     
     $query = @"
 SELECT 
@@ -328,20 +328,20 @@ LIMIT 10
     if ($result) {
         Write-ColorOutput $result "Green"
     } else {
-        Write-ColorOutput "DDL队列为空" "Yellow"
+        Write-ColorOutput "DDL queue is empty" "Yellow"
     }
 }
 
-# 数据分布分析
+# Analyze data distribution
 function Analyze-DataDistribution {
     param([string]$TableName)
     
     if (-not $TableName) {
-        Write-ColorOutput "请指定表名" "Red"
+        Write-ColorOutput "Please specify table name" "Red"
         return
     }
     
-    Write-ColorOutput "📊 分析数据分布: $TableName" "Cyan"
+    Write-ColorOutput "📊 Analyzing data distribution: $TableName" "Cyan"
     
     $query = @"
 SELECT 
@@ -360,11 +360,11 @@ ORDER BY row_count DESC
     }
 }
 
-# 创建测试集群表
+# Create test cluster table
 function Create-TestClusterTable {
-    Write-ColorOutput "🛠️ 创建测试集群表..." "Cyan"
+    Write-ColorOutput "🛠️ Creating test cluster table..." "Cyan"
     
-    # 创建本地表
+    # Create local table
     $localTableQuery = @"
 CREATE TABLE IF NOT EXISTS test_cluster_local ON CLUSTER $ClusterName (
     id UInt32,
@@ -378,7 +378,7 @@ PARTITION BY toYYYYMM(timestamp)
     
     $result1 = Invoke-ClickHouseQuery -Query $localTableQuery
     
-    # 创建分布式表
+    # Create distributed table
     $distributedTableQuery = @"
 CREATE TABLE IF NOT EXISTS test_cluster_distributed ON CLUSTER $ClusterName AS test_cluster_local
 ENGINE = Distributed('$ClusterName', currentDatabase(), 'test_cluster_local', rand())
@@ -387,10 +387,10 @@ ENGINE = Distributed('$ClusterName', currentDatabase(), 'test_cluster_local', ra
     $result2 = Invoke-ClickHouseQuery -Query $distributedTableQuery
     
     if ($result1 -ne $null -and $result2 -ne $null) {
-        Write-ColorOutput "✅ 测试表创建完成" "Green"
+        Write-ColorOutput "✅ Test table creation completed" "Green"
         
-        # 插入测试数据
-        Write-ColorOutput "📝 插入测试数据..." "Yellow"
+        # Insert test data
+        Write-ColorOutput "📝 Inserting test data..." "Yellow"
         $insertQuery = @"
 INSERT INTO test_cluster_distributed 
 SELECT 
@@ -402,51 +402,51 @@ FROM numbers(1000)
 "@
         
         Invoke-ClickHouseQuery -Query $insertQuery | Out-Null
-        Write-ColorOutput "✅ 测试数据插入完成" "Green"
+        Write-ColorOutput "✅ Test data insertion completed" "Green"
     }
 }
 
-# 显示帮助信息
+# Show help information
 function Show-Help {
-    Write-ColorOutput "ClickHouse 集群管理脚本" "Yellow"
+    Write-ColorOutput "ClickHouse Cluster Management Script" "Yellow"
     Write-ColorOutput "=" * 40 "Yellow"
     Write-ColorOutput ""
-    Write-ColorOutput "用法: .\cluster-management.ps1 -Action <action> [参数]" "White"
+    Write-ColorOutput "Usage: .\cluster-management.ps1 -Action <action> [parameters]" "White"
     Write-ColorOutput ""
-    Write-ColorOutput "可用操作:" "Cyan"
-    Write-ColorOutput "  health          - 执行完整健康检查" "White"
-    Write-ColorOutput "  status          - 检查集群状态" "White"
-    Write-ColorOutput "  replicas        - 检查副本状态" "White"
-    Write-ColorOutput "  tables          - 检查分布式表" "White"
-    Write-ColorOutput "  zookeeper       - 检查ZooKeeper连接" "White"
-    Write-ColorOutput "  metrics         - 显示性能指标" "White"
-    Write-ColorOutput "  ddl-queue       - 查看DDL队列" "White"
-    Write-ColorOutput "  sync-replica    - 同步副本 (需要-TableName参数)" "White"
-    Write-ColorOutput "  restart-replica - 重启副本队列 (需要-TableName参数)" "White"
-    Write-ColorOutput "  optimize        - 优化表" "White"
-    Write-ColorOutput "  analyze-dist    - 分析数据分布 (需要-TableName参数)" "White"
-    Write-ColorOutput "  create-test     - 创建测试表" "White"
-    Write-ColorOutput "  help            - 显示此帮助信息" "White"
+    Write-ColorOutput "Available actions:" "Cyan"
+    Write-ColorOutput "  health          - Run complete health check" "White"
+    Write-ColorOutput "  status          - Check cluster status" "White"
+    Write-ColorOutput "  replicas        - Check replica status" "White"
+    Write-ColorOutput "  tables          - Check distributed tables" "White"
+    Write-ColorOutput "  zookeeper       - Check ZooKeeper connection" "White"
+    Write-ColorOutput "  metrics         - Show performance metrics" "White"
+    Write-ColorOutput "  ddl-queue       - View DDL queue" "White"
+    Write-ColorOutput "  sync-replica    - Sync replica (requires -TableName parameter)" "White"
+    Write-ColorOutput "  restart-replica - Restart replica queue (requires -TableName parameter)" "White"
+    Write-ColorOutput "  optimize        - Optimize tables" "White"
+    Write-ColorOutput "  analyze-dist    - Analyze data distribution (requires -TableName parameter)" "White"
+    Write-ColorOutput "  create-test     - Create test table" "White"
+    Write-ColorOutput "  help            - Show this help information" "White"
     Write-ColorOutput ""
-    Write-ColorOutput "参数:" "Cyan"
-    Write-ColorOutput "  -ClusterName    - 集群名称 (默认: production_cluster)" "White"
-    Write-ColorOutput "  -Host           - ClickHouse主机 (默认: localhost)" "White"
-    Write-ColorOutput "  -Port           - ClickHouse端口 (默认: 8123)" "White"
-    Write-ColorOutput "  -Database       - 数据库名 (默认: default)" "White"
-    Write-ColorOutput "  -User           - 用户名 (默认: default)" "White"
-    Write-ColorOutput "  -Password       - 密码 (默认: 空)" "White"
-    Write-ColorOutput "  -TableName      - 表名 (某些操作需要)" "White"
+    Write-ColorOutput "Parameters:" "Cyan"
+    Write-ColorOutput "  -ClusterName    - Cluster name (default: production_cluster)" "White"
+    Write-ColorOutput "  -Host           - ClickHouse host (default: localhost)" "White"
+    Write-ColorOutput "  -Port           - ClickHouse port (default: 8123)" "White"
+    Write-ColorOutput "  -Database       - Database name (default: default)" "White"
+    Write-ColorOutput "  -User           - Username (default: default)" "White"
+    Write-ColorOutput "  -Password       - Password (default: empty)" "White"
+    Write-ColorOutput "  -TableName      - Table name (required for some operations)" "White"
     Write-ColorOutput ""
-    Write-ColorOutput "示例:" "Cyan"
+    Write-ColorOutput "Examples:" "Cyan"
     Write-ColorOutput "  .\cluster-management.ps1 -Action health" "White"
     Write-ColorOutput "  .\cluster-management.ps1 -Action sync-replica -TableName user_events_local" "White"
     Write-ColorOutput "  .\cluster-management.ps1 -Action analyze-dist -TableName test_cluster_local" "White"
 }
 
-# 主程序逻辑
+# Main program logic
 function Main {
-    Write-ColorOutput "🚀 ClickHouse 集群管理工具" "Magenta"
-    Write-ColorOutput "连接到: $($Host):$($Port) (集群: $ClusterName)" "Gray"
+    Write-ColorOutput "🚀 ClickHouse Cluster Management Tool" "Magenta"
+    Write-ColorOutput "Connecting to: $($Host):$($Port) (Cluster: $ClusterName)" "Gray"
     Write-ColorOutput ""
     
     switch ($Action.ToLower()) {
@@ -461,14 +461,14 @@ function Main {
             if ($args.Length -gt 0) {
                 Sync-Replica -TableName $args[0]
             } else {
-                Write-ColorOutput "请提供表名: -TableName <table_name>" "Red"
+                Write-ColorOutput "Please provide table name: -TableName <table_name>" "Red"
             }
         }
         "restart-replica" { 
             if ($args.Length -gt 0) {
                 Restart-ReplicaQueue -TableName $args[0]
             } else {
-                Write-ColorOutput "请提供表名: -TableName <table_name>" "Red"
+                Write-ColorOutput "Please provide table name: -TableName <table_name>" "Red"
             }
         }
         "optimize" { Optimize-ClusterTables }
@@ -476,26 +476,26 @@ function Main {
             if ($args.Length -gt 0) {
                 Analyze-DataDistribution -TableName $args[0]
             } else {
-                Write-ColorOutput "请提供表名: -TableName <table_name>" "Red"
+                Write-ColorOutput "Please provide table name: -TableName <table_name>" "Red"
             }
         }
         "create-test" { Create-TestClusterTable }
         "help" { Show-Help }
         default { 
-            Write-ColorOutput "未知操作: $Action" "Red"
+            Write-ColorOutput "Unknown action: $Action" "Red"
             Show-Help 
         }
     }
 }
 
-# 执行主程序
+# Execute main program
 try {
     Main
 }
 catch {
-    Write-ColorOutput "脚本执行出错: $($_.Exception.Message)" "Red"
-    Write-ColorOutput "请检查ClickHouse连接和参数设置" "Yellow"
+    Write-ColorOutput "Script execution error: $($_.Exception.Message)" "Red"
+    Write-ColorOutput "Please check ClickHouse connection and parameter settings" "Yellow"
 }
 
 Write-ColorOutput ""
-Write-ColorOutput "脚本执行完成" "Green" 
+Write-ColorOutput "Script execution completed" "Green" 

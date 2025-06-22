@@ -1,5 +1,5 @@
-# ClickHouse 集群管理脚本 - 简化版
-# Day 8: 集群管理和分布式
+# ClickHouse Cluster Management Script - Simplified Version
+# Day 8: Cluster Management and Distributed
 # =====================================
 
 param(
@@ -13,7 +13,7 @@ param(
     [int]$Port = 8123
 )
 
-# 颜色输出函数
+# Color output function
 function Write-ColorOutput {
     param(
         [string]$Message,
@@ -22,7 +22,7 @@ function Write-ColorOutput {
     Write-Host $Message -ForegroundColor $Color
 }
 
-# 执行ClickHouse查询
+# Execute ClickHouse query
 function Invoke-ClickHouseQuery {
     param([string]$Query)
     
@@ -34,14 +34,14 @@ function Invoke-ClickHouseQuery {
         return $response
     }
     catch {
-        Write-ColorOutput "查询执行失败: $($_.Exception.Message)" "Red"
+        Write-ColorOutput "Query execution failed: $($_.Exception.Message)" "Red"
         return $null
     }
 }
 
-# 检查集群状态
+# Check cluster status
 function Check-ClusterStatus {
-    Write-ColorOutput "🔍 检查集群状态..." "Cyan"
+    Write-ColorOutput "🔍 Checking cluster status..." "Cyan"
     
     $query = "SELECT cluster, shard_num, replica_num, host_name, port FROM system.clusters ORDER BY cluster, shard_num, replica_num"
     $result = Invoke-ClickHouseQuery -Query $query
@@ -49,13 +49,13 @@ function Check-ClusterStatus {
     if ($result) {
         Write-ColorOutput $result "Green"
     } else {
-        Write-ColorOutput "无法获取集群状态" "Yellow"
+        Write-ColorOutput "Unable to get cluster status" "Yellow"
     }
 }
 
-# 检查副本状态
+# Check replica status
 function Check-ReplicaStatus {
-    Write-ColorOutput "🔄 检查副本状态..." "Cyan"
+    Write-ColorOutput "🔄 Checking replica status..." "Cyan"
     
     $query = "SELECT database, table, replica_name, is_leader, absolute_delay, queue_size FROM system.replicas LIMIT 10"
     $result = Invoke-ClickHouseQuery -Query $query
@@ -63,13 +63,13 @@ function Check-ReplicaStatus {
     if ($result) {
         Write-ColorOutput $result "Green"
     } else {
-        Write-ColorOutput "无副本表或无法访问副本信息" "Yellow"
+        Write-ColorOutput "No replica tables or unable to access replica information" "Yellow"
     }
 }
 
-# 检查分布式表
+# Check distributed tables
 function Check-DistributedTables {
-    Write-ColorOutput "📊 检查分布式表..." "Cyan"
+    Write-ColorOutput "📊 Checking distributed tables..." "Cyan"
     
     $query = "SELECT database, name, engine FROM system.tables WHERE engine LIKE '%Distributed%'"
     $result = Invoke-ClickHouseQuery -Query $query
@@ -77,13 +77,13 @@ function Check-DistributedTables {
     if ($result) {
         Write-ColorOutput $result "Green"
     } else {
-        Write-ColorOutput "未找到分布式表" "Yellow"
+        Write-ColorOutput "No distributed tables found" "Yellow"
     }
 }
 
-# 显示基本信息
+# Show basic information
 function Show-BasicInfo {
-    Write-ColorOutput "ℹ️ 基本信息..." "Cyan"
+    Write-ColorOutput "ℹ️ Basic information..." "Cyan"
     
     $query = "SELECT version() as clickhouse_version, hostName() as hostname"
     $result = Invoke-ClickHouseQuery -Query $query
@@ -93,9 +93,9 @@ function Show-BasicInfo {
     }
 }
 
-# 执行健康检查
+# Run health check
 function Run-HealthCheck {
-    Write-ColorOutput "🏥 执行集群健康检查..." "Yellow"
+    Write-ColorOutput "🏥 Running cluster health check..." "Yellow"
     Write-ColorOutput "=" * 50 "Yellow"
     
     Show-BasicInfo
@@ -110,37 +110,37 @@ function Run-HealthCheck {
     Check-DistributedTables
     
     Write-ColorOutput "=" * 50 "Yellow"
-    Write-ColorOutput "✅ 健康检查完成" "Green"
+    Write-ColorOutput "✅ Health check completed" "Green"
 }
 
-# 显示帮助信息
+# Show help information
 function Show-Help {
-    Write-ColorOutput "ClickHouse 集群管理脚本 - 简化版" "Yellow"
+    Write-ColorOutput "ClickHouse Cluster Management Script - Simplified Version" "Yellow"
     Write-ColorOutput "=" * 45 "Yellow"
     Write-ColorOutput ""
-    Write-ColorOutput "用法: .\cluster-management-simple.ps1 -Action <action> [参数]" "White"
+    Write-ColorOutput "Usage: .\cluster-management-simple.ps1 -Action <action> [parameters]" "White"
     Write-ColorOutput ""
-    Write-ColorOutput "可用操作:" "Cyan"
-    Write-ColorOutput "  health      - 执行完整健康检查" "White"
-    Write-ColorOutput "  status      - 检查集群状态" "White"
-    Write-ColorOutput "  replicas    - 检查副本状态" "White"
-    Write-ColorOutput "  tables      - 检查分布式表" "White"
-    Write-ColorOutput "  info        - 显示基本信息" "White"
-    Write-ColorOutput "  help        - 显示此帮助信息" "White"
+    Write-ColorOutput "Available actions:" "Cyan"
+    Write-ColorOutput "  health      - Run complete health check" "White"
+    Write-ColorOutput "  status      - Check cluster status" "White"
+    Write-ColorOutput "  replicas    - Check replica status" "White"
+    Write-ColorOutput "  tables      - Check distributed tables" "White"
+    Write-ColorOutput "  info        - Show basic information" "White"
+    Write-ColorOutput "  help        - Show this help information" "White"
     Write-ColorOutput ""
-    Write-ColorOutput "参数:" "Cyan"
-    Write-ColorOutput "  -Host       - ClickHouse主机 (默认: localhost)" "White"
-    Write-ColorOutput "  -Port       - ClickHouse端口 (默认: 8123)" "White"
+    Write-ColorOutput "Parameters:" "Cyan"
+    Write-ColorOutput "  -Host       - ClickHouse host (default: localhost)" "White"
+    Write-ColorOutput "  -Port       - ClickHouse port (default: 8123)" "White"
     Write-ColorOutput ""
-    Write-ColorOutput "示例:" "Cyan"
+    Write-ColorOutput "Examples:" "Cyan"
     Write-ColorOutput "  .\cluster-management-simple.ps1 -Action health" "White"
     Write-ColorOutput "  .\cluster-management-simple.ps1 -Action status -Host 192.168.1.100" "White"
 }
 
-# 主程序逻辑
+# Main program logic
 function Main {
-    Write-ColorOutput "🚀 ClickHouse 集群管理工具 (简化版)" "Magenta"
-    Write-ColorOutput "连接到: $($Host):$($Port)" "Gray"
+    Write-ColorOutput "🚀 ClickHouse Cluster Management Tool (Simplified Version)" "Magenta"
+    Write-ColorOutput "Connecting to: $($Host):$($Port)" "Gray"
     Write-ColorOutput ""
     
     switch ($Action.ToLower()) {
@@ -151,23 +151,23 @@ function Main {
         "info" { Show-BasicInfo }
         "help" { Show-Help }
         default { 
-            Write-ColorOutput "未知操作: $Action" "Red"
+            Write-ColorOutput "Unknown action: $Action" "Red"
             Show-Help 
         }
     }
 }
 
-# 执行主程序
+# Execute main program
 try {
-    # 加载System.Web程序集用于URL编码
+    # Load System.Web assembly for URL encoding
     Add-Type -AssemblyName System.Web
     
     Main
 }
 catch {
-    Write-ColorOutput "脚本执行出错: $($_.Exception.Message)" "Red"
-    Write-ColorOutput "请检查ClickHouse连接和参数设置" "Yellow"
+    Write-ColorOutput "Script execution error: $($_.Exception.Message)" "Red"
+    Write-ColorOutput "Please check ClickHouse connection and parameter settings" "Yellow"
 }
 
 Write-ColorOutput ""
-Write-ColorOutput "脚本执行完成" "Green" 
+Write-ColorOutput "Script execution completed" "Green" 

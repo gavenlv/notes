@@ -1,6 +1,6 @@
-# 技术学习教程 - 文件完整性检查
+# Technology Learning Tutorial - File Integrity Check
 Write-Host "============================================================" -ForegroundColor Cyan
-Write-Host "  技术学习教程 - 文件完整性检查" -ForegroundColor Yellow
+Write-Host "  Technology Learning Tutorial - File Integrity Check" -ForegroundColor Yellow
 Write-Host "============================================================" -ForegroundColor Cyan
 Write-Host ""
 

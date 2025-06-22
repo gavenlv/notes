@@ -1,5 +1,5 @@
-# ClickHouse 监控检查脚本
-# Day 9: 监控和运维
+# ClickHouse Monitoring Check Script
+# Day 9: Monitoring and Operations
 # =============================================
 
 param(
@@ -10,11 +10,11 @@ param(
     [switch]$Verbose
 )
 
-# 初始化
+# Initialize
 $script:alertCount = 0
 $script:checkResults = @()
 
-# 记录日志函数
+# Log function
 function Write-Log {
     param([string]$Message, [string]$Level = "INFO")
     $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"

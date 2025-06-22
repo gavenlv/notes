@@ -1,5 +1,5 @@
-# SSH密钥生成脚本
-# 为阿里云ClickHouse集群部署生成SSH密钥对
+# SSH Key Generation Script
+# Generate SSH key pair for Alibaba Cloud ClickHouse cluster deployment
 
 param(
     [string]$KeyPath = "infrastructure\terraform\clickhouse_key",
@@ -12,237 +12,237 @@ $Green = "Green"
 $Yellow = "Yellow"
 $Blue = "Blue"
 
-Write-Host "🔑 SSH密钥生成脚本" -ForegroundColor $Blue
+Write-Host "🔑 SSH Key Generation Script" -ForegroundColor $Blue
 Write-Host "===========================================" -ForegroundColor $Blue
 
-# 检查ssh-keygen是否可用
+# Check if ssh-keygen is available
 function Test-SshKeygen {
     try {
         ssh-keygen -h 2>$null
         return $true
     }
     catch {
-        Write-Host "❌ ssh-keygen未找到" -ForegroundColor $Red
-        Write-Host "请安装OpenSSH客户端或Git for Windows" -ForegroundColor $Yellow
+        Write-Host "❌ ssh-keygen not found" -ForegroundColor $Red
+        Write-Host "Please install OpenSSH client or Git for Windows" -ForegroundColor $Yellow
         return $false
     }
 }
 
-# 生成SSH密钥对
+# Generate SSH key pair
 function New-SshKeyPair {
     param(
         [string]$KeyPath,
         [int]$KeySize
     )
     
-    Write-Host "🔐 生成SSH密钥对..." -ForegroundColor $Blue
-    Write-Host "密钥路径: $KeyPath" -ForegroundColor $Blue
-    Write-Host "密钥大小: $KeySize bits" -ForegroundColor $Blue
+    Write-Host "🔐 Generating SSH key pair..." -ForegroundColor $Blue
+    Write-Host "Key path: $KeyPath" -ForegroundColor $Blue
+    Write-Host "Key size: $KeySize bits" -ForegroundColor $Blue
     
-    # 检查是否已存在密钥文件
+    # Check if key files already exist
     if (Test-Path "$KeyPath" -or Test-Path "$KeyPath.pub") {
-        Write-Host "⚠️  密钥文件已存在" -ForegroundColor $Yellow
-        $overwrite = Read-Host "是否覆盖现有密钥? (y/N)"
+        Write-Host "⚠️  Key files already exist" -ForegroundColor $Yellow
+        $overwrite = Read-Host "Overwrite existing keys? (y/N)"
         if ($overwrite -ne "y" -and $overwrite -ne "Y") {
-            Write-Host "⏭️  跳过密钥生成" -ForegroundColor $Yellow
+            Write-Host "⏭️  Skipping key generation" -ForegroundColor $Yellow
             return $true
         }
         
-        # 删除现有密钥
+        # Remove existing keys
         if (Test-Path "$KeyPath") { Remove-Item "$KeyPath" -Force }
         if (Test-Path "$KeyPath.pub") { Remove-Item "$KeyPath.pub" -Force }
     }
     
     try {
-        # 生成密钥对（无密码）
+        # Generate key pair (no password)
         ssh-keygen -t rsa -b $KeySize -f $KeyPath -N '""' -C "clickhouse-cluster-key"
         
         if (Test-Path "$KeyPath" -and Test-Path "$KeyPath.pub") {
-            Write-Host "✅ SSH密钥对生成成功" -ForegroundColor $Green
-            Write-Host "私钥: $KeyPath" -ForegroundColor $Blue
-            Write-Host "公钥: $KeyPath.pub" -ForegroundColor $Blue
+            Write-Host "✅ SSH key pair generated successfully" -ForegroundColor $Green
+            Write-Host "Private key: $KeyPath" -ForegroundColor $Blue
+            Write-Host "Public key: $KeyPath.pub" -ForegroundColor $Blue
             return $true
         }
         else {
-            Write-Host "❌ 密钥文件生成失败" -ForegroundColor $Red
+            Write-Host "❌ Key file generation failed" -ForegroundColor $Red
             return $false
         }
     }
     catch {
-        Write-Host "❌ 生成SSH密钥时出错: $($_.Exception.Message)" -ForegroundColor $Red
+        Write-Host "❌ Error generating SSH key: $($_.Exception.Message)" -ForegroundColor $Red
         return $false
     }
 }
 
-# 显示公钥内容
+# Show public key content
 function Show-PublicKey {
     param([string]$KeyPath)
     
     $publicKeyPath = "$KeyPath.pub"
     if (Test-Path $publicKeyPath) {
-        Write-Host "`n📋 公钥内容:" -ForegroundColor $Blue
+        Write-Host "`n📋 Public key content:" -ForegroundColor $Blue
         Write-Host "========================================" -ForegroundColor $Blue
         Get-Content $publicKeyPath
         Write-Host "========================================" -ForegroundColor $Blue
     }
 }
 
-# 设置文件权限（Windows）
+# Set file permissions (Windows)
 function Set-KeyPermissions {
     param([string]$KeyPath)
     
     try {
-        # 设置私钥文件权限（仅当前用户可读写）
+        # Set private key file permissions (current user read/write only)
         if (Test-Path $KeyPath) {
             icacls $KeyPath /inheritance:r /grant:r "$env:USERNAME:(R,W)"
-            Write-Host "✅ 私钥文件权限已设置" -ForegroundColor $Green
+            Write-Host "✅ Private key file permissions set" -ForegroundColor $Green
         }
     }
     catch {
-        Write-Host "⚠️  设置文件权限时出现警告: $($_.Exception.Message)" -ForegroundColor $Yellow
+        Write-Host "⚠️  Warning setting file permissions: $($_.Exception.Message)" -ForegroundColor $Yellow
     }
 }
 
-# 验证密钥对
+# Verify key pair
 function Test-KeyPair {
     param([string]$KeyPath)
     
-    Write-Host "🔍 验证密钥对..." -ForegroundColor $Blue
+    Write-Host "🔍 Verifying key pair..." -ForegroundColor $Blue
     
     try {
-        # 从私钥生成公钥并比较
+        # Generate public key from private key and compare
         $generatedPublicKey = ssh-keygen -y -f $KeyPath
         $existingPublicKey = (Get-Content "$KeyPath.pub").Split(' ')[0,1] -join ' '
         
         if ($generatedPublicKey -eq $existingPublicKey) {
-            Write-Host "✅ 密钥对验证成功" -ForegroundColor $Green
+            Write-Host "✅ Key pair verification successful" -ForegroundColor $Green
             return $true
         }
         else {
-            Write-Host "❌ 密钥对不匹配" -ForegroundColor $Red
+            Write-Host "❌ Key pair mismatch" -ForegroundColor $Red
             return $false
         }
     }
     catch {
-        Write-Host "⚠️  密钥对验证出现警告: $($_.Exception.Message)" -ForegroundColor $Yellow
-        return $true  # 不影响主流程
+        Write-Host "⚠️  Warning during key pair verification: $($_.Exception.Message)" -ForegroundColor $Yellow
+        return $true  # Don't affect main flow
     }
 }
 
-# 创建使用说明
+# Create usage instructions
 function New-UsageInstructions {
     param([string]$KeyPath)
     
     $instructionsPath = "$(Split-Path $KeyPath)\SSH-USAGE.md"
     
     $instructions = @"
-# SSH密钥使用说明
+# SSH Key Usage Instructions
 
-## 生成的文件
-- **私钥**: $KeyPath
-- **公钥**: $KeyPath.pub
+## Generated Files
+- **Private key**: $KeyPath
+- **Public key**: $KeyPath.pub
 
-## 连接服务器
-使用以下命令连接到ClickHouse节点：
+## Connecting to Servers
+Use the following commands to connect to ClickHouse nodes:
 
 ``````bash
-# 连接到节点1
+# Connect to node 1
 ssh -i $KeyPath ubuntu@<node1_public_ip>
 
-# 连接到节点2  
+# Connect to node 2  
 ssh -i $KeyPath ubuntu@<node2_public_ip>
 
-# 连接到节点3
+# Connect to node 3
 ssh -i $KeyPath ubuntu@<node3_public_ip>
 
-# 连接到ZooKeeper节点
+# Connect to ZooKeeper node
 ssh -i $KeyPath ubuntu@<zookeeper_public_ip>
 ``````
 
-## 注意事项
-1. 保护好私钥文件，不要泄露给他人
-2. 私钥文件权限应设置为仅当前用户可读
-3. 如果在Linux/macOS上使用，需要设置文件权限：
+## Important Notes
+1. Protect your private key file, do not share with others
+2. Private key file permissions should be set to current user read-only
+3. If using on Linux/macOS, set file permissions:
    ``````bash
    chmod 600 $KeyPath
    ``````
 
-## Terraform输出
-部署完成后，可以通过以下命令查看连接信息：
+## Terraform Output
+After deployment, view connection information with:
 ``````bash
 terraform output ssh_commands
 ``````
 
-## 故障排除
-如果SSH连接失败，请检查：
-1. 公网IP地址是否正确
-2. 安全组是否允许SSH(22端口)访问
-3. 私钥文件权限是否正确
-4. 服务器是否已完全启动
+## Troubleshooting
+If SSH connection fails, check:
+1. Public IP address is correct
+2. Security group allows SSH (port 22) access
+3. Private key file permissions are correct
+4. Server has fully started
 "@
 
     $instructions | Out-File -FilePath $instructionsPath -Encoding UTF8
-    Write-Host "📖 使用说明已创建: $instructionsPath" -ForegroundColor $Blue
+    Write-Host "📖 Usage instructions created: $instructionsPath" -ForegroundColor $Blue
 }
 
-# 主函数
+# Main function
 function Main {
-    Write-Host "开始生成SSH密钥对..." -ForegroundColor $Blue
+    Write-Host "Starting SSH key pair generation..." -ForegroundColor $Blue
     
-    # 检查ssh-keygen
+    # Check ssh-keygen
     if (-not (Test-SshKeygen)) {
-        Write-Host "请安装OpenSSH或使用Git Bash运行此脚本" -ForegroundColor $Yellow
+        Write-Host "Please install OpenSSH or run this script with Git Bash" -ForegroundColor $Yellow
         exit 1
     }
     
-    # 确保目录存在
+    # Ensure directory exists
     $keyDir = Split-Path $KeyPath -Parent
     if ($keyDir -and -not (Test-Path $keyDir)) {
         New-Item -ItemType Directory -Path $keyDir -Force | Out-Null
-        Write-Host "✅ 创建目录: $keyDir" -ForegroundColor $Green
+        Write-Host "✅ Created directory: $keyDir" -ForegroundColor $Green
     }
     
-    # 生成密钥对
+    # Generate key pair
     if (New-SshKeyPair -KeyPath $KeyPath -KeySize $KeySize) {
-        # 设置权限
+        # Set permissions
         Set-KeyPermissions -KeyPath $KeyPath
         
-        # 验证密钥对
+        # Verify key pair
         Test-KeyPair -KeyPath $KeyPath | Out-Null
         
-        # 显示公钥
+        # Show public key
         Show-PublicKey -KeyPath $KeyPath
         
-        # 创建使用说明
+        # Create usage instructions
         New-UsageInstructions -KeyPath $KeyPath
         
-        Write-Host "`n🎉 SSH密钥生成完成!" -ForegroundColor $Green
-        Write-Host "现在可以运行Terraform部署命令了" -ForegroundColor $Blue
+        Write-Host "`n🎉 SSH key generation completed!" -ForegroundColor $Green
+        Write-Host "You can now run Terraform deployment commands" -ForegroundColor $Blue
     }
     else {
-        Write-Host "❌ SSH密钥生成失败" -ForegroundColor $Red
+        Write-Host "❌ SSH key generation failed" -ForegroundColor $Red
         exit 1
     }
 }
 
-# 显示帮助信息
+# Show help information
 function Show-Help {
-    Write-Host "SSH密钥生成脚本"
+    Write-Host "SSH Key Generation Script"
     Write-Host ""
-    Write-Host "用法: .\generate-ssh-key.ps1 [参数]"
+    Write-Host "Usage: .\generate-ssh-key.ps1 [parameters]"
     Write-Host ""
-    Write-Host "参数:"
-    Write-Host "  -KeyPath    密钥文件路径 (默认: infrastructure\terraform\clickhouse_key)"
-    Write-Host "  -KeyName    密钥对名称 (默认: clickhouse-keypair)"  
-    Write-Host "  -KeySize    密钥大小 (默认: 2048)"
+    Write-Host "Parameters:"
+    Write-Host "  -KeyPath    Key file path (default: infrastructure\terraform\clickhouse_key)"
+    Write-Host "  -KeyName    Key pair name (default: clickhouse-keypair)"  
+    Write-Host "  -KeySize    Key size (default: 2048)"
     Write-Host ""
-    Write-Host "示例:"
-    Write-Host "  .\generate-ssh-key.ps1                           # 使用默认设置"
-    Write-Host "  .\generate-ssh-key.ps1 -KeySize 4096            # 使用4096位密钥"
-    Write-Host "  .\generate-ssh-key.ps1 -KeyPath my_key          # 自定义密钥路径"
+    Write-Host "Examples:"
+    Write-Host "  .\generate-ssh-key.ps1                           # Use default settings"
+    Write-Host "  .\generate-ssh-key.ps1 -KeySize 4096            # Use 4096-bit key"
+    Write-Host "  .\generate-ssh-key.ps1 -KeyPath my_key          # Custom key path"
 }
 
-# 脚本入口
+# Script entry point
 if ($args -contains "-help" -or $args -contains "--help") {
     Show-Help
 }
