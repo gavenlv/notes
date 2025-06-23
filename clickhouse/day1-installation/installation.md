@@ -34,18 +34,18 @@
 
 **国内用户推荐下载方式:**
 ```powershell
-# 方法1: 官方下载 (可能较慢)
-# 访问: https://www.docker.com/products/docker-desktop/
+# Method 1: Official download (may be slow)
+# Visit: https://www.docker.com/products/docker-desktop/
 
-# 方法2: 国内镜像站 (推荐)
-# 访问: https://mirrors.tuna.tsinghua.edu.cn/docker-ce/win/static/stable/x86_64/
+# Method 2: Domestic mirror site (recommended)
+# Visit: https://mirrors.tuna.tsinghua.edu.cn/docker-ce/win/static/stable/x86_64/
 ```
 
 ### 1.2 安装Docker Desktop
 
 1. **运行安装程序**
    ```powershell
-   # 以管理员身份运行安装包
+   # Run the installer as administrator
    # Docker Desktop Installer.exe
    ```
 
@@ -56,7 +56,7 @@
 
 3. **重启系统**
    ```powershell
-   # 安装完成后重启计算机
+   # Restart computer after installation
    Restart-Computer
    ```
 
@@ -84,17 +84,17 @@
 ### 1.4 验证Docker安装
 
 ```powershell
-# 检查Docker版本
+# Check Docker version
 docker --version
-# 预期输出: Docker version 24.0.x, build xxx
+# Expected output: Docker version 24.0.x, build xxx
 
-# 检查Docker运行状态
+# Check Docker running status
 docker info
-# 查看是否有错误信息
+# Check for error messages
 
-# 测试Docker功能
+# Test Docker functionality
 docker run hello-world
-# 应该显示 "Hello from Docker!" 消息
+# Should display "Hello from Docker!" message
 ```
 
 ## 第二步：一键安装ClickHouse 🏠
@@ -103,14 +103,14 @@ docker run hello-world
 
 **下载并运行专用安装脚本:**
 ```powershell
-# 创建工作目录
+# Create working directory
 New-Item -ItemType Directory -Path "C:\ClickHouse" -Force
 Set-Location "C:\ClickHouse"
 
-# 下载安装脚本 (从Day1代码目录)
-# 复制 docker-install-windows.ps1 到当前目录
+# Download installation script (from Day1 code directory)
+# Copy docker-install-windows.ps1 to current directory
 
-# 运行一键安装脚本
+# Run one-click installation script
 powershell -ExecutionPolicy Bypass -File "docker-install-windows.ps1"
 ```
 
@@ -129,11 +129,11 @@ powershell -ExecutionPolicy Bypass -File "docker-install-windows.ps1"
 #### 2.2.1 创建工作目录
 
 ```powershell
-# 创建ClickHouse工作目录
+# Create ClickHouse working directory
 New-Item -ItemType Directory -Path "C:\ClickHouse" -Force
 Set-Location "C:\ClickHouse"
 
-# 创建子目录
+# Create subdirectories
 $dirs = @("data", "logs", "config", "backups", "scripts")
 foreach ($dir in $dirs) {
     New-Item -ItemType Directory -Path $dir -Force
@@ -143,14 +143,14 @@ foreach ($dir in $dirs) {
 #### 2.2.2 下载ClickHouse镜像
 
 ```powershell
-# 拉取ClickHouse官方镜像
+# Pull official ClickHouse image
 docker pull clickhouse/clickhouse-server:latest
 
-# 如果下载慢，使用国内镜像
+# If download is slow, use domestic mirror
 docker pull registry.cn-hangzhou.aliyuncs.com/clickhouse/clickhouse-server:latest
 docker tag registry.cn-hangzhou.aliyuncs.com/clickhouse/clickhouse-server:latest clickhouse/clickhouse-server:latest
 
-# 验证镜像
+# Verify image
 docker images | Select-String "clickhouse"
 ```
 
@@ -158,22 +158,22 @@ docker images | Select-String "clickhouse"
 
 **创建主配置文件 config.xml:**
 ```powershell
-# 创建config.xml
+# Create config.xml
 @"
 <?xml version="1.0"?>
 <yandex>
-    <!-- 网络配置 -->
+    <!-- Network configuration -->
     <listen_host>0.0.0.0</listen_host>
     <http_port>8123</http_port>
     <tcp_port>9000</tcp_port>
     <mysql_port>9004</mysql_port>
     
-    <!-- 数据路径配置 -->
+    <!-- Data path configuration -->
     <path>/var/lib/clickhouse/</path>
     <tmp_path>/var/lib/clickhouse/tmp/</tmp_path>
     <user_files_path>/var/lib/clickhouse/user_files/</user_files_path>
     
-    <!-- 日志配置 -->
+    <!-- Log configuration -->
     <logger>
         <level>information</level>
         <log>/var/log/clickhouse-server/clickhouse-server.log</log>
@@ -182,17 +182,17 @@ docker images | Select-String "clickhouse"
         <count>10</count>
     </logger>
     
-    <!-- 内存配置 -->
+    <!-- Memory configuration -->
     <max_server_memory_usage>0</max_server_memory_usage>
     <max_server_memory_usage_to_ram_ratio>0.8</max_server_memory_usage_to_ram_ratio>
     
-    <!-- 性能配置 -->
+    <!-- Performance configuration -->
     <max_concurrent_queries>100</max_concurrent_queries>
     <max_connections>4096</max_connections>
     <keep_alive_timeout>3</keep_alive_timeout>
     <max_session_timeout>3600</max_session_timeout>
     
-    <!-- 时区配置 -->
+    <!-- Timezone configuration -->
     <timezone>Asia/Shanghai</timezone>
 </yandex>
 "@ | Out-File -FilePath "config\config.xml" -Encoding UTF8
@@ -210,21 +210,21 @@ docker images | Select-String "clickhouse"
 
 **生成密码哈希:**
 ```powershell
-# 生成加密密码
+# Generate encrypted password
 $plainPassword = "ClickHouse@2024"
 
-# 计算SHA256哈希
+# Calculate SHA256 hash
 $sha256 = [System.Security.Cryptography.SHA256]::Create()
 $hashBytes = $sha256.ComputeHash([System.Text.Encoding]::UTF8.GetBytes($plainPassword))
 $passwordHash = [System.BitConverter]::ToString($hashBytes).Replace('-', '').ToLower()
 
-Write-Host "原始密码: $plainPassword" -ForegroundColor Yellow
-Write-Host "SHA256哈希: $passwordHash" -ForegroundColor Green
+Write-Host "Original password: $plainPassword" -ForegroundColor Yellow
+Write-Host "SHA256 hash: $passwordHash" -ForegroundColor Green
 ```
 
 **创建users.xml:**
 ```powershell
-# 创建users.xml (使用上面生成的哈希值)
+# Create users.xml (using the hash generated above)
 @"
 <?xml version="1.0"?>
 <yandex>
@@ -243,7 +243,7 @@ Write-Host "SHA256哈希: $passwordHash" -ForegroundColor Green
     </profiles>
 
     <users>
-        <!-- 默认用户 (开发环境使用) -->
+        <!-- Default user (for development environment) -->
         <default>
             <password></password>
             <networks>
@@ -253,9 +253,9 @@ Write-Host "SHA256哈希: $passwordHash" -ForegroundColor Green
             <quota>default</quota>
         </default>
         
-        <!-- 管理员用户 -->
+        <!-- Admin user -->
         <admin>
-            <!-- 使用SHA256加密密码 -->
+            <!-- Use SHA256 encrypted password -->
             <password_sha256_hex>$passwordHash</password_sha256_hex>
             <networks>
                 <ip>::1</ip>
@@ -268,7 +268,7 @@ Write-Host "SHA256哈希: $passwordHash" -ForegroundColor Green
             <quota>default</quota>
         </admin>
         
-        <!-- 只读用户 -->
+        <!-- Read-only user -->
         <readonly_user>
             <password>ReadOnly@2024</password>
             <networks>
@@ -375,38 +375,38 @@ Write-Host "SHA256哈希: $passwordHash" -ForegroundColor Green
 ```powershell
 # 创建密码加密脚本
 @"
-# ClickHouse密码加密工具
+# ClickHouse Password Encryption Tool
 param([string]`$Password)
 
 if (-not `$Password) {
-    `$Password = Read-Host "请输入要加密的密码" -AsSecureString
+    `$Password = Read-Host "Please enter the password to encrypt" -AsSecureString
     `$Password = [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR(`$Password))
 }
 
-# 计算SHA256哈希
+# Calculate SHA256 hash
 `$sha256 = [System.Security.Cryptography.SHA256]::Create()
 `$hashBytes = `$sha256.ComputeHash([System.Text.Encoding]::UTF8.GetBytes(`$Password))
 `$hashString = [System.BitConverter]::ToString(`$hashBytes).Replace('-', '').ToLower()
 
-Write-Host "原始密码: `$Password" -ForegroundColor Yellow
-Write-Host "SHA256哈希: `$hashString" -ForegroundColor Green
+Write-Host "Original password: `$Password" -ForegroundColor Yellow
+Write-Host "SHA256 hash: `$hashString" -ForegroundColor Green
 Write-Host ""
-Write-Host "在users.xml中使用:" -ForegroundColor Cyan
+Write-Host "Use in users.xml:" -ForegroundColor Cyan
 Write-Host "<password_sha256_hex>`$hashString</password_sha256_hex>" -ForegroundColor White
 
-# 保存到文件
+# Save to file
 `$hashString | Out-File -FilePath "password_hash.txt" -Encoding UTF8
-Write-Host "哈希值已保存到 password_hash.txt"
+Write-Host "Hash value saved to password_hash.txt"
 "@ | Out-File -FilePath "generate-password.ps1" -Encoding UTF8
 
-# 运行密码加密
+# Run password encryption
 powershell -File "generate-password.ps1" -Password "ClickHouse@2024"
 ```
 
 ### 2.6 启动ClickHouse容器
 
 ```powershell
-# 创建并启动ClickHouse容器
+# Create and start ClickHouse container
 docker run -d `
   --name clickhouse-server `
   --hostname clickhouse-server `
@@ -420,7 +420,7 @@ docker run -d `
   --ulimit nofile=262144:262144 `
   clickhouse/clickhouse-server:latest
 
-Write-Host "ClickHouse容器启动中..." -ForegroundColor Green
+Write-Host "ClickHouse container starting..." -ForegroundColor Green
 ```
 
 ## 第三步：启动容器和验证安装 ✅
@@ -428,7 +428,7 @@ Write-Host "ClickHouse容器启动中..." -ForegroundColor Green
 ### 3.1 启动ClickHouse容器
 
 ```powershell
-# 启动容器
+# Start container
 docker run -d `
     --name clickhouse-server `
     --hostname clickhouse-server `
@@ -442,8 +442,8 @@ docker run -d `
     --ulimit nofile=262144:262144 `
     clickhouse/clickhouse-server:latest
 
-# 等待服务启动
-Write-Host "等待ClickHouse服务启动..." -ForegroundColor Yellow
+# Wait for service startup
+Write-Host "Waiting for ClickHouse service to start..." -ForegroundColor Yellow
 Start-Sleep -Seconds 10
 ```
 
@@ -452,44 +452,44 @@ Start-Sleep -Seconds 10
 #### 3.2.1 检查容器状态
 
 ```powershell
-# 检查容器运行状态
+# Check container running status
 docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}" | Select-String "clickhouse"
 
-# 查看容器日志
+# View container logs
 docker logs clickhouse-server --tail 20
 
-# 检查容器资源使用
+# Check container resource usage
 docker stats clickhouse-server --no-stream
 ```
 
 #### 3.2.2 网络连接测试
 
 ```powershell
-# 测试HTTP接口
+# Test HTTP interface
 try {
     $response = Invoke-WebRequest -Uri "http://localhost:8123" -Method GET -TimeoutSec 10
-    Write-Host "✅ HTTP接口状态: $($response.StatusCode)" -ForegroundColor Green
+    Write-Host "✅ HTTP interface status: $($response.StatusCode)" -ForegroundColor Green
 } catch {
-    Write-Host "❌ HTTP接口测试失败: $_" -ForegroundColor Red
+    Write-Host "❌ HTTP interface test failed: $_" -ForegroundColor Red
 }
 
-# 测试版本查询
+# Test version query
 try {
     $query = "SELECT version()"
     $result = Invoke-WebRequest -Uri "http://localhost:8123" -Method POST -Body $query -TimeoutSec 10
-    Write-Host "✅ ClickHouse版本: $($result.Content.Trim())" -ForegroundColor Green
+    Write-Host "✅ ClickHouse version: $($result.Content.Trim())" -ForegroundColor Green
 } catch {
-    Write-Host "❌ 版本查询失败: $_" -ForegroundColor Red
+    Write-Host "❌ Version query failed: $_" -ForegroundColor Red
 }
 
-# 测试端口连通性
+# Test port connectivity
 $ports = @(8123, 9000, 9004)
 foreach ($port in $ports) {
     $tcpTest = Test-NetConnection -ComputerName localhost -Port $port -WarningAction SilentlyContinue
     if ($tcpTest.TcpTestSucceeded) {
-        Write-Host "✅ 端口 $port 可访问" -ForegroundColor Green
+        Write-Host "✅ Port $port accessible" -ForegroundColor Green
     } else {
-        Write-Host "❌ 端口 $port 不可访问" -ForegroundColor Red
+        Write-Host "❌ Port $port not accessible" -ForegroundColor Red
     }
 }
 ```
@@ -497,60 +497,60 @@ foreach ($port in $ports) {
 #### 3.2.3 用户连接测试
 
 ```powershell
-# 测试默认用户连接
-Write-Host "`n测试默认用户连接:" -ForegroundColor Yellow
+# Test default user connection
+Write-Host "`nTesting default user connection:" -ForegroundColor Yellow
 try {
     $result = docker exec clickhouse-server clickhouse-client --query "SELECT 'Default user test passed'"
-    Write-Host "✅ 默认用户连接正常: $result" -ForegroundColor Green
+    Write-Host "✅ Default user connection normal: $result" -ForegroundColor Green
 } catch {
-    Write-Host "❌ 默认用户连接失败" -ForegroundColor Red
+    Write-Host "❌ Default user connection failed" -ForegroundColor Red
 }
 
-# 测试管理员用户连接
-Write-Host "`n测试管理员用户连接:" -ForegroundColor Yellow
+# Test admin user connection
+Write-Host "`nTesting admin user connection:" -ForegroundColor Yellow
 try {
     $result = docker exec clickhouse-server clickhouse-client --user admin --password ClickHouse@2024 --query "SELECT 'Admin user test passed'"
-    Write-Host "✅ 管理员用户连接正常: $result" -ForegroundColor Green
+    Write-Host "✅ Admin user connection normal: $result" -ForegroundColor Green
 } catch {
-    Write-Host "❌ 管理员用户连接失败" -ForegroundColor Red
+    Write-Host "❌ Admin user connection failed" -ForegroundColor Red
 }
 
-# 测试只读用户连接
-Write-Host "`n测试只读用户连接:" -ForegroundColor Yellow
+# Test readonly user connection
+Write-Host "`nTesting readonly user connection:" -ForegroundColor Yellow
 try {
     $result = docker exec clickhouse-server clickhouse-client --user readonly_user --password ReadOnly@2024 --query "SELECT 'Readonly user test passed'"
-    Write-Host "✅ 只读用户连接正常: $result" -ForegroundColor Green
+    Write-Host "✅ Readonly user connection normal: $result" -ForegroundColor Green
     
-    # 测试只读限制
-    Write-Host "测试只读用户权限限制:" -ForegroundColor Gray
+    # Test readonly restrictions
+    Write-Host "Testing readonly user permission restrictions:" -ForegroundColor Gray
     $createResult = docker exec clickhouse-server clickhouse-client --user readonly_user --password ReadOnly@2024 --query "CREATE DATABASE test_readonly" 2>&1
     if ($createResult -match "readonly" -or $createResult -match "permission") {
-        Write-Host "✅ 只读用户权限限制正常" -ForegroundColor Green
+        Write-Host "✅ Readonly user permission restrictions normal" -ForegroundColor Green
     } else {
-        Write-Host "⚠️  只读用户权限限制可能有问题" -ForegroundColor Yellow
+        Write-Host "⚠️  Readonly user permission restrictions may have issues" -ForegroundColor Yellow
     }
 } catch {
-    Write-Host "❌ 只读用户连接失败" -ForegroundColor Red
+    Write-Host "❌ Readonly user connection failed" -ForegroundColor Red
 }
 ```
 
 #### 3.2.4 配置文件验证
 
 ```powershell
-# 检查系统用户
-Write-Host "`n检查系统用户:" -ForegroundColor Yellow
+# Check system users
+Write-Host "`nChecking system users:" -ForegroundColor Yellow
 docker exec clickhouse-server clickhouse-client --query "SELECT name FROM system.users"
 
-# 检查内存配置
-Write-Host "`n检查内存配置:" -ForegroundColor Yellow
+# Check memory configuration
+Write-Host "`nChecking memory configuration:" -ForegroundColor Yellow
 docker exec clickhouse-server clickhouse-client --query "SELECT name, value FROM system.settings WHERE name LIKE '%memory%' LIMIT 5"
 
-# 检查网络配置
-Write-Host "`n检查网络配置:" -ForegroundColor Yellow
+# Check network configuration
+Write-Host "`nChecking network configuration:" -ForegroundColor Yellow
 docker exec clickhouse-server clickhouse-client --query "SELECT interface, port FROM system.servers"
 
-# 检查数据库列表
-Write-Host "`n检查数据库列表:" -ForegroundColor Yellow
+# Check database list
+Write-Host "`nChecking database list:" -ForegroundColor Yellow
 docker exec clickhouse-server clickhouse-client --user admin --password ClickHouse@2024 --query "SHOW DATABASES"
 ```
 
@@ -560,7 +560,7 @@ docker exec clickhouse-server clickhouse-client --user admin --password ClickHou
 
 **使用专用配置验证工具:**
 ```powershell
-# 运行配置验证脚本
+# Run configuration validation script
 powershell -ExecutionPolicy Bypass -File "config-validator.ps1"
 ```
 
@@ -578,7 +578,7 @@ powershell -ExecutionPolicy Bypass -File "config-validator.ps1"
 #### 4.2.1 生成强密码
 
 ```powershell
-# 生成强密码函数
+# Generate strong password function
 function Generate-StrongPassword {
     param([int]$Length = 16)
     $chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*"
@@ -589,12 +589,12 @@ function Generate-StrongPassword {
     return $password
 }
 
-# 生成3个强密码示例
+# Generate 3 strong password examples
 1..3 | ForEach-Object {
     $strongPassword = Generate-StrongPassword
-    Write-Host "强密码$_`: $strongPassword" -ForegroundColor Yellow
+    Write-Host "Strong password $_`: $strongPassword" -ForegroundColor Yellow
     
-    # 计算SHA256哈希
+    # Calculate SHA256 hash
     $sha256 = [System.Security.Cryptography.SHA256]::Create()
     $hashBytes = $sha256.ComputeHash([System.Text.Encoding]::UTF8.GetBytes($strongPassword))
     $hashString = [System.BitConverter]::ToString($hashBytes).Replace('-', '').ToLower()
@@ -612,7 +612,7 @@ $sha256 = [System.Security.Cryptography.SHA256]::Create()
 $hashBytes = $sha256.ComputeHash([System.Text.Encoding]::UTF8.GetBytes($newUserPassword))
 $passwordHash = [System.BitConverter]::ToString($hashBytes).Replace('-', '').ToLower()
 
-Write-Host "新用户配置示例:" -ForegroundColor Cyan
+Write-Host "New user configuration example:" -ForegroundColor Cyan
 Write-Host @"
 <new_user>
     <password_sha256_hex>$passwordHash</password_sha256_hex>
@@ -631,10 +631,10 @@ Write-Host @"
 #### 4.3.1 IP访问限制配置
 
 ```powershell
-Write-Host "网络访问限制配置示例:" -ForegroundColor Cyan
+Write-Host "Network access restriction configuration example:" -ForegroundColor Cyan
 
-# 仅本地访问
-Write-Host "`n1. 仅本地访问:" -ForegroundColor Yellow
+# Local access only
+Write-Host "`n1. Local access only:" -ForegroundColor Yellow
 Write-Host @"
 <networks>
     <ip>::1</ip>
@@ -642,8 +642,8 @@ Write-Host @"
 </networks>
 "@ -ForegroundColor White
 
-# 局域网访问
-Write-Host "`n2. 局域网访问:" -ForegroundColor Yellow
+# LAN access
+Write-Host "`n2. LAN access:" -ForegroundColor Yellow
 Write-Host @"
 <networks>
     <ip>192.168.0.0/16</ip>
@@ -652,8 +652,8 @@ Write-Host @"
 </networks>
 "@ -ForegroundColor White
 
-# 特定IP访问
-Write-Host "`n3. 特定IP访问:" -ForegroundColor Yellow
+# Specific IP access
+Write-Host "`n3. Specific IP access:" -ForegroundColor Yellow
 Write-Host @"
 <networks>
     <ip>192.168.1.100</ip>
@@ -665,25 +665,25 @@ Write-Host @"
 #### 4.3.2 端口配置优化
 
 ```powershell
-Write-Host "`n端口配置说明:" -ForegroundColor Cyan
-Write-Host "HTTP端口 (8123): REST API和Web界面访问" -ForegroundColor Gray
-Write-Host "TCP端口 (9000): 原生客户端连接" -ForegroundColor Gray
-Write-Host "MySQL端口 (9004): MySQL协议兼容" -ForegroundColor Gray
-Write-Host "PostgreSQL端口 (9005): PostgreSQL协议兼容" -ForegroundColor Gray
+Write-Host "`nPort configuration description:" -ForegroundColor Cyan
+Write-Host "HTTP port (8123): REST API and web interface access" -ForegroundColor Gray
+Write-Host "TCP port (9000): Native client connection" -ForegroundColor Gray
+Write-Host "MySQL port (9004): MySQL protocol compatibility" -ForegroundColor Gray
+Write-Host "PostgreSQL port (9005): PostgreSQL protocol compatibility" -ForegroundColor Gray
 
-# 测试当前端口配置
-Write-Host "`n当前端口状态:" -ForegroundColor Yellow
+# Test current port configuration
+Write-Host "`nCurrent port status:" -ForegroundColor Yellow
 $ports = @(8123, 9000, 9004)
 foreach ($port in $ports) {
     try {
         $test = Test-NetConnection -ComputerName localhost -Port $port -WarningAction SilentlyContinue
         if ($test.TcpTestSucceeded) {
-            Write-Host "✅ 端口 $port 可访问" -ForegroundColor Green
+            Write-Host "✅ Port $port accessible" -ForegroundColor Green
         } else {
-            Write-Host "❌ 端口 $port 不可访问" -ForegroundColor Red
+            Write-Host "❌ Port $port not accessible" -ForegroundColor Red
         }
     } catch {
-        Write-Host "⚠️  端口 $port 测试失败" -ForegroundColor Yellow
+        Write-Host "⚠️  Port $port test failed" -ForegroundColor Yellow
     }
 }
 ```
@@ -693,18 +693,18 @@ foreach ($port in $ports) {
 #### 4.4.1 内存配置调优
 
 ```powershell
-Write-Host "`n内存配置优化:" -ForegroundColor Cyan
+Write-Host "`nMemory configuration optimization:" -ForegroundColor Cyan
 
-# 获取系统内存信息
+# Get system memory information
 $totalMemory = Get-CimInstance -ClassName Win32_ComputerSystem
 $memoryGB = [math]::Round($totalMemory.TotalPhysicalMemory / 1GB, 2)
-Write-Host "系统总内存: ${memoryGB}GB" -ForegroundColor Gray
+Write-Host "Total system memory: ${memoryGB}GB" -ForegroundColor Gray
 
-# 推荐内存配置
-$recommendedMemory = [math]::Floor($memoryGB * 0.6) * 1000000000  # 60%的系统内存
-Write-Host "推荐ClickHouse内存限制: $([math]::Round($recommendedMemory / 1000000000, 1))GB" -ForegroundColor Yellow
+# Recommended memory configuration
+$recommendedMemory = [math]::Floor($memoryGB * 0.6) * 1000000000  # 60% of system memory
+Write-Host "Recommended ClickHouse memory limit: $([math]::Round($recommendedMemory / 1000000000, 1))GB" -ForegroundColor Yellow
 
-Write-Host "`n内存配置示例:" -ForegroundColor Yellow
+Write-Host "`nMemory configuration example:" -ForegroundColor Yellow
 Write-Host @"
 <!-- 限制服务器内存使用为系统内存的60% -->
 <max_server_memory_usage_to_ram_ratio>0.6</max_server_memory_usage_to_ram_ratio>
@@ -720,17 +720,17 @@ Write-Host @"
 #### 4.4.2 并发配置调优
 
 ```powershell
-Write-Host "`n并发配置优化:" -ForegroundColor Cyan
+Write-Host "`nConcurrency configuration optimization:" -ForegroundColor Cyan
 
-# 获取CPU核心数
+# Get CPU core count
 $cpuCores = (Get-CimInstance -ClassName Win32_Processor).NumberOfCores
-Write-Host "CPU核心数: $cpuCores" -ForegroundColor Gray
+Write-Host "CPU cores: $cpuCores" -ForegroundColor Gray
 
-# 推荐并发配置
+# Recommended concurrency configuration
 $recommendedQueries = $cpuCores * 4
 $recommendedConnections = $cpuCores * 128
 
-Write-Host "`n推荐并发配置:" -ForegroundColor Yellow
+Write-Host "`nRecommended concurrency configuration:" -ForegroundColor Yellow
 Write-Host @"
 <!-- 最大并发查询数 -->
 <max_concurrent_queries>$recommendedQueries</max_concurrent_queries>
@@ -749,38 +749,38 @@ Write-Host @"
 #### 4.5.1 安全备份配置
 
 ```powershell
-# 备份当前配置
-Write-Host "备份当前配置文件..." -ForegroundColor Yellow
+# Backup current configuration
+Write-Host "Backing up current configuration files..." -ForegroundColor Yellow
 $timestamp = Get-Date -Format "yyyy-MM-dd-HH-mm-ss"
 $backupDir = "config\backup-$timestamp"
 New-Item -ItemType Directory -Path $backupDir -Force | Out-Null
 
 Copy-Item "config\config.xml" "$backupDir\config.xml" -Force
 Copy-Item "config\users.xml" "$backupDir\users.xml" -Force
-Write-Host "✅ 配置文件已备份到: $backupDir" -ForegroundColor Green
+Write-Host "✅ Configuration files backed up to: $backupDir" -ForegroundColor Green
 ```
 
 #### 4.5.2 配置修改示例
 
 ```powershell
-Write-Host "`n配置修改示例 - 调整日志级别:" -ForegroundColor Cyan
+Write-Host "`nConfiguration modification example - Adjust log level:" -ForegroundColor Cyan
 
-# 读取当前配置
+# Read current configuration
 $configPath = "config\config.xml"
 $configContent = Get-Content $configPath -Raw -Encoding UTF8
 
-# 显示当前日志级别
+# Display current log level
 if ($configContent -match '<level>([^<]+)</level>') {
     $currentLevel = $matches[1]
-    Write-Host "当前日志级别: $currentLevel" -ForegroundColor Yellow
+    Write-Host "Current log level: $currentLevel" -ForegroundColor Yellow
 }
 
-Write-Host "`n可用的日志级别:" -ForegroundColor Gray
+Write-Host "`nAvailable log levels:" -ForegroundColor Gray
 @("trace", "debug", "information", "warning", "error") | ForEach-Object {
-    Write-Host "  - $_ $(if($_ -eq $currentLevel){'(当前)'})" -ForegroundColor White
+    Write-Host "  - $_ $(if($_ -eq $currentLevel){'(current)'})" -ForegroundColor White
 }
 
-Write-Host "`n修改日志级别为debug的命令:" -ForegroundColor Cyan
+Write-Host "`nCommand to change log level to debug:" -ForegroundColor Cyan
 Write-Host @'
 $configContent = $configContent -replace '<level>information</level>', '<level>debug</level>'
 $configContent | Out-File -FilePath "config\config.xml" -Encoding UTF8
@@ -790,7 +790,7 @@ $configContent | Out-File -FilePath "config\config.xml" -Encoding UTF8
 #### 4.5.3 容器重启和验证
 
 ```powershell
-Write-Host "`n容器重启步骤:" -ForegroundColor Cyan
+Write-Host "`nContainer restart steps:" -ForegroundColor Cyan
 Write-Host @"
 # 1. 停止容器
 docker stop clickhouse-server

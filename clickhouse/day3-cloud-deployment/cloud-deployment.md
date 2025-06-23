@@ -106,19 +106,19 @@ graph LR
 
 #### 1.1 安装Terraform
 ```powershell
-# 下载Terraform
+# Download Terraform
 # https://www.terraform.io/downloads.html
 
-# 验证安装
+# Verify installation
 terraform version
 ```
 
 #### 1.2 配置阿里云访问
 ```powershell
-# 检查AccessKey文件
+# Check AccessKey file
 Get-Content C:\Users\mingbo\aliyun\AccessKey.csv
 
-# 设置环境变量（自动）
+# Set environment variables (automatic)
 .\infrastructure\terraform\setup_aliyun.ps1 -Action plan
 ```
 
@@ -126,10 +126,10 @@ Get-Content C:\Users\mingbo\aliyun\AccessKey.csv
 
 #### 2.1 生成密钥对
 ```powershell
-# 生成SSH密钥对
+# Generate SSH key pair
 .\infrastructure\terraform\generate-ssh-key.ps1
 
-# 检查生成的文件
+# Check generated files
 ls infrastructure\terraform\clickhouse_key*
 ```
 
@@ -165,10 +165,10 @@ terraform output -json
 
 #### 4.1 连接测试
 ```powershell
-# 获取连接信息
+# Get connection information
 terraform output ssh_commands
 
-# SSH连接示例
+# SSH connection example
 ssh -i clickhouse_key ubuntu@<public_ip>
 ```
 
