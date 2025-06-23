@@ -1,0 +1,118 @@
+<?xml version="1.0"?>
+<clickhouse>
+    <!-- 目标集群配置：1 shard, 2 replicas -->
+    <remote_servers>
+        <cluster_1s_2r>
+            <!-- 单个分片，两个副本 -->
+            <shard>
+                <replica>
+                    <host>10.0.1.1</host><!-- 复用原有IP -->
+                    <port>9000</port>
+                    <user>default</user>
+                    <password></password>
+                </replica>
+                <replica>
+                    <host>10.0.1.2</host><!-- 复用原有IP -->
+                    <port>9000</port>
+                    <user>default</user>
+                    <password></password>
+                </replica>
+            </shard>
+        </cluster_1s_2r>
+    </remote_servers>
+
+    <!-- ZooKeeper配置（与源集群相同） -->
+    <zookeeper>
+        <node>
+            <host>10.0.1.10</host>
+            <port>2181</port>
+        </node>
+        <node>
+            <host>10.0.1.11</host>
+            <port>2181</port>
+        </node>
+        <node>
+            <host>10.0.1.12</host>
+            <port>2181</port>
+        </node>
+    </zookeeper>
+
+    <!-- 分布式DDL设置 -->
+    <distributed_ddl>
+        <path>/clickhouse/task_queue/ddl</path>
+        <profile>default</profile>
+        <pool_size>1</pool_size>
+        <max_tasks_in_queue>1000</max_tasks_in_queue>
+        <task_max_lifetime>604800</task_max_lifetime>
+        <cleanup_delay_period>60</cleanup_delay_period>
+        <max_pushed_ddl_entries_to_keep>1000</max_pushed_ddl_entries_to_keep>
+    </distributed_ddl>
+
+    <!-- 宏定义 -->
+    <macros>
+        <cluster>cluster_1s_2r</cluster>
+        <shard>01</shard><!-- 统一分片编号 -->
+        <replica>replica_1</replica><!-- 根据实际节点调整 -->
+    </macros>
+
+    <!-- 优化性能设置（单分片需要更高配置） -->
+    <max_connections>8192</max_connections>
+    <keep_alive_timeout>3</keep_alive_timeout>
+    <max_concurrent_queries>200</max_concurrent_queries>
+    <uncompressed_cache_size>17179869184</uncompressed_cache_size><!-- 16GB -->
+    <mark_cache_size>10737418240</mark_cache_size><!-- 10GB -->
+    
+    <!-- 内存使用优化 -->
+    <max_memory_usage>85899345920</max_memory_usage><!-- 80GB -->
+    <max_bytes_before_external_group_by>68719476736</max_bytes_before_external_group_by><!-- 64GB -->
+    <max_bytes_before_external_sort>68719476736</max_bytes_before_external_sort><!-- 64GB -->
+    
+    <!-- 查询处理优化 -->
+    <max_threads>32</max_threads>
+    <max_alter_threads>8</max_alter_threads>
+    <background_pool_size>32</background_pool_size>
+    <background_merges_mutations_concurrency_ratio>4</background_merges_mutations_concurrency_ratio>
+    
+    <!-- 网络设置 -->
+    <listen_host>::</listen_host>
+    <http_port>8123</http_port>
+    <tcp_port>9000</tcp_port>
+    <mysql_port>9004</mysql_port>
+    <postgresql_port>9005</postgresql_port>
+    
+    <!-- 日志设置 -->
+    <logger>
+        <level>information</level>
+        <log>/var/log/clickhouse-server/clickhouse-server.log</log>
+        <errorlog>/var/log/clickhouse-server/clickhouse-server.err.log</errorlog>
+        <size>1000M</size>
+        <count>10</count>
+    </logger>
+
+    <!-- 数据存储配置 -->
+    <storage_configuration>
+        <disks>
+            <default>
+                <path>/var/lib/clickhouse/</path>
+            </default>
+            <fast_disk>
+                <path>/var/lib/clickhouse_fast/</path>
+                <type>local</type>
+            </fast_disk>
+        </disks>
+        <policies>
+            <fast_policy>
+                <volumes>
+                    <fast>
+                        <disk>fast_disk</disk>
+                        <max_data_part_size_bytes>1073741824</max_data_part_size_bytes><!-- 1GB -->
+                    </fast>
+                    <main>
+                        <disk>default</disk>
+                    </main>
+                </volumes>
+                <move_factor>0.1</move_factor>
+            </fast_policy>
+        </policies>
+    </storage_configuration>
+</clickhouse> 

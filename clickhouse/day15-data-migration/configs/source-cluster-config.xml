@@ -1,0 +1,112 @@
+<?xml version="1.0"?>
+<clickhouse>
+    <!-- 源集群配置：3 shards, 2 replicas -->
+    <remote_servers>
+        <cluster_3s_2r>
+            <!-- 第一个分片 -->
+            <shard>
+                <replica>
+                    <host>10.0.1.1</host>
+                    <port>9000</port>
+                    <user>default</user>
+                    <password></password>
+                </replica>
+                <replica>
+                    <host>10.0.1.2</host>
+                    <port>9000</port>
+                    <user>default</user>
+                    <password></password>
+                </replica>
+            </shard>
+            
+            <!-- 第二个分片 -->
+            <shard>
+                <replica>
+                    <host>10.0.1.3</host>
+                    <port>9000</port>
+                    <user>default</user>
+                    <password></password>
+                </replica>
+                <replica>
+                    <host>10.0.1.4</host>
+                    <port>9000</port>
+                    <user>default</user>
+                    <password></password>
+                </replica>
+            </shard>
+            
+            <!-- 第三个分片 -->
+            <shard>
+                <replica>
+                    <host>10.0.1.5</host>
+                    <port>9000</port>
+                    <user>default</user>
+                    <password></password>
+                </replica>
+                <replica>
+                    <host>10.0.1.6</host>
+                    <port>9000</port>
+                    <user>default</user>
+                    <password></password>
+                </replica>
+            </shard>
+        </cluster_3s_2r>
+    </remote_servers>
+
+    <!-- ZooKeeper配置 -->
+    <zookeeper>
+        <node>
+            <host>10.0.1.10</host>
+            <port>2181</port>
+        </node>
+        <node>
+            <host>10.0.1.11</host>
+            <port>2181</port>
+        </node>
+        <node>
+            <host>10.0.1.12</host>
+            <port>2181</port>
+        </node>
+    </zookeeper>
+
+    <!-- 分布式DDL设置 -->
+    <distributed_ddl>
+        <path>/clickhouse/task_queue/ddl</path>
+        <profile>default</profile>
+        <pool_size>1</pool_size>
+        <max_tasks_in_queue>1000</max_tasks_in_queue>
+        <task_max_lifetime>604800</task_max_lifetime>
+        <cleanup_delay_period>60</cleanup_delay_period>
+        <max_pushed_ddl_entries_to_keep>1000</max_pushed_ddl_entries_to_keep>
+    </distributed_ddl>
+
+    <!-- 宏定义 -->
+    <macros>
+        <cluster>cluster_3s_2r</cluster>
+        <shard>01</shard><!-- 根据实际节点调整 -->
+        <replica>replica_1</replica><!-- 根据实际节点调整 -->
+    </macros>
+
+    <!-- 性能设置 -->
+    <max_connections>4096</max_connections>
+    <keep_alive_timeout>3</keep_alive_timeout>
+    <max_concurrent_queries>100</max_concurrent_queries>
+    <uncompressed_cache_size>8589934592</uncompressed_cache_size>
+    <mark_cache_size>5368709120</mark_cache_size>
+    
+    <!-- 网络设置 -->
+    <listen_host>::</listen_host>
+    <http_port>8123</http_port>
+    <tcp_port>9000</tcp_port>
+    <mysql_port>9004</mysql_port>
+    <postgresql_port>9005</postgresql_port>
+    
+    <!-- 日志设置 -->
+    <logger>
+        <level>information</level>
+        <log>/var/log/clickhouse-server/clickhouse-server.log</log>
+        <errorlog>/var/log/clickhouse-server/clickhouse-server.err.log</errorlog>
+        <size>1000M</size>
+        <count>10</count>
+    </logger>
+</clickhouse> 
