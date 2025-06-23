@@ -1,0 +1,417 @@
+---
+# Day 6: 高级条件判断演示
+- name: 高级条件判断与逻辑控制
+  hosts: localhost
+  gather_facts: yes
+  vars:
+    # 环境配置
+    environment: "{{ env | default('development') }}"
+    deployment_type: "{{ deploy_type | default('standard') }}"
+    
+    # 服务器配置
+    server_specs:
+      cpu_cores: "{{ ansible_processor_vcpus | default(2) }}"
+      memory_gb: "{{ (ansible_memtotal_mb / 1024) | round | int if ansible_memtotal_mb is defined else 4 }}"
+      disk_gb: 100
+    
+    # 环境特定配置
+    environments:
+      development:
+        max_connections: 50
+        log_level: debug
+        backup_enabled: false
+        monitoring_enabled: false
+        ssl_enabled: false
+      staging:
+        max_connections: 200
+        log_level: info
+        backup_enabled: true
+        monitoring_enabled: true
+        ssl_enabled: true
+      production:
+        max_connections: 1000
+        log_level: warn
+        backup_enabled: true
+        monitoring_enabled: true
+        ssl_enabled: true
+        approval_required: true
+    
+    # 服务列表
+    available_services:
+      - name: nginx
+        required_memory: 1
+        environments: ["development", "staging", "production"]
+        os_support: ["Ubuntu", "CentOS", "RedHat"]
+      - name: mysql
+        required_memory: 2
+        environments: ["staging", "production"]
+        os_support: ["Ubuntu", "CentOS"]
+      - name: redis
+        required_memory: 1
+        environments: ["production"]
+        os_support: ["Ubuntu", "CentOS", "RedHat"]
+      - name: nodejs
+        required_memory: 1
+        environments: ["development", "staging"]
+        os_support: ["Ubuntu"]
+    
+    # 用户角色配置
+    user_roles:
+      admin:
+        sudo_access: true
+        ssh_access: true
+        environments: ["development", "staging", "production"]
+      developer:
+        sudo_access: false
+        ssh_access: true
+        environments: ["development", "staging"]
+      operator:
+        sudo_access: true
+        ssh_access: true
+        environments: ["staging", "production"]
+
+  tasks:
+    # ==================================================
+    # 第一部分：基础条件判断演示
+    # ==================================================
+    
+    - name: "=== 第一部分：基础条件判断演示 ==="
+      debug:
+        msg: "开始演示基础条件判断功能"
+
+    - name: 检查当前环境配置
+      debug:
+        msg: |
+          当前环境: {{ environment }}
+          部署类型: {{ deployment_type }}
+          服务器规格: {{ server_specs.cpu_cores }}核心, {{ server_specs.memory_gb }}GB内存
+      when: environment is defined
+
+    - name: 简单条件判断 - 开发环境特殊处理
+      debug:
+        msg: "开发环境 - 启用调试模式和详细日志"
+      when: environment == "development"
+
+    - name: 多条件组合 - 生产环境且高配置服务器
+      debug:
+        msg: "生产环境高配置服务器 - 启用所有优化功能"
+      when:
+        - environment == "production"
+        - server_specs.cpu_cores >= 4
+        - server_specs.memory_gb >= 8
+
+    - name: 逻辑运算符 - 复杂条件表达式
+      debug:
+        msg: "满足高性能配置要求"
+      when: >
+        (environment == "production" and server_specs.cpu_cores >= 4) or
+        (environment == "staging" and server_specs.memory_gb >= 8) or
+        (environment == "development" and deployment_type == "testing")
+
+    # ==================================================
+    # 第二部分：变量检查和类型判断
+    # ==================================================
+    
+    - name: "=== 第二部分：变量检查和类型判断 ==="
+      debug:
+        msg: "开始演示变量检查和类型判断"
+
+    - name: 检查变量是否已定义
+      debug:
+        msg: "环境配置已定义: {{ environments[environment] }}"
+      when: 
+        - environment is defined
+        - environment in environments
+
+    - name: 检查变量类型 - 字符串类型
+      debug:
+        msg: "环境变量是字符串类型: {{ environment }}"
+      when: environment is string
+
+    - name: 检查变量类型 - 数字类型
+      debug:
+        msg: "CPU核心数是数字类型: {{ server_specs.cpu_cores }}"
+      when: server_specs.cpu_cores is number
+
+    - name: 检查变量类型 - 布尔类型
+      debug:
+        msg: "SSL启用状态: {{ environments[environment].ssl_enabled }}"
+      when: 
+        - environments[environment].ssl_enabled is defined
+        - environments[environment].ssl_enabled is boolean
+
+    # ==================================================
+    # 第三部分：正则表达式和模式匹配
+    # ==================================================
+    
+    - name: "=== 第三部分：正则表达式和模式匹配 ==="
+      debug:
+        msg: "开始演示正则表达式和模式匹配"
+
+    - name: 正则表达式匹配 - 检查环境名称模式
+      debug:
+        msg: "环境名称符合生产模式"
+      when: environment is match("^prod.*")
+
+    - name: 正则表达式匹配 - 检查开发相关环境
+      debug:
+        msg: "检测到开发相关环境: {{ environment }}"
+      when: environment is match("^(dev|development|test).*")
+
+    - name: 字符串包含检查
+      debug:
+        msg: "环境名称包含 'prod': {{ environment }}"
+      when: "'prod' in environment"
+
+    # ==================================================
+    # 第四部分：动态条件设置
+    # ==================================================
+    
+    - name: "=== 第四部分：动态条件设置 ==="
+      debug:
+        msg: "开始演示动态条件设置"
+
+    - name: 动态设置数据库配置
+      set_fact:
+        database_config:
+          host: >-
+            {% if environment == 'production' %}
+            prod-db.company.com
+            {% elif environment == 'staging' %}
+            staging-db.company.com
+            {% else %}
+            localhost
+            {% endif %}
+          port: >-
+            {% if environment == 'production' %}
+            3306
+            {% elif environment == 'staging' %}
+            3307
+            {% else %}
+            3308
+            {% endif %}
+          pool_size: >-
+            {% if server_specs.memory_gb >= 8 %}
+            50
+            {% elif server_specs.memory_gb >= 4 %}
+            20
+            {% else %}
+            10
+            {% endif %}
+
+    - name: 显示动态生成的数据库配置
+      debug:
+        var: database_config
+
+    - name: 动态设置服务器性能参数
+      set_fact:
+        performance_config:
+          worker_processes: "{{ server_specs.cpu_cores }}"
+          worker_connections: "{{ (server_specs.memory_gb * 256) | int }}"
+          keepalive_timeout: >-
+            {% if environment == 'production' %}
+            65
+            {% else %}
+            30
+            {% endif %}
+          client_max_body_size: >-
+            {% if environment == 'production' %}
+            100m
+            {% elif environment == 'staging' %}
+            50m
+            {% else %}
+            10m
+            {% endif %}
+
+    - name: 显示性能配置
+      debug:
+        var: performance_config
+
+    # ==================================================
+    # 第五部分：服务兼容性检查
+    # ==================================================
+    
+    - name: "=== 第五部分：服务兼容性检查 ==="
+      debug:
+        msg: "开始演示服务兼容性检查"
+
+    - name: 检查服务环境兼容性
+      debug:
+        msg: "服务 {{ item.name }} 在环境 {{ environment }} 中可用"
+      loop: "{{ available_services }}"
+      when: environment in item.environments
+
+    - name: 检查服务内存要求
+      debug:
+        msg: "服务 {{ item.name }} 内存要求 {{ item.required_memory }}GB，当前可用 {{ server_specs.memory_gb }}GB"
+      loop: "{{ available_services }}"
+      when: 
+        - environment in item.environments
+        - server_specs.memory_gb >= item.required_memory
+
+    - name: 检查操作系统兼容性
+      debug:
+        msg: "服务 {{ item.name }} 支持当前操作系统 {{ ansible_distribution | default('Unknown') }}"
+      loop: "{{ available_services }}"
+      when: 
+        - ansible_distribution is defined
+        - ansible_distribution in item.os_support
+        - environment in item.environments
+
+    # ==================================================
+    # 第六部分：用户权限和访问控制
+    # ==================================================
+    
+    - name: "=== 第六部分：用户权限和访问控制 ==="
+      debug:
+        msg: "开始演示用户权限和访问控制"
+
+    - name: 检查用户角色环境访问权限
+      debug:
+        msg: "角色 {{ item.key }} 可以访问环境 {{ environment }}"
+      loop: "{{ user_roles | dict2items }}"
+      when: environment in item.value.environments
+
+    - name: 检查管理员权限需求
+      debug:
+        msg: "当前环境需要管理员权限"
+      when: 
+        - environment in ["staging", "production"]
+        - user_roles.admin.environments is defined
+        - environment in user_roles.admin.environments
+
+    - name: 检查SSH访问权限
+      debug:
+        msg: "角色 {{ item.key }} 具有SSH访问权限"
+      loop: "{{ user_roles | dict2items }}"
+      when: 
+        - item.value.ssh_access | default(false)
+        - environment in item.value.environments
+
+    # ==================================================
+    # 第七部分：条件性配置生成
+    # ==================================================
+    
+    - name: "=== 第七部分：条件性配置生成 ==="
+      debug:
+        msg: "开始演示条件性配置生成"
+
+    - name: 生成环境特定的应用配置
+      set_fact:
+        app_config:
+          debug: "{{ true if environment == 'development' else false }}"
+          log_level: "{{ environments[environment].log_level }}"
+          max_connections: "{{ environments[environment].max_connections }}"
+          ssl_enabled: "{{ environments[environment].ssl_enabled }}"
+          backup_enabled: "{{ environments[environment].backup_enabled }}"
+          monitoring_enabled: "{{ environments[environment].monitoring_enabled }}"
+          cache_enabled: "{{ true if server_specs.memory_gb >= 4 else false }}"
+          compression_enabled: "{{ true if environment != 'development' else false }}"
+
+    - name: 显示生成的应用配置
+      debug:
+        var: app_config
+
+    - name: 条件性创建配置文件内容
+      set_fact:
+        config_content: |
+          # 自动生成的配置文件
+          # 环境: {{ environment }}
+          # 生成时间: {{ ansible_date_time.iso8601 }}
+          
+          [server]
+          environment = {{ environment }}
+          debug = {{ app_config.debug | lower }}
+          log_level = {{ app_config.log_level }}
+          
+          [database]
+          host = {{ database_config.host }}
+          port = {{ database_config.port }}
+          pool_size = {{ database_config.pool_size }}
+          
+          [performance]
+          worker_processes = {{ performance_config.worker_processes }}
+          worker_connections = {{ performance_config.worker_connections }}
+          keepalive_timeout = {{ performance_config.keepalive_timeout }}
+          
+          {% if app_config.ssl_enabled %}
+          [ssl]
+          enabled = true
+          certificate = /etc/ssl/certs/{{ environment }}.crt
+          private_key = /etc/ssl/private/{{ environment }}.key
+          {% endif %}
+          
+          {% if app_config.monitoring_enabled %}
+          [monitoring]
+          enabled = true
+          endpoint = /metrics
+          port = 9090
+          {% endif %}
+
+    - name: 显示生成的配置文件内容
+      debug:
+        msg: "{{ config_content }}"
+
+    # ==================================================
+    # 第八部分：条件性任务执行总结
+    # ==================================================
+    
+    - name: "=== 第八部分：条件性任务执行总结 ==="
+      debug:
+        msg: "开始生成条件性任务执行总结"
+
+    - name: 统计已执行的条件任务
+      set_fact:
+        execution_summary:
+          environment: "{{ environment }}"
+          compatible_services: "{{ available_services | selectattr('environments', 'contains', environment) | list | length }}"
+          memory_sufficient_services: "{{ available_services | selectattr('required_memory', 'le', server_specs.memory_gb) | list | length }}"
+          accessible_roles: "{{ user_roles | dict2items | selectattr('value.environments', 'contains', environment) | list | length }}"
+          ssl_required: "{{ environments[environment].ssl_enabled }}"
+          backup_required: "{{ environments[environment].backup_enabled }}"
+          monitoring_required: "{{ environments[environment].monitoring_enabled }}"
+          high_performance_mode: "{{ server_specs.cpu_cores >= 4 and server_specs.memory_gb >= 8 }}"
+
+    - name: 显示执行总结
+      debug:
+        msg: |
+          ======================================
+          条件判断演示执行总结
+          ======================================
+          环境: {{ execution_summary.environment }}
+          兼容服务数量: {{ execution_summary.compatible_services }}
+          内存满足要求的服务: {{ execution_summary.memory_sufficient_services }}
+          可访问角色数量: {{ execution_summary.accessible_roles }}
+          SSL要求: {{ execution_summary.ssl_required }}
+          备份要求: {{ execution_summary.backup_required }}
+          监控要求: {{ execution_summary.monitoring_required }}
+          高性能模式: {{ execution_summary.high_performance_mode }}
+          ======================================
+
+    - name: 根据条件生成推荐配置
+      debug:
+        msg: |
+          推荐配置建议:
+          {% if execution_summary.high_performance_mode %}
+          - 启用高性能模式配置
+          - 增加缓存配置
+          - 启用连接池优化
+          {% endif %}
+          {% if execution_summary.ssl_required %}
+          - 配置SSL证书
+          - 启用HTTPS重定向
+          {% endif %}
+          {% if execution_summary.backup_required %}
+          - 设置自动备份策略
+          - 配置备份保留策略
+          {% endif %}
+          {% if execution_summary.monitoring_required %}
+          - 部署监控代理
+          - 配置告警规则
+          {% endif %}
+      when: execution_summary is defined
+
+  handlers:
+    - name: restart services
+      debug:
+        msg: "重启服务: {{ item }}" 

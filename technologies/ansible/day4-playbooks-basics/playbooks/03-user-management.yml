@@ -1,0 +1,313 @@
+---
+# 用户管理 Playbook
+- name: "用户和权限管理"
+  hosts: all
+  become: yes
+  vars:
+    # 定义应用用户列表
+    app_users:
+      - name: "webdev"
+        comment: "Web开发人员"
+        groups: ["sudo", "www-data"]
+        shell: "/bin/bash"
+        create_home: yes
+        password: "$6$salt$encrypted_password"  # 需要预先加密
+        
+      - name: "deploy"
+        comment: "部署专用用户"
+        groups: ["www-data"]
+        shell: "/bin/bash"
+        create_home: yes
+        system: yes
+        
+      - name: "monitor"
+        comment: "监控用户"
+        groups: ["monitor"]
+        shell: "/bin/bash"
+        create_home: yes
+        system: yes
+        
+    # SSH 公钥 (实际使用时应该从文件读取)
+    ssh_keys:
+      webdev: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC... webdev@company.com"
+      deploy: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQD... deploy@automation"
+      
+  tasks:
+    - name: "创建必要的用户组"
+      group:
+        name: "{{ item }}"
+        state: present
+      loop:
+        - developers
+        - deployers
+        - monitor
+        
+    - name: "显示当前用户列表"
+      command: cat /etc/passwd
+      register: current_users
+      changed_when: false
+      
+    - name: "显示现有用户(仅用户名)"
+      debug:
+        msg: "现有用户: {{ current_users.stdout_lines | map('regex_replace', '^([^:]+):.*', '\\1') | list }}"
+        
+    - name: "创建应用用户"
+      user:
+        name: "{{ item.name }}"
+        comment: "{{ item.comment | default('') }}"
+        groups: "{{ (item.groups | default([])) + ['developers'] }}"
+        shell: "{{ item.shell | default('/bin/bash') }}"
+        create_home: "{{ item.create_home | default(true) }}"
+        system: "{{ item.system | default(false) }}"
+        state: present
+        # password: "{{ item.password | default(omit) }}"
+      loop: "{{ app_users }}"
+      register: user_creation
+      
+    - name: "显示用户创建结果"
+      debug:
+        msg: |
+          用户 {{ item.item.name }}:
+          状态: {{ 'created' if item.changed else 'already exists' }}
+          UID: {{ item.uid | default('N/A') }}
+          主目录: {{ item.home | default('N/A') }}
+      loop: "{{ user_creation.results }}"
+      
+    - name: "设置用户密码 (交互式)"
+      debug:
+        msg: |
+          请为用户 {{ item.name }} 手动设置密码:
+          sudo passwd {{ item.name }}
+      loop: "{{ app_users }}"
+      when: item.password is not defined
+      
+    - name: "创建 SSH 目录"
+      file:
+        path: "/home/{{ item.name }}/.ssh"
+        state: directory
+        owner: "{{ item.name }}"
+        group: "{{ item.name }}"
+        mode: '0700'
+      loop: "{{ app_users }}"
+      when: not item.system | default(false)
+      
+    - name: "设置 SSH 公钥"
+      authorized_key:
+        user: "{{ item.key }}"
+        key: "{{ item.value }}"
+        state: present
+        comment: "Ansible managed key for {{ item.key }}"
+      loop: "{{ ssh_keys | dict2items }}"
+      when: item.key in (app_users | map(attribute='name') | list)
+      
+    - name: "配置 sudo 权限"
+      copy:
+        content: |
+          # 开发人员 sudo 权限
+          %developers ALL=(ALL) NOPASSWD: /usr/bin/systemctl restart nginx
+          %developers ALL=(ALL) NOPASSWD: /usr/bin/systemctl reload nginx
+          %developers ALL=(ALL) NOPASSWD: /usr/bin/systemctl status nginx
+          %developers ALL=(ALL) NOPASSWD: /usr/bin/tail -f /var/log/nginx/*
+          %developers ALL=(ALL) NOPASSWD: /usr/bin/less /var/log/nginx/*
+          
+          # 部署人员权限
+          %deployers ALL=(ALL) NOPASSWD: /usr/bin/systemctl restart *
+          %deployers ALL=(ALL) NOPASSWD: /usr/bin/systemctl reload *
+          %deployers ALL=(ALL) NOPASSWD: /usr/bin/systemctl stop *
+          %deployers ALL=(ALL) NOPASSWD: /usr/bin/systemctl start *
+          
+          # 监控权限
+          %monitor ALL=(ALL) NOPASSWD: /usr/bin/systemctl status *
+          %monitor ALL=(ALL) NOPASSWD: /usr/bin/ps aux
+          %monitor ALL=(ALL) NOPASSWD: /usr/bin/netstat -tlnp
+          %monitor ALL=(ALL) NOPASSWD: /usr/bin/ss -tlnp
+        dest: /etc/sudoers.d/app_users
+        mode: '0440'
+        validate: 'visudo -cf %s'
+        
+    - name: "创建用户专用目录"
+      file:
+        path: "{{ item.path }}"
+        state: directory
+        owner: "{{ item.owner }}"
+        group: "{{ item.group | default(item.owner) }}"
+        mode: "{{ item.mode }}"
+      loop:
+        - { path: "/opt/apps", owner: "deploy", mode: "0755" }
+        - { path: "/var/log/apps", owner: "deploy", group: "www-data", mode: "0775" }
+        - { path: "/home/webdev/scripts", owner: "webdev", mode: "0755" }
+        - { path: "/home/monitor/tools", owner: "monitor", mode: "0755" }
+        
+    - name: "创建用户脚本"
+      copy:
+        content: |
+          #!/bin/bash
+          # {{ item.name }} 的便捷脚本
+          
+          echo "欢迎 {{ item.name }}!"
+          echo "当前时间: $(date)"
+          echo "系统负载: $(uptime | cut -d',' -f3-)"
+          echo "磁盘使用: $(df -h / | tail -1 | awk '{print $5}')"
+          
+          # 常用别名
+          alias ll='ls -la'
+          alias la='ls -A'
+          alias l='ls -CF'
+          alias ..='cd ..'
+          alias ...='cd ../..'
+          alias grep='grep --color=auto'
+          
+          {% if item.name == 'webdev' %}
+          # Web 开发专用别名
+          alias nginx-reload='sudo systemctl reload nginx'
+          alias nginx-status='sudo systemctl status nginx'
+          alias nginx-test='sudo nginx -t'
+          alias logs='sudo tail -f /var/log/nginx/error.log'
+          {% endif %}
+          
+          {% if item.name == 'deploy' %}
+          # 部署专用别名
+          alias deploy-status='sudo systemctl status nginx php7.4-fpm mysql'
+          alias app-logs='sudo tail -f /var/log/apps/*'
+          alias quick-deploy='cd /opt/apps && ./deploy.sh'
+          {% endif %}
+          
+          {% if item.name == 'monitor' %}
+          # 监控专用别名
+          alias check-services='sudo systemctl status nginx php7.4-fpm mysql'
+          alias check-ports='sudo netstat -tlnp'
+          alias check-processes='ps aux | head -20'
+          alias check-disk='df -h'
+          alias check-memory='free -h'
+          {% endif %}
+        dest: "/home/{{ item.name }}/.bashrc_custom"
+        owner: "{{ item.name }}"
+        group: "{{ item.name }}"
+        mode: '0644'
+      loop: "{{ app_users }}"
+      when: not item.system | default(false)
+      
+    - name: "添加自定义配置到 .bashrc"
+      lineinfile:
+        path: "/home/{{ item.name }}/.bashrc"
+        line: "source ~/.bashrc_custom"
+        create: yes
+        owner: "{{ item.name }}"
+        group: "{{ item.name }}"
+        mode: '0644'
+      loop: "{{ app_users }}"
+      when: not item.system | default(false)
+      
+    - name: "设置用户环境变量"
+      copy:
+        content: |
+          # {{ item.name }} 专用环境变量
+          export USER_ROLE="{{ item.comment | default('User') }}"
+          export WORKSPACE="/home/{{ item.name }}"
+          
+          {% if item.name == 'webdev' %}
+          export NGINX_CONF_DIR="/etc/nginx"
+          export WEB_ROOT="/var/www"
+          export DEV_MODE="true"
+          {% endif %}
+          
+          {% if item.name == 'deploy' %}
+          export APP_DIR="/opt/apps"
+          export LOG_DIR="/var/log/apps"
+          export DEPLOY_ENV="production"
+          {% endif %}
+          
+          {% if item.name == 'monitor' %}
+          export MONITOR_TOOLS="/home/monitor/tools"
+          export LOG_LEVEL="info"
+          {% endif %}
+        dest: "/home/{{ item.name }}/.profile_custom"
+        owner: "{{ item.name }}"
+        group: "{{ item.name }}"
+        mode: '0644'
+      loop: "{{ app_users }}"
+      when: not item.system | default(false)
+      
+    - name: "验证用户创建"
+      command: id {{ item.name }}
+      register: user_verify
+      loop: "{{ app_users }}"
+      changed_when: false
+      
+    - name: "显示用户验证结果"
+      debug:
+        msg: |
+          用户 {{ item.item.name }} 验证结果:
+          {{ item.stdout }}
+      loop: "{{ user_verify.results }}"
+      
+    - name: "检查用户权限"
+      command: groups {{ item.name }}
+      register: user_groups
+      loop: "{{ app_users }}"
+      changed_when: false
+      
+    - name: "显示用户组信息"
+      debug:
+        msg: "{{ item.stdout }}"
+      loop: "{{ user_groups.results }}"
+      
+    - name: "生成用户报告"
+      copy:
+        content: |
+          # 用户管理报告
+          生成时间: {{ ansible_date_time.iso8601 }}
+          主机: {{ inventory_hostname }}
+          
+          ## 创建的用户
+          {% for user in app_users %}
+          - 用户名: {{ user.name }}
+            描述: {{ user.comment | default('无描述') }}
+            用户组: {{ user.groups | default([]) | join(', ') }}
+            Shell: {{ user.shell | default('/bin/bash') }}
+            系统用户: {{ user.system | default(false) }}
+            主目录: /home/{{ user.name }}
+          
+          {% endfor %}
+          
+          ## SSH 密钥配置
+          {% for key_user, key_value in ssh_keys.items() %}
+          - {{ key_user }}: 已配置 SSH 公钥
+          {% endfor %}
+          
+          ## 目录结构
+          - /opt/apps (部署目录)
+          - /var/log/apps (应用日志)
+          - /home/webdev/scripts (开发脚本)
+          - /home/monitor/tools (监控工具)
+          
+          ## Sudo 权限
+          - 开发人员: nginx 服务管理, 日志查看
+          - 部署人员: 所有服务管理
+          - 监控人员: 状态查看, 进程监控
+          
+          ## 注意事项
+          1. 请为新用户设置密码: sudo passwd <username>
+          2. SSH 密钥已配置，可直接远程登录
+          3. 自定义脚本已添加到 ~/.bashrc_custom
+          4. 环境变量配置在 ~/.profile_custom
+        dest: "/tmp/user_management_report.md"
+        mode: '0644'
+        
+    - name: "显示完成信息"
+      debug:
+        msg: |
+          🎉 用户管理完成！
+          
+          创建的用户: {{ app_users | map(attribute='name') | join(', ') }}
+          
+          下一步操作:
+          1. 为用户设置密码
+          2. 测试 SSH 登录
+          3. 验证 sudo 权限
+          4. 查看报告: cat /tmp/user_management_report.md
+          
+          快速测试:
+          sudo su - webdev
+          sudo su - deploy
+          sudo su - monitor 

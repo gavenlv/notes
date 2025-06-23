@@ -1,0 +1,445 @@
+{
+  "monitoring": {
+    "version": "1.0",
+    "generated_at": "{{ ansible_date_time.iso8601 }}",
+    "generated_by": "{{ inventory_hostname }}",
+    "application": {
+      "name": "{{ app_config.name }}",
+      "version": "{{ app_config.version }}",
+      "environment": "{{ app_config.environment }}"
+    },
+    
+    "global_settings": {
+      "scrape_interval": "15s",
+      "evaluation_interval": "15s",
+      "external_labels": {
+        "environment": "{{ app_config.environment }}",
+        "application": "{{ app_config.name | lower }}",
+        "region": "{{ ansible_default_ipv4.address | regex_replace('^(\\d+\\.\\d+)\\..*', '\\1') }}"
+      }
+    },
+    
+    "targets": {
+      "servers": [
+        {% for server in servers %}
+        {
+          "hostname": "{{ server.hostname }}",
+          "ip": "{{ server.ip }}",
+          "role": "{{ server.role }}",
+          "services": {{ server.services | to_json }},
+          "specs": {
+            "cpu_cores": {{ server.specs.cpu }},
+            "memory_mb": {{ server.specs.memory }},
+            "disk_gb": {{ server.specs.disk }}
+          },
+          "endpoints": {
+            {% if server.role == 'frontend' %}
+            "nginx_status": "http://{{ server.ip }}:8080/nginx_status",
+            "metrics": "http://{{ server.ip }}:9090/metrics"
+            {% elif server.role == 'api' %}
+            "health": "http://{{ server.ip }}:8080/health",
+            "metrics": "http://{{ server.ip }}:8080/metrics"
+            {% elif server.role == 'database' %}
+            "mysql_exporter": "http://{{ server.ip }}:9104/metrics",
+            "health": "http://{{ server.ip }}:3306"
+            {% endif %}
+          }
+        }{% if not loop.last %},{% endif %}
+        {% endfor %}
+      ]
+    },
+    
+    {% if monitoring.enabled | default(false) %}
+    "health_checks": {
+      "enabled": true,
+      "endpoints": [
+        {% for endpoint in monitoring.endpoints %}
+        {
+          "name": "{{ endpoint.name }}",
+          "path": "{{ endpoint.path }}",
+          "check_interval": "{{ endpoint.check_interval }}",
+          "timeout": "5s",
+          "expected_status": 200,
+          "targets": [
+            {% for server in servers %}
+            {% if server.role in ['frontend', 'api'] %}
+            "http://{{ server.ip }}:{% if server.role == 'frontend' %}80{% else %}8080{% endif %}{{ endpoint.path }}"{% if not loop.last %},{% endif %}
+            {% endif %}
+            {% endfor %}
+          ]
+        }{% if not loop.last %},{% endif %}
+        {% endfor %}
+      ]
+    },
+    
+    "alerting": {
+      "enabled": true,
+      "rules": [
+        {% for alert in monitoring.alerts %}
+        {
+          "name": "{{ alert.metric }}_high",
+          "metric": "{{ alert.metric }}",
+          "condition": "> {{ alert.threshold }}",
+          "severity": "{{ alert.severity }}",
+          "for": "{% if alert.severity == 'critical' %}2m{% else %}5m{% endif %}",
+          "labels": {
+            "alertname": "{{ alert.metric | title }}High",
+            "severity": "{{ alert.severity }}"
+          },
+          "annotations": {
+            {% if alert.metric == 'cpu_usage' %}
+            "summary": "High CPU usage detected",
+            "description": "CPU usage is above {{ alert.threshold }}% for more than {% if alert.severity == 'critical' %}2{% else %}5{% endif %} minutes"
+            {% elif alert.metric == 'memory_usage' %}
+            "summary": "High memory usage detected", 
+            "description": "Memory usage is above {{ alert.threshold }}% for more than {% if alert.severity == 'critical' %}2{% else %}5{% endif %} minutes"
+            {% elif alert.metric == 'disk_usage' %}
+            "summary": "High disk usage detected",
+            "description": "Disk usage is above {{ alert.threshold }}% for more than {% if alert.severity == 'critical' %}2{% else %}5{% endif %} minutes"
+            {% endif %}
+          }
+        }{% if not loop.last %},{% endif %}
+        {% endfor %}
+      ]
+    },
+    {% endif %}
+    
+    "prometheus": {
+      "enabled": true,
+      "config": {
+        "global": {
+          "scrape_interval": "15s",
+          "evaluation_interval": "15s"
+        },
+        "rule_files": [
+          "/etc/prometheus/rules/*.yml"
+        ],
+        "scrape_configs": [
+          {
+            "job_name": "{{ app_config.name | lower }}-nodes",
+            "static_configs": [
+              {
+                "targets": [
+                  {% for server in servers %}
+                  "{{ server.ip }}:9100"{% if not loop.last %},{% endif %}
+                  {% endfor %}
+                ]
+              }
+            ],
+            "scrape_interval": "30s",
+            "metrics_path": "/metrics"
+          },
+          {% set frontend_servers = servers | selectattr('role', 'equalto', 'frontend') | list %}
+          {% if frontend_servers %}
+          {
+            "job_name": "{{ app_config.name | lower }}-nginx",
+            "static_configs": [
+              {
+                "targets": [
+                  {% for server in frontend_servers %}
+                  "{{ server.ip }}:9113"{% if not loop.last %},{% endif %}
+                  {% endfor %}
+                ]
+              }
+            ],
+            "scrape_interval": "30s"
+          },
+          {% endif %}
+          {% set api_servers = servers | selectattr('role', 'equalto', 'api') | list %}
+          {% if api_servers %}
+          {
+            "job_name": "{{ app_config.name | lower }}-api",
+            "static_configs": [
+              {
+                "targets": [
+                  {% for server in api_servers %}
+                  "{{ server.ip }}:8080"{% if not loop.last %},{% endif %}
+                  {% endfor %}
+                ]
+              }
+            ],
+            "scrape_interval": "15s",
+            "metrics_path": "/metrics"
+          },
+          {% endif %}
+          {% set db_servers = servers | selectattr('role', 'equalto', 'database') | list %}
+          {% if db_servers %}
+          {
+            "job_name": "{{ app_config.name | lower }}-mysql",
+            "static_configs": [
+              {
+                "targets": [
+                  {% for server in db_servers %}
+                  "{{ server.ip }}:9104"{% if not loop.last %},{% endif %}
+                  {% endfor %}
+                ]
+              }
+            ],
+            "scrape_interval": "30s"
+          }
+          {% endif %}
+        ],
+        "alerting": {
+          "alertmanagers": [
+            {
+              "static_configs": [
+                {
+                  "targets": [
+                    "{{ servers[0].ip }}:9093"
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    
+    "grafana": {
+      "enabled": true,
+      "config": {
+        "server": {
+          "http_port": 3000,
+          "domain": "{% if websites %}{{ websites[0].domain }}{% else %}{{ ansible_default_ipv4.address }}{% endif %}",
+          "root_url": "http://{% if websites %}{{ websites[0].domain }}{% else %}{{ ansible_default_ipv4.address }}{% endif %}:3000/grafana/"
+        },
+        "database": {
+          "type": "sqlite3",
+          "path": "/var/lib/grafana/grafana.db"
+        },
+        "security": {
+          "admin_user": "admin",
+          "admin_password": "{{ app_config.name | lower }}_grafana_{{ app_config.environment }}",
+          "secret_key": "{{ (app_config.name + '_grafana_' + ansible_date_time.epoch) | hash('sha256') }}"
+        },
+        "users": {
+          "allow_sign_up": {{ app_config.environment != 'production' }},
+          "allow_org_create": {{ app_config.environment != 'production' }},
+          "auto_assign_org": true,
+          "auto_assign_org_role": "Viewer"
+        },
+        "auth": {
+          "disable_login_form": false,
+          "disable_signout_menu": false
+        },
+        "datasources": [
+          {
+            "name": "Prometheus",
+            "type": "prometheus",
+            "url": "http://{{ servers[0].ip }}:9090",
+            "access": "proxy",
+            "is_default": true
+          }
+        ],
+        "dashboards": [
+          {
+            "name": "System Overview",
+            "folder": "{{ app_config.name }}",
+            "panels": [
+              "CPU Usage",
+              "Memory Usage", 
+              "Disk Usage",
+              "Network I/O",
+              "Load Average"
+            ]
+          },
+          {
+            "name": "Application Metrics",
+            "folder": "{{ app_config.name }}",
+            "panels": [
+              "Request Rate",
+              "Response Time",
+              "Error Rate",
+              "Active Users",
+              "Database Connections"
+            ]
+          },
+          {
+            "name": "Infrastructure",
+            "folder": "{{ app_config.name }}",
+            "panels": [
+              "Server Status",
+              "Service Health",
+              "Resource Utilization",
+              "Alert Summary"
+            ]
+          }
+        ]
+      }
+    },
+    
+    "logging": {
+      "enabled": true,
+      "elasticsearch": {
+        "enabled": {{ app_config.environment == 'production' }},
+        "hosts": [
+          {% if app_config.environment == 'production' %}
+          {% for server in servers[:2] %}
+          "{{ server.ip }}:9200"{% if not loop.last %},{% endif %}
+          {% endfor %}
+          {% else %}
+          "{{ servers[0].ip }}:9200"
+          {% endif %}
+        ],
+        "index_template": "{{ app_config.name | lower }}-{{ app_config.environment }}"
+      },
+      "logstash": {
+        "enabled": {{ app_config.environment == 'production' }},
+        "input_ports": {
+          "beats": 5044,
+          "syslog": 5000,
+          "http": 8080
+        },
+        "output": {
+          "elasticsearch": true,
+          "file": {{ app_config.environment != 'production' }}
+        }
+      },
+      "filebeat": {
+        "enabled": true,
+        "inputs": [
+          {
+            "type": "log",
+            "paths": [
+              "/var/log/nginx/*.log",
+              "/var/log/{{ app_config.name | lower }}/*.log"
+            ],
+            "fields": {
+              "environment": "{{ app_config.environment }}",
+              "application": "{{ app_config.name | lower }}",
+              "log_type": "application"
+            }
+          },
+          {
+            "type": "log", 
+            "paths": [
+              "/var/log/syslog",
+              "/var/log/auth.log"
+            ],
+            "fields": {
+              "environment": "{{ app_config.environment }}",
+              "log_type": "system"
+            }
+          }
+        ]
+      }
+    },
+    
+    "notifications": {
+      "enabled": true,
+      "channels": [
+        {% if app_config.environment == 'production' %}
+        {
+          "name": "email",
+          "type": "email",
+          "settings": {
+            "addresses": [
+              {% for user in users if user.role == 'admin' and user.active %}
+              "{{ user.email }}"{% if not loop.last %},{% endif %}
+              {% endfor %}
+            ],
+            "subject": "[{{ app_config.environment | upper }}] {{ app_config.name }} Alert"
+          }
+        },
+        {
+          "name": "slack",
+          "type": "slack",
+          "settings": {
+            "webhook_url": "https://hooks.slack.com/services/YOUR/WEBHOOK/URL",
+            "channel": "#alerts-{{ app_config.environment }}",
+            "username": "{{ app_config.name }}-monitor"
+          }
+        }
+        {% else %}
+        {
+          "name": "console",
+          "type": "console",
+          "settings": {
+            "log_level": "info"
+          }
+        }
+        {% endif %}
+      ]
+    },
+    
+    "backup_monitoring": {
+      "enabled": {{ app_config.environment == 'production' }},
+      "checks": [
+        {
+          "name": "database_backup",
+          "type": "file_age",
+          "path": "/backup/mysql/latest.sql.gz",
+          "max_age_hours": 25
+        },
+        {
+          "name": "application_backup", 
+          "type": "file_age",
+          "path": "/backup/{{ app_config.name | lower }}/latest.tar.gz",
+          "max_age_hours": 25
+        },
+        {
+          "name": "config_backup",
+          "type": "file_age", 
+          "path": "/backup/configs/latest.tar.gz",
+          "max_age_hours": 168
+        }
+      ]
+    },
+    
+    "performance_targets": {
+      {% if app_config.environment == 'production' %}
+      "response_time_p95": "500ms",
+      "availability": "99.9%",
+      "error_rate": "0.1%",
+      "cpu_usage_avg": "70%",
+      "memory_usage_avg": "80%",
+      "disk_usage_max": "85%"
+      {% elif app_config.environment == 'staging' %}
+      "response_time_p95": "1000ms",
+      "availability": "99%",
+      "error_rate": "1%",
+      "cpu_usage_avg": "80%",
+      "memory_usage_avg": "85%",
+      "disk_usage_max": "90%"
+      {% else %}
+      "response_time_p95": "2000ms",
+      "availability": "95%",
+      "error_rate": "5%",
+      "cpu_usage_avg": "90%",
+      "memory_usage_avg": "90%",
+      "disk_usage_max": "95%"
+      {% endif %}
+    },
+    
+    "maintenance_windows": [
+      {
+        "name": "weekly_maintenance",
+        "schedule": "0 2 * * 1",
+        "duration": "1h",
+        "description": "Weekly system maintenance"
+      },
+      {
+        "name": "monthly_patching",
+        "schedule": "0 3 1 * *", 
+        "duration": "3h",
+        "description": "Monthly security patching"
+      }
+    ],
+    
+    "metadata": {
+      "total_servers": {{ servers | length }},
+      "server_roles": {
+        {% for role, role_servers in servers | groupby('role') %}
+        "{{ role }}": {{ role_servers | length }}{% if not loop.last %},{% endif %}
+        {% endfor %}
+      },
+      "total_memory_gb": {{ servers | map(attribute='specs.memory') | sum / 1024 | round(1) }},
+      "total_cpu_cores": {{ servers | map(attribute='specs.cpu') | sum }},
+      "total_disk_gb": {{ servers | map(attribute='specs.disk') | sum }},
+      "monitoring_endpoints": {{ monitoring.endpoints | length if monitoring.enabled else 0 }},
+      "alert_rules": {{ monitoring.alerts | length if monitoring.enabled else 0 }},
+      "active_users": {{ users | selectattr('active') | list | length }},
+      "config_checksum": "{{ (monitoring | to_json + ansible_date_time.epoch) | hash('md5') }}"
+    }
+  }
+} 

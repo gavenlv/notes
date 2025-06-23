@@ -1,0 +1,272 @@
+---
+# Web 服务器配置 Playbook
+- name: "配置 Nginx Web 服务器"
+  hosts: web_servers
+  become: yes
+  vars:
+    server_name: "myapp.local"
+    document_root: "/var/www/myapp"
+    nginx_user: "www-data"
+    app_port: 80
+    
+  tasks:
+    - name: "更新软件包缓存 (Ubuntu/Debian)"
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+      when: ansible_os_family == "Debian"
+      
+    - name: "安装 Nginx"
+      package:
+        name: nginx
+        state: present
+        
+    - name: "安装必要的工具"
+      package:
+        name:
+          - curl
+          - wget
+          - htop
+        state: present
+        
+    - name: "创建应用目录"
+      file:
+        path: "{{ document_root }}"
+        state: directory
+        owner: "{{ nginx_user }}"
+        group: "{{ nginx_user }}"
+        mode: '0755'
+        
+    - name: "备份默认配置"
+      copy:
+        src: /etc/nginx/sites-available/default
+        dest: /etc/nginx/sites-available/default.backup
+        remote_src: yes
+      ignore_errors: yes
+      
+    - name: "创建虚拟主机配置"
+      copy:
+        content: |
+          # {{ server_name }} 虚拟主机配置
+          server {
+              listen {{ app_port }};
+              listen [::]:{{ app_port }};
+              
+              server_name {{ server_name }} www.{{ server_name }};
+              root {{ document_root }};
+              index index.html index.htm index.nginx-debian.html;
+              
+              # 安全头设置
+              add_header X-Frame-Options "SAMEORIGIN";
+              add_header X-XSS-Protection "1; mode=block";
+              add_header X-Content-Type-Options "nosniff";
+              
+              # 主要位置块
+              location / {
+                  try_files $uri $uri/ =404;
+              }
+              
+              # 静态文件缓存
+              location ~* \.(jpg|jpeg|png|gif|ico|css|js)$ {
+                  expires 1y;
+                  add_header Cache-Control "public, immutable";
+              }
+              
+              # 隐藏 .htaccess 文件
+              location ~ /\.ht {
+                  deny all;
+              }
+              
+              # 日志配置
+              access_log /var/log/nginx/{{ server_name }}.access.log;
+              error_log /var/log/nginx/{{ server_name }}.error.log;
+          }
+        dest: "/etc/nginx/sites-available/{{ server_name }}"
+        owner: root
+        group: root
+        mode: '0644'
+      notify: 
+        - reload nginx
+        
+    - name: "启用站点"
+      file:
+        src: "/etc/nginx/sites-available/{{ server_name }}"
+        dest: "/etc/nginx/sites-enabled/{{ server_name }}"
+        state: link
+      notify: reload nginx
+      
+    - name: "删除默认站点"
+      file:
+        path: /etc/nginx/sites-enabled/default
+        state: absent
+      notify: reload nginx
+      
+    - name: "测试 Nginx 配置"
+      command: nginx -t
+      register: nginx_config_test
+      changed_when: false
+      
+    - name: "显示配置测试结果"
+      debug:
+        msg: "Nginx 配置测试: {{ nginx_config_test.stderr }}"
+        
+    - name: "创建示例主页"
+      copy:
+        content: |
+          <!DOCTYPE html>
+          <html lang="zh-CN">
+          <head>
+              <meta charset="UTF-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <title>欢迎来到 {{ server_name }}</title>
+              <style>
+                  body {
+                      font-family: Arial, sans-serif;
+                      max-width: 800px;
+                      margin: 50px auto;
+                      padding: 20px;
+                      background-color: #f5f5f5;
+                  }
+                  .container {
+                      background: white;
+                      padding: 30px;
+                      border-radius: 10px;
+                      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                  }
+                  h1 { color: #333; text-align: center; }
+                  .info { background: #e7f3ff; padding: 15px; border-radius: 5px; margin: 20px 0; }
+                  .status { display: flex; justify-content: space-between; margin: 10px 0; }
+                  .label { font-weight: bold; }
+                  .footer { text-align: center; margin-top: 30px; color: #666; }
+              </style>
+          </head>
+          <body>
+              <div class="container">
+                  <h1>🎉 Web 服务器配置成功！</h1>
+                  
+                  <div class="info">
+                      <h3>服务器信息</h3>
+                      <div class="status">
+                          <span class="label">主机名:</span>
+                          <span>{{ inventory_hostname }}</span>
+                      </div>
+                      <div class="status">
+                          <span class="label">服务器名:</span>
+                          <span>{{ server_name }}</span>
+                      </div>
+                      <div class="status">
+                          <span class="label">系统:</span>
+                          <span>{{ ansible_distribution }} {{ ansible_distribution_version }}</span>
+                      </div>
+                      <div class="status">
+                          <span class="label">Nginx 版本:</span>
+                          <span id="nginx-version">检测中...</span>
+                      </div>
+                      <div class="status">
+                          <span class="label">部署时间:</span>
+                          <span>{{ ansible_date_time.iso8601 }}</span>
+                      </div>
+                  </div>
+                  
+                  <div class="info">
+                      <h3>快速测试</h3>
+                      <p>运行以下命令测试服务器:</p>
+                      <pre>curl -I http://{{ ansible_default_ipv4.address | default('localhost') }}</pre>
+                  </div>
+                  
+                  <div class="footer">
+                      <p>Powered by Ansible & Nginx</p>
+                  </div>
+              </div>
+              
+              <script>
+                  // 简单的版本检测
+                  fetch('/nginx-version')
+                      .then(response => response.text())
+                      .catch(() => 'nginx/unknown')
+                      .then(version => {
+                          document.getElementById('nginx-version').textContent = 'Nginx 已安装';
+                      });
+              </script>
+          </body>
+          </html>
+        dest: "{{ document_root }}/index.html"
+        owner: "{{ nginx_user }}"
+        group: "{{ nginx_user }}"
+        mode: '0644'
+        
+    - name: "创建测试页面"
+      copy:
+        content: |
+          <!DOCTYPE html>
+          <html>
+          <head>
+              <title>服务器状态测试</title>
+              <style>
+                  body { font-family: monospace; background: #000; color: #0f0; padding: 20px; }
+                  .status { margin: 10px 0; }
+                  .ok { color: #0f0; }
+                  .error { color: #f00; }
+              </style>
+          </head>
+          <body>
+              <h1>🔧 服务器状态检查</h1>
+              <div class="status ok">✓ Nginx 运行正常</div>
+              <div class="status ok">✓ 配置文件有效</div>
+              <div class="status ok">✓ 权限设置正确</div>
+              <div class="status ok">✓ 主页加载成功</div>
+              <p>当前时间: {{ ansible_date_time.iso8601 }}</p>
+              <p>服务器: {{ inventory_hostname }}</p>
+          </body>
+          </html>
+        dest: "{{ document_root }}/test.html"
+        owner: "{{ nginx_user }}"
+        group: "{{ nginx_user }}"
+        mode: '0644'
+        
+    - name: "启动并启用 Nginx 服务"
+      service:
+        name: nginx
+        state: started
+        enabled: yes
+        
+    - name: "检查 Nginx 服务状态"
+      command: systemctl is-active nginx
+      register: nginx_status
+      changed_when: false
+      
+    - name: "显示服务状态"
+      debug:
+        msg: "Nginx 服务状态: {{ nginx_status.stdout }}"
+        
+    - name: "检查端口监听状态"
+      command: netstat -tlnp | grep :{{ app_port }}
+      register: port_status
+      changed_when: false
+      ignore_errors: yes
+      
+    - name: "显示端口状态"
+      debug:
+        msg: "端口 {{ app_port }} 监听状态: {{ port_status.stdout_lines | default(['端口未开放']) }}"
+        
+    - name: "测试 Web 服务器响应"
+      uri:
+        url: "http://localhost:{{ app_port }}"
+        method: GET
+        status_code: 200
+      register: web_test
+      ignore_errors: yes
+      
+    - name: "显示 Web 测试结果"
+      debug:
+        msg: |
+          Web 服务器测试结果:
+          状态码: {{ web_test.status | default('连接失败') }}
+          响应时间: {{ web_test.elapsed | default('N/A') }}秒
+          内容长度: {{ web_test.content_length | default('N/A') }}字节
+          
+  handlers:
+    - name: reload nginx
+      service:
+        name: nginx
+        state: reloaded 

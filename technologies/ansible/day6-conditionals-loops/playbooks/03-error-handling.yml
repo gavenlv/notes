@@ -1,0 +1,508 @@
+---
+# Day 6: 错误处理和流程控制演示
+- name: 错误处理与流程控制高级应用
+  hosts: localhost
+  gather_facts: yes
+  vars:
+    # 服务配置
+    services:
+      - name: nginx
+        required: true
+        port: 80
+        config_file: /etc/nginx/nginx.conf
+        dependencies: []
+      - name: mysql
+        required: true
+        port: 3306
+        config_file: /etc/mysql/my.cnf
+        dependencies: []
+      - name: redis
+        required: false
+        port: 6379
+        config_file: /etc/redis/redis.conf
+        dependencies: []
+      - name: nodejs
+        required: true
+        port: 3000
+        config_file: /etc/nodejs/app.conf
+        dependencies: ["nginx", "mysql"]
+      - name: elasticsearch
+        required: false
+        port: 9200
+        config_file: /etc/elasticsearch/elasticsearch.yml
+        dependencies: []
+    
+    # 部署配置
+    deployment_stages:
+      - name: pre_check
+        required: true
+        timeout: 30
+        can_skip: false
+      - name: backup
+        required: true
+        timeout: 300
+        can_skip: false
+      - name: deploy_code
+        required: true
+        timeout: 600
+        can_skip: false
+      - name: migrate_database
+        required: true
+        timeout: 900
+        can_skip: false
+      - name: restart_services
+        required: true
+        timeout: 180
+        can_skip: true
+      - name: health_check
+        required: true
+        timeout: 120
+        can_skip: false
+      - name: smoke_test
+        required: false
+        timeout: 300
+        can_skip: true
+      - name: performance_test
+        required: false
+        timeout: 1200
+        can_skip: true
+    
+    # 环境配置
+    environment: "{{ env | default('staging') }}"
+    rollback_enabled: "{{ rollback | default(true) }}"
+    force_deployment: "{{ force | default(false) }}"
+    skip_tests: "{{ skip_tests | default(false) }}"
+    
+    # 错误处理配置
+    max_retries: 3
+    retry_delay: 10
+    failure_threshold: 2
+
+  tasks:
+    # ==================================================
+    # 第一部分：基础错误处理演示
+    # ==================================================
+    
+    - name: "=== 第一部分：基础错误处理演示 ==="
+      debug:
+        msg: "开始演示基础错误处理功能"
+
+    - name: 模拟可能失败的任务 - 忽略错误
+      debug:
+        msg: "尝试启动服务: {{ item.name }}"
+      loop: "{{ services }}"
+      register: service_start_results
+      failed_when: false  # 永不失败
+      changed_when: item.name != "elasticsearch"  # 模拟elasticsearch启动失败
+
+    - name: 检查启动失败的服务
+      debug:
+        msg: "服务启动失败: {{ item.item.name }} (端口: {{ item.item.port }})"
+      loop: "{{ service_start_results.results }}"
+      when: not item.changed
+
+    - name: 条件性失败 - 必需服务启动失败时报错
+      fail:
+        msg: "必需服务 {{ item.item.name }} 启动失败，部署终止"
+      loop: "{{ service_start_results.results }}"
+      when: 
+        - not item.changed
+        - item.item.required
+
+    # ==================================================
+    # 第二部分：重试机制演示
+    # ==================================================
+    
+    - name: "=== 第二部分：重试机制演示 ==="
+      debug:
+        msg: "开始演示重试机制"
+
+    - name: 模拟网络连接检查 (带重试)
+      debug:
+        msg: "检查网络连接 - 尝试 {{ ansible_loop.index }}"
+      register: network_check
+      until: network_check is succeeded
+      retries: "{{ max_retries }}"
+      delay: "{{ retry_delay }}"
+      loop: "{{ range(1, 4) | list }}"  # 模拟3次检查
+      failed_when: false
+
+    - name: 模拟服务健康检查 (带重试和条件)
+      debug:
+        msg: "健康检查服务 {{ item.name }} - 端口 {{ item.port }}"
+      register: health_check_result
+      until: health_check_result is succeeded or item.name == "elasticsearch"
+      retries: 3
+      delay: 5
+      loop: "{{ services }}"
+      failed_when: 
+        - health_check_result is failed
+        - item.required
+      ignore_errors: "{{ not item.required }}"
+
+    # ==================================================
+    # 第三部分：Block/Rescue/Always 演示
+    # ==================================================
+    
+    - name: "=== 第三部分：Block/Rescue/Always 演示 ==="
+      debug:
+        msg: "开始演示 Block/Rescue/Always 错误处理"
+
+    - block:
+        - name: 主要部署任务块 - 预检查
+          debug:
+            msg: "执行部署前预检查"
+          register: precheck_result
+
+        - name: 主要部署任务块 - 备份数据
+          debug:
+            msg: "创建数据备份"
+          register: backup_result
+          failed_when: environment == "production" and not force_deployment  # 模拟生产环境需要强制部署
+
+        - name: 主要部署任务块 - 部署代码
+          debug:
+            msg: "部署应用代码"
+          register: deploy_result
+
+        - name: 主要部署任务块 - 数据迁移
+          debug:
+            msg: "执行数据库迁移"
+          register: migration_result
+
+        - name: 设置部署成功标志
+          set_fact:
+            deployment_successful: true
+
+      rescue:
+        - name: 部署失败处理 - 记录错误
+          debug:
+            msg: |
+              部署失败！错误信息:
+              环境: {{ environment }}
+              失败阶段: 检测中...
+              时间: {{ ansible_date_time.iso8601 }}
+
+        - name: 部署失败处理 - 发送告警
+          debug:
+            msg: "发送部署失败告警到运维团队"
+
+        - name: 部署失败处理 - 回滚检查
+          debug:
+            msg: "检查是否需要执行回滚操作"
+          when: rollback_enabled
+
+        - name: 部署失败处理 - 执行回滚
+          block:
+            - name: 回滚代码
+              debug:
+                msg: "回滚到上一个稳定版本"
+            
+            - name: 回滚数据库
+              debug:
+                msg: "恢复数据库备份"
+              when: backup_result is defined
+            
+            - name: 重启服务
+              debug:
+                msg: "重启相关服务"
+
+          when: rollback_enabled
+          rescue:
+            - name: 回滚失败处理
+              debug:
+                msg: "回滚操作失败，需要人工介入"
+              
+            - name: 发送紧急告警
+              debug:
+                msg: "发送紧急告警 - 回滚失败"
+
+        - name: 设置部署失败标志
+          set_fact:
+            deployment_successful: false
+
+      always:
+        - name: 清理临时文件
+          debug:
+            msg: "清理部署过程中的临时文件"
+
+        - name: 记录部署日志
+          debug:
+            msg: |
+              部署记录:
+              环境: {{ environment }}
+              结果: {{ 'SUCCESS' if deployment_successful | default(false) else 'FAILED' }}
+              时间: {{ ansible_date_time.iso8601 }}
+              强制部署: {{ force_deployment }}
+              回滚启用: {{ rollback_enabled }}
+
+        - name: 生成部署报告
+          set_fact:
+            deployment_report:
+              timestamp: "{{ ansible_date_time.iso8601 }}"
+              environment: "{{ environment }}"
+              success: "{{ deployment_successful | default(false) }}"
+              force_deployment: "{{ force_deployment }}"
+              rollback_enabled: "{{ rollback_enabled }}"
+              services_checked: "{{ services | length }}"
+              failed_services: "{{ health_check_result.results | default([]) | rejectattr('changed', 'equalto', true) | list | length if health_check_result is defined else 0 }}"
+
+      when: environment in ['development', 'staging', 'production']
+
+    # ==================================================
+    # 第四部分：条件性流程控制
+    # ==================================================
+    
+    - name: "=== 第四部分：条件性流程控制 ==="
+      debug:
+        msg: "开始演示条件性流程控制"
+
+    - name: 环境兼容性检查
+      fail:
+        msg: "不支持的环境: {{ environment }}"
+      when: environment not in ['development', 'staging', 'production']
+
+    - name: 生产环境安全检查
+      block:
+        - name: 检查生产环境部署权限
+          debug:
+            msg: "验证生产环境部署权限"
+          
+        - name: 强制确认检查
+          fail:
+            msg: "生产环境部署需要启用 force_deployment 参数"
+          when: 
+            - environment == "production"
+            - not force_deployment
+
+        - name: 生产环境备份检查
+          debug:
+            msg: "验证生产环境备份策略"
+          
+      when: environment == "production"
+
+    - name: 依赖关系检查
+      debug:
+        msg: "检查服务 {{ item.name }} 的依赖关系: {{ item.dependencies | join(', ') if item.dependencies else '无依赖' }}"
+      loop: "{{ services }}"
+      register: dependency_check
+
+    # ==================================================
+    # 第五部分：循环中的错误处理
+    # ==================================================
+    
+    - name: "=== 第五部分：循环中的错误处理 ==="
+      debug:
+        msg: "开始演示循环中的错误处理"
+
+    - name: 批量服务部署 (容错处理)
+      debug:
+        msg: "部署服务: {{ item.name }} (必需: {{ item.required }})"
+      loop: "{{ services }}"
+      register: service_deployment
+      failed_when: 
+        - item.name == "elasticsearch"  # 模拟elasticsearch部署失败
+        - item.required  # 只有必需服务失败才算真正失败
+      ignore_errors: "{{ not item.required }}"
+
+    - name: 统计部署结果
+      set_fact:
+        deployment_stats:
+          total: "{{ services | length }}"
+          successful: "{{ service_deployment.results | selectattr('failed', 'undefined') | list | length }}"
+          failed: "{{ service_deployment.results | selectattr('failed', 'defined') | selectattr('failed') | list | length }}"
+          optional_failed: "{{ service_deployment.results | selectattr('failed', 'defined') | selectattr('failed') | selectattr('item.required', 'equalto', false) | list | length }}"
+
+    - name: 显示部署统计
+      debug:
+        msg: |
+          服务部署统计:
+          - 总服务数: {{ deployment_stats.total }}
+          - 成功部署: {{ deployment_stats.successful }}
+          - 失败部署: {{ deployment_stats.failed }}
+          - 可选服务失败: {{ deployment_stats.optional_failed }}
+          - 成功率: {{ (deployment_stats.successful / deployment_stats.total * 100) | round(1) }}%
+
+    # ==================================================
+    # 第六部分：复杂部署流程控制
+    # ==================================================
+    
+    - name: "=== 第六部分：复杂部署流程控制 ==="
+      debug:
+        msg: "开始演示复杂部署流程控制"
+
+    - name: 执行部署阶段
+      include_tasks: deployment_stage.yml
+      loop: "{{ deployment_stages }}"
+      loop_control:
+        loop_var: stage
+      vars:
+        stage_name: "{{ stage.name }}"
+        stage_required: "{{ stage.required }}"
+        stage_timeout: "{{ stage.timeout }}"
+        stage_can_skip: "{{ stage.can_skip }}"
+        current_environment: "{{ environment }}"
+      register: stage_results
+      when: not (skip_tests and stage.name in ['smoke_test', 'performance_test'])
+
+    # 创建部署阶段任务文件的内容
+    - name: 创建部署阶段任务
+      debug:
+        msg: |
+          执行阶段: {{ stage.name }}
+          - 必需: {{ stage.required }}
+          - 超时: {{ stage.timeout }}秒
+          - 可跳过: {{ stage.can_skip }}
+          {% if stage.name == 'migrate_database' and environment == 'production' %}
+          - 生产环境数据库迁移需要额外确认
+          {% endif %}
+      register: stage_execution
+      failed_when: 
+        - stage.name == "performance_test"  # 模拟性能测试失败
+        - stage.required
+        - not stage.can_skip
+      ignore_errors: "{{ stage.can_skip }}"
+
+    # ==================================================
+    # 第七部分：错误恢复和清理
+    # ==================================================
+    
+    - name: "=== 第七部分：错误恢复和清理 ==="
+      debug:
+        msg: "开始演示错误恢复和清理"
+
+    - name: 检查是否需要清理
+      set_fact:
+        needs_cleanup: "{{ deployment_stats.failed > 0 or not deployment_successful | default(true) }}"
+
+    - name: 执行清理操作
+      block:
+        - name: 停止失败的服务
+          debug:
+            msg: "停止服务: {{ item.item.name }}"
+          loop: "{{ service_deployment.results }}"
+          when: 
+            - item.failed is defined
+            - item.failed
+
+        - name: 清理临时配置文件
+          debug:
+            msg: "清理配置文件: {{ item.config_file }}.tmp"
+          loop: "{{ services }}"
+
+        - name: 释放占用的端口
+          debug:
+            msg: "释放端口: {{ item.port }}"
+          loop: "{{ services }}"
+          when: item.name in (service_deployment.results | selectattr('failed', 'defined') | selectattr('failed') | map(attribute='item.name') | list)
+
+      when: needs_cleanup
+
+    # ==================================================
+    # 第八部分：最终状态验证
+    # ==================================================
+    
+    - name: "=== 第八部分：最终状态验证 ==="
+      debug:
+        msg: "开始演示最终状态验证"
+
+    - name: 验证系统状态
+      debug:
+        msg: "验证系统整体状态"
+      register: system_validation
+      failed_when: false
+
+    - name: 生成最终报告
+      set_fact:
+        final_report:
+          deployment_time: "{{ ansible_date_time.iso8601 }}"
+          environment: "{{ environment }}"
+          overall_success: "{{ deployment_successful | default(false) and deployment_stats.failed == 0 }}"
+          services_total: "{{ deployment_stats.total }}"
+          services_successful: "{{ deployment_stats.successful }}"
+          services_failed: "{{ deployment_stats.failed }}"
+          cleanup_performed: "{{ needs_cleanup }}"
+          rollback_enabled: "{{ rollback_enabled }}"
+          force_deployment: "{{ force_deployment }}"
+          skip_tests: "{{ skip_tests }}"
+          error_summary: |
+            {% set errors = [] %}
+            {% if deployment_stats.failed > 0 %}
+              {% set _ = errors.append(deployment_stats.failed ~ ' 个服务部署失败') %}
+            {% endif %}
+            {% if not deployment_successful | default(true) %}
+              {% set _ = errors.append('主要部署流程失败') %}
+            {% endif %}
+            {% if needs_cleanup %}
+              {% set _ = errors.append('需要执行清理操作') %}
+            {% endif %}
+            {{ errors | join('; ') if errors else '无错误' }}
+
+    - name: 显示最终部署报告
+      debug:
+        msg: |
+          ==========================================
+          Day 6 错误处理演示 - 最终部署报告
+          ==========================================
+          部署时间: {{ final_report.deployment_time }}
+          目标环境: {{ final_report.environment }}
+          整体状态: {{ '✓ 成功' if final_report.overall_success else '✗ 失败' }}
+          
+          服务部署统计:
+          - 总计: {{ final_report.services_total }}
+          - 成功: {{ final_report.services_successful }}
+          - 失败: {{ final_report.services_failed }}
+          
+          配置选项:
+          - 强制部署: {{ '是' if final_report.force_deployment else '否' }}
+          - 回滚启用: {{ '是' if final_report.rollback_enabled else '否' }}
+          - 跳过测试: {{ '是' if final_report.skip_tests else '否' }}
+          - 执行清理: {{ '是' if final_report.cleanup_performed else '否' }}
+          
+          错误摘要: {{ final_report.error_summary }}
+          ==========================================
+
+    # ==================================================
+    # 第九部分：条件性后续操作
+    # ==================================================
+    
+    - name: "=== 第九部分：条件性后续操作 ==="
+      debug:
+        msg: "根据部署结果执行后续操作"
+
+    - name: 成功部署后的操作
+      block:
+        - name: 发送成功通知
+          debug:
+            msg: "发送部署成功通知到团队"
+
+        - name: 更新部署记录
+          debug:
+            msg: "更新部署记录数据库"
+
+        - name: 启动监控
+          debug:
+            msg: "启动应用监控和告警"
+
+      when: final_report.overall_success
+
+    - name: 失败部署后的操作
+      block:
+        - name: 发送失败告警
+          debug:
+            msg: "发送部署失败告警到运维团队"
+
+        - name: 创建事故单
+          debug:
+            msg: "自动创建部署失败事故单"
+
+        - name: 通知相关人员
+          debug:
+            msg: "通知开发团队和运维团队"
+
+      when: not final_report.overall_success
+
+    - name: 存档部署日志
+      debug:
+        msg: "存档部署日志和配置文件"
+      always 

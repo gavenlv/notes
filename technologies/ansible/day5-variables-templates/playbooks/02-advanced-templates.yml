@@ -1,0 +1,282 @@
+---
+# 高级模板演示 Playbook
+- name: "Jinja2 模板高级功能演示"
+  hosts: localhost
+  connection: local
+  gather_facts: yes
+  
+  vars:
+    # 应用配置
+    app_config:
+      name: "AdvancedWebApp"
+      version: "2.1.0"
+      environment: "production"
+      
+    # 用户配置
+    users:
+      - name: "alice"
+        email: "alice@company.com"
+        role: "admin"
+        active: true
+        department: "engineering"
+        permissions:
+          - "read"
+          - "write"
+          - "admin"
+      - name: "bob"
+        email: "bob@company.com"
+        role: "developer"
+        active: true
+        department: "engineering"
+        permissions:
+          - "read"
+          - "write"
+      - name: "charlie"
+        email: "charlie@company.com"
+        role: "designer"
+        active: false
+        department: "design"
+        permissions:
+          - "read"
+      - name: "diana"
+        email: "diana@company.com"
+        role: "manager"
+        active: true
+        department: "marketing"
+        permissions:
+          - "read"
+          - "write"
+          
+    # 服务器配置
+    servers:
+      - hostname: "web01"
+        ip: "192.168.1.10"
+        role: "frontend"
+        specs:
+          cpu: 4
+          memory: 8192
+          disk: 500
+        services:
+          - "nginx"
+          - "php-fpm"
+      - hostname: "web02"
+        ip: "192.168.1.11"
+        role: "frontend"
+        specs:
+          cpu: 4
+          memory: 8192
+          disk: 500
+        services:
+          - "nginx"
+          - "php-fpm"
+      - hostname: "api01"
+        ip: "192.168.1.20"
+        role: "api"
+        specs:
+          cpu: 8
+          memory: 16384
+          disk: 1000
+        services:
+          - "nodejs"
+          - "redis"
+      - hostname: "db01"
+        ip: "192.168.1.30"
+        role: "database"
+        specs:
+          cpu: 8
+          memory: 32768
+          disk: 2000
+        services:
+          - "mysql"
+          - "backup-agent"
+          
+    # 网站配置
+    websites:
+      - domain: "www.company.com"
+        ssl: true
+        locations:
+          - path: "/"
+            config:
+              try_files: "$uri $uri/ /index.php?$query_string"
+              expires: "1h"
+          - path: "/api/"
+            config:
+              proxy_pass: "http://api-backend"
+              proxy_set_header: "Host $host"
+          - path: "/static/"
+            config:
+              expires: "1y"
+              add_header: "Cache-Control public"
+      - domain: "admin.company.com"
+        ssl: true
+        auth_required: true
+        locations:
+          - path: "/"
+            config:
+              try_files: "$uri $uri/ /admin.php?$query_string"
+              
+    # 监控配置
+    monitoring:
+      enabled: true
+      endpoints:
+        - name: "health"
+          path: "/health"
+          check_interval: "30s"
+        - name: "metrics"
+          path: "/metrics"
+          check_interval: "60s"
+      alerts:
+        - metric: "cpu_usage"
+          threshold: 80
+          severity: "warning"
+        - metric: "memory_usage"
+          threshold: 90
+          severity: "critical"
+        - metric: "disk_usage"
+          threshold: 85
+          severity: "warning"
+          
+  tasks:
+    - name: "创建高级 Nginx 配置文件"
+      template:
+        src: advanced-nginx.conf.j2
+        dest: "/tmp/nginx_advanced_{{ ansible_date_time.epoch }}.conf"
+        mode: '0644'
+      vars:
+        worker_processes: "{{ ansible_processor_vcpus }}"
+        worker_connections: "{{ ansible_processor_vcpus * 1024 }}"
+        
+    - name: "生成用户管理脚本"
+      template:
+        src: user-management.sh.j2
+        dest: "/tmp/user_management_{{ ansible_date_time.epoch }}.sh"
+        mode: '0755'
+        
+    - name: "创建服务器清单文档"
+      template:
+        src: server-inventory.md.j2
+        dest: "/tmp/server_inventory_{{ ansible_date_time.epoch }}.md"
+        mode: '0644'
+        
+    - name: "生成应用配置文件"
+      template:
+        src: app-config.yml.j2
+        dest: "/tmp/app_config_{{ ansible_date_time.epoch }}.yml"
+        mode: '0644'
+        
+    - name: "创建监控配置"
+      template:
+        src: monitoring-config.json.j2
+        dest: "/tmp/monitoring_config_{{ ansible_date_time.epoch }}.json"
+        mode: '0644'
+        
+    - name: "生成部署脚本"
+      template:
+        src: deploy-script.sh.j2
+        dest: "/tmp/deploy_script_{{ ansible_date_time.epoch }}.sh"
+        mode: '0755'
+      vars:
+        deployment_user: "deploy"
+        app_directory: "/opt/{{ app_config.name | lower }}"
+        backup_directory: "/backup/{{ app_config.name | lower }}"
+        
+    - name: "创建 Docker Compose 文件"
+      template:
+        src: docker-compose.yml.j2
+        dest: "/tmp/docker_compose_{{ ansible_date_time.epoch }}.yml"
+        mode: '0644'
+        
+    - name: "生成系统服务文件"
+      template:
+        src: systemd-service.j2
+        dest: "/tmp/{{ app_config.name | lower }}.service"
+        mode: '0644'
+      vars:
+        service_config:
+          name: "{{ app_config.name | lower }}"
+          description: "{{ app_config.name }} Application Service"
+          user: "{{ app_config.name | lower }}"
+          working_directory: "/opt/{{ app_config.name | lower }}"
+          exec_start: "/opt/{{ app_config.name | lower }}/bin/start.sh"
+          environment:
+            NODE_ENV: "{{ app_config.environment }}"
+            APP_VERSION: "{{ app_config.version }}"
+            
+    - name: "创建数据库初始化脚本"
+      template:
+        src: database-init.sql.j2
+        dest: "/tmp/database_init_{{ ansible_date_time.epoch }}.sql"
+        mode: '0644'
+      vars:
+        database_name: "{{ app_config.name | lower }}_{{ app_config.environment }}"
+        admin_users: "{{ users | selectattr('role', 'equalto', 'admin') | list }}"
+        
+    - name: "生成 Ansible 变量文件"
+      template:
+        src: generated-vars.yml.j2
+        dest: "/tmp/generated_vars_{{ ansible_date_time.epoch }}.yml"
+        mode: '0644'
+        
+    - name: "演示 Jinja2 过滤器和函数"
+      debug:
+        msg: |
+          ========== Jinja2 过滤器演示 ==========
+          
+          原始应用名: {{ app_config.name }}
+          小写应用名: {{ app_config.name | lower }}
+          大写应用名: {{ app_config.name | upper }}
+          应用名长度: {{ app_config.name | length }}
+          
+          活跃用户数: {{ users | selectattr('active') | list | length }}
+          管理员用户: {{ users | selectattr('role', 'equalto', 'admin') | map(attribute='name') | join(', ') }}
+          工程部用户: {{ users | selectattr('department', 'equalto', 'engineering') | map(attribute='name') | list }}
+          
+          服务器总数: {{ servers | length }}
+          前端服务器: {{ servers | selectattr('role', 'equalto', 'frontend') | map(attribute='hostname') | join(', ') }}
+          总内存(GB): {{ servers | map(attribute='specs.memory') | sum / 1024 }}
+          平均CPU核数: {{ servers | map(attribute='specs.cpu') | sum / servers | length }}
+          
+    - name: "创建复杂条件模板示例"
+      template:
+        src: conditional-config.j2
+        dest: "/tmp/conditional_config_{{ ansible_date_time.epoch }}.txt"
+        mode: '0644'
+      vars:
+        features:
+          ssl_enabled: true
+          backup_enabled: true
+          monitoring_enabled: true
+          debug_mode: false
+          
+    - name: "显示生成文件列表"
+      debug:
+        msg: |
+          🎉 高级模板演示完成！
+          
+          生成的文件:
+          📄 Nginx 配置: /tmp/nginx_advanced_{{ ansible_date_time.epoch }}.conf
+          📜 用户管理脚本: /tmp/user_management_{{ ansible_date_time.epoch }}.sh
+          📋 服务器清单: /tmp/server_inventory_{{ ansible_date_time.epoch }}.md
+          ⚙️ 应用配置: /tmp/app_config_{{ ansible_date_time.epoch }}.yml
+          📊 监控配置: /tmp/monitoring_config_{{ ansible_date_time.epoch }}.json
+          🚀 部署脚本: /tmp/deploy_script_{{ ansible_date_time.epoch }}.sh
+          🐳 Docker Compose: /tmp/docker_compose_{{ ansible_date_time.epoch }}.yml
+          🔧 系统服务: /tmp/{{ app_config.name | lower }}.service
+          🗃️ 数据库初始化: /tmp/database_init_{{ ansible_date_time.epoch }}.sql
+          📝 生成的变量: /tmp/generated_vars_{{ ansible_date_time.epoch }}.yml
+          🔀 条件配置示例: /tmp/conditional_config_{{ ansible_date_time.epoch }}.txt
+          
+          高级模板技术展示:
+          ✓ 复杂变量处理和嵌套访问
+          ✓ 条件判断和循环控制
+          ✓ 过滤器链式使用
+          ✓ 宏定义和重用
+          ✓ 数据分组和统计
+          ✓ 动态配置生成
+          ✓ 多格式文件生成 (YAML, JSON, Shell, SQL)
+          
+          建议下一步:
+          1. 查看生成的配置文件
+          2. 理解模板中的逻辑
+          3. 尝试修改变量重新生成
+          4. 学习更多 Jinja2 过滤器 

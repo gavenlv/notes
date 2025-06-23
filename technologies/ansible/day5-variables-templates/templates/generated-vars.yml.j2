@@ -1,0 +1,491 @@
+# Generated Variables for {{ app_config.name }}
+# Created by Ansible on {{ ansible_date_time.iso8601 }}
+# Environment: {{ app_config.environment }}
+# Host: {{ inventory_hostname }}
+
+# ===========================================
+# Application Variables
+# ===========================================
+app_meta:
+  name: "{{ app_config.name }}"
+  version: "{{ app_config.version }}"
+  environment: "{{ app_config.environment }}"
+  generated_at: "{{ ansible_date_time.iso8601 }}"
+  generated_by: "{{ ansible_user | default('ansible') }}"
+  target_host: "{{ inventory_hostname }}"
+  ansible_version: "{{ ansible_version.full }}"
+
+# Computed application settings
+app_computed:
+  debug_enabled: {{ app_config.environment != 'production' }}
+  ssl_enabled: {{ (websites and websites[0].ssl) | default(false) }}
+  monitoring_enabled: {{ monitoring.enabled | default(false) }}
+  
+  # Port configuration based on environment
+  ports:
+    {% if app_config.environment == 'production' %}
+    http: 80
+    https: 443
+    app: 8080
+    {% elif app_config.environment == 'staging' %}
+    http: 80
+    https: 443
+    app: 8081
+    {% else %}
+    http: 3000
+    https: 3443
+    app: 3000
+    {% endif %}
+  
+  # Worker configuration based on system specs
+  workers:
+    nginx: {{ ansible_processor_vcpus }}
+    {% if app_config.environment == 'production' %}
+    application: {{ ansible_processor_vcpus * 2 }}
+    {% elif app_config.environment == 'staging' %}
+    application: {{ ansible_processor_vcpus }}
+    {% else %}
+    application: 1
+    {% endif %}
+  
+  # Memory allocation (in MB)
+  memory:
+    total_system: {{ ansible_memtotal_mb }}
+    {% set memory_for_app = (ansible_memtotal_mb * 0.6) | int %}
+    allocated_to_app: {{ memory_for_app }}
+    {% if app_config.environment == 'production' %}
+    mysql_buffer_pool: {{ (memory_for_app * 0.4) | int }}
+    redis_maxmemory: {{ (memory_for_app * 0.2) | int }}
+    {% else %}
+    mysql_buffer_pool: {{ (memory_for_app * 0.3) | int }}
+    redis_maxmemory: {{ (memory_for_app * 0.1) | int }}
+    {% endif %}
+  
+  # Storage paths
+  paths:
+    app_root: "/opt/{{ app_config.name | lower }}"
+    logs: "/var/log/{{ app_config.name | lower }}"
+    data: "/var/lib/{{ app_config.name | lower }}"
+    uploads: "/var/lib/{{ app_config.name | lower }}/uploads"
+    cache: "/var/cache/{{ app_config.name | lower }}"
+    backups: "/backup/{{ app_config.name | lower }}"
+    ssl_certs: "/etc/ssl/{{ app_config.name | lower }}"
+
+# ===========================================
+# Infrastructure Variables
+# ===========================================
+infrastructure:
+  # Server inventory with computed values
+  servers:
+    total_count: {{ servers | length }}
+    by_role:
+      {% for role, role_servers in servers | groupby('role') %}
+      {{ role }}: {{ role_servers | length }}
+      {% endfor %}
+    
+    # Load balancer configuration
+    load_balancer:
+      {% set frontend_servers = servers | selectattr('role', 'equalto', 'frontend') | list %}
+      enabled: {{ frontend_servers | length > 1 }}
+      algorithm: "{{ 'round_robin' if frontend_servers | length > 1 else 'none' }}"
+      backends:
+        {% for server in frontend_servers %}
+        - host: "{{ server.ip }}"
+          port: 80
+          weight: 1
+        {% endfor %}
+    
+    # Database cluster
+    database:
+      {% set db_servers = servers | selectattr('role', 'equalto', 'database') | list %}
+      cluster_enabled: {{ db_servers | length > 1 }}
+      {% if db_servers %}
+      primary: "{{ db_servers[0].ip }}"
+      replicas:
+        {% for server in db_servers[1:] %}
+        - "{{ server.ip }}"
+        {% endfor %}
+      {% endif %}
+      total_memory_gb: {{ servers | selectattr('role', 'equalto', 'database') | map(attribute='specs.memory') | sum / 1024 | round(1) }}
+      total_storage_gb: {{ servers | selectattr('role', 'equalto', 'database') | map(attribute='specs.disk') | sum }}
+    
+    # Cache cluster
+    cache:
+      {% set api_servers = servers | selectattr('role', 'equalto', 'api') | list %}
+      enabled: {{ api_servers | length > 0 }}
+      {% if api_servers %}
+      nodes:
+        {% for server in api_servers %}
+        - host: "{{ server.ip }}"
+          port: 6379
+          memory_mb: {{ (server.specs.memory * 0.3) | int }}
+        {% endfor %}
+      {% endif %}
+
+  # Network configuration
+  network:
+    subnets:
+      {% for server in servers %}
+      {% set subnet = server.ip | regex_replace('(\\d+\\.\\d+\\.\\d+)\\.\\d+', '\\1.0/24') %}
+      - "{{ subnet }}"
+      {% endfor %}
+    
+    firewall_rules:
+      # Web traffic
+      - port: 80
+        protocol: tcp
+        source: "0.0.0.0/0"
+        description: "HTTP traffic"
+      
+      - port: 443
+        protocol: tcp
+        source: "0.0.0.0/0"
+        description: "HTTPS traffic"
+      
+      # Internal communication
+      {% for server in servers %}
+      - port: "{% if server.role == 'database' %}3306{% elif server.role == 'api' %}6379{% else %}8080{% endif %}"
+        protocol: tcp
+        source: "{{ servers | map(attribute='ip') | join(',') }}"
+        description: "{{ server.role }} internal communication"
+      {% endfor %}
+      
+      {% if monitoring.enabled | default(false) %}
+      # Monitoring
+      - port: 9090
+        protocol: tcp
+        source: "{{ servers | map(attribute='ip') | join(',') }}"
+        description: "Prometheus metrics"
+      
+      - port: 3000
+        protocol: tcp
+        source: "{{ servers | map(attribute='ip') | join(',') }}"
+        description: "Grafana dashboard"
+      {% endif %}
+
+# ===========================================
+# User Management Variables
+# ===========================================
+user_management:
+  total_users: {{ users | length }}
+  active_users: {{ users | selectattr('active') | list | length }}
+  inactive_users: {{ users | rejectattr('active') | list | length }}
+  
+  # Users by role
+  roles:
+    {% for role, role_users in users | groupby('role') %}
+    {{ role }}:
+      total: {{ role_users | length }}
+      active: {{ role_users | selectattr('active') | list | length }}
+      users:
+        {% for user in role_users %}
+        - username: "{{ user.name }}"
+          email: "{{ user.email }}"
+          active: {{ user.active }}
+          permissions: {{ user.permissions | length }}
+        {% endfor %}
+    {% endfor %}
+  
+  # Users by department
+  departments:
+    {% for dept, dept_users in users | groupby('department') %}
+    {{ dept }}:
+      total: {{ dept_users | length }}
+      active: {{ dept_users | selectattr('active') | list | length }}
+      roles:
+        {% for role in dept_users | map(attribute='role') | unique %}
+        - "{{ role }}"
+        {% endfor %}
+    {% endfor %}
+  
+  # Permission matrix
+  permissions:
+    {% set all_permissions = users | map(attribute='permissions') | sum(start=[]) | unique | list %}
+    available: {{ all_permissions | length }}
+    matrix:
+      {% for permission in all_permissions %}
+      {{ permission }}:
+        {% for role, role_users in users | groupby('role') %}
+        {% set users_with_permission = role_users | selectattr('permissions', 'search', permission) | list %}
+        {{ role }}: {{ users_with_permission | length }}/{{ role_users | length }}
+        {% endfor %}
+      {% endfor %}
+
+# ===========================================
+# Security Configuration
+# ===========================================
+security:
+  ssl:
+    enabled: {{ (websites and websites[0].ssl) | default(false) }}
+    {% if websites %}
+    certificates:
+      {% for website in websites %}
+      - domain: "{{ website.domain }}"
+        ssl_enabled: {{ website.ssl | default(false) }}
+        cert_path: "/etc/ssl/certs/{{ website.domain }}.crt"
+        key_path: "/etc/ssl/private/{{ website.domain }}.key"
+      {% endfor %}
+    {% endif %}
+  
+  authentication:
+    {% if app_config.environment == 'production' %}
+    session_timeout: 3600  # 1 hour
+    max_login_attempts: 3
+    lockout_duration: 1800  # 30 minutes
+    password_policy:
+      min_length: 12
+      require_special_chars: true
+      require_numbers: true
+      require_uppercase: true
+    {% elif app_config.environment == 'staging' %}
+    session_timeout: 7200  # 2 hours
+    max_login_attempts: 5
+    lockout_duration: 900   # 15 minutes
+    password_policy:
+      min_length: 8
+      require_special_chars: true
+      require_numbers: true
+      require_uppercase: false
+    {% else %}
+    session_timeout: 86400  # 24 hours
+    max_login_attempts: 10
+    lockout_duration: 300   # 5 minutes
+    password_policy:
+      min_length: 6
+      require_special_chars: false
+      require_numbers: false
+      require_uppercase: false
+    {% endif %}
+  
+  access_control:
+    # Admin access restrictions
+    admin_ip_whitelist:
+      {% if app_config.environment == 'production' %}
+      - "10.0.0.0/8"      # Internal network
+      - "172.16.0.0/12"   # Private network
+      - "192.168.0.0/16"  # Local network
+      {% else %}
+      - "0.0.0.0/0"       # Allow all in non-production
+      {% endif %}
+    
+    # Service-to-service authentication
+    api_keys:
+      internal_services: "{{ (app_config.name + '_internal_' + app_config.environment + '_' + ansible_date_time.epoch) | hash('sha256') }}"
+      monitoring: "{{ (app_config.name + '_monitoring_' + app_config.environment + '_' + ansible_date_time.epoch) | hash('sha256') }}"
+
+# ===========================================
+# Monitoring and Alerting
+# ===========================================
+{% if monitoring.enabled | default(false) %}
+monitoring_computed:
+  endpoints:
+    total: {{ monitoring.endpoints | length }}
+    health_checks:
+      {% for endpoint in monitoring.endpoints %}
+      - name: "{{ endpoint.name }}"
+        url: "http://{{ ansible_default_ipv4.address }}{{ endpoint.path }}"
+        interval: "{{ endpoint.check_interval }}"
+        timeout: "5s"
+      {% endfor %}
+  
+  alerts:
+    total: {{ monitoring.alerts | length }}
+    by_severity:
+      {% for severity in monitoring.alerts | map(attribute='severity') | unique %}
+      {{ severity }}: {{ monitoring.alerts | selectattr('severity', 'equalto', severity) | list | length }}
+      {% endfor %}
+    
+    thresholds:
+      {% for alert in monitoring.alerts %}
+      {{ alert.metric }}:
+        threshold: {{ alert.threshold }}
+        severity: "{{ alert.severity }}"
+        action: "{{ 'page_oncall' if alert.severity == 'critical' else 'send_email' }}"
+      {% endfor %}
+  
+  retention:
+    {% if app_config.environment == 'production' %}
+    metrics: "30d"
+    logs: "90d"
+    traces: "7d"
+    {% elif app_config.environment == 'staging' %}
+    metrics: "14d"
+    logs: "30d"
+    traces: "3d"
+    {% else %}
+    metrics: "7d"
+    logs: "7d"
+    traces: "1d"
+    {% endif %}
+{% endif %}
+
+# ===========================================
+# Backup and Recovery
+# ===========================================
+backup:
+  enabled: {{ app_config.environment == 'production' }}
+  {% if app_config.environment == 'production' %}
+  schedule:
+    database:
+      full_backup: "0 2 * * 0"      # Weekly full backup
+      incremental: "0 2 * * 1-6"    # Daily incremental
+    application:
+      daily: "0 3 * * *"            # Daily application backup
+    configuration:
+      weekly: "0 4 * * 0"           # Weekly config backup
+  
+  retention:
+    database_full: 4      # Keep 4 weekly full backups
+    database_incremental: 7  # Keep 7 daily incrementals
+    application: 30       # Keep 30 daily app backups
+    configuration: 12     # Keep 12 weekly config backups
+  
+  storage:
+    local_path: "/backup/{{ app_config.name | lower }}"
+    remote_enabled: true
+    remote_type: "s3"
+    remote_bucket: "{{ app_config.name | lower }}-backups-{{ app_config.environment }}"
+  {% endif %}
+
+# ===========================================
+# Performance Tuning
+# ===========================================
+performance:
+  # System resource allocation
+  resource_allocation:
+    {% set total_memory_mb = ansible_memtotal_mb %}
+    {% set total_cpu_cores = ansible_processor_vcpus %}
+    
+    system_reserved:
+      memory_mb: {{ (total_memory_mb * 0.1) | int }}
+      cpu_cores: {{ (total_cpu_cores * 0.1) | round(1) }}
+    
+    application:
+      memory_mb: {{ (total_memory_mb * 0.6) | int }}
+      cpu_cores: {{ (total_cpu_cores * 0.7) | round(1) }}
+    
+    database:
+      memory_mb: {{ (total_memory_mb * 0.3) | int }}
+      cpu_cores: {{ (total_cpu_cores * 0.2) | round(1) }}
+  
+  # Cache configuration
+  caching:
+    {% if app_config.environment == 'production' %}
+    levels:
+      - type: "memory"
+        size_mb: {{ (ansible_memtotal_mb * 0.1) | int }}
+        ttl: 300
+      - type: "redis"
+        size_mb: {{ (ansible_memtotal_mb * 0.2) | int }}
+        ttl: 3600
+      - type: "cdn"
+        enabled: true
+        ttl: 86400
+    {% else %}
+    levels:
+      - type: "memory"
+        size_mb: {{ (ansible_memtotal_mb * 0.05) | int }}
+        ttl: 60
+      - type: "redis"
+        size_mb: {{ (ansible_memtotal_mb * 0.1) | int }}
+        ttl: 300
+    {% endif %}
+  
+  # Connection pooling
+  connection_pools:
+    database:
+      {% if app_config.environment == 'production' %}
+      min_connections: 10
+      max_connections: {{ ansible_processor_vcpus * 5 }}
+      {% elif app_config.environment == 'staging' %}
+      min_connections: 5
+      max_connections: {{ ansible_processor_vcpus * 3 }}
+      {% else %}
+      min_connections: 2
+      max_connections: {{ ansible_processor_vcpus * 2 }}
+      {% endif %}
+      connection_timeout: 30
+      idle_timeout: 600
+    
+    redis:
+      {% if app_config.environment == 'production' %}
+      pool_size: {{ ansible_processor_vcpus * 2 }}
+      {% else %}
+      pool_size: {{ ansible_processor_vcpus }}
+      {% endif %}
+      connection_timeout: 5
+      read_timeout: 30
+
+# ===========================================
+# Environment-Specific Overrides
+# ===========================================
+environment_config:
+  {% if app_config.environment == 'production' %}
+  production:
+    error_reporting: true
+    debug_logging: false
+    profiling: false
+    analytics: true
+    cdn_enabled: true
+    minification: true
+    compression: true
+    rate_limiting:
+      enabled: true
+      requests_per_minute: 1000
+      burst_size: 100
+  {% elif app_config.environment == 'staging' %}
+  staging:
+    error_reporting: true
+    debug_logging: true
+    profiling: true
+    analytics: false
+    cdn_enabled: false
+    minification: true
+    compression: true
+    rate_limiting:
+      enabled: true
+      requests_per_minute: 500
+      burst_size: 50
+  {% else %}
+  development:
+    error_reporting: true
+    debug_logging: true
+    profiling: true
+    analytics: false
+    cdn_enabled: false
+    minification: false
+    compression: false
+    rate_limiting:
+      enabled: false
+    hot_reload: true
+    auto_restart: true
+  {% endif %}
+
+# ===========================================
+# Deployment Metadata
+# ===========================================
+deployment:
+  metadata:
+    config_version: "1.0"
+    generated_files_count: 11
+    template_engine: "Jinja2"
+    variable_count: {{ (app_config | to_json | length + users | to_json | length + servers | to_json | length) }}
+    checksum: "{{ (app_config | to_json + users | to_json + servers | to_json + ansible_date_time.epoch) | hash('md5') }}"
+    
+  validation:
+    required_vars_present: true
+    environment_valid: {{ app_config.environment in ['development', 'staging', 'production'] }}
+    servers_configured: {{ servers | length > 0 }}
+    users_configured: {{ users | length > 0 }}
+    monitoring_setup: {{ monitoring.enabled | default(false) }}
+    ssl_configured: {{ (websites and websites[0].ssl) | default(false) }}
+    
+  next_steps:
+    - "Review generated configuration files"
+    - "Update firewall rules based on network configuration"
+    - "Set up SSL certificates for domains"
+    - "Configure backup schedules"
+    - "Set up monitoring alerts"
+    - "Test deployment with generated scripts"
+    - "Update DNS records for new domains"
+    - "Schedule user training for new features" 

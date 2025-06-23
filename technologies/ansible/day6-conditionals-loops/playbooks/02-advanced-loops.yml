@@ -1,0 +1,567 @@
+---
+# Day 6: 高级循环技术演示
+- name: 高级循环与批量操作
+  hosts: localhost
+  gather_facts: yes
+  vars:
+    # 用户管理配置
+    users:
+      - username: alice
+        department: engineering
+        role: developer
+        ssh_keys:
+          - "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAAB... alice@laptop"
+          - "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAAB... alice@desktop"
+        environments: ["development", "staging"]
+        groups: ["developers", "git-users"]
+      - username: bob
+        department: operations
+        role: admin
+        ssh_keys:
+          - "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAAB... bob@workstation"
+        environments: ["staging", "production"]
+        groups: ["admins", "operators"]
+      - username: charlie
+        department: engineering
+        role: lead
+        ssh_keys:
+          - "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAAB... charlie@macbook"
+        environments: ["development", "staging", "production"]
+        groups: ["developers", "leads", "architects"]
+    
+    # 服务器配置
+    servers:
+      - hostname: web01
+        ip: "192.168.1.10"
+        roles: ["web", "app"]
+        environment: production
+        specs:
+          cpu: 4
+          memory: 8
+          disk: 100
+        services:
+          - name: nginx
+            port: 80
+            config_template: nginx.conf.j2
+          - name: nodejs
+            port: 3000
+            config_template: app.conf.j2
+      - hostname: web02
+        ip: "192.168.1.11"
+        roles: ["web", "app"]
+        environment: production
+        specs:
+          cpu: 4
+          memory: 8
+          disk: 100
+        services:
+          - name: nginx
+            port: 80
+            config_template: nginx.conf.j2
+          - name: nodejs
+            port: 3000
+            config_template: app.conf.j2
+      - hostname: db01
+        ip: "192.168.1.20"
+        roles: ["database"]
+        environment: production
+        specs:
+          cpu: 8
+          memory: 16
+          disk: 500
+        services:
+          - name: mysql
+            port: 3306
+            config_template: mysql.cnf.j2
+      - hostname: cache01
+        ip: "192.168.1.30"
+        roles: ["cache"]
+        environment: production
+        specs:
+          cpu: 2
+          memory: 4
+          disk: 50
+        services:
+          - name: redis
+            port: 6379
+            config_template: redis.conf.j2
+    
+    # 应用配置
+    applications:
+      frontend:
+        servers: ["web01", "web02"]
+        dependencies: ["backend", "cache"]
+        health_check: "/health"
+        deployment_strategy: "rolling"
+      backend:
+        servers: ["web01", "web02"]
+        dependencies: ["database", "cache"]
+        health_check: "/api/health"
+        deployment_strategy: "blue_green"
+      database:
+        servers: ["db01"]
+        dependencies: []
+        health_check: "/mysql-health"
+        deployment_strategy: "maintenance"
+      cache:
+        servers: ["cache01"]
+        dependencies: []
+        health_check: "/redis-health"
+        deployment_strategy: "rolling"
+    
+    # 数据库配置
+    databases:
+      - name: app_db
+        users:
+          - username: app_user
+            password: "secure_password_123"
+            privileges: ["SELECT", "INSERT", "UPDATE", "DELETE"]
+            tables: ["users", "orders", "products"]
+          - username: readonly_user
+            password: "readonly_pass_456"
+            privileges: ["SELECT"]
+            tables: ["users", "products", "reports"]
+        tables:
+          - name: users
+            columns: ["id", "username", "email", "created_at"]
+            indexes: ["username", "email"]
+          - name: orders
+            columns: ["id", "user_id", "total", "status", "created_at"]
+            indexes: ["user_id", "status", "created_at"]
+          - name: products
+            columns: ["id", "name", "price", "category", "stock"]
+            indexes: ["category", "price"]
+    
+    # 监控配置
+    monitoring_targets:
+      system:
+        - metric: cpu_usage
+          warning: 70
+          critical: 85
+        - metric: memory_usage
+          warning: 80
+          critical: 90
+        - metric: disk_usage
+          warning: 85
+          critical: 95
+      application:
+        - metric: response_time
+          warning: 500
+          critical: 1000
+        - metric: error_rate
+          warning: 5
+          critical: 10
+        - metric: request_rate
+          warning: 1000
+          critical: 2000
+      database:
+        - metric: connection_count
+          warning: 80
+          critical: 100
+        - metric: query_time
+          warning: 100
+          critical: 500
+
+  tasks:
+    # ==================================================
+    # 第一部分：基础循环演示
+    # ==================================================
+    
+    - name: "=== 第一部分：基础循环演示 ==="
+      debug:
+        msg: "开始演示基础循环功能"
+
+    - name: 简单列表循环 - 显示所有用户
+      debug:
+        msg: "用户: {{ item.username }}, 部门: {{ item.department }}, 角色: {{ item.role }}"
+      loop: "{{ users }}"
+
+    - name: 字典循环 - 显示应用配置
+      debug:
+        msg: "应用: {{ item.key }}, 服务器: {{ item.value.servers | join(', ') }}, 策略: {{ item.value.deployment_strategy }}"
+      loop: "{{ applications | dict2items }}"
+
+    - name: 范围循环 - 生成序列号
+      debug:
+        msg: "序列号: {{ item }}"
+      loop: "{{ range(1, 6) | list }}"
+
+    # ==================================================
+    # 第二部分：嵌套循环演示
+    # ==================================================
+    
+    - name: "=== 第二部分：嵌套循环演示 ==="
+      debug:
+        msg: "开始演示嵌套循环功能"
+
+    - name: 用户与SSH密钥的嵌套循环
+      debug:
+        msg: "为用户 {{ item.0.username }} 配置SSH密钥: {{ item.1[:50] }}..."
+      loop: "{{ users | subelements('ssh_keys') }}"
+
+    - name: 服务器与服务的嵌套循环
+      debug:
+        msg: "在服务器 {{ item.0.hostname }} 上配置服务 {{ item.1.name }}:{{ item.1.port }}"
+      loop: "{{ servers | subelements('services') }}"
+
+    - name: 数据库与用户的嵌套循环
+      debug:
+        msg: "数据库 {{ item.0.name }} 创建用户 {{ item.1.username }} (权限: {{ item.1.privileges | join(', ') }})"
+      loop: "{{ databases | subelements('users') }}"
+
+    - name: 用户与组合权限的产品循环
+      debug:
+        msg: "用户 {{ item.0.username }} 在环境 {{ item.1 }} 中具有访问权限"
+      loop: "{{ users | product(['development', 'staging', 'production']) | list }}"
+      when: item.1 in item.0.environments
+
+    # ==================================================
+    # 第三部分：条件循环演示
+    # ==================================================
+    
+    - name: "=== 第三部分：条件循环演示 ==="
+      debug:
+        msg: "开始演示条件循环功能"
+
+    - name: 条件循环 - 仅显示生产环境服务器
+      debug:
+        msg: "生产服务器: {{ item.hostname }} ({{ item.ip }}) - 角色: {{ item.roles | join(', ') }}"
+      loop: "{{ servers }}"
+      when: item.environment == "production"
+
+    - name: 条件循环 - 显示高配置服务器
+      debug:
+        msg: "高配置服务器: {{ item.hostname }} - CPU: {{ item.specs.cpu }}核, 内存: {{ item.specs.memory }}GB"
+      loop: "{{ servers }}"
+      when: 
+        - item.specs.cpu >= 4
+        - item.specs.memory >= 8
+
+    - name: 条件循环 - 显示管理员用户
+      debug:
+        msg: "管理员用户: {{ item.username }} ({{ item.department }})"
+      loop: "{{ users }}"
+      when: item.role in ["admin", "lead"]
+
+    - name: 条件循环 - 显示数据库相关服务器
+      debug:
+        msg: "数据库服务器: {{ item.hostname }} - 存储: {{ item.specs.disk }}GB"
+      loop: "{{ servers }}"
+      when: "'database' in item.roles"
+
+    # ==================================================
+    # 第四部分：循环变量和索引
+    # ==================================================
+    
+    - name: "=== 第四部分：循环变量和索引 ==="
+      debug:
+        msg: "开始演示循环变量和索引"
+
+    - name: 使用循环索引和状态
+      debug:
+        msg: |
+          项目 {{ ansible_loop.index }}/{{ ansible_loop.length }}: {{ item.username }}
+          {% if ansible_loop.first %}这是第一个用户{% endif %}
+          {% if ansible_loop.last %}这是最后一个用户{% endif %}
+          进度: {{ (ansible_loop.index / ansible_loop.length * 100) | round(1) }}%
+      loop: "{{ users }}"
+
+    - name: 自定义循环变量名
+      debug:
+        msg: "服务器索引 {{ server_index }}: {{ server_item.hostname }} ({{ server_item.ip }})"
+      loop: "{{ servers }}"
+      loop_control:
+        index_var: server_index
+        loop_var: server_item
+
+    - name: 带标签的循环进度
+      debug:
+        msg: "处理服务器配置 [{{ server.hostname }}] - 第{{ ansible_loop.index }}步/共{{ ansible_loop.length }}步"
+      loop: "{{ servers }}"
+      loop_control:
+        loop_var: server
+        label: "{{ server.hostname }}"
+
+    # ==================================================
+    # 第五部分：高级过滤和选择
+    # ==================================================
+    
+    - name: "=== 第五部分：高级过滤和选择 ==="
+      debug:
+        msg: "开始演示高级过滤和选择"
+
+    - name: 按属性过滤服务器
+      debug:
+        msg: "Web服务器: {{ item.hostname }} - 角色: {{ item.roles | join(', ') }}"
+      loop: "{{ servers | selectattr('roles', 'contains', 'web') | list }}"
+
+    - name: 按多个条件过滤
+      debug:
+        msg: "高性能生产服务器: {{ item.hostname }} - {{ item.specs.cpu }}核/{{ item.specs.memory }}GB"
+      loop: "{{ servers | selectattr('environment', 'equalto', 'production') | selectattr('specs.cpu', 'ge', 4) | list }}"
+
+    - name: 分组显示用户
+      debug:
+        msg: "部门 {{ item.key }}: {{ item.value | map(attribute='username') | join(', ') }}"
+      loop: "{{ users | groupby('department') }}"
+
+    - name: 按角色分组服务器
+      debug:
+        msg: "角色 {{ item.key }}: {{ item.value | map(attribute='hostname') | join(', ') }}"
+      loop: "{{ servers | map('extract', servers, 'roles') | flatten | unique | map('regex_replace', '^(.*)$', '\\1') | list | zip_longest(servers | groupby('roles') | map('first') | list) | list }}"
+      when: false  # 复杂示例，实际使用时需要简化
+
+    # 简化版本的分组显示
+    - name: 统计服务器角色分布
+      debug:
+        msg: "角色统计 - Web: {{ web_servers | length }}, DB: {{ db_servers | length }}, Cache: {{ cache_servers | length }}"
+      vars:
+        web_servers: "{{ servers | selectattr('roles', 'contains', 'web') | list }}"
+        db_servers: "{{ servers | selectattr('roles', 'contains', 'database') | list }}"
+        cache_servers: "{{ servers | selectattr('roles', 'contains', 'cache') | list }}"
+
+    # ==================================================
+    # 第六部分：动态循环构建
+    # ==================================================
+    
+    - name: "=== 第六部分：动态循环构建 ==="
+      debug:
+        msg: "开始演示动态循环构建"
+
+    - name: 构建服务器-服务映射
+      set_fact:
+        server_service_map: |
+          {% set result = [] %}
+          {% for server in servers %}
+            {% for service in server.services %}
+              {% set mapping = {
+                'server': server.hostname,
+                'service': service.name,
+                'port': service.port,
+                'ip': server.ip,
+                'environment': server.environment
+              } %}
+              {% set _ = result.append(mapping) %}
+            {% endfor %}
+          {% endfor %}
+          {{ result }}
+
+    - name: 显示服务器-服务映射
+      debug:
+        msg: "服务映射: {{ item.server }}:{{ item.port }} -> {{ item.service }} ({{ item.environment }})"
+      loop: "{{ server_service_map }}"
+
+    - name: 构建用户环境权限矩阵
+      set_fact:
+        user_environment_matrix: |
+          {% set result = [] %}
+          {% for user in users %}
+            {% for env in ['development', 'staging', 'production'] %}
+              {% set access = {
+                'user': user.username,
+                'environment': env,
+                'has_access': env in user.environments,
+                'role': user.role,
+                'department': user.department
+              } %}
+              {% set _ = result.append(access) %}
+            {% endfor %}
+          {% endfor %}
+          {{ result }}
+
+    - name: 显示用户环境访问权限
+      debug:
+        msg: "用户 {{ item.user }} 对环境 {{ item.environment }} 的访问权限: {{ '✓' if item.has_access else '✗' }}"
+      loop: "{{ user_environment_matrix }}"
+      when: item.has_access
+
+    # ==================================================
+    # 第七部分：批量操作模拟
+    # ==================================================
+    
+    - name: "=== 第七部分：批量操作模拟 ==="
+      debug:
+        msg: "开始演示批量操作模拟"
+
+    - name: 模拟批量用户创建
+      debug:
+        msg: |
+          创建用户: {{ item.username }}
+          - 主组: {{ item.department }}
+          - 附加组: {{ item.groups | join(', ') }}
+          - Shell: /bin/bash
+          - 主目录: /home/{{ item.username }}
+      loop: "{{ users }}"
+      register: user_creation_results
+
+    - name: 显示用户创建结果统计
+      debug:
+        msg: |
+          用户创建统计:
+          - 总用户数: {{ user_creation_results.results | length }}
+          - 开发人员: {{ users | selectattr('role', 'equalto', 'developer') | list | length }}
+          - 管理员: {{ users | selectattr('role', 'equalto', 'admin') | list | length }}
+          - 团队主管: {{ users | selectattr('role', 'equalto', 'lead') | list | length }}
+
+    - name: 模拟服务健康检查
+      debug:
+        msg: "检查服务 {{ item.service }} 在 {{ item.server }}:{{ item.port }} 的健康状态"
+      loop: "{{ server_service_map }}"
+      register: health_check_results
+
+    - name: 模拟监控指标收集
+      debug:
+        msg: "收集 {{ item.0.hostname }} 的 {{ item.1.metric }} 指标 (警告: {{ item.1.warning }}, 严重: {{ item.1.critical }})"
+      loop: "{{ servers | product(monitoring_targets.system) | list }}"
+      when: "'web' in item.0.roles"
+
+    # ==================================================
+    # 第八部分：错误处理和恢复
+    # ==================================================
+    
+    - name: "=== 第八部分：错误处理和恢复 ==="
+      debug:
+        msg: "开始演示错误处理和恢复"
+
+    - name: 模拟可能失败的服务操作
+      debug:
+        msg: "尝试重启服务 {{ item.name }} 在 {{ item.server }}"
+      loop: "{{ server_service_map }}"
+      register: service_restart_results
+      failed_when: false  # 模拟：不让任务真正失败
+      changed_when: item.service != "mysql"  # 模拟：MySQL 重启失败
+
+    - name: 检查操作失败的服务
+      debug:
+        msg: "服务操作失败: {{ item.item.service }} 在 {{ item.item.server }}"
+      loop: "{{ service_restart_results.results }}"
+      when: not item.changed
+
+    - name: 统计操作结果
+      set_fact:
+        operation_summary:
+          total_operations: "{{ service_restart_results.results | length }}"
+          successful_operations: "{{ service_restart_results.results | selectattr('changed') | list | length }}"
+          failed_operations: "{{ service_restart_results.results | rejectattr('changed') | list | length }}"
+          success_rate: "{{ ((service_restart_results.results | selectattr('changed') | list | length) / (service_restart_results.results | length) * 100) | round(1) }}"
+
+    - name: 显示操作统计
+      debug:
+        msg: |
+          ======================================
+          批量操作结果统计
+          ======================================
+          总操作数: {{ operation_summary.total_operations }}
+          成功操作: {{ operation_summary.successful_operations }}
+          失败操作: {{ operation_summary.failed_operations }}
+          成功率: {{ operation_summary.success_rate }}%
+          ======================================
+
+    # ==================================================
+    # 第九部分：性能优化演示
+    # ==================================================
+    
+    - name: "=== 第九部分：性能优化演示 ==="
+      debug:
+        msg: "开始演示性能优化技术"
+
+    - name: 批量操作优化 - 收集所有需要的信息
+      set_fact:
+        batch_operations: |
+          {% set ops = [] %}
+          {% for server in servers %}
+            {% for service in server.services %}
+              {% set op = {
+                'type': 'service_config',
+                'server': server.hostname,
+                'service': service.name,
+                'template': service.config_template,
+                'priority': 'high' if 'database' in server.roles else 'normal'
+              } %}
+              {% set _ = ops.append(op) %}
+            {% endfor %}
+          {% endfor %}
+          {{ ops | sort(attribute='priority', reverse=true) }}
+
+    - name: 显示优化后的操作顺序
+      debug:
+        msg: "优先级 {{ item.priority }}: 配置 {{ item.service }} 在 {{ item.server }}"
+      loop: "{{ batch_operations }}"
+
+    - name: 模拟并行任务执行
+      debug:
+        msg: "并行执行任务组 {{ ansible_loop.index }}: {{ item | map(attribute='service') | join(', ') }}"
+      loop: "{{ batch_operations | batch(3) | list }}"
+
+    # ==================================================
+    # 第十部分：综合应用示例
+    # ==================================================
+    
+    - name: "=== 第十部分：综合应用示例 ==="
+      debug:
+        msg: "开始综合应用示例演示"
+
+    - name: 生成完整的部署计划
+      set_fact:
+        deployment_plan: |
+          {% set plan = {} %}
+          {% for app_name, app_config in applications.items() %}
+            {% set app_plan = {
+              'name': app_name,
+              'strategy': app_config.deployment_strategy,
+              'servers': [],
+              'dependencies': app_config.dependencies,
+              'health_check': app_config.health_check
+            } %}
+            {% for server_name in app_config.servers %}
+              {% set server = servers | selectattr('hostname', 'equalto', server_name) | first %}
+              {% set server_info = {
+                'hostname': server.hostname,
+                'ip': server.ip,
+                'services': server.services | selectattr('name', 'in', ['nginx', 'nodejs', 'mysql', 'redis']) | list,
+                'specs': server.specs
+              } %}
+              {% set _ = app_plan.servers.append(server_info) %}
+            {% endfor %}
+            {% set _ = plan.update({app_name: app_plan}) %}
+          {% endfor %}
+          {{ plan }}
+
+    - name: 显示应用部署计划
+      debug:
+        msg: |
+          应用: {{ item.key }}
+          策略: {{ item.value.strategy }}
+          服务器: {{ item.value.servers | map(attribute='hostname') | join(', ') }}
+          依赖: {{ item.value.dependencies | join(', ') if item.value.dependencies else '无' }}
+          健康检查: {{ item.value.health_check }}
+      loop: "{{ deployment_plan | dict2items }}"
+
+    - name: 生成最终配置摘要
+      set_fact:
+        final_summary:
+          total_users: "{{ users | length }}"
+          total_servers: "{{ servers | length }}"
+          total_services: "{{ server_service_map | length }}"
+          total_applications: "{{ applications | length }}"
+          environments: "{{ users | map(attribute='environments') | flatten | unique | list }}"
+          departments: "{{ users | map(attribute='department') | unique | list }}"
+          server_roles: "{{ servers | map(attribute='roles') | flatten | unique | list }}"
+
+    - name: 显示最终配置摘要
+      debug:
+        msg: |
+          ==========================================
+          Day 6 高级循环演示 - 最终配置摘要
+          ==========================================
+          用户总数: {{ final_summary.total_users }}
+          服务器总数: {{ final_summary.total_servers }}
+          服务总数: {{ final_summary.total_services }}
+          应用总数: {{ final_summary.total_applications }}
+          
+          环境列表: {{ final_summary.environments | join(', ') }}
+          部门列表: {{ final_summary.departments | join(', ') }}
+          服务器角色: {{ final_summary.server_roles | join(', ') }}
+          
+          演示完成时间: {{ ansible_date_time.iso8601 }}
+          ========================================== 

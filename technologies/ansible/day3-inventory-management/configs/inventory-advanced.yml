@@ -1,0 +1,369 @@
+# 高级 Ansible Inventory 示例
+# 展示复杂的企业级主机组织和变量管理
+
+all:
+  # 全局变量 - 适用于所有主机
+  vars:
+    # 基础设置
+    ansible_user: ansible
+    ansible_ssh_private_key_file: ~/.ssh/ansible_key
+    ansible_ssh_common_args: '-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null'
+    
+    # 全局应用设置
+    company_name: "MyCompany"
+    ntp_servers:
+      - ntp1.example.com
+      - ntp2.example.com
+    dns_servers:
+      - 8.8.8.8
+      - 8.8.4.4
+    
+    # 监控设置
+    monitoring_enabled: true
+    log_level: info
+
+  children:
+    # ============ 按环境分组 ============
+    development:
+      vars:
+        environment: dev
+        debug_mode: true
+        log_level: debug
+        backup_retention_days: 7
+        ssl_enabled: false
+      children:
+        dev_webservers:
+        dev_databases:
+        dev_cache:
+
+    staging:
+      vars:
+        environment: staging
+        debug_mode: false
+        log_level: info
+        backup_retention_days: 14
+        ssl_enabled: true
+        ssl_cert_path: /etc/ssl/staging
+      children:
+        staging_webservers:
+        staging_databases:
+        staging_cache:
+
+    production:
+      vars:
+        environment: prod
+        debug_mode: false
+        log_level: warn
+        backup_retention_days: 30
+        ssl_enabled: true
+        ssl_cert_path: /etc/ssl/production
+        high_availability: true
+      children:
+        prod_webservers:
+        prod_databases:
+        prod_cache:
+        prod_loadbalancers:
+
+    # ============ 按功能分组 ============
+    webservers:
+      vars:
+        service_type: web
+        http_port: 80
+        https_port: 443
+        nginx_version: "1.18"
+        nginx_worker_processes: auto
+        nginx_worker_connections: 1024
+        app_deploy_path: /opt/webapp
+        static_files_path: /var/www/static
+      children:
+        dev_webservers:
+        staging_webservers:
+        prod_webservers:
+
+    databases:
+      vars:
+        service_type: database
+        mysql_port: 3306
+        mysql_version: "8.0"
+        innodb_buffer_pool_size: "1G"
+        max_connections: 200
+        backup_schedule: "0 2 * * *"  # 每天凌晨2点备份
+        data_dir: /var/lib/mysql
+      children:
+        dev_databases:
+        staging_databases:
+        prod_databases:
+
+    cache:
+      vars:
+        service_type: cache
+        redis_port: 6379
+        redis_version: "6.2"
+        redis_maxmemory: "512mb"
+        redis_maxmemory_policy: "allkeys-lru"
+        redis_save_config:
+          - "900 1"    # 900秒内至少1个key变化
+          - "300 10"   # 300秒内至少10个key变化
+          - "60 10000" # 60秒内至少10000个key变化
+      children:
+        dev_cache:
+        staging_cache:
+        prod_cache:
+
+    loadbalancers:
+      vars:
+        service_type: loadbalancer
+        haproxy_version: "2.4"
+        haproxy_stats_port: 8404
+        haproxy_stats_user: admin
+        health_check_interval: 5
+        connection_timeout: 5000
+        server_timeout: 50000
+
+    # ============ 按地域分组 ============
+    us_east:
+      vars:
+        region: us-east-1
+        timezone: America/New_York
+        data_center: dc-us-east
+        network_segment: 10.1.0.0/16
+      hosts:
+        web01.us-east.example.com:
+        web02.us-east.example.com:
+        db01.us-east.example.com:
+
+    us_west:
+      vars:
+        region: us-west-2
+        timezone: America/Los_Angeles
+        data_center: dc-us-west
+        network_segment: 10.2.0.0/16
+      hosts:
+        web01.us-west.example.com:
+        web02.us-west.example.com:
+        db01.us-west.example.com:
+
+    europe:
+      vars:
+        region: eu-west-1
+        timezone: Europe/London
+        data_center: dc-europe
+        network_segment: 10.3.0.0/16
+      hosts:
+        web01.eu.example.com:
+        web02.eu.example.com:
+        db01.eu.example.com:
+
+    # ============ 开发环境主机 ============
+    dev_webservers:
+      hosts:
+        dev-web01.example.com:
+          ansible_host: 192.168.10.11
+          server_id: dev-web01
+          cpu_cores: 2
+          memory_gb: 4
+          disk_gb: 50
+        dev-web02.example.com:
+          ansible_host: 192.168.10.12
+          server_id: dev-web02
+          cpu_cores: 2
+          memory_gb: 4
+          disk_gb: 50
+
+    dev_databases:
+      hosts:
+        dev-db01.example.com:
+          ansible_host: 192.168.10.21
+          server_id: dev-db01
+          mysql_server_id: 1
+          cpu_cores: 4
+          memory_gb: 8
+          disk_gb: 100
+          mysql_replication_role: master
+
+    dev_cache:
+      hosts:
+        dev-redis01.example.com:
+          ansible_host: 192.168.10.31
+          server_id: dev-redis01
+          cpu_cores: 2
+          memory_gb: 4
+          disk_gb: 20
+
+    # ============ 预发布环境主机 ============
+    staging_webservers:
+      hosts:
+        staging-web01.example.com:
+          ansible_host: 192.168.20.11
+          server_id: staging-web01
+          cpu_cores: 4
+          memory_gb: 8
+          disk_gb: 100
+        staging-web02.example.com:
+          ansible_host: 192.168.20.12
+          server_id: staging-web02
+          cpu_cores: 4
+          memory_gb: 8
+          disk_gb: 100
+
+    staging_databases:
+      hosts:
+        staging-db01.example.com:
+          ansible_host: 192.168.20.21
+          server_id: staging-db01
+          mysql_server_id: 10
+          cpu_cores: 8
+          memory_gb: 16
+          disk_gb: 200
+          mysql_replication_role: master
+        staging-db02.example.com:
+          ansible_host: 192.168.20.22
+          server_id: staging-db02
+          mysql_server_id: 11
+          cpu_cores: 8
+          memory_gb: 16
+          disk_gb: 200
+          mysql_replication_role: slave
+
+    staging_cache:
+      hosts:
+        staging-redis01.example.com:
+          ansible_host: 192.168.20.31
+          server_id: staging-redis01
+          cpu_cores: 4
+          memory_gb: 8
+          disk_gb: 50
+
+    # ============ 生产环境主机 ============
+    prod_webservers:
+      hosts:
+        prod-web01.example.com:
+          ansible_host: 10.1.1.11
+          server_id: prod-web01
+          cpu_cores: 8
+          memory_gb: 16
+          disk_gb: 200
+          load_balancer_weight: 100
+        prod-web02.example.com:
+          ansible_host: 10.1.1.12
+          server_id: prod-web02
+          cpu_cores: 8
+          memory_gb: 16
+          disk_gb: 200
+          load_balancer_weight: 100
+        prod-web03.example.com:
+          ansible_host: 10.1.1.13
+          server_id: prod-web03
+          cpu_cores: 8
+          memory_gb: 16
+          disk_gb: 200
+          load_balancer_weight: 100
+
+    prod_databases:
+      hosts:
+        prod-db01.example.com:
+          ansible_host: 10.1.2.11
+          server_id: prod-db01
+          mysql_server_id: 100
+          cpu_cores: 16
+          memory_gb: 64
+          disk_gb: 1000
+          mysql_replication_role: master
+        prod-db02.example.com:
+          ansible_host: 10.1.2.12
+          server_id: prod-db02
+          mysql_server_id: 101
+          cpu_cores: 16
+          memory_gb: 64
+          disk_gb: 1000
+          mysql_replication_role: slave
+        prod-db03.example.com:
+          ansible_host: 10.1.2.13
+          server_id: prod-db03
+          mysql_server_id: 102
+          cpu_cores: 16
+          memory_gb: 64
+          disk_gb: 1000
+          mysql_replication_role: slave
+
+    prod_cache:
+      hosts:
+        prod-redis01.example.com:
+          ansible_host: 10.1.3.11
+          server_id: prod-redis01
+          cpu_cores: 8
+          memory_gb: 32
+          disk_gb: 200
+          redis_cluster_role: master
+        prod-redis02.example.com:
+          ansible_host: 10.1.3.12
+          server_id: prod-redis02
+          cpu_cores: 8
+          memory_gb: 32
+          disk_gb: 200
+          redis_cluster_role: slave
+        prod-redis03.example.com:
+          ansible_host: 10.1.3.13
+          server_id: prod-redis03
+          cpu_cores: 8
+          memory_gb: 32
+          disk_gb: 200
+          redis_cluster_role: master
+
+    prod_loadbalancers:
+      hosts:
+        prod-lb01.example.com:
+          ansible_host: 10.1.0.11
+          server_id: prod-lb01
+          cpu_cores: 4
+          memory_gb: 8
+          disk_gb: 100
+          haproxy_priority: 200
+          keepalived_state: MASTER
+        prod-lb02.example.com:
+          ansible_host: 10.1.0.12
+          server_id: prod-lb02
+          cpu_cores: 4
+          memory_gb: 8
+          disk_gb: 100
+          haproxy_priority: 100
+          keepalived_state: BACKUP
+
+    # ============ 特殊功能分组 ============
+    monitoring:
+      hosts:
+        monitoring.example.com:
+          ansible_host: 10.1.4.10
+          server_id: monitoring
+          cpu_cores: 4
+          memory_gb: 16
+          disk_gb: 500
+      vars:
+        prometheus_port: 9090
+        grafana_port: 3000
+        alertmanager_port: 9093
+
+    logging:
+      hosts:
+        logging.example.com:
+          ansible_host: 10.1.4.20
+          server_id: logging
+          cpu_cores: 8
+          memory_gb: 32
+          disk_gb: 2000
+      vars:
+        elasticsearch_port: 9200
+        kibana_port: 5601
+        logstash_port: 5044
+
+    backup:
+      hosts:
+        backup.example.com:
+          ansible_host: 10.1.4.30
+          server_id: backup
+          cpu_cores: 4
+          memory_gb: 8
+          disk_gb: 5000
+      vars:
+        backup_retention_full: 90  # 全量备份保留90天
+        backup_retention_inc: 30   # 增量备份保留30天 

@@ -1,0 +1,251 @@
+# Ansible 核心模块参考
+# 这个文件包含了常用模块的示例和最佳实践
+
+---
+# 系统信息模块
+system_modules:
+  setup:
+    description: "收集系统信息 (facts)"
+    examples:
+      - name: "收集所有系统信息"
+        command: "ansible all -m setup"
+      - name: "过滤特定信息"
+        command: "ansible all -m setup -a 'filter=ansible_os_family'"
+      - name: "保存信息到文件"
+        command: "ansible all -m setup --tree /tmp/facts"
+
+  ping:
+    description: "测试连接性"
+    examples:
+      - name: "基本连接测试"
+        command: "ansible all -m ping"
+      - name: "自定义返回数据"
+        command: "ansible all -m ping -a 'data=hello'"
+
+# 文件操作模块
+file_modules:
+  copy:
+    description: "复制文件到远程主机"
+    parameters:
+      src: "源文件路径"
+      dest: "目标文件路径"
+      owner: "文件所有者"
+      group: "文件组"
+      mode: "文件权限"
+      backup: "是否备份"
+    examples:
+      - name: "复制文件"
+        command: "ansible all -m copy -a 'src=/tmp/test.txt dest=/tmp/test.txt'"
+      - name: "复制并设置权限"
+        command: "ansible all -m copy -a 'src=file.conf dest=/etc/app.conf owner=root group=root mode=0644 backup=yes'"
+
+  file:
+    description: "管理文件和目录属性"
+    parameters:
+      path: "文件或目录路径"
+      state: "期望状态 (file, directory, absent, link, hard, touch)"
+      owner: "所有者"
+      group: "组"
+      mode: "权限"
+    examples:
+      - name: "创建目录"
+        command: "ansible all -m file -a 'path=/opt/app state=directory mode=0755'"
+      - name: "删除文件"
+        command: "ansible all -m file -a 'path=/tmp/test state=absent'"
+      - name: "创建软链接"
+        command: "ansible all -m file -a 'src=/opt/app dest=/usr/local/app state=link'"
+
+  template:
+    description: "使用 Jinja2 模板复制文件"
+    parameters:
+      src: "模板文件路径"
+      dest: "目标文件路径"
+      backup: "是否备份"
+    examples:
+      - name: "使用模板"
+        command: "ansible all -m template -a 'src=config.j2 dest=/etc/app.conf backup=yes'"
+
+  fetch:
+    description: "从远程主机获取文件"
+    parameters:
+      src: "远程文件路径"
+      dest: "本地目录路径"
+      flat: "是否扁平化目录结构"
+    examples:
+      - name: "获取配置文件"
+        command: "ansible all -m fetch -a 'src=/etc/nginx/nginx.conf dest=/tmp/configs/'"
+
+# 包管理模块
+package_modules:
+  apt:
+    description: "Debian/Ubuntu 包管理"
+    parameters:
+      name: "包名"
+      state: "状态 (present, absent, latest)"
+      update_cache: "是否更新缓存"
+      cache_valid_time: "缓存有效时间"
+    examples:
+      - name: "安装软件包"
+        command: "ansible ubuntu -m apt -a 'name=nginx state=present'"
+      - name: "更新并安装"
+        command: "ansible ubuntu -m apt -a 'name=nginx state=present update_cache=yes'"
+      - name: "安装多个包"
+        command: "ansible ubuntu -m apt -a 'name=nginx,mysql-server,php state=present'"
+
+  yum:
+    description: "RedHat/CentOS 包管理"
+    parameters:
+      name: "包名"
+      state: "状态"
+      enablerepo: "启用的仓库"
+      disablerepo: "禁用的仓库"
+    examples:
+      - name: "安装软件包"
+        command: "ansible centos -m yum -a 'name=nginx state=present'"
+      - name: "从特定仓库安装"
+        command: "ansible centos -m yum -a 'name=nginx state=present enablerepo=epel'"
+
+  package:
+    description: "通用包管理模块"
+    parameters:
+      name: "包名"
+      state: "状态"
+    examples:
+      - name: "通用安装"
+        command: "ansible all -m package -a 'name=git state=present'"
+
+# 服务管理模块
+service_modules:
+  service:
+    description: "管理系统服务"
+    parameters:
+      name: "服务名"
+      state: "状态 (started, stopped, restarted, reloaded)"
+      enabled: "是否开机启动"
+    examples:
+      - name: "启动服务"
+        command: "ansible all -m service -a 'name=nginx state=started'"
+      - name: "启动并启用"
+        command: "ansible all -m service -a 'name=nginx state=started enabled=yes'"
+
+  systemd:
+    description: "Systemd 服务管理"
+    parameters:
+      name: "服务名"
+      state: "状态"
+      enabled: "是否启用"
+      daemon_reload: "是否重载守护进程"
+    examples:
+      - name: "重载并启动"
+        command: "ansible all -m systemd -a 'name=nginx state=started daemon_reload=yes'"
+
+# 命令执行模块
+command_modules:
+  command:
+    description: "执行命令 (不支持shell特性)"
+    parameters:
+      cmd: "要执行的命令"
+      chdir: "工作目录"
+      creates: "如果文件存在则跳过"
+      removes: "如果文件不存在则跳过"
+    examples:
+      - name: "基本命令"
+        command: "ansible all -m command -a 'uptime'"
+      - name: "条件执行"
+        command: "ansible all -m command -a 'touch /tmp/test creates=/tmp/test'"
+
+  shell:
+    description: "执行Shell命令 (支持管道、重定向等)"
+    parameters:
+      cmd: "Shell命令"
+      chdir: "工作目录"
+    examples:
+      - name: "使用管道"
+        command: "ansible all -m shell -a 'ps aux | grep nginx'"
+      - name: "重定向输出"
+        command: "ansible all -m shell -a 'echo hello > /tmp/test.txt'"
+
+  script:
+    description: "执行本地脚本"
+    parameters:
+      script: "脚本路径"
+    examples:
+      - name: "执行脚本"
+        command: "ansible all -m script -a '/tmp/setup.sh'"
+
+# 用户管理模块
+user_modules:
+  user:
+    description: "管理用户账户"
+    parameters:
+      name: "用户名"
+      state: "状态 (present, absent)"
+      shell: "登录Shell"
+      home: "家目录"
+      groups: "附加组"
+      password: "密码 (已加密)"
+    examples:
+      - name: "创建用户"
+        command: "ansible all -m user -a 'name=deploy state=present shell=/bin/bash'"
+      - name: "添加到组"
+        command: "ansible all -m user -a 'name=deploy groups=sudo append=yes'"
+
+  group:
+    description: "管理用户组"
+    parameters:
+      name: "组名"
+      state: "状态"
+      gid: "组ID"
+    examples:
+      - name: "创建组"
+        command: "ansible all -m group -a 'name=app state=present gid=1001'"
+
+# 网络模块
+network_modules:
+  get_url:
+    description: "下载文件"
+    parameters:
+      url: "URL地址"
+      dest: "目标路径"
+      mode: "文件权限"
+      timeout: "超时时间"
+    examples:
+      - name: "下载文件"
+        command: "ansible all -m get_url -a 'url=https://example.com/file.tar.gz dest=/tmp/'"
+
+  uri:
+    description: "HTTP请求"
+    parameters:
+      url: "URL地址"
+      method: "HTTP方法"
+      body: "请求体"
+      headers: "请求头"
+    examples:
+      - name: "GET请求"
+        command: "ansible all -m uri -a 'url=http://example.com/api/status method=GET'"
+
+# 归档模块
+archive_modules:
+  unarchive:
+    description: "解压归档文件"
+    parameters:
+      src: "源文件"
+      dest: "目标目录"
+      remote_src: "源文件是否在远程"
+      owner: "所有者"
+      group: "组"
+    examples:
+      - name: "解压本地文件"
+        command: "ansible all -m unarchive -a 'src=/tmp/app.tar.gz dest=/opt/'"
+      - name: "解压远程文件"
+        command: "ansible all -m unarchive -a 'src=/tmp/app.tar.gz dest=/opt/ remote_src=yes'"
+
+  archive:
+    description: "创建归档文件"
+    parameters:
+      path: "要归档的路径"
+      dest: "归档文件路径"
+      format: "归档格式"
+    examples:
+      - name: "创建tar.gz"
+        command: "ansible all -m archive -a 'path=/opt/app dest=/tmp/app.tar.gz format=gz'" 

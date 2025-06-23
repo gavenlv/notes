@@ -1,0 +1,74 @@
+---
+# 系统信息收集 Playbook
+- name: "收集和显示系统信息"
+  hosts: all
+  gather_facts: yes
+  tasks:
+    - name: "显示主机基本信息"
+      debug:
+        msg: |
+          ========== 主机信息 ==========
+          主机名: {{ inventory_hostname }}
+          操作系统: {{ ansible_os_family }} {{ ansible_distribution }} {{ ansible_distribution_version }}
+          内核版本: {{ ansible_kernel }}
+          架构: {{ ansible_architecture }}
+          
+    - name: "显示网络信息"
+      debug:
+        msg: |
+          ========== 网络信息 ==========
+          默认IP: {{ ansible_default_ipv4.address | default('未知') }}
+          所有IP地址: {{ ansible_all_ipv4_addresses | join(', ') }}
+          默认网关: {{ ansible_default_ipv4.gateway | default('未知') }}
+          DNS服务器: {{ ansible_dns.nameservers | default([]) | join(', ') }}
+          
+    - name: "显示硬件信息"
+      debug:
+        msg: |
+          ========== 硬件信息 ==========
+          CPU核数: {{ ansible_processor_vcpus }}
+          CPU型号: {{ ansible_processor[2] | default('未知') }}
+          总内存: {{ ansible_memtotal_mb }}MB
+          可用内存: {{ ansible_memfree_mb }}MB
+          磁盘设备: {{ ansible_devices.keys() | list | join(', ') }}
+          
+    - name: "显示系统负载和运行时间"
+      debug:
+        msg: |
+          ========== 系统状态 ==========
+          系统负载: {{ ansible_loadavg }}
+          启动时间: {{ ansible_uptime_seconds }}秒
+          当前时间: {{ ansible_date_time.iso8601 }}
+          时区: {{ ansible_date_time.tz }}
+          
+    - name: "检查磁盘使用情况"
+      command: df -h
+      register: disk_usage
+      
+    - name: "显示磁盘使用情况"
+      debug:
+        msg: |
+          ========== 磁盘使用情况 ==========
+          {{ disk_usage.stdout }}
+          
+    - name: "检查内存使用详情"
+      command: free -h
+      register: memory_info
+      
+    - name: "显示内存使用详情"
+      debug:
+        msg: |
+          ========== 内存使用详情 ==========
+          {{ memory_info.stdout }}
+          
+    - name: "收集系统服务状态"
+      service_facts:
+      
+    - name: "显示关键服务状态"
+      debug:
+        msg: |
+          ========== 关键服务状态 ==========
+          SSH服务: {{ ansible_facts.services['ssh.service'].state | default('未安装') }}
+          网络管理: {{ ansible_facts.services['NetworkManager.service'].state | default('未安装') }}
+          防火墙: {{ ansible_facts.services['ufw.service'].state | default('未安装') }}
+      when: ansible_facts.services is defined 

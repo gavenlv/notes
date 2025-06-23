@@ -1,0 +1,90 @@
+version: '3.8'
+
+services:
+  # Ansible 控制节点
+  ansible-control:
+    image: quay.io/ansible/ansible-runner:latest
+    container_name: ansible-control
+    hostname: control
+    volumes:
+      - .:/workspace
+      - ~/.ssh:/root/.ssh:ro
+    working_dir: /workspace
+    networks:
+      - ansible-network
+    command: tail -f /dev/null
+
+  # 测试节点 1 - Ubuntu
+  node1:
+    image: ubuntu:22.04
+    container_name: ansible-node1
+    hostname: node1
+    networks:
+      - ansible-network
+    command: |
+      bash -c "
+        apt-get update &&
+        apt-get install -y openssh-server python3 sudo &&
+        useradd -m -s /bin/bash ansible &&
+        echo 'ansible:ansible' | chpasswd &&
+        echo 'ansible ALL=(ALL) NOPASSWD:ALL' > /etc/sudoers.d/ansible &&
+        mkdir -p /home/ansible/.ssh &&
+        chown ansible:ansible /home/ansible/.ssh &&
+        chmod 700 /home/ansible/.ssh &&
+        service ssh start &&
+        tail -f /dev/null
+      "
+
+  # 测试节点 2 - CentOS
+  node2:
+    image: centos:8
+    container_name: ansible-node2
+    hostname: node2
+    networks:
+      - ansible-network
+    command: |
+      bash -c "
+        dnf update -y &&
+        dnf install -y openssh-server python3 sudo passwd &&
+        useradd -m -s /bin/bash ansible &&
+        echo 'ansible:ansible' | chpasswd &&
+        echo 'ansible ALL=(ALL) NOPASSWD:ALL' > /etc/sudoers.d/ansible &&
+        mkdir -p /home/ansible/.ssh &&
+        chown ansible:ansible /home/ansible/.ssh &&
+        chmod 700 /home/ansible/.ssh &&
+        ssh-keygen -A &&
+        /usr/sbin/sshd -D
+      "
+
+  # 测试节点 3 - Alpine (轻量级)
+  node3:
+    image: alpine:latest
+    container_name: ansible-node3
+    hostname: node3
+    networks:
+      - ansible-network
+    command: |
+      sh -c "
+        apk update &&
+        apk add --no-cache openssh-server python3 sudo bash &&
+        adduser -D -s /bin/bash ansible &&
+        echo 'ansible:ansible' | chpasswd &&
+        echo 'ansible ALL=(ALL) NOPASSWD:ALL' > /etc/sudoers.d/ansible &&
+        mkdir -p /home/ansible/.ssh &&
+        chown ansible:ansible /home/ansible/.ssh &&
+        chmod 700 /home/ansible/.ssh &&
+        ssh-keygen -A &&
+        /usr/sbin/sshd -D
+      "
+
+networks:
+  ansible-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+
+# 数据卷
+volumes:
+  ssh_keys:
+    driver: local 
