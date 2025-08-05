@@ -1,0 +1,209 @@
+---
+# 执行策略演示 Playbook
+# 展示不同执行策略的使用
+
+- name: 线性执行策略演示
+  hosts: all
+  strategy: linear
+  serial: 2
+  gather_facts: no
+  
+  tasks:
+    - name: 线性部署任务
+      debug:
+        msg: "线性执行 - 主机: {{ inventory_hostname }}, 批次: {{ play_hosts.index(inventory_hostname) + 1 }}"
+        
+    - name: 模拟部署操作
+      shell: "echo '部署到 {{ inventory_hostname }}' && sleep 5"
+      
+    - name: 验证部署
+      debug:
+        msg: "验证 {{ inventory_hostname }} 的部署状态"
+        
+---
+- name: 自由执行策略演示
+  hosts: all
+  strategy: free
+  gather_facts: no
+  
+  tasks:
+    - name: 并行执行任务
+      debug:
+        msg: "自由执行 - 主机: {{ inventory_hostname }}"
+        
+    - name: 模拟并行操作
+      shell: "echo '并行操作 {{ inventory_hostname }}' && sleep 3"
+      
+    - name: 并行验证
+      debug:
+        msg: "并行验证 {{ inventory_hostname }}"
+        
+---
+- name: 调试策略演示
+  hosts: all
+  strategy: debug
+  gather_facts: no
+  
+  tasks:
+    - name: 调试模式任务
+      debug:
+        msg: "调试模式 - 主机: {{ inventory_hostname }}"
+        
+    - name: 单步执行
+      debug:
+        msg: "单步执行: {{ inventory_hostname }}"
+        
+---
+- name: 滚动更新演示
+  hosts: webservers
+  strategy: linear
+  serial:
+    - 1
+    - 50%
+    - 100%
+  gather_facts: no
+  
+  tasks:
+    - name: 停止服务
+      debug:
+        msg: "停止服务: {{ inventory_hostname }}"
+        
+    - name: 更新应用
+      debug:
+        msg: "更新应用: {{ inventory_hostname }}"
+        
+    - name: 启动服务
+      debug:
+        msg: "启动服务: {{ inventory_hostname }}"
+        
+    - name: 健康检查
+      debug:
+        msg: "健康检查: {{ inventory_hostname }}"
+        
+---
+- name: 批量操作演示
+  hosts: all
+  strategy: linear
+  serial: "25%"
+  gather_facts: no
+  
+  tasks:
+    - name: 批量系统更新
+      debug:
+        msg: "批量更新: {{ inventory_hostname }}"
+        
+    - name: 模拟系统更新
+      shell: "echo '系统更新 {{ inventory_hostname }}' && sleep 10"
+      
+    - name: 重启服务
+      debug:
+        msg: "重启服务: {{ inventory_hostname }}"
+        
+---
+- name: 复杂策略组合演示
+  hosts: all
+  strategy: linear
+  serial: 3
+  gather_facts: no
+  
+  tasks:
+    - name: 第一阶段 - 准备
+      debug:
+        msg: "准备阶段: {{ inventory_hostname }}"
+        
+    - name: 第二阶段 - 部署
+      debug:
+        msg: "部署阶段: {{ inventory_hostname }}"
+        
+    - name: 第三阶段 - 验证
+      debug:
+        msg: "验证阶段: {{ inventory_hostname }}"
+        
+    - name: 第四阶段 - 清理
+      debug:
+        msg: "清理阶段: {{ inventory_hostname }}"
+        
+---
+- name: 条件策略演示
+  hosts: all
+  strategy: linear
+  serial: "{{ deployment_batch_size | default(5) }}"
+  vars:
+    deployment_batch_size: 3
+  gather_facts: no
+  
+  tasks:
+    - name: 条件部署
+      debug:
+        msg: "条件部署: {{ inventory_hostname }}"
+      when: inventory_hostname in groups['target_servers']
+      
+    - name: 跳过部署
+      debug:
+        msg: "跳过部署: {{ inventory_hostname }}"
+      when: inventory_hostname not in groups['target_servers']
+        
+---
+- name: 性能优化策略演示
+  hosts: all
+  strategy: free
+  serial: "{{ ansible_play_hosts | length }}"
+  gather_facts: no
+  
+  tasks:
+    - name: 并行性能测试
+      debug:
+        msg: "性能测试: {{ inventory_hostname }}"
+        
+    - name: 模拟性能测试
+      shell: "echo '性能测试 {{ inventory_hostname }}' && sleep 2"
+      
+    - name: 收集性能数据
+      debug:
+        msg: "收集数据: {{ inventory_hostname }}"
+        
+---
+- name: 错误处理策略演示
+  hosts: all
+  strategy: linear
+  serial: 2
+  gather_facts: no
+  
+  tasks:
+    - name: 可能失败的任务
+      command: "exit {{ (inventory_hostname | hash('md5') | int) % 3 }}"
+      register: task_result
+      ignore_errors: yes
+      
+    - name: 处理失败
+      debug:
+        msg: "任务失败: {{ inventory_hostname }}"
+      when: task_result.failed
+      
+    - name: 处理成功
+      debug:
+        msg: "任务成功: {{ inventory_hostname }}"
+      when: task_result.rc == 0
+      
+---
+- name: 监控策略演示
+  hosts: all
+  strategy: linear
+  serial: 1
+  gather_facts: no
+  
+  tasks:
+    - name: 监控部署进度
+      debug:
+        msg: |
+          部署进度:
+          主机: {{ inventory_hostname }}
+          批次: {{ play_hosts.index(inventory_hostname) + 1 }}/{{ play_hosts | length }}
+          时间: {{ ansible_date_time.iso8601 }}
+          
+    - name: 记录部署日志
+      local_action:
+        module: lineinfile
+        path: /tmp/deployment.log
+        line: "{{ ansible_date_time.iso8601 }} - {{ inventory_hostname }} - 部署完成"
+      delegate_to: localhost 

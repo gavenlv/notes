@@ -1,0 +1,83 @@
+version: '3.8'
+
+networks:
+  ansible-network:
+    driver: bridge
+
+services:
+  # Ansible 控制节点 - 使用 Python 镜像并手动安装 Ansible
+  ansible-control:
+    image: python:3.11-slim
+    container_name: ansible-control
+    hostname: control
+    networks:
+      - ansible-network
+    volumes:
+      - ../code:/ansible-code
+      - ../examples:/ansible-examples
+    working_dir: /ansible-code
+    command: >
+      bash -c "
+      echo 'Setting up Ansible control node...' &&
+      pip install ansible --no-warn-script-location &&
+      apt-get update -y &&
+      apt-get install -y openssh-client sshpass vim curl wget &&
+      mkdir -p /etc/ansible &&
+      echo '[nodes]' > /etc/ansible/hosts &&
+      echo 'node1 ansible_host=ansible-node1 ansible_user=root ansible_password=ansible' >> /etc/ansible/hosts &&
+      echo 'node2 ansible_host=ansible-node2 ansible_user=root ansible_password=ansible' >> /etc/ansible/hosts &&
+      echo '[defaults]' > /etc/ansible/ansible.cfg &&
+      echo 'host_key_checking = False' >> /etc/ansible/ansible.cfg &&
+      echo 'timeout = 30' >> /etc/ansible/ansible.cfg &&
+      echo 'Ansible control node ready!' &&
+      tail -f /dev/null
+      "
+    restart: unless-stopped
+
+  # Ubuntu 节点 - 尝试使用您的镜像，失败则使用标准镜像
+  node1:
+    image: ubuntu:22.04
+    container_name: ansible-node1
+    hostname: node1
+    networks:
+      - ansible-network
+    command: >
+      bash -c "
+      echo 'Setting up Ubuntu node...' &&
+      apt-get update -y &&
+      apt-get install -y openssh-server python3 sudo vim curl wget &&
+      mkdir -p /var/run/sshd &&
+      echo 'root:ansible' | chpasswd &&
+      sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config &&
+      sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/' /etc/ssh/sshd_config &&
+      useradd -m ansible &&
+      echo 'ansible:ansible' | chpasswd &&
+      echo 'ansible ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers &&
+      echo 'Ubuntu node ready!' &&
+      /usr/sbin/sshd -D
+      "
+    restart: unless-stopped
+
+  # CentOS 节点 - 使用 Rocky Linux 替代
+  node2:
+    image: rockylinux:8
+    container_name: ansible-node2
+    hostname: node2
+    networks:
+      - ansible-network
+    command: >
+      bash -c "
+      echo 'Setting up Rocky Linux node...' &&
+      dnf update -y &&
+      dnf install -y openssh-server python3 sudo vim curl wget &&
+      ssh-keygen -A &&
+      echo 'root:ansible' | chpasswd &&
+      sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config &&
+      sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/' /etc/ssh/sshd_config &&
+      useradd -m ansible &&
+      echo 'ansible:ansible' | chpasswd &&
+      echo 'ansible ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers &&
+      echo 'Rocky Linux node ready!' &&
+      /usr/sbin/sshd -D
+      "
+    restart: unless-stopped 

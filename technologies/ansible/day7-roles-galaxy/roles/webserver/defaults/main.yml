@@ -1,0 +1,166 @@
+---
+# Web 服务器角色默认配置
+
+# 基础服务器配置
+webserver_type: "nginx"  # nginx, apache, caddy
+webserver_version: "latest"
+webserver_user: "www-data"
+webserver_group: "www-data"
+
+# 服务配置
+webserver_port: 80
+webserver_ssl_port: 443
+webserver_enable_ssl: false
+webserver_enable_http2: true
+
+# 性能配置
+webserver_worker_processes: "auto"
+webserver_worker_connections: 1024
+webserver_keepalive_timeout: 65
+webserver_client_max_body_size: "1m"
+
+# SSL 配置
+webserver_ssl_cert_path: "/etc/ssl/certs/server.crt"
+webserver_ssl_key_path: "/etc/ssl/private/server.key"
+webserver_ssl_protocols: "TLSv1.2 TLSv1.3"
+webserver_ssl_ciphers: "HIGH:!aNULL:!MD5"
+
+# 日志配置
+webserver_log_dir: "/var/log/nginx"
+webserver_access_log: "{{ webserver_log_dir }}/access.log"
+webserver_error_log: "{{ webserver_log_dir }}/error.log"
+webserver_log_level: "warn"
+webserver_log_format: "combined"
+
+# 虚拟主机配置
+webserver_vhosts: []
+# 示例配置：
+# webserver_vhosts:
+#   - name: "example.com"
+#     port: 80
+#     server_name: "example.com www.example.com"
+#     document_root: "/var/www/example.com"
+#     ssl_enabled: false
+#     ssl_cert: "/path/to/cert.pem"
+#     ssl_key: "/path/to/private.key"
+#     custom_config: |
+#       location /api/ {
+#         proxy_pass http://backend;
+#       }
+
+# 负载均衡配置
+webserver_upstream_servers: []
+# 示例配置：
+# webserver_upstream_servers:
+#   - name: "backend"
+#     servers:
+#       - "192.168.1.10:8080"
+#       - "192.168.1.11:8080"
+#     method: "round_robin"  # round_robin, least_conn, ip_hash
+
+# 缓存配置
+webserver_enable_cache: true
+webserver_cache_dir: "/var/cache/nginx"
+webserver_cache_max_size: "1g"
+webserver_cache_inactive: "60m"
+
+# 压缩配置
+webserver_enable_gzip: true
+webserver_gzip_level: 6
+webserver_gzip_types:
+  - "text/plain"
+  - "text/css"
+  - "application/json"
+  - "application/javascript"
+  - "text/xml"
+  - "application/xml"
+  - "application/xml+rss"
+  - "text/javascript"
+
+# 安全配置
+webserver_hide_version: true
+webserver_server_tokens: "off"
+webserver_security_headers:
+  x_frame_options: "DENY"
+  x_content_type_options: "nosniff"
+  x_xss_protection: "1; mode=block"
+  strict_transport_security: "max-age=31536000; includeSubDomains"
+
+# 监控配置
+webserver_enable_status: true
+webserver_status_path: "/nginx_status"
+webserver_status_allowed_ips:
+  - "127.0.0.1"
+  - "::1"
+
+# 环境特定配置
+webserver_environments:
+  development:
+    log_level: "debug"
+    worker_processes: 1
+    enable_cache: false
+  staging:
+    log_level: "info"
+    worker_processes: 2
+    enable_cache: true
+  production:
+    log_level: "warn"
+    worker_processes: "auto"
+    enable_cache: true
+    hide_version: true
+
+# 服务管理
+webserver_service_name: "nginx"
+webserver_service_enabled: true
+webserver_service_state: "started"
+
+# 包管理
+webserver_packages:
+  nginx:
+    - "nginx"
+    - "nginx-extras"
+  apache:
+    - "apache2"
+    - "apache2-utils"
+  caddy:
+    - "caddy"
+
+# 配置文件路径
+webserver_config_paths:
+  nginx:
+    main_config: "/etc/nginx/nginx.conf"
+    sites_available: "/etc/nginx/sites-available"
+    sites_enabled: "/etc/nginx/sites-enabled"
+    conf_d: "/etc/nginx/conf.d"
+  apache:
+    main_config: "/etc/apache2/apache2.conf"
+    sites_available: "/etc/apache2/sites-available"
+    sites_enabled: "/etc/apache2/sites-enabled"
+    conf_available: "/etc/apache2/conf-available"
+
+# 防火墙配置
+webserver_firewall_enabled: true
+webserver_firewall_rules:
+  - port: "{{ webserver_port }}"
+    protocol: "tcp"
+    rule: "allow"
+  - port: "{{ webserver_ssl_port }}"
+    protocol: "tcp"
+    rule: "allow"
+    state: "{{ 'enabled' if webserver_enable_ssl else 'disabled' }}"
+
+# 备份配置
+webserver_backup_enabled: false
+webserver_backup_schedule: "0 2 * * *"  # 每天凌晨2点
+webserver_backup_retention: 7  # 保留7天
+webserver_backup_configs:
+  - "{{ webserver_config_paths[webserver_type]['main_config'] }}"
+  - "{{ webserver_config_paths[webserver_type]['sites_available'] }}"
+
+# 健康检查配置
+webserver_health_check:
+  enabled: true
+  path: "/health"
+  timeout: 5
+  interval: 30
+  retries: 3 

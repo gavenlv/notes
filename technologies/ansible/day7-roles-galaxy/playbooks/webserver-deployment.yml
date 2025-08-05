@@ -1,0 +1,267 @@
+---
+# Web 服务器部署演示剧本
+
+- name: 部署 Web 服务器集群
+  hosts: webservers
+  become: yes
+  gather_facts: yes
+  
+  vars:
+    # 环境配置
+    deployment_environment: "{{ env | default('staging') }}"
+    
+    # Web 服务器配置
+    webserver_type: "nginx"
+    webserver_enable_ssl: true
+    webserver_enable_http2: true
+    
+    # 虚拟主机配置
+    webserver_vhosts:
+      - name: "api.example.com"
+        server_name: "api.example.com"
+        document_root: "/var/www/api"
+        port: 80
+        ssl_enabled: true
+        ssl_cert: "/etc/ssl/certs/api.example.com.crt"
+        ssl_key: "/etc/ssl/private/api.example.com.key"
+        custom_config: |
+          location /v1/ {
+            proxy_pass http://api_backend;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+          }
+          
+          location /health {
+            access_log off;
+            return 200 "healthy\n";
+            add_header Content-Type text/plain;
+          }
+      
+      - name: "static.example.com"
+        server_name: "static.example.com"
+        document_root: "/var/www/static"
+        port: 80
+        ssl_enabled: true
+        ssl_cert: "/etc/ssl/certs/static.example.com.crt"
+        ssl_key: "/etc/ssl/private/static.example.com.key"
+        custom_config: |
+          location ~* \.(jpg|jpeg|png|gif|ico|css|js)$ {
+            expires 1y;
+            add_header Cache-Control "public, immutable";
+          }
+    
+    # 负载均衡配置
+    webserver_upstream_servers:
+      - name: "api_backend"
+        servers:
+          - "192.168.1.10:8080 weight=3"
+          - "192.168.1.11:8080 weight=2"
+          - "192.168.1.12:8080 weight=1 backup"
+        method: "least_conn"
+    
+    # 性能优化
+    webserver_worker_processes: "auto"
+    webserver_worker_connections: 2048
+    webserver_client_max_body_size: "10m"
+    
+    # 安全配置
+    webserver_security_headers:
+      x_frame_options: "SAMEORIGIN"
+      x_content_type_options: "nosniff"
+      x_xss_protection: "1; mode=block"
+      strict_transport_security: "max-age=31536000; includeSubDomains; preload"
+      content_security_policy: "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'"
+    
+    # 监控配置
+    webserver_enable_status: true
+    webserver_status_allowed_ips:
+      - "127.0.0.1"
+      - "192.168.1.0/24"
+    
+    # 备份配置
+    webserver_backup_enabled: true
+    webserver_backup_schedule: "0 3 * * *"
+    
+    # 环境特定配置覆盖
+    environment_configs:
+      development:
+        webserver_log_level: "debug"
+        webserver_enable_ssl: false
+        webserver_backup_enabled: false
+      staging:
+        webserver_log_level: "info"
+        webserver_worker_connections: 1024
+      production:
+        webserver_log_level: "warn"
+        webserver_worker_connections: 4096
+        webserver_hide_version: true
+
+  pre_tasks:
+    - name: 显示部署信息
+      debug:
+        msg:
+          - "开始部署 Web 服务器集群"
+          - "环境: {{ deployment_environment }}"
+          - "服务器类型: {{ webserver_type }}"
+          - "目标主机: {{ ansible_play_hosts | join(', ') }}"
+      run_once: true
+
+    - name: 检查主机连接性
+      ping:
+
+    - name: 收集系统信息
+      setup:
+        gather_subset:
+          - "!all"
+          - "!min"
+          - "network"
+          - "hardware"
+          - "virtual"
+
+    - name: 应用环境特定配置
+      set_fact:
+        webserver_log_level: "{{ environment_configs[deployment_environment].webserver_log_level | default(webserver_log_level) }}"
+        webserver_enable_ssl: "{{ environment_configs[deployment_environment].webserver_enable_ssl | default(webserver_enable_ssl) }}"
+        webserver_worker_connections: "{{ environment_configs[deployment_environment].webserver_worker_connections | default(webserver_worker_connections) }}"
+        webserver_backup_enabled: "{{ environment_configs[deployment_environment].webserver_backup_enabled | default(webserver_backup_enabled) }}"
+        webserver_hide_version: "{{ environment_configs[deployment_environment].webserver_hide_version | default(webserver_hide_version) }}"
+      when: deployment_environment in environment_configs
+
+  roles:
+    - role: webserver
+      tags: [webserver]
+
+  post_tasks:
+    - name: 等待服务启动
+      wait_for:
+        port: "{{ webserver_port }}"
+        host: "{{ ansible_default_ipv4.address }}"
+        delay: 2
+        timeout: 30
+
+    - name: 验证 Web 服务器响应
+      uri:
+        url: "http://{{ ansible_default_ipv4.address }}:{{ webserver_port }}/health"
+        method: GET
+        timeout: 10
+      register: health_check
+      retries: 3
+      delay: 5
+      until: health_check.status == 200
+      ignore_errors: yes
+
+    - name: 显示健康检查结果
+      debug:
+        msg: |
+          健康检查结果:
+          - 状态码: {{ health_check.status | default('失败') }}
+          - 响应时间: {{ health_check.elapsed | default('N/A') }}秒
+          - 服务器: {{ inventory_hostname }}
+
+    - name: 生成部署报告
+      template:
+        src: deployment_report.j2
+        dest: "/tmp/webserver_deployment_{{ ansible_date_time.epoch }}.txt"
+      delegate_to: localhost
+      run_once: true
+      vars:
+        deployment_time: "{{ ansible_date_time.iso8601 }}"
+        deployed_hosts: "{{ ansible_play_hosts }}"
+        deployment_user: "{{ ansible_user }}"
+
+  handlers:
+    - name: restart webserver
+      service:
+        name: "{{ webserver_service_name }}"
+        state: restarted
+
+    - name: reload webserver
+      service:
+        name: "{{ webserver_service_name }}"
+        state: reloaded
+
+# 额外的管理任务
+- name: Web 服务器管理任务
+  hosts: webservers
+  become: yes
+  gather_facts: no
+  
+  tasks:
+    - name: 创建维护页面
+      copy:
+        content: |
+          <!DOCTYPE html>
+          <html>
+          <head>
+              <title>系统维护</title>
+              <meta charset="utf-8">
+          </head>
+          <body>
+              <h1>系统正在维护中</h1>
+              <p>我们正在进行系统维护，请稍后再试。</p>
+              <p>维护时间: {{ ansible_date_time.iso8601 }}</p>
+          </body>
+          </html>
+        dest: "/var/www/maintenance.html"
+        owner: "{{ webserver_user }}"
+        group: "{{ webserver_group }}"
+        mode: '0644'
+      tags: [maintenance]
+
+    - name: 配置日志轮转
+      copy:
+        content: |
+          {{ webserver_log_dir }}/*.log {
+              daily
+              missingok
+              rotate 30
+              compress
+              delaycompress
+              notifempty
+              create 0644 {{ webserver_user }} {{ webserver_group }}
+              postrotate
+                  systemctl reload {{ webserver_service_name }}
+              endscript
+          }
+        dest: "/etc/logrotate.d/webserver"
+        mode: '0644'
+      tags: [logs]
+
+    - name: 设置监控脚本
+      copy:
+        content: |
+          #!/bin/bash
+          # Web 服务器监控脚本
+          
+          SERVICE_NAME="{{ webserver_service_name }}"
+          LOG_FILE="/var/log/webserver-monitor.log"
+          
+          # 检查服务状态
+          if ! systemctl is-active --quiet $SERVICE_NAME; then
+              echo "$(date): $SERVICE_NAME 服务已停止，尝试重启" >> $LOG_FILE
+              systemctl restart $SERVICE_NAME
+              
+              # 发送通知
+              if command -v mail >/dev/null 2>&1; then
+                  echo "$SERVICE_NAME 服务在 $(hostname) 上已重启" | mail -s "服务重启通知" admin@example.com
+              fi
+          fi
+          
+          # 检查磁盘空间
+          DISK_USAGE=$(df /var/log | tail -1 | awk '{print $5}' | sed 's/%//')
+          if [ $DISK_USAGE -gt 80 ]; then
+              echo "$(date): 磁盘使用率高: ${DISK_USAGE}%" >> $LOG_FILE
+          fi
+        dest: "/usr/local/bin/webserver-monitor.sh"
+        mode: '0755'
+      tags: [monitoring]
+
+    - name: 添加监控 cron 任务
+      cron:
+        name: "Web 服务器监控"
+        minute: "*/5"
+        job: "/usr/local/bin/webserver-monitor.sh"
+        user: root
+      tags: [monitoring] 

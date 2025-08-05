@@ -1,0 +1,195 @@
+---
+# 模块测试示例 Playbook
+# 演示自定义模块的使用方法
+
+- name: 测试自定义模块
+  hosts: localhost
+  gather_facts: yes
+  vars:
+    test_file_path: "/tmp/ansible_test_file.txt"
+    test_template_path: "templates/test_config.j2"
+    
+  tasks:
+    # 测试 advanced_file 模块
+    - name: 测试 - 创建简单文件
+      advanced_file:
+        path: "{{ test_file_path }}"
+        content: |
+          # 测试配置文件
+          server_name = {{ ansible_hostname }}
+          created_at = {{ ansible_date_time.iso8601 }}
+          
+          [database]
+          host = localhost
+          port = 5432
+          name = testdb
+        mode: '0644'
+        backup: true
+      register: file_result
+      
+    - name: 显示文件创建结果
+      debug:
+        var: file_result
+        
+    - name: 验证文件存在
+      stat:
+        path: "{{ test_file_path }}"
+      register: file_stat
+      
+    - name: 确认文件已创建
+      assert:
+        that:
+          - file_stat.stat.exists
+          - file_stat.stat.mode == "0644"
+        fail_msg: "文件创建失败或权限不正确"
+        
+    # 测试文件更新
+    - name: 测试 - 更新文件内容
+      advanced_file:
+        path: "{{ test_file_path }}"
+        content: |
+          # 更新的测试配置文件
+          server_name = {{ ansible_hostname }}
+          updated_at = {{ ansible_date_time.iso8601 }}
+          version = 2.0
+          
+          [database]
+          host = db.example.com
+          port = 5432
+          name = production_db
+          
+          [cache]
+          enabled = true
+          ttl = 3600
+        mode: '0644'
+        backup: true
+      register: file_update_result
+      
+    - name: 显示文件更新结果
+      debug:
+        var: file_update_result
+        
+    # 测试 system_info 模块
+    - name: 测试 - 收集系统信息
+      system_info:
+        info_type: all
+        top_processes: 5
+        include_services: true
+      register: system_data
+      
+    - name: 显示基本系统信息
+      debug:
+        msg: |
+          主机名: {{ system_data.system_info.basic.hostname }}
+          平台: {{ system_data.system_info.basic.platform }}
+          Python版本: {{ system_data.system_info.basic.python_version }}
+          运行时间: {{ system_data.system_info.basic.uptime_seconds }} 秒
+          
+    - name: 显示硬件信息
+      debug:
+        msg: |
+          CPU核心数: {{ system_data.system_info.hardware.cpu.cpu_count_logical }}
+          内存使用率: {{ system_data.system_info.hardware.memory.percent }}%
+          内存总量: {{ (system_data.system_info.hardware.memory.total / 1024 / 1024 / 1024) | round(2) }} GB
+      when: system_data.system_info.hardware is defined
+      
+    - name: 显示前5个进程
+      debug:
+        msg: "{{ item.name }} (PID: {{ item.pid }}) - CPU: {{ item.cpu_percent }}%"
+      loop: "{{ system_data.system_info.processes.top_processes }}"
+      when: system_data.system_info.processes is defined
+      
+    # 测试仅收集特定类型信息
+    - name: 测试 - 仅收集硬件信息
+      system_info:
+        info_type: hardware
+        format: json
+      register: hardware_only
+      
+    - name: 显示硬件信息摘要
+      debug:
+        msg: |
+          CPU使用率: {{ hardware_only.system_info.hardware.cpu.cpu_percent }}%
+          内存使用率: {{ hardware_only.system_info.hardware.memory.percent }}%
+          交换分区使用率: {{ hardware_only.system_info.hardware.swap.percent }}%
+      when: hardware_only.system_info.hardware is defined
+      
+    # 测试网络信息
+    - name: 测试 - 收集网络信息
+      system_info:
+        info_type: network
+      register: network_info
+      
+    - name: 显示网络接口
+      debug:
+        msg: "接口 {{ item.key }} 有 {{ item.value | length }} 个地址"
+      loop: "{{ network_info.system_info.network.interfaces | dict2items }}"
+      when: network_info.system_info.network is defined
+      
+    # 测试存储信息
+    - name: 测试 - 收集存储信息
+      system_info:
+        info_type: storage
+      register: storage_info
+      
+    - name: 显示磁盘分区使用情况
+      debug:
+        msg: |
+          分区: {{ item.mountpoint }}
+          文件系统: {{ item.fstype }}
+          使用率: {{ item.percent | round(2) }}%
+          可用空间: {{ (item.free / 1024 / 1024 / 1024) | round(2) }} GB
+      loop: "{{ storage_info.system_info.storage.partitions }}"
+      when: storage_info.system_info.storage is defined
+      
+    # 清理测试文件
+    - name: 清理 - 删除测试文件
+      advanced_file:
+        path: "{{ test_file_path }}"
+        state: absent
+      register: cleanup_result
+      
+    - name: 显示清理结果
+      debug:
+        var: cleanup_result
+        
+    # 验证文件已删除
+    - name: 验证文件已删除
+      stat:
+        path: "{{ test_file_path }}"
+      register: cleanup_stat
+      
+    - name: 确认文件已删除
+      assert:
+        that:
+          - not cleanup_stat.stat.exists
+        fail_msg: "文件删除失败"
+        
+    # 测试创建空文件
+    - name: 测试 - 创建空文件 (touch)
+      advanced_file:
+        path: "/tmp/empty_test_file"
+        state: touch
+        mode: '0600'
+      register: touch_result
+      
+    - name: 显示 touch 结果
+      debug:
+        var: touch_result
+        
+    - name: 清理空文件
+      advanced_file:
+        path: "/tmp/empty_test_file"
+        state: absent
+
+    # 性能测试
+    - name: 性能测试 - 多次调用 system_info
+      system_info:
+        info_type: basic
+      register: perf_test
+      loop: "{{ range(3) | list }}"
+      
+    - name: 显示性能测试结果
+      debug:
+        msg: "第{{ item + 1 }}次调用完成，主机名: {{ perf_test.results[item].system_info.basic.hostname }}"
+      loop: "{{ range(3) | list }}" 

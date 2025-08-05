@@ -1,0 +1,218 @@
+---
+# Web 服务器角色元数据
+
+galaxy_info:
+  author: "Ansible Learning Team"
+  company: "DevOps Academy"
+  description: "企业级 Web 服务器配置角色，支持 Nginx、Apache 和 Caddy"
+  license: "MIT"
+  min_ansible_version: "2.9"
+  
+  platforms:
+    - name: Ubuntu
+      versions:
+        - 18.04
+        - 20.04
+        - 22.04
+    - name: Debian
+      versions:
+        - 10
+        - 11
+    - name: EL
+      versions:
+        - 7
+        - 8
+        - 9
+    - name: Fedora
+      versions:
+        - 35
+        - 36
+  
+  galaxy_tags:
+    - web
+    - webserver
+    - nginx
+    - apache
+    - caddy
+    - loadbalancer
+    - ssl
+    - https
+    - proxy
+    - enterprise
+    - production
+
+# 角色依赖
+dependencies:
+  - role: common.firewall
+    vars:
+      firewall_rules: "{{ webserver_firewall_rules }}"
+    when: webserver_firewall_enabled | default(true)
+
+# 角色变量规范
+argument_specs:
+  main:
+    description: "Main entry point for the webserver role"
+    options:
+      webserver_type:
+        description: "Web server type to install and configure"
+        type: str
+        required: true
+        choices:
+          - nginx
+          - apache
+          - caddy
+        default: nginx
+      
+      webserver_version:
+        description: "Web server version to install"
+        type: str
+        default: "latest"
+      
+      webserver_port:
+        description: "HTTP port for the web server"
+        type: int
+        default: 80
+      
+      webserver_ssl_port:
+        description: "HTTPS port for the web server"
+        type: int
+        default: 443
+      
+      webserver_enable_ssl:
+        description: "Enable SSL/TLS support"
+        type: bool
+        default: false
+      
+      webserver_enable_http2:
+        description: "Enable HTTP/2 support"
+        type: bool
+        default: true
+      
+      webserver_vhosts:
+        description: "List of virtual hosts to configure"
+        type: list
+        elements: dict
+        default: []
+        options:
+          name:
+            description: "Virtual host name"
+            type: str
+            required: true
+          server_name:
+            description: "Server name(s) for the virtual host"
+            type: str
+            required: true
+          document_root:
+            description: "Document root directory"
+            type: str
+            required: true
+          port:
+            description: "Port for this virtual host"
+            type: int
+            default: 80
+          ssl_enabled:
+            description: "Enable SSL for this virtual host"
+            type: bool
+            default: false
+      
+      webserver_upstream_servers:
+        description: "List of upstream server groups for load balancing"
+        type: list
+        elements: dict
+        default: []
+        options:
+          name:
+            description: "Upstream group name"
+            type: str
+            required: true
+          servers:
+            description: "List of backend servers"
+            type: list
+            elements: str
+            required: true
+          method:
+            description: "Load balancing method"
+            type: str
+            choices:
+              - round_robin
+              - least_conn
+              - ip_hash
+              - random
+            default: round_robin
+      
+      webserver_worker_processes:
+        description: "Number of worker processes"
+        type: str
+        default: "auto"
+      
+      webserver_worker_connections:
+        description: "Maximum number of connections per worker"
+        type: int
+        default: 1024
+      
+      webserver_enable_cache:
+        description: "Enable web server caching"
+        type: bool
+        default: true
+      
+      webserver_enable_gzip:
+        description: "Enable gzip compression"
+        type: bool
+        default: true
+      
+      webserver_firewall_enabled:
+        description: "Configure firewall rules"
+        type: bool
+        default: true
+      
+      webserver_backup_enabled:
+        description: "Enable configuration backup"
+        type: bool
+        default: false
+      
+      webserver_health_check:
+        description: "Health check configuration"
+        type: dict
+        default:
+          enabled: true
+          path: "/health"
+          timeout: 5
+          interval: 30
+          retries: 3
+
+# 标签定义
+tags:
+  - webserver
+  - web
+  - proxy
+  - loadbalancer
+  - ssl
+
+# 兼容性信息
+compatibility:
+  ansible_version: ">=2.9"
+  python_version: ">=3.6"
+  
+# 角色变量优先级说明
+variable_precedence:
+  description: |
+    This role uses the following variable precedence (highest to lowest):
+    1. Extra vars (-e)
+    2. Role vars (vars/main.yml)
+    3. Play vars
+    4. Role defaults (defaults/main.yml)
+  
+# 性能建议
+performance_notes:
+  - "Use webserver_worker_processes: 'auto' for optimal performance"
+  - "Adjust webserver_worker_connections based on expected load"
+  - "Enable caching (webserver_enable_cache: true) for better performance"
+  - "Use HTTP/2 (webserver_enable_http2: true) for modern browsers"
+
+# 安全建议
+security_notes:
+  - "Always use SSL in production (webserver_enable_ssl: true)"
+  - "Configure security headers (webserver_security_headers)"
+  - "Hide server version (webserver_hide_version: true)"
+  - "Regularly update web server packages"
+  - "Use strong SSL protocols and ciphers" 

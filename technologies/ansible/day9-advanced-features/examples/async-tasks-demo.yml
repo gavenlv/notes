@@ -1,0 +1,133 @@
+---
+# 异步任务演示 Playbook
+# 展示 async 和 poll 机制的使用
+
+- name: 异步任务演示
+  hosts: localhost
+  gather_facts: no
+  vars:
+    long_running_script: |
+      #!/bin/bash
+      echo "开始长时间运行的任务..."
+      sleep 30
+      echo "任务完成"
+      exit 0
+    
+  tasks:
+    # 1. 基本异步任务
+    - name: 基本异步任务
+      shell: "{{ long_running_script }}"
+      async: 60
+      poll: 10
+      register: async_result
+      
+    - name: 显示异步任务结果
+      debug:
+        msg: |
+          任务ID: {{ async_result.ansible_job_id }}
+          状态: {{ async_result.finished }}
+          返回码: {{ async_result.rc }}
+          
+    # 2. 后台任务（不等待完成）
+    - name: 后台启动服务
+      shell: |
+        echo "启动后台服务..."
+        nohup /usr/bin/background_service > /dev/null 2>&1 &
+        echo $! > /tmp/service.pid
+      async: 300
+      poll: 0
+      register: background_result
+      
+    - name: 显示后台任务信息
+      debug:
+        msg: "后台任务已启动，任务ID: {{ background_result.ansible_job_id }}"
+        
+    # 3. 带条件的异步任务
+    - name: 条件异步任务
+      shell: "echo '条件任务执行中...' && sleep 20"
+      async: 60
+      poll: 5
+      when: ansible_os_family == "RedHat"
+      register: conditional_result
+      
+    - name: 显示条件任务结果
+      debug:
+        msg: "条件任务完成: {{ conditional_result.finished }}"
+      when: conditional_result is defined
+        
+    # 4. 异步任务状态检查
+    - name: 检查异步任务状态
+      async_status:
+        jid: "{{ async_result.ansible_job_id }}"
+      register: status_result
+      until: status_result.finished
+      retries: 10
+      delay: 5
+      
+    - name: 显示最终状态
+      debug:
+        msg: |
+          任务最终状态:
+          - 完成: {{ status_result.finished }}
+          - 返回码: {{ status_result.rc }}
+          - 标准输出: {{ status_result.stdout }}
+          - 错误输出: {{ status_result.stderr }}
+          
+    # 5. 多个异步任务
+    - name: 启动多个异步任务
+      shell: "echo '任务 {{ item }} 开始' && sleep {{ item * 5 }}"
+      async: 120
+      poll: 0
+      loop: [1, 2, 3, 4, 5]
+      register: multiple_results
+      
+    - name: 等待所有任务完成
+      async_status:
+        jid: "{{ item.ansible_job_id }}"
+      register: multiple_status
+      loop: "{{ multiple_results.results }}"
+      until: multiple_status.finished
+      retries: 20
+      delay: 10
+      
+    - name: 显示多任务结果
+      debug:
+        msg: "任务 {{ item.ansible_job_id }} 完成状态: {{ item.finished }}"
+      loop: "{{ multiple_status.results }}"
+      
+    # 6. 错误处理
+    - name: 可能失败的异步任务
+      shell: "echo '模拟失败任务' && exit 1"
+      async: 30
+      poll: 5
+      register: failed_result
+      ignore_errors: yes
+      
+    - name: 处理失败的任务
+      debug:
+        msg: "任务失败，返回码: {{ failed_result.rc }}"
+      when: failed_result.failed
+      
+    # 7. 资源监控异步任务
+    - name: 启动资源监控
+      shell: |
+        echo "开始监控系统资源..."
+        for i in {1..10}; do
+          echo "监控周期 $i: $(date)"
+          free -m
+          sleep 5
+        done
+      async: 300
+      poll: 0
+      register: monitor_result
+      
+    - name: 显示监控任务信息
+      debug:
+        msg: "资源监控任务已启动: {{ monitor_result.ansible_job_id }}"
+        
+    # 8. 清理任务
+    - name: 清理临时文件
+      file:
+        path: /tmp/service.pid
+        state: absent
+      ignore_errors: yes 

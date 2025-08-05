@@ -1,0 +1,140 @@
+---
+# Web 服务器配置验证
+
+- name: 验证 Web 服务器类型
+  assert:
+    that:
+      - webserver_type in ['nginx', 'apache', 'caddy']
+    fail_msg: "不支持的 Web 服务器类型: {{ webserver_type }}"
+    success_msg: "Web 服务器类型验证通过: {{ webserver_type }}"
+
+- name: 验证端口配置
+  assert:
+    that:
+      - webserver_port | int > 0
+      - webserver_port | int < 65536
+      - webserver_ssl_port | int > 0
+      - webserver_ssl_port | int < 65536
+      - webserver_port != webserver_ssl_port
+    fail_msg: "端口配置无效"
+    success_msg: "端口配置验证通过"
+
+- name: 验证 SSL 配置
+  block:
+    - name: 检查 SSL 证书文件路径
+      assert:
+        that:
+          - webserver_ssl_cert_path is defined
+          - webserver_ssl_cert_path | length > 0
+          - webserver_ssl_key_path is defined
+          - webserver_ssl_key_path | length > 0
+        fail_msg: "SSL 启用时必须配置证书路径"
+
+    - name: 验证 SSL 协议
+      assert:
+        that:
+          - webserver_ssl_protocols is defined
+          - "'TLSv1.2' in webserver_ssl_protocols or 'TLSv1.3' in webserver_ssl_protocols"
+        fail_msg: "SSL 协议配置必须包含 TLSv1.2 或 TLSv1.3"
+  when: webserver_enable_ssl
+
+- name: 验证虚拟主机配置
+  block:
+    - name: 检查虚拟主机必要字段
+      assert:
+        that:
+          - item.name is defined
+          - item.server_name is defined
+          - item.document_root is defined
+        fail_msg: "虚拟主机 {{ item.name | default('未知') }} 缺少必要配置"
+      loop: "{{ webserver_vhosts }}"
+      loop_control:
+        label: "{{ item.name | default('未知') }}"
+
+    - name: 检查重复的虚拟主机名称
+      assert:
+        that:
+          - webserver_vhosts | map(attribute='name') | list | unique | length == webserver_vhosts | length
+        fail_msg: "存在重复的虚拟主机名称"
+  when: webserver_vhosts | length > 0
+
+- name: 验证负载均衡配置
+  block:
+    - name: 检查上游服务器配置
+      assert:
+        that:
+          - item.name is defined
+          - item.servers is defined
+          - item.servers | length > 0
+        fail_msg: "上游服务器 {{ item.name | default('未知') }} 配置无效"
+      loop: "{{ webserver_upstream_servers }}"
+      loop_control:
+        label: "{{ item.name | default('未知') }}"
+
+    - name: 验证负载均衡方法
+      assert:
+        that:
+          - item.method | default('round_robin') in ['round_robin', 'least_conn', 'ip_hash', 'random']
+        fail_msg: "不支持的负载均衡方法: {{ item.method | default('round_robin') }}"
+      loop: "{{ webserver_upstream_servers }}"
+      loop_control:
+        label: "{{ item.name | default('未知') }}"
+  when: webserver_upstream_servers | length > 0
+
+- name: 验证性能配置
+  assert:
+    that:
+      - webserver_worker_connections | int > 0
+      - webserver_keepalive_timeout | int > 0
+      - webserver_client_max_body_size | regex_search('^[0-9]+[kmg]?$')
+    fail_msg: "性能配置参数无效"
+    success_msg: "性能配置验证通过"
+
+- name: 验证日志配置
+  assert:
+    that:
+      - webserver_log_dir is defined
+      - webserver_log_level in ['debug', 'info', 'notice', 'warn', 'error', 'crit', 'alert', 'emerg']
+    fail_msg: "日志配置无效"
+    success_msg: "日志配置验证通过"
+
+- name: 验证环境配置
+  block:
+    - name: 获取当前环境配置
+      set_fact:
+        current_env_config: "{{ webserver_environments[ansible_environment | default('production')] | default({}) }}"
+      when: ansible_environment is defined
+
+    - name: 显示环境特定配置
+      debug:
+        msg: "当前环境: {{ ansible_environment | default('production') }}"
+      when: ansible_environment is defined
+
+- name: 检查系统要求
+  block:
+    - name: 检查操作系统支持
+      assert:
+        that:
+          - ansible_os_family in ['Debian', 'RedHat', 'SUSE']
+        fail_msg: "不支持的操作系统: {{ ansible_os_family }}"
+
+    - name: 检查架构支持
+      assert:
+        that:
+          - ansible_architecture in ['x86_64', 'aarch64']
+        fail_msg: "不支持的系统架构: {{ ansible_architecture }}"
+
+    - name: 检查最低内存要求 (建议)
+      debug:
+        msg: "警告: 系统内存较低 ({{ ansible_memtotal_mb }}MB), 建议至少 1GB"
+      when: ansible_memtotal_mb | int < 1024
+
+- name: 显示验证结果
+  debug:
+    msg:
+      - "配置验证完成"
+      - "Web 服务器类型: {{ webserver_type }}"
+      - "监听端口: {{ webserver_port }}"
+      - "SSL 启用: {{ webserver_enable_ssl }}"
+      - "虚拟主机数量: {{ webserver_vhosts | length }}"
+      - "上游服务器组数量: {{ webserver_upstream_servers | length }}" 

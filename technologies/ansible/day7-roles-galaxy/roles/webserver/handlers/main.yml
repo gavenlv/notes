@@ -1,0 +1,181 @@
+---
+# Web 服务器角色处理器
+
+- name: restart webserver
+  service:
+    name: "{{ webserver_service_name }}"
+    state: restarted
+  become: yes
+
+- name: reload webserver
+  service:
+    name: "{{ webserver_service_name }}"
+    state: reloaded
+  become: yes
+
+- name: restart nginx
+  service:
+    name: nginx
+    state: restarted
+  become: yes
+  when: webserver_type == "nginx"
+
+- name: reload nginx
+  service:
+    name: nginx
+    state: reloaded
+  become: yes
+  when: webserver_type == "nginx"
+
+- name: restart apache
+  service:
+    name: "{{ 'apache2' if ansible_os_family == 'Debian' else 'httpd' }}"
+    state: restarted
+  become: yes
+  when: webserver_type == "apache"
+
+- name: reload apache
+  service:
+    name: "{{ 'apache2' if ansible_os_family == 'Debian' else 'httpd' }}"
+    state: reloaded
+  become: yes
+  when: webserver_type == "apache"
+
+- name: restart caddy
+  service:
+    name: caddy
+    state: restarted
+  become: yes
+  when: webserver_type == "caddy"
+
+- name: reload caddy
+  service:
+    name: caddy
+    state: reloaded
+  become: yes
+  when: webserver_type == "caddy"
+
+- name: validate webserver config
+  command: "{{ webserver_config_test_command[webserver_type] }}"
+  register: config_test_result
+  failed_when: config_test_result.rc != 0
+  vars:
+    webserver_config_test_command:
+      nginx: "nginx -t"
+      apache: "{{ 'apache2ctl' if ansible_os_family == 'Debian' else 'httpd' }} -t"
+      caddy: "caddy validate --config /etc/caddy/Caddyfile"
+
+- name: restart firewall
+  service:
+    name: "{{ firewall_service_name }}"
+    state: restarted
+  become: yes
+  when: 
+    - webserver_firewall_enabled
+    - firewall_service_name is defined
+  vars:
+    firewall_service_name: "{{ 'ufw' if ansible_os_family == 'Debian' else 'firewalld' }}"
+
+- name: update ssl certificates
+  command: "{{ ssl_update_command }}"
+  when: 
+    - webserver_enable_ssl
+    - ssl_update_command is defined
+  vars:
+    ssl_update_command: "update-ca-certificates"
+
+- name: restart logrotate
+  service:
+    name: logrotate
+    state: restarted
+  become: yes
+  when: webserver_backup_enabled
+
+- name: clear webserver cache
+  file:
+    path: "{{ webserver_cache_dir }}"
+    state: absent
+  notify: create cache directory
+
+- name: create cache directory
+  file:
+    path: "{{ webserver_cache_dir }}"
+    state: directory
+    owner: "{{ webserver_user }}"
+    group: "{{ webserver_group }}"
+    mode: '0755'
+
+- name: update monitoring config
+  template:
+    src: monitoring.conf.j2
+    dest: "{{ webserver_config_paths[webserver_type]['conf_d'] }}/monitoring.conf"
+  when: webserver_enable_status
+  notify: reload webserver
+
+- name: notify external monitoring
+  uri:
+    url: "{{ monitoring_webhook_url }}"
+    method: POST
+    body_format: json
+    body:
+      service: "webserver"
+      type: "{{ webserver_type }}"
+      status: "restarted"
+      timestamp: "{{ ansible_date_time.iso8601 }}"
+      host: "{{ inventory_hostname }}"
+    headers:
+      Authorization: "Bearer {{ monitoring_webhook_token }}"
+  when: 
+    - monitoring_webhook_url is defined
+    - monitoring_webhook_token is defined
+  ignore_errors: yes
+
+- name: send notification
+  mail:
+    to: "{{ admin_email }}"
+    subject: "Web 服务器重启通知 - {{ inventory_hostname }}"
+    body: |
+      Web 服务器已重启
+      
+      服务器: {{ inventory_hostname }}
+      服务类型: {{ webserver_type }}
+      时间: {{ ansible_date_time.iso8601 }}
+      用户: {{ ansible_user }}
+      
+      请检查服务状态。
+    charset: utf8
+  when: 
+    - admin_email is defined
+    - send_notifications | default(false)
+  ignore_errors: yes
+
+- name: log restart event
+  lineinfile:
+    path: "{{ webserver_log_dir }}/restart.log"
+    line: "{{ ansible_date_time.iso8601 }} - {{ webserver_type }} 服务重启 - 用户: {{ ansible_user }} - 主机: {{ inventory_hostname }}"
+    create: yes
+    owner: "{{ webserver_user }}"
+    group: "{{ webserver_group }}"
+    mode: '0644'
+
+- name: wait for webserver to start
+  wait_for:
+    port: "{{ webserver_port }}"
+    host: "{{ ansible_default_ipv4.address }}"
+    delay: 2
+    timeout: 30
+  when: webserver_service_state == "started"
+
+- name: verify webserver is responding
+  uri:
+    url: "http://{{ ansible_default_ipv4.address }}:{{ webserver_port }}/{{ webserver_health_check.path | default('') }}"
+    method: GET
+    timeout: "{{ webserver_health_check.timeout | default(5) }}"
+  register: health_check_result
+  until: health_check_result.status == 200
+  retries: "{{ webserver_health_check.retries | default(3) }}"
+  delay: "{{ webserver_health_check.interval | default(30) }}"
+  when: 
+    - webserver_health_check.enabled | default(true)
+    - webserver_service_state == "started"
+  ignore_errors: yes 

@@ -1,0 +1,70 @@
+---
+# Web 服务器角色主要任务
+
+- name: 显示角色信息
+  debug:
+    msg: "开始配置 {{ webserver_type }} Web 服务器"
+  tags: [info]
+
+- name: 验证角色配置
+  include_tasks: validate.yml
+  tags: [validate, always]
+
+- name: 安装 Web 服务器
+  include_tasks: install.yml
+  tags: [install]
+
+- name: 配置基础设置
+  include_tasks: configure.yml
+  tags: [configure]
+
+- name: 配置虚拟主机
+  include_tasks: vhosts.yml
+  when: webserver_vhosts | length > 0
+  tags: [vhosts]
+
+- name: 配置 SSL
+  include_tasks: ssl.yml
+  when: webserver_enable_ssl
+  tags: [ssl]
+
+- name: 配置负载均衡
+  include_tasks: upstream.yml
+  when: webserver_upstream_servers | length > 0
+  tags: [upstream]
+
+- name: 配置安全设置
+  include_tasks: security.yml
+  tags: [security]
+
+- name: 配置监控
+  include_tasks: monitoring.yml
+  when: webserver_enable_status
+  tags: [monitoring]
+
+- name: 配置防火墙
+  include_tasks: firewall.yml
+  when: webserver_firewall_enabled
+  tags: [firewall]
+
+- name: 启动和启用服务
+  include_tasks: service.yml
+  tags: [service]
+
+- name: 验证部署
+  include_tasks: verify.yml
+  tags: [verify]
+
+- name: 配置备份
+  include_tasks: backup.yml
+  when: webserver_backup_enabled
+  tags: [backup]
+
+- name: 显示完成信息
+  debug:
+    msg: 
+      - "{{ webserver_type | title }} 服务器配置完成"
+      - "服务状态: {{ webserver_service_state }}"
+      - "监听端口: {{ webserver_port }}{{ ', ' + webserver_ssl_port | string if webserver_enable_ssl else '' }}"
+      - "配置文件: {{ webserver_config_paths[webserver_type]['main_config'] }}"
+  tags: [info] 

@@ -1,0 +1,164 @@
+---
+# 数据库角色默认配置
+
+# 数据库类型和版本
+database_type: "mysql"  # mysql, postgresql, mongodb
+database_version: "latest"
+database_engine: "InnoDB"  # MySQL: InnoDB, MyISAM; PostgreSQL: 自动
+
+# 服务配置
+database_port: 3306  # MySQL: 3306, PostgreSQL: 5432, MongoDB: 27017
+database_bind_address: "127.0.0.1"
+database_max_connections: 200
+
+# 认证和用户管理
+database_root_password: "{{ vault_database_root_password | default('admin123') }}"
+database_create_root_user: true
+database_remove_anonymous_users: true
+database_remove_test_database: true
+
+# 数据库和用户定义
+database_databases: []
+# 示例配置：
+# database_databases:
+#   - name: "myapp"
+#     encoding: "utf8mb4"
+#     collation: "utf8mb4_unicode_ci"
+#     state: present
+
+database_users: []
+# 示例配置：
+# database_users:
+#   - name: "app_user"
+#     password: "secure_password"
+#     database: "myapp"
+#     privileges: "ALL"
+#     host: "%"
+#     state: present
+
+# 数据目录和日志配置
+database_data_dir: "/var/lib/mysql"
+database_log_dir: "/var/log/mysql"
+database_log_error: "{{ database_log_dir }}/error.log"
+database_log_slow_queries: true
+database_slow_query_log_file: "{{ database_log_dir }}/slow.log"
+database_long_query_time: 2
+
+# 性能配置
+database_buffer_pool_size: "128M"  # MySQL InnoDB
+database_shared_buffers: "128MB"   # PostgreSQL
+database_query_cache_size: "64M"   # MySQL
+database_max_allowed_packet: "64M"
+
+# 复制配置
+database_replication_enabled: false
+database_server_id: 1
+database_master_host: ""
+database_replica_user: "replica"
+database_replica_password: "{{ vault_replica_password | default('replica123') }}"
+
+# 高可用配置
+database_cluster_enabled: false
+database_cluster_name: "db-cluster"
+database_cluster_nodes: []
+
+# 备份配置
+database_backup_enabled: true
+database_backup_schedule: "0 2 * * *"  # 每天凌晨2点
+database_backup_retention: 7  # 保留7天
+database_backup_dir: "/backup/mysql"
+database_backup_compression: true
+
+# 监控配置
+database_monitoring_enabled: true
+database_performance_schema: true
+database_metrics_user: "monitor"
+database_metrics_password: "{{ vault_metrics_password | default('monitor123') }}"
+
+# SSL/TLS 配置
+database_ssl_enabled: false
+database_ssl_cert: "/etc/ssl/certs/mysql-server-cert.pem"
+database_ssl_key: "/etc/ssl/private/mysql-server-key.pem"
+database_ssl_ca: "/etc/ssl/certs/ca-cert.pem"
+
+# 防火墙配置
+database_firewall_enabled: true
+database_allowed_hosts:
+  - "127.0.0.1"
+  - "::1"
+
+# 服务管理
+database_service_enabled: true
+database_service_state: "started"
+
+# 包管理
+database_packages:
+  mysql:
+    - "mysql-server"
+    - "mysql-client"
+    - "python3-pymysql"
+  postgresql:
+    - "postgresql"
+    - "postgresql-contrib"
+    - "python3-psycopg2"
+  mongodb:
+    - "mongodb-org"
+    - "python3-pymongo"
+
+# 配置文件路径
+database_config_files:
+  mysql:
+    main: "/etc/mysql/mysql.conf.d/mysqld.cnf"
+    custom: "/etc/mysql/conf.d/custom.cnf"
+  postgresql:
+    main: "/etc/postgresql/13/main/postgresql.conf"
+    hba: "/etc/postgresql/13/main/pg_hba.conf"
+  mongodb:
+    main: "/etc/mongod.conf"
+
+# 环境特定配置
+database_environments:
+  development:
+    max_connections: 50
+    buffer_pool_size: "64M"
+    log_level: "debug"
+    backup_enabled: false
+  staging:
+    max_connections: 100
+    buffer_pool_size: "128M"
+    log_level: "info"
+    backup_enabled: true
+  production:
+    max_connections: 200
+    buffer_pool_size: "256M"
+    log_level: "warn"
+    backup_enabled: true
+    ssl_enabled: true
+
+# 安全加固配置
+database_security_hardening:
+  enabled: true
+  disable_local_infile: true
+  skip_symbolic_links: true
+  bind_address_restriction: true
+  log_connections: true
+  log_disconnections: true
+
+# 优化配置
+database_optimization:
+  innodb_file_per_table: true
+  innodb_flush_log_at_trx_commit: 1
+  innodb_log_buffer_size: "8M"
+  innodb_log_file_size: "64M"
+  query_cache_type: 1
+  tmp_table_size: "32M"
+  max_heap_table_size: "32M"
+
+# 健康检查配置
+database_health_check:
+  enabled: true
+  user: "health_check"
+  password: "{{ vault_health_check_password | default('health123') }}"
+  timeout: 5
+  interval: 30
+  retries: 3 

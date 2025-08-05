@@ -1,0 +1,135 @@
+---
+# 委托执行演示 Playbook
+# 展示 delegate_to 和 local_action 的使用
+
+- name: 委托执行演示
+  hosts: all
+  gather_facts: yes
+  vars:
+    config_template: |
+      server {
+          listen 80;
+          server_name {{ inventory_hostname }};
+          location / {
+              proxy_pass http://backend;
+          }
+      }
+    
+  tasks:
+    # 1. 基本委托执行
+    - name: 在负载均衡器上更新配置
+      template:
+        src: nginx.conf.j2
+        dest: /etc/nginx/sites-available/{{ inventory_hostname }}
+      delegate_to: "{{ groups['loadbalancers'][0] | default('localhost') }}"
+      notify: reload nginx
+      
+    # 2. 在控制节点执行
+    - name: 在控制节点生成报告
+      template:
+        src: host_report.j2
+        dest: /tmp/reports/{{ inventory_hostname }}_report.html
+      delegate_to: localhost
+      run_once: true
+      
+    # 3. 条件委托
+    - name: 条件委托执行
+      command: /usr/bin/update_config --host {{ inventory_hostname }}
+      delegate_to: "{{ item }}"
+      loop: "{{ groups['config_servers'] | default(['localhost']) }}"
+      when: inventory_hostname in groups['target_servers']
+      
+    # 4. 本地操作
+    - name: 本地文件操作
+      local_action:
+        module: copy
+        src: /local/path/{{ inventory_hostname }}.conf
+        dest: /remote/path/{{ inventory_hostname }}.conf
+      when: inventory_hostname in groups['webservers']
+      
+    # 5. 简化的本地操作
+    - name: 简化的本地操作
+      copy:
+        src: /local/path/{{ inventory_hostname }}.conf
+        dest: /remote/path/{{ inventory_hostname }}.conf
+      delegate_to: localhost
+      when: inventory_hostname in groups['webservers']
+      
+    # 6. 本地命令执行
+    - name: 在控制节点执行命令
+      local_action:
+        module: shell
+        cmd: "echo '{{ inventory_hostname }} - {{ ansible_date_time.iso8601 }}' >> /tmp/hosts.log"
+        
+    # 7. 数据库操作委托
+    - name: 在数据库服务器上执行查询
+      mysql_query:
+        login_db: inventory
+        query: "INSERT INTO hosts (name, ip, status) VALUES ('{{ inventory_hostname }}', '{{ ansible_default_ipv4.address }}', 'active')"
+      delegate_to: "{{ groups['database_servers'][0] | default('localhost') }}"
+      
+    # 8. 监控服务器委托
+    - name: 在监控服务器上注册主机
+      uri:
+        url: "http://{{ groups['monitoring_servers'][0] }}/api/hosts"
+        method: POST
+        body_format: json
+        body: |
+          {
+            "name": "{{ inventory_hostname }}",
+            "ip": "{{ ansible_default_ipv4.address }}",
+            "groups": "{{ group_names }}"
+          }
+      delegate_to: "{{ groups['monitoring_servers'][0] | default('localhost') }}"
+      
+    # 9. 配置管理委托
+    - name: 在配置管理服务器上更新
+      git:
+        repo: "https://github.com/company/configs.git"
+        dest: /tmp/configs
+        version: main
+      delegate_to: "{{ groups['config_servers'][0] | default('localhost') }}"
+      
+    - name: 同步配置到目标主机
+      synchronize:
+        src: /tmp/configs/{{ inventory_hostname }}/
+        dest: /etc/app/
+      delegate_to: "{{ groups['config_servers'][0] | default('localhost') }}"
+      
+    # 10. 日志聚合委托
+    - name: 在日志服务器上收集日志
+      local_action:
+        module: fetch
+        src: /var/log/app/{{ inventory_hostname }}.log
+        dest: /tmp/logs/
+        flat: yes
+      when: inventory_hostname in groups['app_servers']
+      
+    # 11. 备份委托
+    - name: 在备份服务器上创建备份
+      archive:
+        path: /etc/app/
+        dest: /backups/{{ inventory_hostname }}_{{ ansible_date_time.epoch }}.tar.gz
+        format: gz
+      delegate_to: "{{ groups['backup_servers'][0] | default('localhost') }}"
+      
+    # 12. 证书管理委托
+    - name: 在证书服务器上生成证书
+      openssl_privatekey:
+        path: /etc/ssl/private/{{ inventory_hostname }}.key
+        size: 2048
+      delegate_to: "{{ groups['certificate_servers'][0] | default('localhost') }}"
+      
+    - name: 复制证书到目标主机
+      copy:
+        src: /etc/ssl/private/{{ inventory_hostname }}.key
+        dest: /etc/ssl/private/{{ inventory_hostname }}.key
+        remote_src: yes
+      delegate_to: "{{ groups['certificate_servers'][0] | default('localhost') }}"
+      
+  handlers:
+    - name: reload nginx
+      service:
+        name: nginx
+        state: reloaded
+      delegate_to: "{{ groups['loadbalancers'][0] | default('localhost') }}" 

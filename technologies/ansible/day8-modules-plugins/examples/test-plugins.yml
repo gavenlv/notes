@@ -1,0 +1,235 @@
+---
+# 插件测试示例 Playbook
+# 演示自定义过滤器和查找插件的使用方法
+
+- name: 测试自定义插件
+  hosts: localhost
+  gather_facts: yes
+  vars:
+    test_data:
+      users:
+        - name: "john doe"
+          email: "john.doe@example.com"
+          created: "2023-01-15"
+          status: "active"
+          salary: 75000
+        - name: "jane smith"
+          email: "jane.smith@company.org"
+          created: "2023-03-22"
+          status: "inactive"
+          salary: 82000
+        - name: "bob wilson"
+          email: "bob.wilson@test.net"
+          created: "2023-05-10"
+          status: "active"
+          salary: 68000
+    
+    nested_config:
+      database:
+        host: "localhost"
+        port: 5432
+        credentials:
+          username: "admin"
+          password: "secret123"
+      cache:
+        redis:
+          host: "redis.example.com"
+          port: 6379
+        memcached:
+          servers:
+            - "mem1.example.com:11211"
+            - "mem2.example.com:11211"
+    
+    file_sizes:
+      - 1024
+      - 1048576
+      - 1073741824
+      - 1099511627776
+      
+  tasks:
+    # 测试字符串操作过滤器
+    - name: 测试字符串过滤器
+      debug:
+        msg: |
+          原始名称: {{ item.name }}
+          标题格式: {{ item.name | to_title_case }}
+          邮箱域名: {{ item.email | extract_domain }}
+          敏感信息遮盖: {{ item.email | mask_sensitive(show_last=6) }}
+      loop: "{{ test_data.users }}"
+      
+    # 测试数据格式化过滤器
+    - name: 测试数据格式化过滤器
+      debug:
+        msg: |
+          文件大小: {{ item }} 字节
+          格式化大小: {{ item | format_bytes }}
+      loop: "{{ file_sizes }}"
+      
+    # 测试Base64编码/解码
+    - name: 测试Base64编码解码
+      debug:
+        msg: |
+          原始文本: "Hello, Ansible!"
+          编码结果: {{ "Hello, Ansible!" | base64_encode_safe }}
+          解码验证: {{ ("Hello, Ansible!" | base64_encode_safe) | base64_decode_safe }}
+          
+    # 测试日期操作
+    - name: 测试日期操作过滤器
+      debug:
+        msg: |
+          用户: {{ item.name | to_title_case }}
+          创建日期: {{ item.created }}
+          账户年龄: {{ item.created | calculate_age }} 天
+          一年后日期: {{ item.created | add_days(365) }}
+      loop: "{{ test_data.users }}"
+      
+    # 测试字典操作
+    - name: 测试字典扁平化
+      debug:
+        msg: |
+          原始配置:
+          {{ nested_config | to_nice_yaml }}
+          
+          扁平化配置:
+          {{ nested_config | flatten_dict | to_nice_yaml }}
+          
+    - name: 测试字典反扁平化
+      vars:
+        flat_config: "{{ nested_config | flatten_dict }}"
+      debug:
+        msg: |
+          扁平化配置:
+          {{ flat_config | to_nice_yaml }}
+          
+          恢复配置:
+          {{ flat_config | unflatten_dict | to_nice_yaml }}
+          
+    # 测试列表操作
+    - name: 测试按状态分组用户
+      debug:
+        msg: |
+          按状态分组的用户:
+          {{ test_data.users | group_by_key('status') | to_nice_yaml }}
+          
+    - name: 测试按薪资排序用户
+      debug:
+        msg: |
+          按薪资排序的用户:
+          {{ test_data.users | sort_by_key('salary', reverse=true) | to_nice_json }}
+          
+    # 测试验证过滤器
+    - name: 测试邮箱验证
+      debug:
+        msg: |
+          邮箱: {{ item.email }}
+          格式有效: {{ item.email | validate_email }}
+      loop: "{{ test_data.users }}"
+      
+    - name: 测试IP地址验证
+      vars:
+        test_ips:
+          - "192.168.1.1"
+          - "10.0.0.256"  # 无效IP
+          - "2001:0db8:85a3:0000:0000:8a2e:0370:7334"
+          - "invalid.ip"
+      debug:
+        msg: |
+          IP地址: {{ item }}
+          格式有效: {{ item | validate_ip }}
+      loop: "{{ test_ips }}"
+      
+    # 测试密码生成
+    - name: 测试密码生成
+      debug:
+        msg: |
+          默认密码: {{ '' | generate_password }}
+          短密码(8位): {{ '' | generate_password(8) }}
+          无特殊字符密码: {{ '' | generate_password(12, false) }}
+          长密码(20位): {{ '' | generate_password(20) }}
+          
+    # 测试正则表达式查找
+    - name: 测试正则表达式命名分组查找
+      vars:
+        log_text: |
+          2023-12-01 10:30:15 INFO User john.doe@example.com logged in from 192.168.1.100
+          2023-12-01 10:35:22 ERROR Failed login attempt for jane.smith@company.org from 10.0.0.50
+          2023-12-01 10:40:18 INFO User bob.wilson@test.net logged out
+        log_pattern: '(?P<timestamp>\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}) (?P<level>\w+) .*?(?P<email>[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})'
+      debug:
+        msg: |
+          日志解析结果:
+          {{ log_text | regex_findall_named(log_pattern) | to_nice_yaml }}
+          
+    # 测试高级JSON查询 (需要jmespath)
+    - name: 测试JSON查询扩展
+      debug:
+        msg: |
+          活跃用户名称: {{ test_data | json_query_extended('users[?status==`active`].name') }}
+          高薪用户邮箱: {{ test_data | json_query_extended('users[?salary > `70000`].email') }}
+      ignore_errors: yes  # 如果没有jmespath库则忽略错误
+      
+    # 创建测试文件用于高级文件操作
+    - name: 创建测试JSON文件
+      copy:
+        content: "{{ test_data | to_nice_json }}"
+        dest: "/tmp/test_data.json"
+        
+    # 测试文件查找 (模拟数据库查找，使用文件系统)
+    - name: 读取JSON文件内容
+      slurp:
+        src: "/tmp/test_data.json"
+      register: json_file_content
+      
+    - name: 解析并显示JSON数据
+      vars:
+        parsed_data: "{{ json_file_content.content | b64decode | from_json }}"
+      debug:
+        msg: |
+          从文件读取的用户数据:
+          {{ parsed_data.users | to_nice_yaml }}
+          
+    # 测试复合过滤器操作
+    - name: 测试复合过滤器链
+      debug:
+        msg: |
+          用户: {{ item.name | to_title_case }}
+          域名: {{ item.email | extract_domain | to_title_case }}
+          创建年龄: {{ item.created | calculate_age }} 天
+          格式化薪资: {{ item.salary | format_bytes }} (误用演示)
+          账户状态: {{ item.status | to_title_case }}
+      loop: "{{ test_data.users | sort_by_key('name') }}"
+      
+    # 测试条件过滤
+    - name: 使用过滤器进行条件筛选
+      debug:
+        msg: "活跃用户: {{ item.name | to_title_case }} - {{ item.email }}"
+      loop: "{{ test_data.users }}"
+      when: 
+        - item.status == 'active'
+        - item.email | validate_email
+        - item.salary > 70000
+        
+    # 性能测试
+    - name: 过滤器性能测试
+      debug:
+        msg: "处理第{{ item }}轮数据"
+      vars:
+        processed_users: "{{ test_data.users | sort_by_key('salary', reverse=true) | group_by_key('status') }}"
+      loop: "{{ range(5) | list }}"
+      
+    # 清理测试文件
+    - name: 清理测试文件
+      file:
+        path: "/tmp/test_data.json"
+        state: absent
+        
+    # 错误处理测试
+    - name: 测试过滤器错误处理
+      debug:
+        msg: "这将导致错误: {{ 123 | extract_domain }}"
+      ignore_errors: yes
+      
+    - name: 测试无效日期格式
+      debug:
+        msg: "无效日期: {{ 'invalid-date' | calculate_age }}"
+      ignore_errors: yes 

@@ -1,0 +1,249 @@
+---
+# 高级循环演示 Playbook
+# 展示复杂的循环和批处理技术
+
+- name: 高级循环演示
+  hosts: localhost
+  gather_facts: no
+  vars:
+    users:
+      - name: "john"
+        role: "admin"
+        active: true
+        groups: ["sudo", "docker"]
+      - name: "jane"
+        role: "user"
+        active: true
+        groups: ["users"]
+      - name: "bob"
+        role: "guest"
+        active: false
+        groups: ["guests"]
+    
+    servers:
+      - name: "web1"
+        ip: "192.168.1.10"
+        services: ["nginx", "php-fpm"]
+      - name: "web2"
+        ip: "192.168.1.11"
+        services: ["nginx", "php-fpm"]
+      - name: "db1"
+        ip: "192.168.1.20"
+        services: ["mysql", "redis"]
+    
+    configs:
+      nginx:
+        port: 80
+        ssl: true
+        upstream: "backend"
+      mysql:
+        port: 3306
+        bind: "0.0.0.0"
+        max_connections: 1000
+      redis:
+        port: 6379
+        bind: "127.0.0.1"
+        max_memory: "2gb"
+        
+  tasks:
+    # 1. 嵌套循环
+    - name: 嵌套循环示例
+      debug:
+        msg: "服务器 {{ item[0].name }} 上的服务 {{ item[1] }}"
+      loop: "{{ servers | product(configs.keys()) }}"
+      
+    # 2. 条件循环
+    - name: 条件循环
+      debug:
+        msg: "处理活跃用户: {{ item.name }} (角色: {{ item.role }})"
+      loop: "{{ users }}"
+      when: item.active
+      
+    # 3. 动态循环
+    - name: 动态循环
+      debug:
+        msg: "配置项: {{ item.key }} = {{ item.value }}"
+      loop: "{{ configs | dict2items }}"
+      
+    # 4. 循环控制
+    - name: 循环控制示例
+      debug:
+        msg: "用户 {{ item.name }} (索引: {{ index }})"
+      loop: "{{ users }}"
+      loop_control:
+        label: "用户: {{ item.name }}"
+        pause: 1
+        index_var: index
+        extended: yes
+        
+    # 5. 复杂循环
+    - name: 复杂循环
+      debug:
+        msg: |
+          服务器: {{ item.name }}
+          IP: {{ item.ip }}
+          服务: {{ item.services | join(', ') }}
+      loop: "{{ servers }}"
+      loop_control:
+        label: "服务器: {{ item.name }}"
+        
+    # 6. 循环过滤
+    - name: 循环过滤
+      debug:
+        msg: "管理员用户: {{ item.name }}"
+      loop: "{{ users | selectattr('role', 'equalto', 'admin') | list }}"
+      
+    # 7. 循环映射
+    - name: 循环映射
+      debug:
+        msg: "用户名: {{ item.name | upper }}"
+      loop: "{{ users | map(attribute='name') | list }}"
+      
+    # 8. 循环聚合
+    - name: 循环聚合
+      debug:
+        msg: "所有服务: {{ servers | map(attribute='services') | flatten | unique | list }}"
+        
+    # 9. 循环分组
+    - name: 循环分组
+      debug:
+        msg: "按角色分组: {{ users | groupby('role') | list }}"
+        
+    # 10. 循环排序
+    - name: 循环排序
+      debug:
+        msg: "按名称排序: {{ users | sort(attribute='name') | map(attribute='name') | list }}"
+        
+    # 11. 循环组合
+    - name: 循环组合
+      debug:
+        msg: "组合: {{ item[0].name }} + {{ item[1].name }}"
+      loop: "{{ users | combinations(2) }}"
+      
+    # 12. 循环笛卡尔积
+    - name: 循环笛卡尔积
+      debug:
+        msg: "笛卡尔积: {{ item[0].name }} - {{ item[1].name }}"
+      loop: "{{ users | product(servers) }}"
+      
+    # 13. 循环子元素
+    - name: 循环子元素
+      debug:
+        msg: "用户 {{ item[0].name }} 的组 {{ item[1] }}"
+      loop: "{{ users | subelements('groups') }}"
+      
+    # 14. 循环字典
+    - name: 循环字典
+      debug:
+        msg: "配置 {{ item.key }}: {{ item.value }}"
+      loop: "{{ configs | dict2items }}"
+      loop_control:
+        label: "配置: {{ item.key }}"
+        
+    # 15. 循环文件
+    - name: 创建测试文件
+      copy:
+        content: "测试文件 {{ item }}"
+        dest: "/tmp/test_file_{{ item }}.txt"
+      loop: [1, 2, 3, 4, 5]
+      
+    - name: 循环文件列表
+      debug:
+        msg: "文件: {{ item }}"
+      loop: "{{ lookup('fileglob', '/tmp/test_file_*.txt') }}"
+      
+    # 16. 循环API数据
+    - name: 模拟API数据
+      set_fact:
+        api_data:
+          - id: 1
+            name: "项目A"
+            status: "active"
+          - id: 2
+            name: "项目B"
+            status: "inactive"
+          - id: 3
+            name: "项目C"
+            status: "active"
+            
+    - name: 处理API数据
+      debug:
+        msg: "项目 {{ item.name }} (ID: {{ item.id }}) - 状态: {{ item.status }}"
+      loop: "{{ api_data }}"
+      when: item.status == "active"
+      
+    # 17. 循环数据库结果
+    - name: 模拟数据库结果
+      set_fact:
+        db_results:
+          - table: "users"
+            count: 150
+            last_update: "2023-12-01"
+          - table: "orders"
+            count: 1250
+            last_update: "2023-12-01"
+          - table: "products"
+            count: 89
+            last_update: "2023-11-30"
+            
+    - name: 处理数据库结果
+      debug:
+        msg: "表 {{ item.table }}: {{ item.count }} 条记录 (更新: {{ item.last_update }})"
+      loop: "{{ db_results }}"
+      loop_control:
+        label: "表: {{ item.table }}"
+        
+    # 18. 循环网络数据
+    - name: 模拟网络扫描
+      set_fact:
+        network_hosts:
+          - ip: "192.168.1.1"
+            hostname: "gateway"
+            status: "up"
+            services: ["ssh", "http"]
+          - ip: "192.168.1.10"
+            hostname: "web1"
+            status: "up"
+            services: ["ssh", "http", "https"]
+          - ip: "192.168.1.20"
+            hostname: "db1"
+            status: "down"
+            services: ["ssh", "mysql"]
+            
+    - name: 处理网络数据
+      debug:
+        msg: "主机 {{ item.hostname }} ({{ item.ip }}) - 状态: {{ item.status }}"
+      loop: "{{ network_hosts }}"
+      when: item.status == "up"
+      
+    # 19. 循环日志数据
+    - name: 模拟日志数据
+      set_fact:
+        log_entries:
+          - timestamp: "2023-12-01 10:30:15"
+            level: "INFO"
+            message: "用户登录成功"
+            user: "john"
+          - timestamp: "2023-12-01 10:35:22"
+            level: "ERROR"
+            message: "数据库连接失败"
+            user: "system"
+          - timestamp: "2023-12-01 10:40:18"
+            level: "WARN"
+            message: "磁盘空间不足"
+            user: "system"
+            
+    - name: 处理日志数据
+      debug:
+        msg: "{{ item.timestamp }} [{{ item.level }}] {{ item.message }}"
+      loop: "{{ log_entries }}"
+      loop_control:
+        label: "日志: {{ item.level }}"
+        
+    # 20. 循环清理
+    - name: 清理测试文件
+      file:
+        path: "{{ item }}"
+        state: absent
+      loop: "{{ lookup('fileglob', '/tmp/test_file_*.txt') }}"
+      ignore_errors: yes 

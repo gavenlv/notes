@@ -1,0 +1,125 @@
+---
+# Web 服务器安装任务
+
+- name: 更新包缓存 (Debian/Ubuntu)
+  apt:
+    update_cache: yes
+    cache_valid_time: 3600
+  when: ansible_os_family == "Debian"
+
+- name: 更新包缓存 (RHEL/CentOS)
+  yum:
+    update_cache: yes
+  when: ansible_os_family == "RedHat"
+
+- name: 安装 EPEL 仓库 (RHEL/CentOS)
+  package:
+    name: epel-release
+    state: present
+  when: 
+    - ansible_os_family == "RedHat"
+    - webserver_type == "nginx"
+
+- name: 添加 Nginx 官方仓库 (Debian/Ubuntu)
+  block:
+    - name: 添加 Nginx 签名密钥
+      apt_key:
+        url: https://nginx.org/keys/nginx_signing.key
+        state: present
+
+    - name: 添加 Nginx 仓库
+      apt_repository:
+        repo: "deb http://nginx.org/packages/{{ ansible_distribution | lower }}/ {{ ansible_distribution_release }} nginx"
+        state: present
+        update_cache: yes
+  when: 
+    - ansible_os_family == "Debian"
+    - webserver_type == "nginx"
+    - webserver_version != "latest"
+
+- name: 添加 Apache 仓库 (如果需要)
+  debug:
+    msg: "使用默认仓库安装 Apache"
+  when: webserver_type == "apache"
+
+- name: 安装 Web 服务器包
+  package:
+    name: "{{ webserver_packages[webserver_type] }}"
+    state: present
+  notify: restart webserver
+
+- name: 安装额外工具包
+  package:
+    name:
+      - curl
+      - wget
+      - rsync
+      - logrotate
+    state: present
+
+- name: 安装 SSL 工具 (如果启用 SSL)
+  package:
+    name:
+      - openssl
+      - ssl-cert
+    state: present
+  when: webserver_enable_ssl
+
+- name: 创建 Web 服务器用户
+  user:
+    name: "{{ webserver_user }}"
+    group: "{{ webserver_group }}"
+    system: yes
+    shell: /bin/false
+    home: /var/www
+    create_home: no
+  when: webserver_user != "www-data"
+
+- name: 创建必要的目录
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ webserver_user }}"
+    group: "{{ webserver_group }}"
+    mode: '0755'
+  loop:
+    - "{{ webserver_log_dir }}"
+    - "{{ webserver_cache_dir }}"
+    - "/var/www"
+    - "/etc/{{ webserver_type }}/conf.d"
+    - "{{ webserver_config_paths[webserver_type]['sites_available'] }}"
+    - "{{ webserver_config_paths[webserver_type]['sites_enabled'] }}"
+
+- name: 创建 SSL 证书目录
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: root
+    group: root
+    mode: '0700'
+  loop:
+    - "/etc/ssl/certs"
+    - "/etc/ssl/private"
+  when: webserver_enable_ssl
+
+- name: 设置正确的文件权限
+  file:
+    path: "{{ webserver_log_dir }}"
+    owner: "{{ webserver_user }}"
+    group: "{{ webserver_group }}"
+    recurse: yes
+
+- name: 检查服务状态
+  service:
+    name: "{{ webserver_service_name }}"
+    enabled: "{{ webserver_service_enabled }}"
+  notify: restart webserver
+
+- name: 显示安装信息
+  debug:
+    msg:
+      - "{{ webserver_type | title }} 安装完成"
+      - "版本: {{ webserver_version }}"
+      - "用户: {{ webserver_user }}"
+      - "配置目录: {{ webserver_config_paths[webserver_type]['main_config'] | dirname }}"
+      - "日志目录: {{ webserver_log_dir }}" 

@@ -1,0 +1,87 @@
+---
+# 数据库角色主要任务
+
+- name: 显示数据库角色信息
+  debug:
+    msg: "开始配置 {{ database_type | title }} 数据库服务器"
+  tags: [info]
+
+- name: 验证数据库配置
+  include_tasks: validate.yml
+  tags: [validate, always]
+
+- name: 安装数据库服务器
+  include_tasks: install.yml
+  tags: [install]
+
+- name: 配置数据库基础设置
+  include_tasks: configure.yml
+  tags: [configure]
+
+- name: 初始化数据库
+  include_tasks: initialize.yml
+  tags: [initialize]
+
+- name: 创建数据库和用户
+  include_tasks: databases.yml
+  when: database_databases | length > 0 or database_users | length > 0
+  tags: [databases]
+
+- name: 配置复制
+  include_tasks: replication.yml
+  when: database_replication_enabled
+  tags: [replication]
+
+- name: 配置集群
+  include_tasks: cluster.yml
+  when: database_cluster_enabled
+  tags: [cluster]
+
+- name: 配置 SSL
+  include_tasks: ssl.yml
+  when: database_ssl_enabled
+  tags: [ssl]
+
+- name: 配置安全设置
+  include_tasks: security.yml
+  tags: [security]
+
+- name: 配置监控
+  include_tasks: monitoring.yml
+  when: database_monitoring_enabled
+  tags: [monitoring]
+
+- name: 配置备份
+  include_tasks: backup.yml
+  when: database_backup_enabled
+  tags: [backup]
+
+- name: 配置防火墙
+  include_tasks: firewall.yml
+  when: database_firewall_enabled
+  tags: [firewall]
+
+- name: 启动和启用数据库服务
+  include_tasks: service.yml
+  tags: [service]
+
+- name: 优化数据库性能
+  include_tasks: optimize.yml
+  tags: [optimize]
+
+- name: 验证数据库部署
+  include_tasks: verify.yml
+  tags: [verify]
+
+- name: 显示完成信息
+  debug:
+    msg: 
+      - "{{ database_type | title }} 数据库配置完成"
+      - "数据库类型: {{ database_type }}"
+      - "服务端口: {{ database_port }}"
+      - "数据目录: {{ database_data_dir }}"
+      - "日志目录: {{ database_log_dir }}"
+      - "备份启用: {{ database_backup_enabled }}"
+      - "复制启用: {{ database_replication_enabled }}"
+      - "SSL 启用: {{ database_ssl_enabled }}"
+  tags: [info] 
