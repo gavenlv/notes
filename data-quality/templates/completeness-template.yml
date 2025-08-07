@@ -1,0 +1,124 @@
+# Completeness Rule Template
+# This template defines rules for checking data completeness (missing values, nulls, etc.)
+
+rule_type: "completeness"
+version: "1.0"
+description: "Template for data completeness validation rules"
+
+# Rule Definition
+rule:
+  name: "completeness_check_{table_name}"
+  description: "Check for missing or null values in {table_name}"
+  category: "completeness"
+  priority: "high"
+  enabled: true
+  
+  # Target table configuration
+  target:
+    database: "{database_name}"
+    table: "{table_name}"
+    partition_key: "{partition_column}"  # Optional: for partitioned tables
+    
+  # Columns to check for completeness
+  columns:
+    - name: "{column_name}"
+      data_type: "{data_type}"
+      nullable: false  # Set to true if column can be null
+      required: true   # Set to false if column is optional
+      
+  # Completeness checks
+  checks:
+    # Check for null values
+    null_check:
+      enabled: true
+      # No threshold - fails if any null values found
+      severity: "high"
+      description: "Check for null values in required columns"
+      
+    # Check for empty strings
+    empty_string_check:
+      enabled: true
+      # No threshold - fails if any empty strings found
+      severity: "medium"
+      description: "Check for empty string values"
+      
+    # Check for missing columns
+    missing_column_check:
+      enabled: true
+      required_columns: ["{required_column1}", "{required_column2}"]
+      severity: "critical"
+      description: "Check if required columns exist"
+      
+    # Check for duplicate records
+    duplicate_check:
+      enabled: true
+      # No threshold - fails if any duplicates found
+      key_columns: ["{unique_key_column}"]
+      severity: "high"
+      description: "Check for duplicate records based on key columns"
+      
+    # Check for data volume
+    volume_check:
+      enabled: true
+      min_rows: 1000  # Minimum expected rows
+      max_rows: 1000000  # Maximum expected rows
+      severity: "medium"
+      description: "Check if data volume is within expected range"
+
+# SQL Query Template
+sql_template: |
+  -- Completeness Check for {table_name}
+  WITH completeness_metrics AS (
+    SELECT
+      -- Null value checks
+      COUNT(*) as total_rows,
+      COUNT(CASE WHEN {column_name} IS NULL THEN 1 END) as null_count,
+      COUNT(CASE WHEN {column_name} = '' THEN 1 END) as empty_count,
+      
+      -- Duplicate checks
+      COUNT(DISTINCT {key_column}) as unique_keys,
+      COUNT(*) as total_keys,
+      
+      -- Volume checks
+      COUNT(*) as row_count
+    FROM {database_name}.{table_name}
+    WHERE {partition_condition}
+  )
+  SELECT
+    total_rows,
+    null_count,
+    empty_count,
+    unique_keys,
+    total_keys,
+    (total_keys - unique_keys) as duplicate_count,
+    row_count,
+    CASE 
+      WHEN null_count > 0 THEN 'FAIL'
+      WHEN empty_count > 0 THEN 'FAIL'
+      WHEN (total_keys - unique_keys) > 0 THEN 'FAIL'
+      WHEN row_count < {min_rows} THEN 'FAIL'
+      WHEN row_count > {max_rows} THEN 'FAIL'
+      ELSE 'PASS'
+    END as check_result
+  FROM completeness_metrics
+
+# Expected Results
+expected_results:
+  null_percentage: "< 5%"
+  empty_percentage: "< 10%"
+  duplicate_percentage: "< 10%"
+  row_count: "Within expected range"
+  
+# Reporting Configuration
+reporting:
+  formats: ["json", "html", "csv"]
+  output_directory: "./reports/"
+  retention_days: 30
+
+# Documentation
+documentation:
+  purpose: "Ensure data completeness by checking for missing values, nulls, and duplicates"
+  business_impact: "Incomplete data can lead to incorrect analytics and business decisions"
+  remediation: "Investigate data pipeline and source systems for missing data"
+  owner: "{data_team}"
+  review_frequency: "weekly" 

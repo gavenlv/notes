@@ -1,0 +1,125 @@
+# Case Sensitivity Rule Template
+# This template defines rules for checking case sensitivity in data
+
+rule_type: "case_sensitivity"
+version: "1.0"
+description: "Template for case sensitivity validation rules"
+
+# Rule Definition
+rule:
+  name: "case_sensitivity_check_{table_name}"
+  description: "Check case sensitivity for {table_name}"
+  category: "accuracy"
+  priority: "medium"
+  enabled: true
+  
+  # Target table configuration
+  target:
+    database: "{database_name}"
+    table: "{table_name}"
+    partition_key: "{partition_column}"  # Optional: for partitioned tables
+    
+  # Columns to check for case sensitivity
+  columns:
+    - name: "{column_name}"
+      data_type: "String"
+      case_sensitive: true  # Set to false if case insensitive
+      expected_case: "lower"  # "lower", "upper", "title", "mixed"
+      
+  # Case sensitivity checks
+  checks:
+    # Case format check
+    case_format_check:
+      enabled: true
+      severity: "medium"
+      description: "Check if text values follow expected case format"
+      
+    # Mixed case check
+    mixed_case_check:
+      enabled: true
+      severity: "low"
+      description: "Check for mixed case values where not expected"
+      
+    # Case consistency check
+    case_consistency_check:
+      enabled: true
+      severity: "medium"
+      description: "Check for consistent case usage across values"
+      
+    # Case-sensitive comparison check
+    case_sensitive_comparison:
+      enabled: true
+      severity: "high"
+      description: "Check case-sensitive string comparisons"
+
+# SQL Query Template
+sql_template: |
+  -- Case Sensitivity Check for {table_name}
+  WITH case_sensitivity_metrics AS (
+    SELECT
+      -- Case format checks
+      COUNT(*) as total_rows,
+      COUNT(CASE WHEN {column_name} != LOWER({column_name}) THEN 1 END) as not_lowercase_count,
+      COUNT(CASE WHEN {column_name} != UPPER({column_name}) THEN 1 END) as not_uppercase_count,
+      
+      -- Mixed case checks
+      COUNT(CASE WHEN {column_name} REGEXP '[A-Z].*[a-z]|[a-z].*[A-Z]' THEN 1 END) as mixed_case_count,
+      
+      -- Case consistency checks
+      COUNT(CASE WHEN {column_name} != TRIM({column_name}) THEN 1 END) as leading_trailing_space_count,
+      
+      -- Case-sensitive comparison checks
+      COUNT(CASE WHEN {column_name} COLLATE utf8_bin != {column_name} THEN 1 END) as case_sensitive_violations
+    FROM {database_name}.{table_name}
+    WHERE {partition_condition}
+  )
+  SELECT
+    total_rows,
+    not_lowercase_count,
+    not_uppercase_count,
+    mixed_case_count,
+    leading_trailing_space_count,
+    case_sensitive_violations,
+    CASE 
+      WHEN not_lowercase_count > 0 AND expected_case = 'lower' THEN 'FAIL'
+      WHEN not_uppercase_count > 0 AND expected_case = 'upper' THEN 'FAIL'
+      WHEN mixed_case_count > 0 AND expected_case != 'mixed' THEN 'FAIL'
+      WHEN leading_trailing_space_count > 0 THEN 'FAIL'
+      WHEN case_sensitive_violations > 0 THEN 'FAIL'
+      ELSE 'PASS'
+    END as check_result
+  FROM case_sensitivity_metrics
+
+# Expected Results
+expected_results:
+  not_lowercase_count: "0 (if expected_case = 'lower')"
+  not_uppercase_count: "0 (if expected_case = 'upper')"
+  mixed_case_count: "0 (if expected_case != 'mixed')"
+  leading_trailing_space_count: "0"
+  case_sensitive_violations: "0"
+
+# Case Sensitivity Rules Examples
+case_sensitivity_rules:
+  - name: "email_lowercase"
+    description: "Email addresses should be lowercase"
+    condition: "email = LOWER(email)"
+    
+  - name: "username_consistency"
+    description: "Usernames should be consistent case"
+    condition: "username = TRIM(username)"
+    
+  - name: "product_code_uppercase"
+    description: "Product codes should be uppercase"
+    condition: "product_code = UPPER(product_code)"
+    
+  - name: "mixed_case_names"
+    description: "Names can be mixed case but should be consistent"
+    condition: "name REGEXP '^[A-Z][a-z]+$'"
+
+# Documentation
+documentation:
+  purpose: "Ensure consistent case usage in text data"
+  business_impact: "Inconsistent case can affect data matching and user experience"
+  remediation: "Standardize case formatting in data pipeline"
+  owner: "{data_team}"
+  review_frequency: "weekly" 

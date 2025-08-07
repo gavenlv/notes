@@ -1,0 +1,112 @@
+# Data Quality Framework Configuration
+# This file defines the overall configuration for the data quality checking system
+
+# ClickHouse Connection Settings
+clickhouse:
+  host: "localhost"
+  port: 9000
+  database: "default"
+  user: "default"
+  password: ""
+  secure: false
+  timeout: 30
+
+# Data Quality Check Settings
+quality_checks:
+  # Global settings for all quality checks
+  enabled: true
+  parallel_execution: true
+  max_parallel_jobs: 5
+  timeout_minutes: 30
+  
+  # Reporting settings
+  generate_reports: true
+  report_format: ["html", "json", "csv"]
+  report_location: "./reports/"
+  
+  # Reporting only - alerting removed per user request
+
+# Rule Categories
+rule_categories:
+  completeness:
+    enabled: true
+    priority: "high"
+    description: "Check for missing or null values in data"
+    
+  accuracy:
+    enabled: true
+    priority: "high"
+    description: "Validate data against business rules and constraints"
+    
+  consistency:
+    enabled: true
+    priority: "medium"
+    description: "Ensure data consistency across tables and systems"
+    
+  timeliness:
+    enabled: true
+    priority: "medium"
+    description: "Verify data freshness and update frequency"
+
+# Scheduling Configuration
+scheduling:
+  # Cron-like schedule for automated checks
+  schedule: "0 */6 * * *"  # Every 6 hours
+  timezone: "UTC"
+  
+  # Check frequency by category
+  completeness_interval: "1h"
+  accuracy_interval: "6h"
+  consistency_interval: "12h"
+  timeliness_interval: "1h"
+
+# Storage Configuration
+storage:
+  # Where to store quality check results
+  results_database: "data_quality"
+  results_table: "quality_results"
+  
+  # Retention policy
+  retention_days: 90
+  archive_old_results: true
+  
+  # Backup settings
+  backup_enabled: true
+  backup_interval: "1d"
+
+# Monitoring Integration
+monitoring:
+  # Prometheus metrics
+  enable_metrics: true
+  metrics_port: 9090
+  
+  # Grafana dashboard
+  enable_dashboard: true
+  dashboard_url: "http://localhost:3000"
+  
+  # Health checks
+  health_check_enabled: true
+  health_check_interval: "5m"
+
+# Logging Configuration
+logging:
+  level: "INFO"
+  format: "json"
+  output: "file"
+  log_file: "./logs/data-quality.log"
+  max_file_size: "100MB"
+  max_files: 10
+
+# Reporting Settings
+reporting:
+  # Report formats and locations
+  formats: ["json", "html", "csv"]
+  output_directory: "./reports/"
+  retention_days: 30
+
+# Custom Settings
+custom:
+  # User-defined settings
+  custom_metrics: []
+  custom_validators: []
+  custom_reporters: [] 

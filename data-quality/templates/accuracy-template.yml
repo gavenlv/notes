@@ -1,0 +1,169 @@
+# Accuracy Rule Template
+# This template defines rules for checking data accuracy (business rules, constraints, etc.)
+
+rule_type: "accuracy"
+version: "1.0"
+description: "Template for data accuracy validation rules"
+
+# Rule Definition
+rule:
+  name: "accuracy_check_{table_name}"
+  description: "Validate data accuracy in {table_name} against business rules"
+  category: "accuracy"
+  priority: "high"
+  enabled: true
+  
+  # Target table configuration
+  target:
+    database: "{database_name}"
+    table: "{table_name}"
+    partition_key: "{partition_column}"  # Optional: for partitioned tables
+    
+  # Columns to check for accuracy
+  columns:
+    - name: "{column_name}"
+      data_type: "{data_type}"
+      validation_rules:
+        - type: "range"
+          min_value: "{min_value}"
+          max_value: "{max_value}"
+        - type: "format"
+          pattern: "{regex_pattern}"
+        - type: "enum"
+          allowed_values: ["{value1}", "{value2}", "{value3}"]
+        - type: "custom"
+          expression: "{custom_expression}"
+          
+  # Accuracy checks
+  checks:
+    # Range validation
+    range_check:
+      enabled: true
+      # No threshold - fails if any out of range values found
+      severity: "high"
+      description: "Check if values are within expected range"
+      
+    # Format validation
+    format_check:
+      enabled: true
+      # No threshold - fails if any wrong format values found
+      severity: "medium"
+      description: "Check if values match expected format"
+      
+    # Enum validation
+    enum_check:
+      enabled: true
+      # No threshold - fails if any invalid enum values found
+      severity: "high"
+      description: "Check if values are from allowed enum set"
+      
+    # Business rule validation
+    business_rule_check:
+      enabled: true
+      # No threshold - fails if any business rule violations found
+      severity: "critical"
+      description: "Check if data follows business rules"
+      
+    # Cross-field validation
+    cross_field_check:
+      enabled: true
+      # No threshold - fails if any cross-field violations found
+      severity: "high"
+      description: "Check relationships between fields"
+      
+    # Statistical validation
+    statistical_check:
+      enabled: true
+      # No threshold - fails if statistical measures are outside expected range
+      severity: "medium"
+      description: "Check statistical properties of data"
+
+# SQL Query Template
+sql_template: |
+  -- Accuracy Check for {table_name}
+  WITH accuracy_metrics AS (
+    SELECT
+      -- Range checks
+      COUNT(*) as total_rows,
+      COUNT(CASE WHEN {column_name} < {min_value} OR {column_name} > {max_value} THEN 1 END) as range_violations,
+      
+      -- Format checks
+      COUNT(CASE WHEN {column_name} NOT REGEXP '{regex_pattern}' THEN 1 END) as format_violations,
+      
+      -- Enum checks
+      COUNT(CASE WHEN {column_name} NOT IN ({enum_values}) THEN 1 END) as enum_violations,
+      
+      -- Business rule checks
+      COUNT(CASE WHEN {business_rule_condition} THEN 1 END) as business_rule_violations,
+      
+      -- Cross-field checks
+      COUNT(CASE WHEN {cross_field_condition} THEN 1 END) as cross_field_violations,
+      
+      -- Statistical checks
+      AVG({column_name}) as avg_value,
+      STDDEV({column_name}) as stddev_value,
+      MIN({column_name}) as min_value,
+      MAX({column_name}) as max_value
+    FROM {database_name}.{table_name}
+    WHERE {partition_condition}
+  )
+  SELECT
+    total_rows,
+    range_violations,
+    format_violations,
+    enum_violations,
+    business_rule_violations,
+    cross_field_violations,
+    avg_value,
+    stddev_value,
+    min_value,
+    max_value,
+    CASE 
+      WHEN range_violations > 0 THEN 'FAIL'
+      WHEN format_violations > 0 THEN 'FAIL'
+      WHEN enum_violations > 0 THEN 'FAIL'
+      WHEN business_rule_violations > 0 THEN 'FAIL'
+      WHEN cross_field_violations > 0 THEN 'FAIL'
+      ELSE 'PASS'
+    END as check_result
+  FROM accuracy_metrics
+
+# Expected Results
+expected_results:
+  range_violation_percentage: "< 2%"
+  format_violation_percentage: "< 1%"
+  enum_violation_percentage: "< 1%"
+  business_rule_violation_percentage: "< 1%"
+  cross_field_violation_percentage: "< 1%"
+  
+# Reporting Configuration
+reporting:
+  formats: ["json", "html", "csv"]
+  output_directory: "./reports/"
+  retention_days: 30
+
+# Business Rules Examples
+business_rules:
+  - name: "age_validation"
+    description: "Age must be between 0 and 120"
+    condition: "age >= 0 AND age <= 120"
+    
+  - name: "email_format"
+    description: "Email must be in valid format"
+    condition: "email REGEXP '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$'"
+    
+  - name: "date_consistency"
+    description: "End date must be after start date"
+    condition: "end_date > start_date"
+    
+  - name: "amount_validation"
+    description: "Amount must be positive"
+    condition: "amount > 0"
+
+# Documentation
+documentation:
+  purpose: "Ensure data accuracy by validating against business rules and constraints"
+  business_impact: "Inaccurate data can lead to wrong business decisions and compliance issues"
+  remediation: "Review data sources and transformation logic for accuracy issues"
+  owner: "{data_team}"
+  review_frequency: "weekly" 

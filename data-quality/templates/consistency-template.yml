@@ -1,0 +1,179 @@
+# Consistency Rule Template
+# This template defines rules for checking data consistency across tables and systems
+
+rule_type: "consistency"
+version: "1.0"
+description: "Template for data consistency validation rules"
+
+# Rule Definition
+rule:
+  name: "consistency_check_{table_name}"
+  description: "Check data consistency for {table_name}"
+  category: "consistency"
+  priority: "medium"
+  enabled: true
+  
+  # Target table configuration
+  target:
+    database: "{database_name}"
+    table: "{table_name}"
+    partition_key: "{partition_column}"  # Optional: for partitioned tables
+    
+  # Related tables for consistency checks
+  related_tables:
+    - database: "{related_database}"
+      table: "{related_table}"
+      relationship: "foreign_key"  # or "summary", "aggregation"
+      key_columns: ["{foreign_key_column}"]
+      reference_columns: ["{primary_key_column}"]
+      
+  # Consistency checks
+  checks:
+    # Referential integrity check
+    referential_integrity:
+      enabled: true
+      # No threshold - fails if any invalid foreign keys found
+      severity: "high"
+      description: "Check referential integrity between tables"
+      
+    # Cross-table consistency check
+    cross_table_consistency:
+      enabled: true
+      # No threshold - fails if any inconsistency found
+      severity: "medium"
+      description: "Check consistency between related tables"
+      
+    # Schema consistency check
+    schema_consistency:
+      enabled: true
+      # No threshold - fails if any schema violations found
+      severity: "critical"
+      description: "Check for schema drift and changes"
+      
+    # Data type consistency check
+    data_type_consistency:
+      enabled: true
+      # No threshold - fails if any data type violations found
+      severity: "high"
+      description: "Check data type consistency across tables"
+      
+    # Aggregation consistency check
+    aggregation_consistency:
+      enabled: true
+      # No threshold - fails if aggregation differences exceed threshold
+      severity: "medium"
+      description: "Check consistency of aggregated values"
+      
+    # Business logic consistency check
+    business_logic_consistency:
+      enabled: true
+      # No threshold - fails if any business logic violations found
+      severity: "high"
+      description: "Check consistency of business logic across tables"
+
+# SQL Query Template
+sql_template: |
+  -- Consistency Check for {table_name}
+  WITH consistency_metrics AS (
+    SELECT
+      -- Referential integrity checks
+      COUNT(*) as total_rows,
+      COUNT(CASE WHEN {foreign_key_column} IS NOT NULL AND {foreign_key_column} NOT IN (
+        SELECT {primary_key_column} FROM {related_database}.{related_table}
+      ) THEN 1 END) as referential_violations,
+      
+      -- Cross-table consistency checks
+      COUNT(CASE WHEN {consistency_condition} THEN 1 END) as cross_table_violations,
+      
+      -- Schema consistency checks
+      COUNT(CASE WHEN {schema_check_condition} THEN 1 END) as schema_violations,
+      
+      -- Data type consistency checks
+      COUNT(CASE WHEN {data_type_condition} THEN 1 END) as data_type_violations,
+      
+      -- Aggregation consistency checks
+      ABS(SUM({aggregation_column}) - (
+        SELECT SUM({related_aggregation_column}) 
+        FROM {related_database}.{related_table}
+      )) as aggregation_difference,
+      
+      -- Business logic consistency checks
+      COUNT(CASE WHEN {business_logic_condition} THEN 1 END) as business_logic_violations
+    FROM {database_name}.{table_name}
+    WHERE {partition_condition}
+  )
+  SELECT
+    total_rows,
+    referential_violations,
+    cross_table_violations,
+    schema_violations,
+    data_type_violations,
+    aggregation_difference,
+    business_logic_violations,
+    CASE 
+      WHEN referential_violations > 0 THEN 'FAIL'
+      WHEN cross_table_violations > 0 THEN 'FAIL'
+      WHEN schema_violations > 0 THEN 'FAIL'
+      WHEN data_type_violations > 0 THEN 'FAIL'
+      WHEN ABS(aggregation_difference) > {aggregation_threshold} THEN 'FAIL'
+      WHEN business_logic_violations > 0 THEN 'FAIL'
+      ELSE 'PASS'
+    END as check_result
+  FROM consistency_metrics
+
+# Expected Results
+expected_results:
+  referential_violation_percentage: "< 1%"
+  cross_table_violation_percentage: "< 5%"
+  schema_violation_percentage: "< 1%"
+  data_type_violation_percentage: "< 1%"
+  aggregation_difference_percentage: "< 5%"
+  business_logic_violation_percentage: "< 1%"
+  
+# Reporting Configuration
+reporting:
+  formats: ["json", "html", "csv"]
+  output_directory: "./reports/"
+  retention_days: 30
+
+# Consistency Rules Examples
+consistency_rules:
+  - name: "order_customer_consistency"
+    description: "All orders must have valid customer references"
+    condition: "customer_id IN (SELECT customer_id FROM customers)"
+    
+  - name: "product_category_consistency"
+    description: "Product categories must be consistent across tables"
+    condition: "category_id IN (SELECT category_id FROM categories)"
+    
+  - name: "date_consistency"
+    description: "Dates must be consistent across related tables"
+    condition: "order_date >= customer_created_date"
+    
+  - name: "amount_consistency"
+    description: "Order amounts must match line item totals"
+    condition: "order_total = (SELECT SUM(line_total) FROM order_items WHERE order_id = orders.order_id)"
+
+# Cross-Table Validation Examples
+cross_table_validations:
+  - name: "summary_consistency"
+    description: "Summary table must match detail table totals"
+    source_table: "order_details"
+    summary_table: "order_summary"
+    aggregation_column: "amount"
+    summary_column: "total_amount"
+    
+  - name: "dimension_consistency"
+    description: "Dimension table must contain all referenced values"
+    dimension_table: "customers"
+    fact_table: "orders"
+    dimension_key: "customer_id"
+    fact_key: "customer_id"
+
+# Documentation
+documentation:
+  purpose: "Ensure data consistency across tables and systems"
+  business_impact: "Inconsistent data can lead to incorrect reporting and analysis"
+  remediation: "Review data pipeline and ETL processes for consistency issues"
+  owner: "{data_team}"
+  review_frequency: "weekly" 

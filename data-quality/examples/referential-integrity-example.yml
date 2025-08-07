@@ -1,0 +1,83 @@
+# Referential Integrity Example Rule
+# This example demonstrates checking referential integrity between tables
+
+rule_type: "consistency"
+version: "1.0"
+description: "Example referential integrity check between orders and customers"
+
+# Rule Definition
+rule:
+  name: "order_customer_referential_integrity"
+  description: "Check referential integrity between orders and customers tables"
+  category: "consistency"
+  priority: "high"
+  enabled: true
+  
+  # Target table configuration
+  target:
+    database: "default"
+    table: "orders"
+    partition_key: "created_date"
+    
+  # Related table for referential integrity check
+  related_tables:
+    - database: "default"
+      table: "customers"
+      relationship: "foreign_key"
+      key_columns: ["customer_id"]
+      reference_columns: ["customer_id"]
+      
+  # Consistency checks
+  checks:
+    # Referential integrity check
+    referential_integrity:
+      enabled: true
+      severity: "high"
+      description: "Check that all order customer_id values exist in customers table"
+
+# SQL Query Template
+sql_template: |
+  -- Referential Integrity Check for orders table
+  WITH referential_metrics AS (
+    SELECT
+      COUNT(*) as total_orders,
+      COUNT(CASE WHEN customer_id IS NOT NULL AND customer_id NOT IN (
+        SELECT customer_id FROM default.customers
+      ) THEN 1 END) as invalid_reference_count,
+      COUNT(CASE WHEN customer_id IS NULL THEN 1 END) as null_customer_id_count
+    FROM default.orders
+    WHERE created_date >= today() - 30
+  )
+  SELECT
+    total_orders,
+    invalid_reference_count,
+    null_customer_id_count,
+    CASE 
+      WHEN invalid_reference_count > 0 THEN 'FAIL'
+      WHEN null_customer_id_count > 0 THEN 'FAIL'
+      ELSE 'PASS'
+    END as check_result
+  FROM referential_metrics
+
+# Expected Results
+expected_results:
+  invalid_reference_count: "0"
+  null_customer_id_count: "0"
+  
+# Business Rules
+business_rules:
+  - name: "order_customer_relationship"
+    description: "Every order must have a valid customer reference"
+    condition: "customer_id IN (SELECT customer_id FROM customers)"
+    
+  - name: "customer_id_not_null"
+    description: "Customer ID cannot be null in orders"
+    condition: "customer_id IS NOT NULL"
+
+# Documentation
+documentation:
+  purpose: "Ensure referential integrity between orders and customers tables"
+  business_impact: "Invalid customer references can cause data inconsistency and reporting errors"
+  remediation: "Review order creation process and customer data pipeline"
+  owner: "data_team"
+  review_frequency: "daily" 

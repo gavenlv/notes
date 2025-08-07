@@ -1,0 +1,104 @@
+# Case Sensitivity Example Rule
+# This example demonstrates checking case sensitivity in email addresses
+
+rule_type: "case_sensitivity"
+version: "1.0"
+description: "Example case sensitivity check for email addresses"
+
+# Rule Definition
+rule:
+  name: "email_case_sensitivity_check"
+  description: "Check case sensitivity for email addresses in users table"
+  category: "accuracy"
+  priority: "medium"
+  enabled: true
+  
+  # Target table configuration
+  target:
+    database: "default"
+    table: "users"
+    partition_key: "created_date"
+    
+  # Columns to check for case sensitivity
+  columns:
+    - name: "email"
+      data_type: "String"
+      case_sensitive: true
+      expected_case: "lower"  # Email addresses should be lowercase
+      
+  # Case sensitivity checks
+  checks:
+    # Case format check
+    case_format_check:
+      enabled: true
+      severity: "medium"
+      description: "Check if email addresses are in lowercase format"
+      
+    # Mixed case check
+    mixed_case_check:
+      enabled: true
+      severity: "low"
+      description: "Check for mixed case values in email addresses"
+      
+    # Case consistency check
+    case_consistency_check:
+      enabled: true
+      severity: "medium"
+      description: "Check for consistent case usage in email addresses"
+
+# SQL Query Template
+sql_template: |
+  -- Case Sensitivity Check for email addresses
+  WITH case_sensitivity_metrics AS (
+    SELECT
+      COUNT(*) as total_rows,
+      COUNT(CASE WHEN email != LOWER(email) THEN 1 END) as not_lowercase_count,
+      COUNT(CASE WHEN email REGEXP '[A-Z].*[a-z]|[a-z].*[A-Z]' THEN 1 END) as mixed_case_count,
+      COUNT(CASE WHEN email != TRIM(email) THEN 1 END) as leading_trailing_space_count,
+      COUNT(CASE WHEN email COLLATE utf8_bin != email THEN 1 END) as case_sensitive_violations
+    FROM default.users
+    WHERE created_date >= today() - 30
+  )
+  SELECT
+    total_rows,
+    not_lowercase_count,
+    mixed_case_count,
+    leading_trailing_space_count,
+    case_sensitive_violations,
+    CASE 
+      WHEN not_lowercase_count > 0 THEN 'FAIL'
+      WHEN mixed_case_count > 0 THEN 'FAIL'
+      WHEN leading_trailing_space_count > 0 THEN 'FAIL'
+      WHEN case_sensitive_violations > 0 THEN 'FAIL'
+      ELSE 'PASS'
+    END as check_result
+  FROM case_sensitivity_metrics
+
+# Expected Results
+expected_results:
+  not_lowercase_count: "0"
+  mixed_case_count: "0"
+  leading_trailing_space_count: "0"
+  case_sensitive_violations: "0"
+
+# Case Sensitivity Rules Examples
+case_sensitivity_rules:
+  - name: "email_lowercase"
+    description: "Email addresses should be lowercase"
+    condition: "email = LOWER(email)"
+    
+  - name: "email_no_spaces"
+    description: "Email addresses should not have leading/trailing spaces"
+    condition: "email = TRIM(email)"
+    
+  - name: "email_consistent_case"
+    description: "Email addresses should have consistent case"
+    condition: "email REGEXP '^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,}$'"
+
+# Documentation
+documentation:
+  purpose: "Ensure consistent case usage in email addresses"
+  business_impact: "Inconsistent email case can affect user authentication and email delivery"
+  remediation: "Standardize email formatting in user registration and data pipeline"
+  owner: "data_team"
+  review_frequency: "daily" 

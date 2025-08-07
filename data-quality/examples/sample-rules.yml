@@ -1,0 +1,147 @@
+# Sample Data Quality Rules
+# This file demonstrates how to define data quality rules for a user table
+
+rule_type: "completeness"
+version: "1.0"
+description: "Sample completeness rules for user table"
+
+# Rule Definition
+rule:
+  name: "user_completeness_check"
+  description: "Check for missing or null values in user table"
+  category: "completeness"
+  priority: "high"
+  enabled: true
+  
+  # Target table configuration
+  target:
+    database: "default"
+    table: "users"
+    partition_key: "created_date"  # Optional: for partitioned tables
+    
+  # Columns to check for completeness
+  columns:
+    - name: "user_id"
+      data_type: "UInt32"
+      nullable: false
+      required: true
+      
+    - name: "email"
+      data_type: "String"
+      nullable: false
+      required: true
+      
+    - name: "name"
+      data_type: "String"
+      nullable: true
+      required: false
+      
+    - name: "age"
+      data_type: "UInt8"
+      nullable: true
+      required: false
+      
+  # Completeness checks
+  checks:
+    # Check for null values in required columns
+    null_check:
+      enabled: true
+      # No threshold - fails if any null values found
+      severity: "high"
+      description: "Check for null values in required columns"
+      
+    # Check for empty strings
+    empty_string_check:
+      enabled: true
+      # No threshold - fails if any empty strings found
+      severity: "medium"
+      description: "Check for empty string values"
+      
+    # Check for duplicate user IDs
+    duplicate_check:
+      enabled: true
+      # No threshold - fails if any duplicates found
+      key_columns: ["user_id"]
+      severity: "critical"
+      description: "Check for duplicate user IDs"
+      
+    # Check for data volume
+    volume_check:
+      enabled: true
+      min_rows: 100  # Minimum expected rows
+      max_rows: 1000000  # Maximum expected rows
+      severity: "medium"
+      description: "Check if data volume is within expected range"
+
+# SQL Query Template
+sql_template: |
+  -- Completeness Check for users table
+  WITH completeness_metrics AS (
+    SELECT
+      -- Null value checks
+      COUNT(*) as total_rows,
+      COUNT(CASE WHEN user_id IS NULL THEN 1 END) as user_id_nulls,
+      COUNT(CASE WHEN email IS NULL THEN 1 END) as email_nulls,
+      COUNT(CASE WHEN name IS NULL THEN 1 END) as name_nulls,
+      COUNT(CASE WHEN age IS NULL THEN 1 END) as age_nulls,
+      
+      -- Empty string checks
+      COUNT(CASE WHEN email = '' THEN 1 END) as empty_emails,
+      COUNT(CASE WHEN name = '' THEN 1 END) as empty_names,
+      
+      -- Duplicate checks
+      COUNT(DISTINCT user_id) as unique_user_ids,
+      COUNT(*) as total_user_ids,
+      
+      -- Volume checks
+      COUNT(*) as row_count
+    FROM default.users
+    WHERE created_date >= today() - 30  -- Last 30 days
+  )
+  SELECT
+    total_rows,
+    user_id_nulls,
+    email_nulls,
+    name_nulls,
+    age_nulls,
+    empty_emails,
+    empty_names,
+    unique_user_ids,
+    total_user_ids,
+    (total_user_ids - unique_user_ids) as duplicate_count,
+    row_count,
+    CASE 
+      WHEN user_id_nulls > 0 THEN 'FAIL'
+      WHEN email_nulls > 0 THEN 'FAIL'
+      WHEN empty_emails > 0 THEN 'FAIL'
+      WHEN (total_user_ids - unique_user_ids) > 0 THEN 'FAIL'
+      WHEN row_count < 100 THEN 'FAIL'
+      WHEN row_count > 1000000 THEN 'FAIL'
+      ELSE 'PASS'
+    END as check_result
+  FROM completeness_metrics
+
+# Expected Results
+expected_results:
+  user_id_null_percentage: "0%"
+  email_null_percentage: "< 5%"
+  name_null_percentage: "Any percentage allowed"
+  age_null_percentage: "Any percentage allowed"
+  empty_email_percentage: "< 10%"
+  empty_name_percentage: "Any percentage allowed"
+  duplicate_percentage: "< 1%"
+  row_count: "Between 100 and 1,000,000"
+  
+# Reporting Configuration
+reporting:
+  formats: ["json", "html", "csv"]
+  output_directory: "./reports/"
+  retention_days: 30
+
+# Documentation
+documentation:
+  purpose: "Ensure user data completeness by checking for missing values and duplicates"
+  business_impact: "Incomplete user data can affect user experience and analytics"
+  remediation: "Investigate user registration and data pipeline for missing data"
+  owner: "data_team"
+  review_frequency: "daily" 

@@ -1,0 +1,152 @@
+# Data Range Example Rule
+# This example demonstrates enhanced data range validation
+
+rule_type: "accuracy"
+version: "1.0"
+description: "Example data range validation for product data"
+
+# Rule Definition
+rule:
+  name: "product_data_range_check"
+  description: "Check data ranges for product information"
+  category: "accuracy"
+  priority: "high"
+  enabled: true
+  
+  # Target table configuration
+  target:
+    database: "default"
+    table: "products"
+    partition_key: "updated_date"
+    
+  # Columns to check for data ranges
+  columns:
+    - name: "price"
+      data_type: "Decimal"
+      validation_rules:
+        - type: "range"
+          min_value: "0.01"
+          max_value: "10000.00"
+        - type: "not_null"
+          required: true
+          
+    - name: "stock_quantity"
+      data_type: "Int32"
+      validation_rules:
+        - type: "range"
+          min_value: "0"
+          max_value: "100000"
+        - type: "not_null"
+          required: true
+          
+    - name: "weight"
+      data_type: "Decimal"
+      validation_rules:
+        - type: "range"
+          min_value: "0.01"
+          max_value: "1000.00"
+        - type: "not_null"
+          required: false
+          
+  # Data range checks
+  checks:
+    # Price range validation
+    price_range_check:
+      enabled: true
+      severity: "high"
+      description: "Check if product prices are within valid range"
+      
+    # Stock quantity validation
+    stock_quantity_check:
+      enabled: true
+      severity: "high"
+      description: "Check if stock quantities are within valid range"
+      
+    # Weight validation
+    weight_range_check:
+      enabled: true
+      severity: "medium"
+      description: "Check if product weights are within valid range"
+      
+    # Negative value check
+    negative_value_check:
+      enabled: true
+      severity: "critical"
+      description: "Check for negative values in numeric fields"
+
+# SQL Query Template
+sql_template: |
+  -- Data Range Check for products table
+  WITH data_range_metrics AS (
+    SELECT
+      COUNT(*) as total_rows,
+      COUNT(CASE WHEN price < 0.01 OR price > 10000.00 THEN 1 END) as price_range_violations,
+      COUNT(CASE WHEN price IS NULL THEN 1 END) as null_price_count,
+      COUNT(CASE WHEN stock_quantity < 0 OR stock_quantity > 100000 THEN 1 END) as stock_range_violations,
+      COUNT(CASE WHEN stock_quantity IS NULL THEN 1 END) as null_stock_count,
+      COUNT(CASE WHEN weight IS NOT NULL AND (weight < 0.01 OR weight > 1000.00) THEN 1 END) as weight_range_violations,
+      COUNT(CASE WHEN price < 0 THEN 1 END) as negative_price_count,
+      COUNT(CASE WHEN stock_quantity < 0 THEN 1 END) as negative_stock_count,
+      COUNT(CASE WHEN weight IS NOT NULL AND weight < 0 THEN 1 END) as negative_weight_count
+    FROM default.products
+    WHERE updated_date >= today() - 30
+  )
+  SELECT
+    total_rows,
+    price_range_violations,
+    null_price_count,
+    stock_range_violations,
+    null_stock_count,
+    weight_range_violations,
+    negative_price_count,
+    negative_stock_count,
+    negative_weight_count,
+    CASE 
+      WHEN price_range_violations > 0 THEN 'FAIL'
+      WHEN null_price_count > 0 THEN 'FAIL'
+      WHEN stock_range_violations > 0 THEN 'FAIL'
+      WHEN null_stock_count > 0 THEN 'FAIL'
+      WHEN weight_range_violations > 0 THEN 'FAIL'
+      WHEN negative_price_count > 0 THEN 'FAIL'
+      WHEN negative_stock_count > 0 THEN 'FAIL'
+      WHEN negative_weight_count > 0 THEN 'FAIL'
+      ELSE 'PASS'
+    END as check_result
+  FROM data_range_metrics
+
+# Expected Results
+expected_results:
+  price_range_violations: "0"
+  null_price_count: "0"
+  stock_range_violations: "0"
+  null_stock_count: "0"
+  weight_range_violations: "0"
+  negative_price_count: "0"
+  negative_stock_count: "0"
+  negative_weight_count: "0"
+
+# Data Range Rules Examples
+data_range_rules:
+  - name: "price_positive_range"
+    description: "Product prices must be between 0.01 and 10000.00"
+    condition: "price >= 0.01 AND price <= 10000.00"
+    
+  - name: "stock_positive_range"
+    description: "Stock quantities must be between 0 and 100000"
+    condition: "stock_quantity >= 0 AND stock_quantity <= 100000"
+    
+  - name: "weight_positive_range"
+    description: "Product weights must be between 0.01 and 1000.00 if not null"
+    condition: "weight IS NULL OR (weight >= 0.01 AND weight <= 1000.00)"
+    
+  - name: "no_negative_values"
+    description: "No negative values allowed in numeric fields"
+    condition: "price >= 0 AND stock_quantity >= 0 AND (weight IS NULL OR weight >= 0)"
+
+# Documentation
+documentation:
+  purpose: "Ensure data ranges are within acceptable business limits"
+  business_impact: "Invalid data ranges can cause pricing errors and inventory issues"
+  remediation: "Review data entry processes and validation rules"
+  owner: "data_team"
+  review_frequency: "daily" 
