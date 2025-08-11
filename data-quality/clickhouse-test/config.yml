@@ -1,0 +1,65 @@
+# ClickHouse数据质量测试配置文件
+
+# ClickHouse连接配置
+clickhouse:
+  host: localhost
+  port: 9000
+  database: data_quality_test
+  user: admin
+  password: "admin"
+  secure: false
+  timeout: 60
+
+# 数据质量检查全局配置
+quality_checks:
+  max_parallel_jobs: 5  # 最大并行作业数
+  timeout: 300  # 单个检查超时时间（秒）
+  fail_fast: false  # 是否在第一个失败时停止
+  categories:  # 启用的规则类别
+    - completeness
+    - accuracy
+    - consistency
+    - case_sensitivity
+    - data_range
+    - timeliness
+
+# 报告配置
+report:
+  format:  # 支持的报告格式
+    - json
+    - txt
+    - html
+  output_dir: reports  # 报告输出目录
+  include_samples: true  # 是否在报告中包含违规样本
+  max_samples: 5  # 每个规则最多包含的违规样本数
+
+# 文件配置
+files:
+  rules: clickhouse-test/quality_rules.yml  # 规则文件路径
+  schema: clickhouse-test/schema.sql  # Schema SQL文件路径
+  data: clickhouse-test/insert_data.sql  # 数据插入SQL文件路径
+
+# 日志配置
+logging:
+  level: INFO  # 日志级别：DEBUG, INFO, WARNING, ERROR, CRITICAL
+  file: logs/data-quality.log  # 日志文件路径
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"  # 日志格式
+  rotate: true  # 是否启用日志轮转
+  max_size: 10485760  # 单个日志文件最大大小（字节）
+  backup_count: 5  # 保留的备份日志文件数量
+
+# 通知配置
+notifications:
+  enabled: false  # 是否启用通知
+  channels:  # 通知渠道
+    email:
+      enabled: false
+      recipients: []
+      subject: "ClickHouse数据质量检查报告"
+    slack:
+      enabled: false
+      webhook_url: ""
+      channel: "#data-quality"
+  thresholds:  # 通知阈值
+    failure_rate: 0.1  # 失败率超过10%时发送通知
+    error_count: 1  # 错误数超过1时发送通知
