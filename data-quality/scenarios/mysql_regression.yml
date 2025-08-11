@@ -1,0 +1,54 @@
+# MySQL 回归测试场景
+name: "mysql_regression"
+description: "MySQL数据库全面数据质量回归测试"
+version: "1.0"
+
+# 场景配置
+scenario:
+  enabled: true
+  timeout: 600
+  fail_fast: false
+  
+# 数据库配置
+database:
+  type: "mysql"
+  host: "localhost"
+  port: 3306
+  database: "data_quality_test"
+  user: "root"
+  password: "password"
+  charset: "utf8mb4"
+  timeout: 60
+
+# 规则配置
+rules:
+  paths:
+    - "scenarios/mysql_regression/rules/"
+    - "rules/mysql/"
+  categories:
+    - "completeness"
+    - "accuracy"
+    - "consistency"
+    - "timeliness"
+  priorities:
+    - "high"
+    - "medium"
+    - "low"
+
+# 执行配置
+execution:
+  max_parallel_jobs: 5
+  timeout: 600
+  retry_failed: true
+  retry_count: 2
+
+# 报告配置
+report:
+  formats:
+    - "html"
+    - "json"
+    - "csv"
+  output_dir: "reports/mysql_regression/"
+  include_samples: true
+  max_samples: 5
+

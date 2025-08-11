@@ -1,0 +1,279 @@
+# 数据质量框架 v2.0 配置文件
+
+# 默认数据库配置
+database:
+  type: "clickhouse"
+  host: "localhost"
+  port: 9000
+  database: "data_quality_test"
+  user: "admin"
+  password: "admin"
+  secure: false
+  timeout: 60
+
+# 多数据库配置
+databases:
+  clickhouse_prod:
+    type: "clickhouse"
+    host: "clickhouse-prod.example.com"
+    port: 9000
+    database: "prod_data"
+    user: "prod_user"
+    password: "prod_password"
+    secure: true
+    timeout: 120
+    
+  mysql_test:
+    type: "mysql"
+    host: "mysql-test.example.com"
+    port: 3306
+    database: "test_data"
+    user: "test_user"
+    password: "test_password"
+    charset: "utf8mb4"
+    timeout: 60
+    
+  postgresql_dev:
+    type: "postgresql"
+    host: "postgresql-dev.example.com"
+    port: 5432
+    database: "dev_data"
+    user: "dev_user"
+    password: "dev_password"
+    timeout: 60
+
+# 规则配置
+rules:
+  paths:
+    - "rules/"
+    - "scenarios/"
+    - "templates/"
+  cache_enabled: true
+  validation_strict: true
+  auto_discovery: true
+
+# 模板配置
+templates:
+  base_dir: "templates/"
+  cache_enabled: true
+  auto_reload: true
+
+# 执行配置
+execution:
+  max_parallel_jobs: 5
+  timeout: 300
+  fail_fast: false
+  retry_failed: false
+  retry_count: 1
+  retry_delay: 5
+
+# 报告配置
+report:
+  formats:
+    - "html"
+    - "json"
+    - "txt"
+  output_dir: "reports/"
+  include_samples: true
+  max_samples: 5
+  retention_days: 30
+  
+  # HTML报告特定配置
+  html:
+    theme: "modern"
+    auto_refresh: false
+    embed_assets: true
+    
+  # JSON报告特定配置
+  json:
+    pretty_print: true
+    include_metadata: true
+
+# 日志配置
+logging:
+  level: "INFO"
+  file: "logs/data-quality.log"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  rotate: true
+  max_size: 10485760  # 10MB
+  backup_count: 5
+
+# 通知配置
+notifications:
+  enabled: false
+  channels:
+    email:
+      enabled: false
+      smtp_server: "smtp.example.com"
+      smtp_port: 587
+      username: "alerts@example.com"
+      password: "password"
+      recipients:
+        - "team@example.com"
+      subject_template: "数据质量检查报告 - {scenario} - {status}"
+      
+    slack:
+      enabled: false
+      webhook_url: "https://hooks.slack.com/services/..."
+      channel: "#data-quality"
+      username: "DataQuality Bot"
+      
+    webhook:
+      enabled: false
+      url: "https://api.example.com/webhooks/data-quality"
+      timeout: 30
+      
+  # 通知触发条件
+  triggers:
+    on_failure: true
+    on_error: true
+    on_success: false
+    failure_threshold: 1
+    error_threshold: 1
+
+# 场景配置
+scenarios:
+  smoke_test:
+    name: "smoke_test"
+    description: "快速冒烟测试"
+    enabled: true
+    rules:
+      paths:
+        - "scenarios/smoke_test/"
+      categories:
+        - "completeness"
+        - "accuracy"
+      priorities:
+        - "high"
+    execution:
+      max_parallel_jobs: 3
+      timeout: 180
+      
+  regression:
+    name: "regression"
+    description: "全面回归测试"
+    enabled: true
+    rules:
+      paths:
+        - "rules/"
+        - "scenarios/regression/"
+      categories:
+        - "completeness"
+        - "accuracy"
+        - "consistency"
+        - "timeliness"
+      priorities:
+        - "high"
+        - "medium"
+        - "low"
+    execution:
+      max_parallel_jobs: 8
+      timeout: 600
+      
+  monitoring:
+    name: "monitoring"
+    description: "持续监控检查"
+    enabled: true
+    rules:
+      paths:
+        - "scenarios/monitoring/"
+      categories:
+        - "completeness"
+        - "accuracy"
+      priorities:
+        - "high"
+    execution:
+      max_parallel_jobs: 4
+      timeout: 300
+    schedule:
+      enabled: true
+      cron: "0 */2 * * *"  # 每2小时执行一次
+      timezone: "Asia/Shanghai"
+
+# 环境特定配置
+environments:
+  dev:
+    database:
+      type: "clickhouse"
+      host: "clickhouse-dev"
+      database: "dev_data_quality_test"
+      user: "dev_user"
+      password: "dev_password"
+    logging:
+      level: "DEBUG"
+    execution:
+      max_parallel_jobs: 2
+      
+  test:
+    database:
+      type: "clickhouse"
+      host: "clickhouse-test"
+      database: "test_data_quality_test"
+      user: "test_user"
+      password: "test_password"
+    execution:
+      max_parallel_jobs: 4
+      
+  prod:
+    database:
+      type: "clickhouse"
+      host: "clickhouse-prod"
+      database: "prod_data_quality_test"
+      user: "prod_user"
+      password: "prod_password"
+      secure: true
+      timeout: 120
+    execution:
+      max_parallel_jobs: 8
+      fail_fast: true
+    notifications:
+      enabled: true
+      channels:
+        email:
+          enabled: true
+        slack:
+          enabled: true
+      triggers:
+        on_failure: true
+        on_error: true
+        on_success: true
+
+# 性能优化配置
+performance:
+  connection_pool:
+    enabled: true
+    max_connections: 10
+    min_connections: 2
+    connection_timeout: 30
+    
+  query_optimization:
+    enabled: true
+    query_timeout: 300
+    batch_size: 1000
+    parallel_queries: true
+    
+  caching:
+    enabled: true
+    cache_dir: ".cache/"
+    ttl: 3600  # 1小时
+    max_size: "100MB"
+
+# 安全配置
+security:
+  encrypt_passwords: false
+  password_key: "data-quality-secret-key"
+  ssl_verify: true
+  ssl_cert_path: ""
+  ssl_key_path: ""
+
+# 元数据配置
+metadata:
+  store_enabled: true
+  store_type: "file"  # file, database, redis
+  store_path: "metadata/"
+  retention_days: 90
+  
+  # 记录执行历史
+  track_history: true
+  max_history_records: 1000
+

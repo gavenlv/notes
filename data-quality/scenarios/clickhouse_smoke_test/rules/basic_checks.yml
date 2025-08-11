@@ -1,0 +1,172 @@
+# ClickHouse 冒烟测试基础检查规则
+
+# 用户表完整性检查
+- rule_type: "completeness"
+  version: "1.0"
+  description: "用户表完整性冒烟测试"
+  scenarios: ["clickhouse_smoke_test", "smoke_test", "all"]
+  
+  rule:
+    name: "users_basic_completeness"
+    description: "检查用户表基本完整性"
+    category: "completeness"
+    priority: "high"
+    enabled: true
+    
+    target:
+      database: "data_quality_test"
+      table: "users"
+      partition_key: "created_date"
+      
+    columns:
+      - name: "user_id"
+        data_type: "UInt32"
+        nullable: false
+        required: true
+        
+      - name: "email"
+        data_type: "String"
+        nullable: false
+        required: true
+        
+    checks:
+      null_check:
+        enabled: true
+        severity: "high"
+        description: "检查必填列中的空值"
+        
+      empty_string_check:
+        enabled: true
+        severity: "medium" 
+        description: "检查空字符串值"
+    
+    template: |
+      -- 用户表基本完整性检查
+      WITH completeness_metrics AS (
+        SELECT
+          COUNT(*) as total_rows,
+          COUNT(CASE WHEN user_id IS NULL THEN 1 END) as user_id_nulls,
+          COUNT(CASE WHEN email IS NULL THEN 1 END) as email_nulls,
+          COUNT(CASE WHEN email = '' THEN 1 END) as empty_emails
+        FROM data_quality_test.users
+        WHERE created_date >= today() - 7  -- 最近7天的数据
+      )
+      SELECT
+        total_rows,
+        user_id_nulls,
+        email_nulls, 
+        empty_emails,
+        CASE 
+          WHEN total_rows = 0 THEN 'FAIL'
+          WHEN user_id_nulls > 0 OR email_nulls > 0 THEN 'FAIL'
+          WHEN empty_emails > 0 THEN 'FAIL'
+          ELSE 'PASS'
+        END as check_result
+      FROM completeness_metrics
+
+# 产品表数据范围检查
+- rule_type: "accuracy"
+  version: "1.0"
+  description: "产品表数据范围冒烟测试"
+  scenarios: ["clickhouse_smoke_test", "smoke_test", "all"]
+  
+  rule:
+    name: "products_basic_range_check"
+    description: "检查产品表基本数据范围"
+    category: "accuracy"
+    priority: "high"
+    enabled: true
+    
+    target:
+      database: "data_quality_test"
+      table: "products"
+      
+    columns:
+      - name: "price"
+        data_type: "Decimal"
+        validation_rules:
+          - type: "range"
+            min_value: "0.01"
+            max_value: "10000.00"
+            
+      - name: "stock_quantity"
+        data_type: "Int32"
+        validation_rules:
+          - type: "range"
+            min_value: "0"
+            max_value: "100000"
+    
+    template: |
+      -- 产品表基本数据范围检查
+      WITH range_metrics AS (
+        SELECT
+          COUNT(*) as total_rows,
+          COUNT(CASE WHEN price <= 0 OR price > 10000 THEN 1 END) as price_violations,
+          COUNT(CASE WHEN stock_quantity < 0 OR stock_quantity > 100000 THEN 1 END) as stock_violations,
+          COUNT(CASE WHEN price IS NULL THEN 1 END) as null_prices,
+          COUNT(CASE WHEN stock_quantity IS NULL THEN 1 END) as null_stock
+        FROM data_quality_test.products
+        WHERE updated_date >= today() - 7  -- 最近7天的数据
+      )
+      SELECT
+        total_rows,
+        price_violations,
+        stock_violations,
+        null_prices,
+        null_stock,
+        CASE 
+          WHEN total_rows = 0 THEN 'FAIL'
+          WHEN price_violations > 0 OR stock_violations > 0 THEN 'FAIL'
+          WHEN null_prices > 0 OR null_stock > 0 THEN 'FAIL'
+          ELSE 'PASS'
+        END as check_result
+      FROM range_metrics
+
+# 基本连接性检查
+- rule_type: "consistency"
+  version: "1.0"
+  description: "订单表基本一致性冒烟测试"
+  scenarios: ["clickhouse_smoke_test", "smoke_test", "all"]
+  
+  rule:
+    name: "orders_basic_consistency"
+    description: "检查订单表基本一致性"
+    category: "consistency" 
+    priority: "medium"
+    enabled: true
+    
+    target:
+      database: "data_quality_test"
+      table: "orders"
+      
+    related_tables:
+      - database: "data_quality_test"
+        table: "customers"
+        relationship: "foreign_key"
+        key_columns: ["customer_id"]
+        reference_columns: ["customer_id"]
+    
+    template: |
+      -- 订单表基本一致性检查
+      WITH consistency_metrics AS (
+        SELECT
+          COUNT(*) as total_orders,
+          COUNT(CASE WHEN customer_id IS NULL THEN 1 END) as null_customer_ids,
+          COUNT(CASE WHEN customer_id IS NOT NULL AND customer_id NOT IN (
+            SELECT customer_id FROM data_quality_test.customers 
+          ) THEN 1 END) as invalid_customer_refs
+        FROM data_quality_test.orders
+        WHERE created_date >= today() - 7  -- 最近7天的数据
+      )
+      SELECT
+        total_orders,
+        null_customer_ids,
+        invalid_customer_refs,
+        CASE 
+          WHEN total_orders = 0 THEN 'FAIL'
+          WHEN null_customer_ids > 0 THEN 'FAIL'
+          WHEN invalid_customer_refs > 0 THEN 'FAIL'
+          ELSE 'PASS'
+        END as check_result
+      FROM consistency_metrics
+

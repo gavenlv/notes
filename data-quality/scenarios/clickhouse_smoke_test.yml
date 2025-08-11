@@ -1,0 +1,51 @@
+# ClickHouse 冒烟测试场景
+name: "clickhouse_smoke_test"
+description: "ClickHouse数据库基础数据质量冒烟测试"
+version: "1.0"
+
+# 场景配置
+scenario:
+  enabled: true
+  timeout: 300
+  fail_fast: false
+  
+# 数据库配置
+database:
+  type: "clickhouse"
+  host: "localhost"
+  port: 9000
+  database: "data_quality_test"
+  user: "admin"
+  password: "admin"
+  secure: false
+  timeout: 60
+
+# 规则配置
+rules:
+  paths:
+    - "scenarios/clickhouse_smoke_test/rules/"
+    - "rules/smoke_test/"
+  categories:
+    - "completeness"
+    - "accuracy"
+    - "consistency"
+  priorities:
+    - "high"
+    - "medium"
+
+# 执行配置
+execution:
+  max_parallel_jobs: 3
+  timeout: 300
+  retry_failed: false
+
+# 报告配置
+report:
+  formats:
+    - "html"
+    - "json"
+    - "txt"
+  output_dir: "reports/smoke_test/"
+  include_samples: true
+  max_samples: 3
+
