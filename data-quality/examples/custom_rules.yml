@@ -1,0 +1,339 @@
+# Custom Data Quality Rules Examples
+# This file demonstrates advanced custom rule definitions for the Data Quality Framework
+
+# 1. Referential Integrity Check - Foreign Key Validation
+- rule_type: "referential_integrity"
+  version: "1.0"
+  description: "Check if orders.customer_id exists in customers.id"
+  scenarios: ["referential_integrity", "all"]
+  
+  rule:
+    name: "orders_customers_fk_check"
+    description: "Validate that all orders have valid customer references"
+    category: "referential_integrity"
+    priority: "high"
+    enabled: true
+    
+    target:
+      database: "ecommerce"
+      table: "orders"
+      column: "customer_id"
+    
+    reference:
+      database: "ecommerce"
+      table: "customers"
+      column: "id"
+    
+    template: |
+      -- Referential integrity check: orders.customer_id -> customers.id
+      WITH orphan_records AS (
+        SELECT 
+          o.customer_id,
+          COUNT(*) as orphan_count
+        FROM ecommerce.orders o
+        LEFT JOIN ecommerce.customers c ON o.customer_id = c.id
+        WHERE c.id IS NULL
+        GROUP BY o.customer_id
+      )
+      SELECT
+        'referential_integrity_check' as check_type,
+        COUNT(*) as total_orphans,
+        SUM(orphan_count) as total_orphan_records,
+        CASE 
+          WHEN COUNT(*) = 0 THEN 'PASS'
+          ELSE 'FAIL'
+        END as check_result,
+        'orders.customer_id references customers.id' as description
+      FROM orphan_records
+
+# 2. Composite Uniqueness Check - Multiple Columns
+- rule_type: "uniqueness"
+  version: "1.0"
+  description: "Check uniqueness of email + domain combination"
+  scenarios: ["uniqueness", "all"]
+  
+  rule:
+    name: "users_email_domain_unique"
+    description: "Ensure email + domain combination is unique"
+    category: "uniqueness"
+    priority: "high"
+    enabled: true
+    
+    target:
+      database: "ecommerce"
+      table: "users"
+    
+    columns: ["email", "domain"]
+    
+    template: |
+      -- Composite uniqueness check: email + domain
+      WITH duplicate_combinations AS (
+        SELECT 
+          email,
+          domain,
+          COUNT(*) as duplicate_count
+        FROM ecommerce.users
+        WHERE email IS NOT NULL AND domain IS NOT NULL
+        GROUP BY email, domain
+        HAVING COUNT(*) > 1
+      )
+      SELECT
+        'composite_uniqueness_check' as check_type,
+        COUNT(*) as total_duplicates,
+        SUM(duplicate_count) as total_duplicate_records,
+        CASE 
+          WHEN COUNT(*) = 0 THEN 'PASS'
+          ELSE 'FAIL'
+        END as check_result,
+        'email + domain combination must be unique' as description
+      FROM duplicate_combinations
+
+# 3. Business Key Uniqueness - Custom Business Logic
+- rule_type: "uniqueness"
+  version: "1.0"
+  description: "Check uniqueness of product_code + category combination"
+  scenarios: ["business_logic", "all"]
+  
+  rule:
+    name: "products_business_key_unique"
+    description: "Ensure product_code is unique within each category"
+    category: "uniqueness"
+    priority: "medium"
+    enabled: true
+    
+    target:
+      database: "ecommerce"
+      table: "products"
+    
+    columns: ["product_code", "category_id"]
+    
+    conditions:
+      active_only: true
+      exclude_deleted: true
+    
+    template: |
+      -- Business key uniqueness: product_code within category
+      WITH duplicate_business_keys AS (
+        SELECT 
+          product_code,
+          category_id,
+          COUNT(*) as duplicate_count
+        FROM ecommerce.products
+        WHERE active = 1 
+          AND deleted_at IS NULL
+          AND product_code IS NOT NULL 
+          AND category_id IS NOT NULL
+        GROUP BY product_code, category_id
+        HAVING COUNT(*) > 1
+      )
+      SELECT
+        'business_key_uniqueness_check' as check_type,
+        COUNT(*) as total_duplicates,
+        SUM(duplicate_count) as total_duplicate_records,
+        CASE 
+          WHEN COUNT(*) = 0 THEN 'PASS'
+          ELSE 'FAIL'
+        END as check_result,
+        'product_code must be unique within category' as description
+      FROM duplicate_business_keys
+
+# 4. Cross-Table Consistency Check
+- rule_type: "custom"
+  version: "1.0"
+  description: "Check if order totals match sum of order items"
+  scenarios: ["data_consistency", "all"]
+  
+  rule:
+    name: "orders_items_total_consistency"
+    description: "Validate order totals against sum of order items"
+    category: "custom"
+    priority: "high"
+    enabled: true
+    
+    target:
+      database: "ecommerce"
+      table: "orders"
+    
+    template: |
+      -- Cross-table consistency: order totals vs sum of items
+      WITH order_totals AS (
+        SELECT 
+          o.id as order_id,
+          o.total_amount as order_total,
+          COALESCE(SUM(oi.quantity * oi.unit_price), 0) as calculated_total,
+          ABS(o.total_amount - COALESCE(SUM(oi.quantity * oi.unit_price), 0)) as difference
+        FROM ecommerce.orders o
+        LEFT JOIN ecommerce.order_items oi ON o.id = oi.order_id
+        WHERE o.status != 'cancelled'
+        GROUP BY o.id, o.total_amount
+      )
+      SELECT
+        'cross_table_consistency_check' as check_type,
+        COUNT(*) as total_orders,
+        COUNT(CASE WHEN difference > 0.01 THEN 1 END) as inconsistent_orders,
+        SUM(difference) as total_difference,
+        CASE 
+          WHEN COUNT(CASE WHEN difference > 0.01 THEN 1 END) = 0 THEN 'PASS'
+          ELSE 'FAIL'
+        END as check_result,
+        'order totals must match sum of order items' as description
+      FROM order_totals
+
+# 5. Data Range Validation with Business Rules
+- rule_type: "custom"
+  version: "1.0"
+  description: "Check if product prices are within acceptable range"
+  scenarios: ["business_rules", "all"]
+  
+  rule:
+    name: "product_price_range_check"
+    description: "Validate product prices are within business-defined ranges"
+    category: "custom"
+    priority: "medium"
+    enabled: true
+    
+    target:
+      database: "ecommerce"
+      table: "products"
+    
+    parameters:
+      min_price: 0.01
+      max_price: 10000.00
+      category_ranges:
+        electronics:
+          min: 10.00
+          max: 5000.00
+        books:
+          min: 5.00
+          max: 200.00
+        clothing:
+          min: 15.00
+          max: 500.00
+    
+    template: |
+      -- Data range validation with business rules
+      WITH price_violations AS (
+        SELECT 
+          id,
+          name,
+          price,
+          category,
+          CASE 
+            WHEN price < 0.01 THEN 'below_minimum'
+            WHEN price > 10000.00 THEN 'above_maximum'
+            WHEN category = 'electronics' AND (price < 10.00 OR price > 5000.00) THEN 'category_range_violation'
+            WHEN category = 'books' AND (price < 5.00 OR price > 200.00) THEN 'category_range_violation'
+            WHEN category = 'clothing' AND (price < 15.00 OR price > 500.00) THEN 'category_range_violation'
+            ELSE 'valid'
+          END as violation_type
+        FROM ecommerce.products
+        WHERE active = 1
+      )
+      SELECT
+        'data_range_validation_check' as check_type,
+        COUNT(*) as total_products,
+        COUNT(CASE WHEN violation_type != 'valid' THEN 1 END) as violations,
+        COUNT(CASE WHEN violation_type = 'below_minimum' THEN 1 END) as below_minimum,
+        COUNT(CASE WHEN violation_type = 'above_maximum' THEN 1 END) as above_maximum,
+        COUNT(CASE WHEN violation_type = 'category_range_violation' THEN 1 END) as category_violations,
+        CASE 
+          WHEN COUNT(CASE WHEN violation_type != 'valid' THEN 1 END) = 0 THEN 'PASS'
+          ELSE 'FAIL'
+        END as check_result,
+        'product prices must be within business-defined ranges' as description
+      FROM price_violations
+
+# 6. Temporal Data Quality Check
+- rule_type: "custom"
+  version: "1.0"
+  description: "Check if order dates are logical and recent"
+  scenarios: ["temporal_quality", "all"]
+  
+  rule:
+    name: "order_date_logic_check"
+    description: "Validate order dates are logical and not in the future"
+    category: "custom"
+    priority: "high"
+    enabled: true
+    
+    target:
+      database: "ecommerce"
+      table: "orders"
+    
+    template: |
+      -- Temporal data quality check
+      WITH date_violations AS (
+        SELECT 
+          id,
+          order_date,
+          created_at,
+          CASE 
+            WHEN order_date > NOW() THEN 'future_date'
+            WHEN order_date < '2020-01-01' THEN 'too_old'
+            WHEN order_date > created_at THEN 'order_date_after_creation'
+            ELSE 'valid'
+          END as violation_type
+        FROM ecommerce.orders
+        WHERE status != 'cancelled'
+      )
+      SELECT
+        'temporal_quality_check' as check_type,
+        COUNT(*) as total_orders,
+        COUNT(CASE WHEN violation_type != 'valid' THEN 1 END) as violations,
+        COUNT(CASE WHEN violation_type = 'future_date' THEN 1 END) as future_dates,
+        COUNT(CASE WHEN violation_type = 'too_old' THEN 1 END) as too_old,
+        COUNT(CASE WHEN violation_type = 'order_date_after_creation' THEN 1 END) as date_logic_error,
+        CASE 
+          WHEN COUNT(CASE WHEN violation_type != 'valid' THEN 1 END) = 0 THEN 'PASS'
+          ELSE 'FAIL'
+        END as check_result,
+        'order dates must be logical and not in the future' as description
+      FROM date_violations
+
+# 7. Data Completeness with Business Context
+- rule_type: "custom"
+  version: "1.0"
+  description: "Check if required fields are populated based on order status"
+  scenarios: ["completeness", "all"]
+  
+  rule:
+    name: "order_completeness_by_status"
+    description: "Validate required fields based on order status"
+    category: "custom"
+    priority: "high"
+    enabled: true
+    
+    target:
+      database: "ecommerce"
+      table: "orders"
+    
+    template: |
+      -- Data completeness with business context
+      WITH completeness_violations AS (
+        SELECT 
+          id,
+          status,
+          CASE 
+            WHEN status = 'shipped' AND tracking_number IS NULL THEN 'missing_tracking'
+            WHEN status = 'delivered' AND delivery_date IS NULL THEN 'missing_delivery_date'
+            WHEN status IN ('paid', 'shipped', 'delivered') AND payment_method IS NULL THEN 'missing_payment_method'
+            WHEN status IN ('shipped', 'delivered') AND shipping_address IS NULL THEN 'missing_shipping_address'
+            ELSE 'complete'
+          END as violation_type
+        FROM ecommerce.orders
+        WHERE status NOT IN ('cancelled', 'pending')
+      )
+      SELECT
+        'business_completeness_check' as check_type,
+        COUNT(*) as total_orders,
+        COUNT(CASE WHEN violation_type != 'complete' THEN 1 END) as violations,
+        COUNT(CASE WHEN violation_type = 'missing_tracking' THEN 1 END) as missing_tracking,
+        COUNT(CASE WHEN violation_type = 'missing_delivery_date' THEN 1 END) as missing_delivery_date,
+        COUNT(CASE WHEN violation_type = 'missing_payment_method' THEN 1 END) as missing_payment_method,
+        COUNT(CASE WHEN violation_type = 'missing_shipping_address' THEN 1 END) as missing_shipping_address,
+        CASE 
+          WHEN COUNT(CASE WHEN violation_type != 'complete' THEN 1 END) = 0 THEN 'PASS'
+          ELSE 'FAIL'
+        END as check_result,
+        'required fields must be populated based on order status' as description
+      FROM completeness_violations

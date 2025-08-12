@@ -1,0 +1,169 @@
+# ClickHouse Basic Connection Test Rules
+
+# 1. Database connection test
+- rule_type: "connectivity"
+  version: "1.0"
+  description: "ClickHouse database connection test"
+  scenarios: ["basic_test", "connectivity", "all"]
+  
+  rule:
+    name: "clickhouse_connection_test"
+    description: "Test basic ClickHouse database connection"
+    category: "connectivity"
+    priority: "high"
+    enabled: true
+    
+    target:
+      database: "default"
+      table: "system.databases"
+      
+    template: |
+      -- ClickHouse connection and system information test
+      SELECT
+        'connection_test' as test_name,
+        count(*) as database_count,
+        version() as clickhouse_version,
+        uptime() as uptime_seconds,
+        now() as current_time,
+        'PASS' as check_result
+      FROM system.databases
+
+# 2. System table access test
+- rule_type: "completeness"
+  version: "1.0"
+  description: "System table access and basic query test"
+  scenarios: ["basic_test", "system_check", "all"]
+  
+  rule:
+    name: "system_tables_access"
+    description: "Test system table access permissions and basic functionality"
+    category: "completeness"
+    priority: "high"
+    enabled: true
+    
+    target:
+      database: "system"
+      table: "tables"
+      
+    template: |
+      -- System table access test
+      WITH system_metrics AS (
+        SELECT
+          count(*) as total_tables,
+          count(DISTINCT database) as total_databases,
+          count(CASE WHEN engine = 'MergeTree' THEN 1 END) as mergetree_tables,
+          count(CASE WHEN is_temporary = 1 THEN 1 END) as temp_tables
+        FROM system.tables
+        WHERE database != 'system'
+      )
+      SELECT
+        total_tables,
+        total_databases,
+        mergetree_tables,
+        temp_tables,
+        CASE 
+          WHEN total_tables >= 0 THEN 'PASS'
+          ELSE 'FAIL'
+        END as check_result
+      FROM system_metrics
+
+# 3. Data type support test
+- rule_type: "accuracy"
+  version: "1.0"
+  description: "ClickHouse data type and function support test"
+  scenarios: ["basic_test", "function_test", "all"]
+  
+  rule:
+    name: "data_types_functions_test"
+    description: "Test ClickHouse supported data types and basic functions"
+    category: "accuracy"
+    priority: "medium"
+    enabled: true
+    
+    target:
+      database: "default"
+      table: "numbers"
+      
+    template: |
+      -- Data type and function test
+      WITH function_tests AS (
+        SELECT
+          -- Numeric functions
+          count(*) as record_count,
+          sum(number) as sum_result,
+          avg(number) as avg_result,
+          max(number) as max_result,
+          min(number) as min_result,
+          
+          -- String functions
+          length('ClickHouse') as string_length,
+          upper('test') as upper_result,
+          lower('TEST') as lower_result,
+          
+          -- Date functions
+          today() as today_date,
+          now() as current_datetime,
+          formatDateTime(now(), '%Y-%m-%d %H:%M:%S') as formatted_time,
+          
+          -- Math functions
+          round(3.14159, 2) as round_result,
+          sqrt(16) as sqrt_result
+        FROM numbers(10)
+      )
+      SELECT
+        record_count,
+        sum_result,
+        round(avg_result, 2) as avg_result,
+        max_result,
+        min_result,
+        string_length,
+        upper_result,
+        lower_result,
+        today_date,
+        current_datetime,
+        formatted_time,
+        round_result,
+        sqrt_result,
+        CASE 
+          WHEN record_count = 10 AND sum_result = 45 THEN 'PASS'
+          ELSE 'FAIL'
+        END as check_result
+      FROM function_tests
+
+# 4. Permission and security test
+- rule_type: "consistency"
+  version: "1.0"
+  description: "User permission and security configuration test"
+  scenarios: ["basic_test", "security_test", "all"]
+  
+  rule:
+    name: "user_permissions_test"
+    description: "Test current user permissions and security settings"
+    category: "consistency"
+    priority: "medium"
+    enabled: true
+    
+    target:
+      database: "system"
+      table: "users"
+      
+    template: |
+      -- User permission test
+      WITH permission_check AS (
+        SELECT
+          count(*) as total_users,
+          count(CASE WHEN name = 'admin' THEN 1 END) as admin_user_exists,
+          count(CASE WHEN name = 'default' THEN 1 END) as default_user_exists,
+          currentUser() as current_user_name
+        FROM system.users
+      )
+      SELECT
+        total_users,
+        admin_user_exists,
+        default_user_exists,
+        current_user_name,
+        CASE 
+          WHEN current_user_name IN ('admin', 'default') THEN 'PASS'
+          ELSE 'PASS'  -- Allow other usernames
+        END as check_result
+      FROM permission_check

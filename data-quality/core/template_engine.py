@@ -459,14 +459,22 @@ class TemplateEngine:
         if not sql:
             return sql
         
-        # 移除多余的空白
-        sql = re.sub(r'\s+', ' ', sql.strip())
+        # 保留换行符，只清理多余的空白
+        lines = sql.split('\n')
+        cleaned_lines = []
         
-        # 移除注释后的多余空行
-        sql = re.sub(r'\n\s*\n', '\n', sql)
+        for line in lines:
+            # 清理每行的前后空白，但保留换行符
+            cleaned_line = line.strip()
+            if cleaned_line:
+                cleaned_lines.append(cleaned_line)
         
-        # 移除未替换的占位符（可选）
-        # sql = re.sub(r'\{[^}]+\}', '', sql)
+        # 重新组合SQL
+        sql = '\n'.join(cleaned_lines)
+        
+        # 确保SQL不为空
+        if not sql.strip():
+            return ""
         
         return sql
     

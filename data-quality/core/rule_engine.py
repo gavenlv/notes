@@ -53,6 +53,26 @@ class RuleEngine:
                 'required_fields': ['rule.name', 'rule.target.database', 'rule.target.table'],
                 'optional_fields': ['rule.time_columns', 'rule.checks', 'rule.thresholds'],
                 'checks': ['freshness_check', 'latency_check', 'frequency_check']
+            },
+            'connectivity': {
+                'required_fields': ['rule.name', 'rule.target.database', 'rule.target.table'],
+                'optional_fields': ['rule.checks', 'rule.thresholds'],
+                'checks': ['connection_test', 'system_access_test', 'function_test']
+            },
+            'referential_integrity': {
+                'required_fields': ['rule.name', 'rule.target.database', 'rule.target.table', 'rule.reference.database', 'rule.reference.table', 'rule.reference.column'],
+                'optional_fields': ['rule.checks', 'rule.thresholds', 'rule.conditions'],
+                'checks': ['foreign_key_check', 'orphan_check', 'circular_reference_check']
+            },
+            'uniqueness': {
+                'required_fields': ['rule.name', 'rule.target.database', 'rule.target.table', 'rule.columns'],
+                'optional_fields': ['rule.checks', 'rule.thresholds', 'rule.conditions'],
+                'checks': ['single_column_unique', 'composite_unique', 'business_key_unique']
+            },
+            'custom': {
+                'required_fields': ['rule.name', 'rule.target.database', 'rule.target.table', 'rule.template'],
+                'optional_fields': ['rule.parameters', 'rule.conditions', 'rule.thresholds'],
+                'checks': ['custom_check']
             }
         }
         return schemas

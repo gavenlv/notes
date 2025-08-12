@@ -4,10 +4,10 @@
 # ClickHouse Connection Settings
 clickhouse:
   host: "localhost"
-  port: 9000
+  port: 8123
   database: "default"
-  user: "default"
-  password: ""
+  user: "admin"
+  password: "admin"
   secure: false
   timeout: 30
 

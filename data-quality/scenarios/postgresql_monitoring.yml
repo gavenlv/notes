@@ -1,15 +1,15 @@
-# PostgreSQL 监控场景
+# PostgreSQL Monitoring Scenario
 name: "postgresql_monitoring"
-description: "PostgreSQL数据库持续监控数据质量检查"
+description: "PostgreSQL Database Continuous Monitoring Data Quality Check"
 version: "1.0"
 
-# 场景配置
+# Scenario Configuration
 scenario:
   enabled: true
   timeout: 300
   fail_fast: false
   
-# 数据库配置
+# Database Configuration
 database:
   type: "postgresql"
   host: "localhost"
@@ -19,7 +19,7 @@ database:
   password: "password"
   timeout: 60
 
-# 规则配置
+# Rule Configuration
 rules:
   paths:
     - "scenarios/postgresql_monitoring/rules/"
@@ -31,13 +31,13 @@ rules:
   priorities:
     - "high"
 
-# 执行配置
+# Execution Configuration
 execution:
   max_parallel_jobs: 4
   timeout: 300
   retry_failed: false
 
-# 报告配置
+# Report Configuration
 report:
   formats:
     - "html"
@@ -46,9 +46,9 @@ report:
   include_samples: true
   max_samples: 3
 
-# 调度配置
+# Schedule Configuration
 schedule:
   enabled: true
-  cron: "0 */6 * * *"  # 每6小时执行一次
+  cron: "0 */6 * * *"  # Execute every 6 hours
   timezone: "Asia/Shanghai"
 

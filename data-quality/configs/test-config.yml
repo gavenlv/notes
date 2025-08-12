@@ -1,0 +1,83 @@
+# Data Quality Framework v2.0 Test Configuration File
+# Using your provided ClickHouse connection information
+
+# Default database configuration
+database:
+  type: "clickhouse"
+  host: "localhost"
+  port: 8123
+  database: "default"
+  user: "admin"
+  password: "admin"
+  secure: false
+  timeout: 60
+
+# Rule configuration
+rules:
+  paths:
+    - "rules/"
+    - "scenarios/"
+    - "examples/"
+  cache_enabled: true
+  validation_strict: false
+
+# Template configuration
+templates:
+  base_dir: "templates/"
+  cache_enabled: true
+  auto_reload: true
+
+# Execution configuration
+execution:
+  max_parallel_jobs: 3
+  timeout: 300
+  fail_fast: false
+  retry_failed: false
+
+# Report configuration
+report:
+  formats:
+    - "html"
+    - "json"
+    - "txt"
+  output_dir: "reports/"
+  include_samples: true
+  max_samples: 5
+  
+  # HTML report specific configuration
+  html:
+    theme: "modern"
+    auto_refresh: false
+    embed_assets: true
+
+# Logging configuration
+logging:
+  level: "DEBUG"
+  file: "logs/data-quality-test.log"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  rotate: true
+  max_size: 10485760
+  backup_count: 3
+
+# Test scenario configuration
+scenarios:
+  basic_test:
+    name: "basic_test"
+    description: "Basic connection and query test"
+    enabled: true
+    rules:
+      paths:
+        - "scenarios/basic_test/"
+    execution:
+      max_parallel_jobs: 2
+      timeout: 120
+
+# Performance optimization configuration
+performance:
+  connection_pool:
+    enabled: false
+    max_connections: 5
+  query_optimization:
+    enabled: true
+    query_timeout: 120
+    batch_size: 1000

@@ -91,6 +91,21 @@ class ClickHouseAdapter(DatabaseAdapter):
     def connect(self) -> bool:
         """连接到ClickHouse"""
         try:
+            port = self.config.get('port', 9000)
+            
+            # 如果是8123端口，使用HTTP接口
+            if port == 8123:
+                return self._connect_http()
+            else:
+                return self._connect_native()
+                
+        except Exception as e:
+            self.logger.error(f"连接ClickHouse失败: {e}")
+            return False
+    
+    def _connect_native(self) -> bool:
+        """使用原生协议连接ClickHouse"""
+        try:
             from clickhouse_driver import Client
             
             self.client = Client(
@@ -106,14 +121,44 @@ class ClickHouseAdapter(DatabaseAdapter):
             # 测试连接
             self.client.execute('SELECT 1')
             self.is_connected = True
-            self.logger.info("成功连接到ClickHouse")
+            self.logger.info("成功连接到ClickHouse (原生协议)")
             return True
             
         except ImportError:
-            self.logger.error("ClickHouse驱动未安装，请运行: pip install clickhouse-driver")
+            self.logger.error("ClickHouse原生驱动未安装，请运行: pip install clickhouse-driver")
             return False
-        except Exception as e:
-            self.logger.error(f"连接ClickHouse失败: {e}")
+        
+    def _connect_http(self) -> bool:
+        """使用HTTP接口连接ClickHouse"""
+        try:
+            import requests
+            
+            self.http_session = requests.Session()
+            self.base_url = f"http://{self.config.get('host', 'localhost')}:{self.config.get('port', 8123)}"
+            
+            # 设置认证
+            user = self.config.get('user', 'default')
+            password = self.config.get('password', '')
+            if user and password:
+                self.http_session.auth = (user, password)
+            
+            # 测试连接
+            response = self.http_session.get(
+                f"{self.base_url}/",
+                params={'query': 'SELECT 1'},
+                timeout=self.config.get('timeout', 60)
+            )
+            
+            if response.status_code == 200:
+                self.is_connected = True
+                self.logger.info("成功连接到ClickHouse (HTTP接口)")
+                return True
+            else:
+                self.logger.error(f"ClickHouse HTTP连接失败，状态码: {response.status_code}")
+                return False
+                
+        except ImportError:
+            self.logger.error("HTTP请求库未安装，请运行: pip install requests")
             return False
     
     def disconnect(self):
@@ -132,27 +177,74 @@ class ClickHouseAdapter(DatabaseAdapter):
             if not self.is_connected:
                 raise Exception("数据库未连接")
             
-            # 执行查询并获取列信息
-            result = self.client.execute(query, with_column_types=True)
-            
-            if not result or not result[0]:
-                return []
-            
-            # 解析结果
-            rows = result[0]
-            columns = [col[0] for col in result[1]]
-            
-            # 转换为字典列表
-            results = []
-            for row in rows:
-                row_dict = dict(zip(columns, row))
-                results.append(row_dict)
-            
-            return results
+            # 根据连接类型选择执行方式
+            if hasattr(self, 'http_session'):
+                return self._execute_http_query(query, params)
+            else:
+                return self._execute_native_query(query, params)
             
         except Exception as e:
             self.logger.error(f"执行ClickHouse查询失败: {e}")
             self.logger.debug(f"查询语句: {query}")
+            return []
+    
+    def _execute_native_query(self, query: str, params: Dict = None) -> List[Dict[str, Any]]:
+        """使用原生协议执行查询"""
+        # 执行查询并获取列信息
+        result = self.client.execute(query, with_column_types=True)
+        
+        if not result or not result[0]:
+            return []
+        
+        # 解析结果
+        rows = result[0]
+        columns = [col[0] for col in result[1]]
+        
+        # 转换为字典列表
+        results = []
+        for row in rows:
+            row_dict = dict(zip(columns, row))
+            results.append(row_dict)
+        
+        return results
+    
+    def _execute_http_query(self, query: str, params: Dict = None) -> List[Dict[str, Any]]:
+        """使用HTTP接口执行查询"""
+        import json
+        
+        # 确保查询不为空
+        if not query or not query.strip():
+            raise Exception("查询语句为空")
+        
+        # 添加FORMAT JSON以获取JSON格式结果
+        if not query.strip().upper().endswith('FORMAT JSON'):
+            query = query.strip() + ' FORMAT JSON'
+        
+        # 执行HTTP请求
+        response = self.http_session.post(
+            f"{self.base_url}/",
+            data=query.encode('utf-8'),
+            headers={'Content-Type': 'text/plain; charset=utf-8'},
+            timeout=self.config.get('timeout', 60)
+        )
+        
+        if response.status_code != 200:
+            raise Exception(f"HTTP查询失败，状态码: {response.status_code}, 响应: {response.text}")
+        
+        # 解析JSON结果
+        try:
+            result_data = json.loads(response.text)
+            if 'data' in result_data:
+                return result_data['data']
+            else:
+                # 如果没有data字段，可能是单行结果
+                return [result_data] if result_data else []
+        except json.JSONDecodeError:
+            # 如果不是JSON格式，尝试解析为简单文本
+            lines = response.text.strip().split('\n')
+            if len(lines) == 1 and lines[0]:
+                # 简单值，创建一个字典
+                return [{'result': lines[0]}]
             return []
     
     def test_connection(self) -> bool:
@@ -161,8 +253,18 @@ class ClickHouseAdapter(DatabaseAdapter):
             if not self.is_connected:
                 return False
             
-            result = self.client.execute('SELECT 1')
-            return result is not None
+            if hasattr(self, 'http_session'):
+                # HTTP接口测试
+                response = self.http_session.get(
+                    f"{self.base_url}/",
+                    params={'query': 'SELECT 1'},
+                    timeout=self.config.get('timeout', 60)
+                )
+                return response.status_code == 200
+            else:
+                # 原生协议测试
+                result = self.client.execute('SELECT 1')
+                return result is not None
             
         except Exception:
             return False

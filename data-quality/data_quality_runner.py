@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-数据质量检查运行器
-支持多场景、多数据库的数据质量检查
+Data Quality Check Runner
+Supports multi-scenario, multi-database data quality checks
 """
 
 import sys
@@ -9,7 +9,7 @@ import argparse
 import logging
 from pathlib import Path
 
-# 添加核心模块到路径
+# Add core modules to path
 sys.path.insert(0, str(Path(__file__).parent))
 
 from core.engine import DataQualityEngine
@@ -18,7 +18,7 @@ from core.database_adapters import DatabaseAdapterFactory
 
 
 def setup_logging(level: str = "INFO"):
-    """设置日志"""
+    """Setup logging"""
     logging.basicConfig(
         level=getattr(logging, level.upper(), logging.INFO),
         format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -30,187 +30,187 @@ def setup_logging(level: str = "INFO"):
 
 
 def list_scenarios(config_manager: ConfigManager):
-    """列出可用场景"""
+    """List available scenarios"""
     scenarios = config_manager.get_available_scenarios()
-    print("可用的数据质量测试场景:")
+    print("Available data quality test scenarios:")
     print("=" * 50)
     
     for scenario in scenarios:
         scenario_config = config_manager.get_scenario_config(scenario)
-        description = scenario_config.get('description', '无描述')
+        description = scenario_config.get('description', 'No description')
         enabled = scenario_config.get('enabled', True)
         status = "✓" if enabled else "✗"
         print(f"  {status} {scenario:<20} - {description}")
     
-    print(f"\n总共 {len(scenarios)} 个场景")
+    print(f"\nTotal {len(scenarios)} scenarios")
 
 
 def list_databases():
-    """列出支持的数据库类型"""
+    """List supported database types"""
     databases = DatabaseAdapterFactory.get_supported_types()
-    print("支持的数据库类型:")
+    print("Supported database types:")
     print("=" * 30)
     
     for db_type in databases:
         requirements = DatabaseAdapterFactory.get_adapter_requirements(db_type)
-        req_str = ", ".join(requirements) if requirements else "无额外依赖"
+        req_str = ", ".join(requirements) if requirements else "No additional dependencies"
         print(f"  • {db_type:<15} ({req_str})")
     
-    print(f"\n总共支持 {len(databases)} 种数据库")
+    print(f"\nTotal support for {len(databases)} database types")
 
 
 def test_database_connection(config_manager: ConfigManager, database_name: str = None):
-    """测试数据库连接"""
+    """Test database connection"""
     db_config = config_manager.get_database_config(database_name)
     db_type = db_config.get('type', 'clickhouse')
     
-    print(f"测试 {db_type} 数据库连接...")
-    print(f"主机: {db_config.get('host', 'unknown')}")
-    print(f"端口: {db_config.get('port', 'unknown')}")
-    print(f"数据库: {db_config.get('database', 'unknown')}")
+    print(f"Testing {db_type} database connection...")
+    print(f"Host: {db_config.get('host', 'unknown')}")
+    print(f"Port: {db_config.get('port', 'unknown')}")
+    print(f"Database: {db_config.get('database', 'unknown')}")
     
     try:
         from core.database_adapters import test_database_connection
         success = test_database_connection(db_type, db_config)
         
         if success:
-            print("✓ 数据库连接成功")
+            print("✓ Database connection successful")
             return True
         else:
-            print("✗ 数据库连接失败")
+            print("✗ Database connection failed")
             return False
             
     except Exception as e:
-        print(f"✗ 数据库连接测试失败: {e}")
+        print(f"✗ Database connection test failed: {e}")
         return False
 
 
 def run_scenario(engine: DataQualityEngine, scenario_name: str, database_config: dict = None):
-    """运行指定场景"""
-    print(f"开始执行数据质量场景: {scenario_name}")
+    """Run specified scenario"""
+    print(f"Starting data quality scenario: {scenario_name}")
     print("=" * 50)
     
     try:
         summary = engine.run_scenario(scenario_name, database_config)
         
-        print("\n执行完成！")
+        print("\nExecution completed!")
         print("=" * 50)
         
-        # 打印摘要
-        print("执行摘要:")
-        print(f"  场景: {summary.get('scenario', 'unknown')}")
-        print(f"  环境: {summary.get('environment', 'unknown')}")
-        print(f"  状态: {summary.get('status', 'unknown')}")
-        print(f"  持续时间: {summary.get('duration', 0):.2f}秒")
+        # Print summary
+        print("Execution summary:")
+        print(f"  Scenario: {summary.get('scenario', 'unknown')}")
+        print(f"  Environment: {summary.get('environment', 'unknown')}")
+        print(f"  Status: {summary.get('status', 'unknown')}")
+        print(f"  Duration: {summary.get('duration', 0):.2f} seconds")
         
         stats = summary.get('summary', {})
-        print(f"  总规则数: {stats.get('total_rules', 0)}")
-        print(f"  通过规则数: {stats.get('passed_rules', 0)}")
-        print(f"  失败规则数: {stats.get('failed_rules', 0)}")
-        print(f"  错误规则数: {stats.get('error_rules', 0)}")
-        print(f"  通过率: {stats.get('pass_rate', 0)}%")
+        print(f"  Total rules: {stats.get('total_rules', 0)}")
+        print(f"  Passed rules: {stats.get('passed_rules', 0)}")
+        print(f"  Failed rules: {stats.get('failed_rules', 0)}")
+        print(f"  Error rules: {stats.get('error_rules', 0)}")
+        print(f"  Pass rate: {stats.get('pass_rate', 0)}%")
         
-        # 确定退出码
+        # Determine exit code
         failed_count = stats.get('failed_rules', 0)
         error_count = stats.get('error_rules', 0)
         
         if failed_count > 0 or error_count > 0:
-            print(f"\n❌ 发现 {failed_count} 个失败和 {error_count} 个错误")
+            print(f"\n❌ Found {failed_count} failures and {error_count} errors")
             return 1
         else:
-            print("\n✅ 所有数据质量检查通过")
+            print("\n✅ All data quality checks passed")
             return 0
             
     except Exception as e:
-        print(f"\n❌ 场景执行失败: {e}")
+        print(f"\n❌ Scenario execution failed: {e}")
         return 1
 
 
 def validate_config(config_manager: ConfigManager):
-    """验证配置"""
-    print("验证配置文件...")
+    """Validate configuration"""
+    print("Validating configuration file...")
     print("=" * 30)
     
     errors = config_manager.validate_config()
     
     if not errors:
-        print("✓ 配置验证通过")
+        print("✓ Configuration validation passed")
         
-        # 显示配置摘要
+        # Display configuration summary
         summary = config_manager.get_config_summary()
-        print("\n配置摘要:")
-        print(f"  环境: {summary.get('environment', 'unknown')}")
-        print(f"  配置文件: {summary.get('config_path', 'unknown')}")
-        print(f"  数据库类型: {summary.get('database_type', 'unknown')}")
-        print(f"  数据库主机: {summary.get('database_host', 'unknown')}")
-        print(f"  最大并行数: {summary.get('max_parallel_jobs', 5)}")
-        print(f"  报告格式: {', '.join(summary.get('report_formats', []))}")
-        print(f"  规则路径: {', '.join(summary.get('rules_paths', []))}")
-        print(f"  可用场景: {len(summary.get('available_scenarios', []))}")
+        print("\nConfiguration summary:")
+        print(f"  Environment: {summary.get('environment', 'unknown')}")
+        print(f"  Config file: {summary.get('config_path', 'unknown')}")
+        print(f"  Database type: {summary.get('database_type', 'unknown')}")
+        print(f"  Database host: {summary.get('database_host', 'unknown')}")
+        print(f"  Max parallel jobs: {summary.get('max_parallel_jobs', 5)}")
+        print(f"  Report formats: {', '.join(summary.get('report_formats', []))}")
+        print(f"  Rule paths: {', '.join(summary.get('rules_paths', []))}")
+        print(f"  Available scenarios: {len(summary.get('available_scenarios', []))}")
         
         return True
     else:
-        print("✗ 配置验证失败:")
+        print("✗ Configuration validation failed:")
         for error in errors:
             print(f"  - {error}")
         return False
 
 
 def main():
-    """主函数"""
+    """Main function"""
     parser = argparse.ArgumentParser(
-        description='数据质量检查工具 v2.0',
+        description='Data Quality Check Tool v2.0',
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
-使用示例:
-  %(prog)s --list-scenarios                    # 列出所有可用场景
-  %(prog)s --list-databases                    # 列出支持的数据库类型
-  %(prog)s --test-connection                   # 测试默认数据库连接
-  %(prog)s --validate-config                   # 验证配置文件
-  %(prog)s --scenario clickhouse_smoke_test    # 运行ClickHouse冒烟测试
-  %(prog)s --scenario mysql_regression --env prod  # 在生产环境运行MySQL回归测试
+Usage examples:
+  %(prog)s --list-scenarios                    # List all available scenarios
+  %(prog)s --list-databases                    # List supported database types
+  %(prog)s --test-connection                   # Test default database connection
+  %(prog)s --validate-config                   # Validate configuration file
+  %(prog)s --scenario clickhouse_smoke_test    # Run ClickHouse smoke test
+  %(prog)s --scenario mysql_regression --env prod  # Run MySQL regression test in production environment
         """
     )
     
-    # 通用参数
+    # General parameters
     parser.add_argument('--config', '-c', 
-                       help='配置文件路径 (默认: configs/data-quality-config.yml)')
+                       help='Configuration file path (default: configs/data-quality-config.yml)')
     parser.add_argument('--env', '-e', default='default',
-                       help='环境名称 (default, dev, test, prod)')
+                       help='Environment name (default, dev, test, prod)')
     parser.add_argument('--log-level', default='INFO',
                        choices=['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'],
-                       help='日志级别')
+                       help='Log level')
     
-    # 功能参数
+    # Function parameters
     parser.add_argument('--list-scenarios', action='store_true',
-                       help='列出所有可用的测试场景')
+                       help='List all available test scenarios')
     parser.add_argument('--list-databases', action='store_true', 
-                       help='列出支持的数据库类型')
+                       help='List supported database types')
     parser.add_argument('--test-connection', action='store_true',
-                       help='测试数据库连接')
+                       help='Test database connection')
     parser.add_argument('--validate-config', action='store_true',
-                       help='验证配置文件')
+                       help='Validate configuration file')
     
-    # 执行参数
+    # Execution parameters
     parser.add_argument('--scenario', '-s',
-                       help='要执行的场景名称')
+                       help='Scenario name to execute')
     parser.add_argument('--database',
-                       help='数据库名称（覆盖默认配置）')
+                       help='Database name (override default configuration)')
     parser.add_argument('--output-dir', '-o',
-                       help='报告输出目录')
+                       help='Report output directory')
     parser.add_argument('--max-workers', type=int,
-                       help='最大并行执行数')
+                       help='Maximum parallel execution count')
     
     args = parser.parse_args()
     
-    # 设置日志
+    # Setup logging
     setup_logging(args.log_level)
     
     try:
-        # 初始化配置管理器
+        # Initialize configuration manager
         config_manager = ConfigManager(args.config, args.env)
         
-        # 处理列表命令
+        # Handle list commands
         if args.list_scenarios:
             list_scenarios(config_manager)
             return 0
@@ -227,36 +227,36 @@ def main():
             success = test_database_connection(config_manager, args.database)
             return 0 if success else 1
         
-        # 处理场景执行
+        # Handle scenario execution
         if args.scenario:
-            # 初始化数据质量引擎
+            # Initialize data quality engine
             engine = DataQualityEngine(args.config, args.env)
             
-            # 覆盖配置
+            # Override configuration
             if args.output_dir:
                 engine.config_manager.set_config_value('report.output_dir', args.output_dir)
             
             if args.max_workers:
                 engine.config_manager.set_config_value('execution.max_parallel_jobs', args.max_workers)
             
-            # 获取数据库配置
+            # Get database configuration
             database_config = None
             if args.database:
                 database_config = config_manager.get_database_config(args.database)
             
-            # 运行场景
+            # Run scenario
             return run_scenario(engine, args.scenario, database_config)
         
-        # 如果没有指定任何操作，显示帮助
+        # If no operation specified, show help
         parser.print_help()
         return 0
         
     except KeyboardInterrupt:
-        print("\n用户中断执行")
+        print("\nUser interrupted execution")
         return 130
     except Exception as e:
-        print(f"执行失败: {e}")
-        logging.exception("执行异常")
+        print(f"Execution failed: {e}")
+        logging.exception("Execution exception")
         return 1
 
 

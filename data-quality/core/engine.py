@@ -296,10 +296,10 @@ class DataQualityEngine:
                     
                     if result['status'] == 'COMPLETED':
                         check_result = result.get('result', {}).get('check_result', 'UNKNOWN')
-                        status_icon = "✓" if check_result == 'PASS' else "✗"
+                        status_icon = "OK" if check_result == 'PASS' else "FAIL"
                         self.logger.info(f"[{i}/{len(rules)}] {status_icon} {rule_name}: {check_result}")
                     else:
-                        self.logger.error(f"[{i}/{len(rules)}] ✗ {rule_name}: {result.get('error', '未知错误')}")
+                        self.logger.error(f"[{i}/{len(rules)}] FAIL {rule_name}: {result.get('error', '未知错误')}")
                         
                 except Exception as e:
                     self.logger.error(f"[{i}/{len(rules)}] ✗ {rule_name}: 执行异常 - {e}")

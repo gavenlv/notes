@@ -1,0 +1,49 @@
+# Custom Rules Demo Scenario
+name: "custom_rules_demo"
+description: "Demonstration of custom data quality rules including referential integrity and uniqueness checks"
+version: "1.0"
+
+# Scenario configuration
+scenario:
+  enabled: true
+  timeout: 300
+  fail_fast: false
+  
+# Database configuration
+database:
+  type: "clickhouse"
+  host: "localhost"
+  port: 8123
+  database: "default"
+  user: "admin"
+  password: "admin"
+  secure: false
+  timeout: 60
+
+# Rule configuration
+rules:
+  paths:
+    - "examples/"
+  categories:
+    - "referential_integrity"
+    - "uniqueness"
+    - "custom"
+  priorities:
+    - "high"
+    - "medium"
+
+# Execution configuration
+execution:
+  max_parallel_jobs: 3
+  timeout: 180
+  retry_failed: false
+
+# Report configuration
+report:
+  formats:
+    - "html"
+    - "json"
+    - "txt"
+  output_dir: "reports/custom_rules_demo/"
+  include_samples: true
+  max_samples: 5

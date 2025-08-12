@@ -1,0 +1,47 @@
+# Basic ClickHouse Connection Test Scenario
+name: "basic_test"
+description: "Basic ClickHouse connection and data quality test"
+version: "1.0"
+
+# Scenario configuration
+scenario:
+  enabled: true
+  timeout: 300
+  fail_fast: false
+  
+# Database configuration
+database:
+  type: "clickhouse"
+  host: "localhost"
+  port: 8123
+  database: "default"
+  user: "admin"
+  password: "admin"
+  secure: false
+  timeout: 60
+
+# Rule configuration
+rules:
+  paths:
+    - "scenarios/basic_test/rules/"
+  categories:
+    - "completeness"
+    - "connectivity"
+  priorities:
+    - "high"
+
+# Execution configuration
+execution:
+  max_parallel_jobs: 2
+  timeout: 120
+  retry_failed: false
+
+# Report configuration
+report:
+  formats:
+    - "html"
+    - "json"
+    - "txt"
+  output_dir: "reports/basic_test/"
+  include_samples: true
+  max_samples: 3

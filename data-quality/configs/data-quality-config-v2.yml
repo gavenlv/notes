@@ -1,6 +1,6 @@
-# 数据质量框架 v2.0 配置文件
+# Data Quality Framework v2.0 Configuration File
 
-# 默认数据库配置
+# Default Database Configuration
 database:
   type: "clickhouse"
   host: "localhost"
@@ -11,7 +11,7 @@ database:
   secure: false
   timeout: 60
 
-# 多数据库配置
+# Multi-Database Configuration
 databases:
   clickhouse_prod:
     type: "clickhouse"
@@ -42,7 +42,7 @@ databases:
     password: "dev_password"
     timeout: 60
 
-# 规则配置
+# Rule Configuration
 rules:
   paths:
     - "rules/"
@@ -52,13 +52,13 @@ rules:
   validation_strict: true
   auto_discovery: true
 
-# 模板配置
+# Template Configuration
 templates:
   base_dir: "templates/"
   cache_enabled: true
   auto_reload: true
 
-# 执行配置
+# Execution Configuration
 execution:
   max_parallel_jobs: 5
   timeout: 300
@@ -67,7 +67,7 @@ execution:
   retry_count: 1
   retry_delay: 5
 
-# 报告配置
+# Report Configuration
 report:
   formats:
     - "html"
@@ -78,18 +78,18 @@ report:
   max_samples: 5
   retention_days: 30
   
-  # HTML报告特定配置
+  # HTML Report Specific Configuration
   html:
     theme: "modern"
     auto_refresh: false
     embed_assets: true
     
-  # JSON报告特定配置
+  # JSON Report Specific Configuration
   json:
     pretty_print: true
     include_metadata: true
 
-# 日志配置
+# Logging Configuration
 logging:
   level: "INFO"
   file: "logs/data-quality.log"
@@ -98,7 +98,7 @@ logging:
   max_size: 10485760  # 10MB
   backup_count: 5
 
-# 通知配置
+# Notification Configuration
 notifications:
   enabled: false
   channels:
@@ -110,7 +110,7 @@ notifications:
       password: "password"
       recipients:
         - "team@example.com"
-      subject_template: "数据质量检查报告 - {scenario} - {status}"
+      subject_template: "Data Quality Check Report - {scenario} - {status}"
       
     slack:
       enabled: false
@@ -123,7 +123,7 @@ notifications:
       url: "https://api.example.com/webhooks/data-quality"
       timeout: 30
       
-  # 通知触发条件
+  # Notification Trigger Conditions
   triggers:
     on_failure: true
     on_error: true
@@ -131,11 +131,11 @@ notifications:
     failure_threshold: 1
     error_threshold: 1
 
-# 场景配置
+# Scenario Configuration
 scenarios:
   smoke_test:
     name: "smoke_test"
-    description: "快速冒烟测试"
+    description: "Quick Smoke Test"
     enabled: true
     rules:
       paths:
@@ -151,7 +151,7 @@ scenarios:
       
   regression:
     name: "regression"
-    description: "全面回归测试"
+    description: "Comprehensive Regression Test"
     enabled: true
     rules:
       paths:
@@ -172,7 +172,7 @@ scenarios:
       
   monitoring:
     name: "monitoring"
-    description: "持续监控检查"
+    description: "Continuous Monitoring Check"
     enabled: true
     rules:
       paths:
@@ -187,10 +187,10 @@ scenarios:
       timeout: 300
     schedule:
       enabled: true
-      cron: "0 */2 * * *"  # 每2小时执行一次
+      cron: "0 */2 * * *"  # Execute every 2 hours
       timezone: "Asia/Shanghai"
 
-# 环境特定配置
+# Environment-Specific Configuration
 environments:
   dev:
     database:
@@ -238,7 +238,7 @@ environments:
         on_error: true
         on_success: true
 
-# 性能优化配置
+# Performance Optimization Configuration
 performance:
   connection_pool:
     enabled: true
@@ -255,10 +255,10 @@ performance:
   caching:
     enabled: true
     cache_dir: ".cache/"
-    ttl: 3600  # 1小时
+    ttl: 3600  # 1 hour
     max_size: "100MB"
 
-# 安全配置
+# Security Configuration
 security:
   encrypt_passwords: false
   password_key: "data-quality-secret-key"
@@ -266,14 +266,14 @@ security:
   ssl_cert_path: ""
   ssl_key_path: ""
 
-# 元数据配置
+# Metadata Configuration
 metadata:
   store_enabled: true
   store_type: "file"  # file, database, redis
   store_path: "metadata/"
   retention_days: 90
   
-  # 记录执行历史
+  # Track Execution History
   track_history: true
   max_history_records: 1000
 
