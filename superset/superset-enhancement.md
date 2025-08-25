@@ -19,81 +19,227 @@ Specific objectives include:
 ## 2. Functional Requirements
 
 ### 2.1. Core Feature: Star Schema Configuration
-Add a new configuration section (e.g., a tab) "Star Schema Model" in the Dataset editing interface.
+Configuration will be stored in the dataset's `extra` field as JSON to avoid UI changes:
 
+```json
+{
+  "star_schema": {
+    "fact_table": "default.fact_sales",
+    "dimension_tables": [
+      {
+        "table_name": "default.dim_customer",
+        "join_type": "LEFT",
+        "join_conditions": [
+          {
+            "fact_column": "customer_id",
+            "dimension_column": "id"
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+**Configuration Fields:**
 | Field Name | Type | Required | Description | Example |
 | :--- | :--- | :--- | :--- | :--- |
-| `fact_table` | String (dropdown) | Yes | Specify the physical table name as the fact table (main table). | `default.fact_sales` |
-| `dimension_tables` | List of Objects | No | A list to configure all associated dimension tables. | |
-| -> `table_name` | String (dropdown) | Yes | Physical table name of the dimension table. | `default.dim_customer` |
-| -> `join_type` | Enum (dropdown) | Yes | Join type: `INNER`, `LEFT`, `RIGHT`, `FULL OUTER`. | `LEFT` |
-| -> `join_conditions` | List of Objects | Yes | Define join conditions. | |
-| --> `fact_column` | String (dropdown) | Yes | Join field in the fact table. | `customer_id` |
-| --> `dimension_column` | String (dropdown) | Yes | Join field in the dimension table. | `id` |
+| `fact_table` | String | Yes | Physical table name of the fact table | `default.fact_sales` |
+| `dimension_tables` | List of Objects | No | List of dimension tables and their join configurations | |
+| -> `table_name` | String | Yes | Physical table name of the dimension table | `default.dim_customer` |
+| -> `join_type` | Enum | Yes | Join type: `INNER`, `LEFT`, `RIGHT`, `FULL OUTER` | `LEFT` |
+| -> `join_conditions` | List of Objects | Yes | Join conditions between fact and dimension tables | |
+| --> `fact_column` | String | Yes | Join field in the fact table | `customer_id` |
+| --> `dimension_column` | String | Yes | Join field in the dimension table | `id` |
+| `field_sync_version` | String | Yes | Timestamp of last successful sync | `2023-11-15T12:00:00Z` |
+| `table_versions` | Object | Yes | Version tracking for schema changes | `{"table": "version"}` |
 
-**UI Interactions:**
-1. Users first select `fact_table` from database and schema.
-2. Click "Add Dimension Table" button to populate the above configuration for each dimension table.
-3. Provide "Test Join" button to validate whether the configured join relationships are valid.
+**Implementation:**
+1. Configuration is done via Dataset > Settings > Extra
+2. No UI changes required - uses existing configuration interface
+3. Supports automatic schema version tracking
+4. Enables programmatic configuration via API
 
 ### 2.2. Core Feature: Dynamic Field Synchronization
-To avoid the tedious work of manually defining all fields, an automation mechanism is needed.
+To maintain column metadata automatically without UI changes, we implement an automatic synchronization system:
 
-| Feature | Description |
-| :--- | :--- |
-| **"Sync Fields" Button** | After saving the "Star Schema Model" configuration, provide a button. When clicked, the system backend performs the following operations: |
-| **Backend Operations** | 1. Execute a **predefined SQL** (or database metadata query) to retrieve all column metadata (column names, data types) from the configured `fact_table` and all `dimension_tables`.<br>2. Sync all fields to the current Dataset's "Columns" list in the format `table_name.column_name` (or more readable aliases like `dimension_table_name_column_name`).<br>3. Automatically mark which fields come from fact tables (can be used for measures) and which come from dimension tables (can be used for rows, columns, filters). |
-| **Result** | Users don't need to manually add any fields and can see all available dimensions and measures in the Explore interface field selector. |
+#### 2.2.1 Sync Triggers
+| Method | Trigger | Use Case |
+|--------|---------|----------|
+| **Auto Sync** | Dataset save with star schema config | Initial setup and updates |
+| **Background Sync** | Periodic schema check (configurable interval) | Production monitoring |
+| **Lazy Sync** | First dataset access after schema change | Development environments |
+
+#### 2.2.2 Sync Process
+```python
+class StarSchemaManager:
+    def sync_columns(self, dataset):
+        config = dataset.extra.get("star_schema")
+        if not config or not self.needs_sync(dataset):
+            return False
+            
+        # Preserve user customizations
+        custom_columns = [c for c in dataset.columns 
+                         if not c.get("managed_by_star_schema")]
+        
+        # Get columns from all tables
+        all_columns = []
+        tables = [config["fact_table"]] + [
+            dim["table_name"] for dim in config["dimension_tables"]
+        ]
+        
+        for table in tables:
+            for col in self._get_table_columns(table):
+                all_columns.append({
+                    "column_name": f"{table}.{col.name}",
+                    "verbose_name": f"{table.split('.')[-1]}_{col.name}",
+                    "type": col.type,
+                    "is_fact": (table == config["fact_table"]),
+                    "managed_by_star_schema": True,
+                    "source_table": table
+                })
+        
+        # Update dataset
+        dataset.columns = custom_columns + all_columns
+        self._update_sync_version(dataset)
+        return True
+
+    def needs_sync(self, dataset):
+        config = dataset.extra.get("star_schema", {})
+        current_versions = self._get_table_versions(dataset)
+        last_versions = config.get("table_versions", {})
+        return current_versions != last_versions
+```
+
+#### 2.2.3 Performance Optimizations
+1. **Caching**: Table schemas cached with 1-hour TTL
+2. **Differential Sync**: Only sync changed tables
+3. **Background Processing**: Async tasks for non-urgent syncs
 
 ### 2.3. Core Feature: Intelligent Query Generation Engine
-This is the technical core of the project. When users drag fields, set filter conditions, and trigger queries in Pivot Table, the backend must generate efficient SQL.
+This is the technical core of the project. The query generator uses the virtual columns from the dataset metadata to generate efficient SQL.
 
 **SQL Generation Rules (Pseudocode Logic):**
 ```python
-# Input: User-selected metrics, rows, columns, filters
-def generate_pivot_sql(metrics, rows, columns, filters):
-    # 1. Parse which table each field belongs to
-    fact_metrics = [m for m in metrics if m.table == fact_table]
-    fact_group_bys = [] # Group fields from fact table (usually Degenerate Dimensions, like order_id)
-    dim_group_bys = []  # Group fields from dimension tables (like customer_name, product_category)
-    fact_filters = []   # Filter conditions on fact table (like sales_date, amount)
-    dim_filters = []    # Filter conditions on dimension tables (like customer_region, product_name)
+class StarSchemaQueryGenerator:
+    def generate_pivot_sql(self, dataset, metrics, rows, columns, filters):
+        config = dataset.extra["star_schema"]
+        fact_table = config["fact_table"]
+        
+        # 1. Parse fields using column metadata
+        fact_metrics = []
+        fact_group_bys = []
+        dim_group_bys = []
+        fact_filters = []
+        dim_filters = []
+        
+        # Helper to get column metadata
+        def get_column_info(field):
+            col = dataset.columns[field.column_name]
+            return {
+                "physical_table": col.source_table,
+                "physical_column": col.column_name.split(".")[-1],
+                "is_fact": col.is_fact
+            }
+        
+        # Categorize metrics
+        for metric in metrics:
+            col_info = get_column_info(metric)
+            if col_info["is_fact"]:
+                fact_metrics.append({
+                    "expression": metric.expression,
+                    "column": col_info["physical_column"],
+                    "alias": metric.alias
+                })
+        
+        # Categorize dimensions (rows + columns)
+        for field in rows + columns:
+            col_info = get_column_info(field)
+            if col_info["is_fact"]:
+                fact_group_bys.append(col_info["physical_column"])
+            else:
+                dim_group_bys.append({
+                    "table": col_info["physical_table"],
+                    "column": col_info["physical_column"],
+                    "alias": field.alias
+                })
+        
+        # Categorize filters
+        for filter in filters:
+            col_info = get_column_info(filter)
+            filter_obj = {
+                "column": col_info["physical_column"],
+                "operator": filter.operator,
+                "value": filter.value
+            }
+            if col_info["is_fact"]:
+                fact_filters.append(filter_obj)
+            else:
+                dim_filters.append({
+                    **filter_obj,
+                    "table": col_info["physical_table"]
+                })
 
-    for field in rows + columns:
-        if field.table == fact_table:
-            fact_group_bys.append(field)
-        else:
-            dim_group_bys.append(field.qualified_name) # Need to join before SELECT
+        # 2. Build CTE for fact table aggregation
+        fact_subquery = f"""
+        SELECT
+            {', '.join(fact_group_bys)},
+            {', '.join(f"{m['expression']}({m['column']}) AS {m['alias']}" 
+                      for m in fact_metrics)}
+        FROM {fact_table}
+        WHERE 1=1
+            {self._build_filters(fact_filters)}
+        GROUP BY {', '.join(fact_group_bys)}
+        """
 
-    for filter in filters:
-        if filter.column.table == fact_table:
-            fact_filters.append(filter)
-        else:
-            dim_filters.append(filter)
+        # 3. Build main query with dimension joins
+        main_query = f"""
+        WITH fact_agg AS ({fact_subquery})
+        SELECT
+            {', '.join([
+                f"{d['table']}.{d['column']} AS {d['alias']}" 
+                for d in dim_group_bys
+            ] + [
+                f"fact_agg.{m['alias']}" for m in fact_metrics
+            ])}
+        FROM fact_agg
+        {self._build_joins(config['dimension_tables'], dim_group_bys)}
+        WHERE 1=1
+            {self._build_filters(dim_filters)}
+        """
 
-    # 2. Build CTE or subquery: efficiently process fact table first
-    fact_subquery = f"""
-    SELECT
-        {', '.join([f.column_name for f in fact_group_bys])},   -- Group fields from fact table
-        {', '.join([m.expression for m in fact_metrics])}      -- Aggregated measures
-    FROM {fact_table} f
-    WHERE 1=1
-        {build_where_clause(fact_filters)} -- Apply fact table filter conditions
-    GROUP BY {', '.join([f.column_name for f in fact_group_bys])}
-    """
+        return main_query
 
-    # 3. Main query: join aggregated results with dimension tables
-    main_query = f"""
-    WITH fact_agg AS ({fact_subquery})
-    SELECT
-        {', '.join(dim_group_bys + [f"fact_agg.{m.alias}" for m in metrics])}
-    FROM fact_agg
-    {build_join_clause(dimension_tables, dim_group_bys)} -- Only join needed dimension tables
-    WHERE 1=1
-        {build_where_clause(dim_filters)} -- Apply dimension table filters (efficient at this point because fact table is already aggregated)
-    """
+    def _build_joins(self, dimension_tables, needed_dims):
+        # Build only necessary joins based on used dimensions
+        needed_tables = {d["table"] for d in needed_dims}
+        joins = []
+        
+        for dim in dimension_tables:
+            if dim["table_name"] in needed_tables:
+                joins.append(
+                    f"{dim['join_type']} JOIN {dim['table_name']} ON " +
+                    " AND ".join(
+                        f"fact_agg.{jc['fact_column']} = "
+                        f"{dim['table_name']}.{jc['dimension_column']}"
+                        for jc in dim["join_conditions"]
+                    )
+                )
+        
+        return "\n".join(joins)
 
-    return main_query
+    def _build_filters(self, filters):
+        if not filters:
+            return ""
+            
+        conditions = []
+        for f in filters:
+            table = f.get("table", "fact_agg")
+            conditions.append(
+                f"AND {table}.{f['column']} {f['operator']} {f['value']}"
+            )
+            
+        return "\n".join(conditions)
 ```
 
 ### 2.4. ClickHouse-Specific Optimizations
