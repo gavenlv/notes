@@ -288,4 +288,4 @@ docker-compose up -d
 
 After completing the installation, proceed to:
 - [Introduction & Basic Concepts](introduction.md)
-- [Configuration & Administration](configuration.md) 
+- [Configuration & Administration](configuration.md)

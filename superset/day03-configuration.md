@@ -230,4 +230,4 @@ SUPERSET_WEBSERVER_WORKERS = 4
 
 After completing the configuration, proceed to:
 - [Day 4: Security & Permissions](../day4-security/security.md)
-- [Day 5: Building Dashboards](../day5-dashboards/dashboards.md) 
+- [Day 5: Building Dashboards](../day5-dashboards/dashboards.md)

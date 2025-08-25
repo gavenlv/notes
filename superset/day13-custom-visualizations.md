@@ -1316,4 +1316,4 @@ Key custom visualization concepts covered:
 - Implement advanced configuration
 - Add styling and theming
 - Set up comprehensive testing
-- Deploy and document plugin 
+- Deploy and document plugin

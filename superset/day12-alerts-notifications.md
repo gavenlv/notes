@@ -713,4 +713,4 @@ Key alerts and notifications concepts covered:
 - Set up notification channels
 - Create custom alert rules
 - Implement monitoring and management
-- Deploy advanced alert features 
+- Deploy advanced alert features

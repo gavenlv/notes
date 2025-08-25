@@ -262,4 +262,4 @@ Superset has a comprehensive role-based access control system that determines wh
 
 After completing the introduction, proceed to:
 - [Day 3: Configuration & Administration](../day3-configuration/configuration.md)
-- [Day 4: Security & Permissions](../day4-security/security.md) 
+- [Day 4: Security & Permissions](../day4-security/security.md)

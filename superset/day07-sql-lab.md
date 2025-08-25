@@ -374,4 +374,4 @@ Key SQL Lab concepts covered:
 - Optimize query performance
 - Create reusable templates
 - Document best practices
-- Explore data with complex queries 
+- Explore data with complex queries

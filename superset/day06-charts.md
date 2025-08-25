@@ -284,4 +284,4 @@ Key chart concepts covered:
 - Practice creating different chart types
 - Experiment with customization options
 - Test performance with large datasets
-- Create chart templates for common use cases 
+- Create chart templates for common use cases

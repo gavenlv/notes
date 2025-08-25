@@ -214,4 +214,4 @@ Key security concepts covered:
 - Test all authentication methods
 - Verify role permissions
 - Review security logs
-- Implement additional security measures as needed 
+- Implement additional security measures as needed

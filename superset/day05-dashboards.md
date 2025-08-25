@@ -276,4 +276,4 @@ Superset can automatically generate and send reports via email on a scheduled ba
 
 After completing dashboard creation, proceed to:
 - [Day 6: Creating Charts & Visualizations](../day6-charts/charts.md)
-- [Day 7: SQL Lab & Query Building](../day7-sql-lab/sql-lab.md) 
+- [Day 7: SQL Lab & Query Building](../day7-sql-lab/sql-lab.md)

@@ -195,4 +195,4 @@ Continuous Integration ensures that all tests run automatically on every code ch
 
 After completing E2E testing setup, proceed to:
 - [Advanced Testing Strategies](../advanced-testing/advanced-testing.md)
-- [Performance Optimization](../performance-optimization/performance-optimization.md) 
+- [Performance Optimization](../performance-optimization/performance-optimization.md)
