@@ -51,195 +51,185 @@ Configuration will be stored in the dataset's `extra` field as JSON to avoid UI 
 | -> `join_conditions` | List of Objects | Yes | Join conditions between fact and dimension tables | |
 | --> `fact_column` | String | Yes | Join field in the fact table | `customer_id` |
 | --> `dimension_column` | String | Yes | Join field in the dimension table | `id` |
-| `field_sync_version` | String | Yes | Timestamp of last successful sync | `2023-11-15T12:00:00Z` |
-| `table_versions` | Object | Yes | Version tracking for schema changes | `{"table": "version"}` |
 
 **Implementation:**
 1. Configuration is done via Dataset > Settings > Extra
 2. No UI changes required - uses existing configuration interface
-3. Supports automatic schema version tracking
+3. After configuration, use "Sync Columns from Source" to populate dataset columns
 4. Enables programmatic configuration via API
 
-### 2.2. Core Feature: Dynamic Field Synchronization
-To maintain column metadata automatically without UI changes, we implement an automatic synchronization system:
+### 2.2. Core Feature: Enhanced Column Synchronization
+Leverage existing Superset "Sync Columns from Source" functionality with star schema enhancement:
 
-#### 2.2.1 Sync Triggers
-| Method | Trigger | Use Case |
-|--------|---------|----------|
-| **Auto Sync** | Dataset save with star schema config | Initial setup and updates |
-| **Background Sync** | Periodic schema check (configurable interval) | Production monitoring |
-| **Lazy Sync** | First dataset access after schema change | Development environments |
+#### 2.2.1 Enhanced Sync Process
+When user clicks "Sync Columns from Source" and star schema is configured:
 
-#### 2.2.2 Sync Process
 ```python
-class StarSchemaManager:
-    def sync_columns(self, dataset):
-        config = dataset.extra.get("star_schema")
-        if not config or not self.needs_sync(dataset):
-            return False
-            
-        # Preserve user customizations
-        custom_columns = [c for c in dataset.columns 
-                         if not c.get("managed_by_star_schema")]
+def sync_columns_from_source(dataset):
+    """Enhanced column sync that handles star schema configuration"""
+    
+    # Standard single-table sync if no star schema config
+    if "star_schema" not in dataset.extra:
+        return standard_sync_columns(dataset)
+    
+    config = dataset.extra["star_schema"]
+    all_columns = []
+    
+    # Get columns from fact table
+    fact_table = config["fact_table"]
+    fact_columns = get_table_columns(dataset.database, fact_table)
+    
+    for col in fact_columns:
+        all_columns.append({
+            "column_name": col.name,
+            "verbose_name": f"fact_{col.name}",
+            "type": col.type,
+            "is_dttm": col.is_dttm,
+            "groupby": True,
+            "filterable": True,
+            "description": f"From fact table: {fact_table}",
+            "python_date_format": col.python_date_format,
+            "source_table": fact_table,
+            "is_fact_column": True
+        })
+    
+    # Get columns from dimension tables
+    for dim_config in config["dimension_tables"]:
+        dim_table = dim_config["table_name"]
+        dim_columns = get_table_columns(dataset.database, dim_table)
         
-        # Get columns from all tables
-        all_columns = []
-        tables = [config["fact_table"]] + [
-            dim["table_name"] for dim in config["dimension_tables"]
-        ]
-        
-        for table in tables:
-            for col in self._get_table_columns(table):
-                all_columns.append({
-                    "column_name": f"{table}.{col.name}",
-                    "verbose_name": f"{table.split('.')[-1]}_{col.name}",
-                    "type": col.type,
-                    "is_fact": (table == config["fact_table"]),
-                    "managed_by_star_schema": True,
-                    "source_table": table
-                })
-        
-        # Update dataset
-        dataset.columns = custom_columns + all_columns
-        self._update_sync_version(dataset)
-        return True
-
-    def needs_sync(self, dataset):
-        config = dataset.extra.get("star_schema", {})
-        current_versions = self._get_table_versions(dataset)
-        last_versions = config.get("table_versions", {})
-        return current_versions != last_versions
+        for col in dim_columns:
+            all_columns.append({
+                "column_name": f"{dim_table.split('.')[-1]}_{col.name}",
+                "verbose_name": f"{dim_table.split('.')[-1]}_{col.name}",
+                "type": col.type,
+                "is_dttm": col.is_dttm,
+                "groupby": True,
+                "filterable": True,
+                "description": f"From dimension table: {dim_table}",
+                "python_date_format": col.python_date_format,
+                "source_table": dim_table,
+                "is_fact_column": False
+            })
+    
+    # Replace dataset columns
+    dataset.columns = all_columns
+    return len(all_columns)
 ```
 
-#### 2.2.3 Performance Optimizations
-1. **Caching**: Table schemas cached with 1-hour TTL
-2. **Differential Sync**: Only sync changed tables
-3. **Background Processing**: Async tasks for non-urgent syncs
+#### 2.2.2 User Experience
+1. **Configuration**: Admin sets up star schema in Dataset > Settings > Extra
+2. **Column Sync**: User clicks existing "Sync Columns from Source" button
+3. **Result**: All columns from fact + dimension tables appear in dataset
+4. **Chart Creation**: Users see full list of pre-defined columns in Explore interface
+5. **Transparent Usage**: Users create pivot tables without knowing the underlying table structure
+
+#### 2.2.3 Column Naming Convention
+- **Fact columns**: Use original name (e.g., `sales_amount`, `order_date`)
+- **Dimension columns**: Prefixed with table name (e.g., `customer_name`, `product_category`)
+- **Verbose names**: Human-readable descriptions for UI display
+- **Metadata**: Each column retains source table information for query generation
 
 ### 2.3. Core Feature: Intelligent Query Generation Engine
-This is the technical core of the project. The query generator uses the virtual columns from the dataset metadata to generate efficient SQL.
+The query generator uses the column metadata to determine physical table sources and generate efficient SQL.
 
 **SQL Generation Rules (Pseudocode Logic):**
 ```python
-class StarSchemaQueryGenerator:
-    def generate_pivot_sql(self, dataset, metrics, rows, columns, filters):
-        config = dataset.extra["star_schema"]
-        fact_table = config["fact_table"]
-        
-        # 1. Parse fields using column metadata
-        fact_metrics = []
-        fact_group_bys = []
-        dim_group_bys = []
-        fact_filters = []
-        dim_filters = []
-        
-        # Helper to get column metadata
-        def get_column_info(field):
-            col = dataset.columns[field.column_name]
-            return {
-                "physical_table": col.source_table,
-                "physical_column": col.column_name.split(".")[-1],
-                "is_fact": col.is_fact
-            }
-        
-        # Categorize metrics
-        for metric in metrics:
-            col_info = get_column_info(metric)
-            if col_info["is_fact"]:
-                fact_metrics.append({
-                    "expression": metric.expression,
-                    "column": col_info["physical_column"],
-                    "alias": metric.alias
-                })
-        
-        # Categorize dimensions (rows + columns)
-        for field in rows + columns:
-            col_info = get_column_info(field)
-            if col_info["is_fact"]:
-                fact_group_bys.append(col_info["physical_column"])
-            else:
-                dim_group_bys.append({
-                    "table": col_info["physical_table"],
-                    "column": col_info["physical_column"],
-                    "alias": field.alias
-                })
-        
-        # Categorize filters
-        for filter in filters:
-            col_info = get_column_info(filter)
-            filter_obj = {
-                "column": col_info["physical_column"],
-                "operator": filter.operator,
-                "value": filter.value
-            }
-            if col_info["is_fact"]:
-                fact_filters.append(filter_obj)
-            else:
-                dim_filters.append({
-                    **filter_obj,
-                    "table": col_info["physical_table"]
-                })
-
-        # 2. Build CTE for fact table aggregation
-        fact_subquery = f"""
-        SELECT
-            {', '.join(fact_group_bys)},
-            {', '.join(f"{m['expression']}({m['column']}) AS {m['alias']}" 
-                      for m in fact_metrics)}
+def generate_pivot_sql(dataset, metrics, rows, columns, filters):
+    """Generate optimized SQL for star schema pivot tables"""
+    
+    if "star_schema" not in dataset.extra:
+        # Fall back to standard query generation
+        return standard_generate_sql(dataset, metrics, rows, columns, filters)
+    
+    config = dataset.extra["star_schema"]
+    fact_table = config["fact_table"]
+    
+    # 1. Categorize fields by source table using column metadata
+    fact_metrics = []
+    fact_dimensions = []
+    dim_tables_needed = set()
+    fact_filters = []
+    dim_filters = []
+    
+    # Process metrics
+    for metric in metrics:
+        col = dataset.get_column(metric.column)
+        if col.is_fact_column:
+            fact_metrics.append({
+                "expression": metric.expression,
+                "column": col.column_name,
+                "alias": metric.label
+            })
+    
+    # Process dimensions (rows + columns)
+    for field in rows + columns:
+        col = dataset.get_column(field)
+        if col.is_fact_column:
+            fact_dimensions.append(col.column_name)
+        else:
+            dim_tables_needed.add(col.source_table)
+    
+    # Process filters
+    for filter_obj in filters:
+        col = dataset.get_column(filter_obj.column)
+        if col.is_fact_column:
+            fact_filters.append({
+                "column": col.column_name,
+                "operator": filter_obj.operator,
+                "value": filter_obj.value
+            })
+        else:
+            dim_filters.append({
+                "table": col.source_table,
+                "column": col.column_name.split('_', 1)[1],  # Remove table prefix
+                "operator": filter_obj.operator,
+                "value": filter_obj.value
+            })
+            dim_tables_needed.add(col.source_table)
+    
+    # 2. Build optimized query with fact aggregation first
+    fact_select = fact_dimensions + [f"{m['expression']} AS {m['alias']}" for m in fact_metrics]
+    fact_where = " AND ".join([f"{f['column']} {f['operator']} {f['value']}" for f in fact_filters])
+    
+    if fact_dimensions:
+        fact_query = f"""
+        SELECT {', '.join(fact_select)}
         FROM {fact_table}
-        WHERE 1=1
-            {self._build_filters(fact_filters)}
-        GROUP BY {', '.join(fact_group_bys)}
+        {f"WHERE {fact_where}" if fact_where else ""}
+        GROUP BY {', '.join(fact_dimensions)}
         """
-
-        # 3. Build main query with dimension joins
-        main_query = f"""
-        WITH fact_agg AS ({fact_subquery})
-        SELECT
-            {', '.join([
-                f"{d['table']}.{d['column']} AS {d['alias']}" 
-                for d in dim_group_bys
-            ] + [
-                f"fact_agg.{m['alias']}" for m in fact_metrics
-            ])}
-        FROM fact_agg
-        {self._build_joins(config['dimension_tables'], dim_group_bys)}
-        WHERE 1=1
-            {self._build_filters(dim_filters)}
+    else:
+        fact_query = f"""
+        SELECT {', '.join(fact_select)}
+        FROM {fact_table}
+        {f"WHERE {fact_where}" if fact_where else ""}
         """
-
-        return main_query
-
-    def _build_joins(self, dimension_tables, needed_dims):
-        # Build only necessary joins based on used dimensions
-        needed_tables = {d["table"] for d in needed_dims}
+    
+    # 3. Add dimension joins only for needed tables
+    if dim_tables_needed:
         joins = []
+        for dim_config in config["dimension_tables"]:
+            if dim_config["table_name"] in dim_tables_needed:
+                join_conditions = " AND ".join([
+                    f"fact_agg.{jc['fact_column']} = {dim_config['table_name']}.{jc['dimension_column']}"
+                    for jc in dim_config["join_conditions"]
+                ])
+                joins.append(f"{dim_config['join_type']} JOIN {dim_config['table_name']} ON {join_conditions}")
         
-        for dim in dimension_tables:
-            if dim["table_name"] in needed_tables:
-                joins.append(
-                    f"{dim['join_type']} JOIN {dim['table_name']} ON " +
-                    " AND ".join(
-                        f"fact_agg.{jc['fact_column']} = "
-                        f"{dim['table_name']}.{jc['dimension_column']}"
-                        for jc in dim["join_conditions"]
-                    )
-                )
+        dim_where = " AND ".join([f"{f['table']}.{f['column']} {f['operator']} {f['value']}" for f in dim_filters])
         
-        return "\n".join(joins)
-
-    def _build_filters(self, filters):
-        if not filters:
-            return ""
-            
-        conditions = []
-        for f in filters:
-            table = f.get("table", "fact_agg")
-            conditions.append(
-                f"AND {table}.{f['column']} {f['operator']} {f['value']}"
-            )
-            
-        return "\n".join(conditions)
+        main_query = f"""
+        WITH fact_agg AS ({fact_query})
+        SELECT *
+        FROM fact_agg
+        {' '.join(joins)}
+        {f"WHERE {dim_where}" if dim_where else ""}
+        """
+    else:
+        main_query = fact_query
+    
+    return main_query
 ```
 
 ### 2.4. ClickHouse-Specific Optimizations
@@ -259,8 +249,12 @@ When generating SQL, identify ClickHouse as the data source and apply specific o
 
 ## 4. User Interface (UI/UX) Changes
 
-1.  **Dataset编辑界面**：增加一个“Star Schema Model”配置标签页，用于2.1节描述的配置。
-2.  **Explore / Chart界面**：**零变更**。这是本设计的核心优势——高级功能在后台完成，前端用户享受简单一致的体验。
+**Zero UI changes required**. This is the core advantage of this design:
+
+1. **Configuration**: Uses existing Dataset > Settings > Extra field
+2. **Column Sync**: Uses existing "Sync Columns from Source" button 
+3. **Chart Creation**: Users see all columns in standard Explore interface
+4. **User Experience**: Completely transparent - users don't need to know about underlying table structure
 
 ### 5. 后续可选增强 (Future Enhancements)
 
