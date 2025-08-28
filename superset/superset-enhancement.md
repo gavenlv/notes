@@ -256,11 +256,11 @@ When generating SQL, identify ClickHouse as the data source and apply specific o
 3. **Chart Creation**: Users see all columns in standard Explore interface
 4. **User Experience**: Completely transparent - users don't need to know about underlying table structure
 
-### 5. 后续可选增强 (Future Enhancements)
+## 5. Future Enhancements
 
-1.  **自动关联探测**：提供功能自动推测事实表和维度表之间的潜在关联关系。
-2.  **雪花模型支持**：扩展配置以支持维度表再关联其他维度表（雪花模型）。
-3.  **多事实表支持**：支持在单个Dataset中配置多个事实表（星座模型），但这会极大增加复杂性。
-4.  **数据源扩展**：将优化逻辑适配到其他OLAP数据库，如Doris、StarRocks、Druid等。
+1. **Automatic Join Detection**: Provide functionality to automatically infer potential join relationships between fact tables and dimension tables.
+2. **Snowflake Schema Support**: Extend configuration to support dimension tables joining other dimension tables (snowflake schema).
+3. **Multi-Fact Table Support**: Support configuring multiple fact tables in a single Dataset (constellation schema), but this would greatly increase complexity.
+4. **Data Source Extension**: Adapt optimization logic to other OLAP databases such as Doris, StarRocks, Druid, etc.
 
 ---
