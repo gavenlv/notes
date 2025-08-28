@@ -1,0 +1,22 @@
+data_source postgresql:
+  type: postgres
+  host: ${POSTGRES_HOST}
+  port: ${POSTGRES_PORT}
+  username: ${POSTGRES_USERNAME}
+  password: ${POSTGRES_PASSWORD}
+  database: ${POSTGRES_DATABASE}
+  schema: public
+
+data_source clickhouse:
+  type: clickhouse
+  host: ${CLICKHOUSE_HOST}
+  port: ${CLICKHOUSE_PORT}
+  username: ${CLICKHOUSE_USERNAME}
+  password: ${CLICKHOUSE_PASSWORD}
+  database: ${CLICKHOUSE_DATABASE}
+
+soda_cloud:
+  # Uncomment and configure if using Soda Cloud
+  # host: cloud.soda.io
+  # api_key_id: your_api_key_id
+  # api_key_secret: your_api_key_secret

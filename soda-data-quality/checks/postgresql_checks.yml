@@ -1,0 +1,87 @@
+checks for postgresql:
+  # Users table checks
+  - row_count > 0:
+      name: Users table has data
+  
+  - freshness(created_at) < 1d:
+      name: Recent user registrations
+  
+  - duplicate_count(email) = 0:
+      name: No duplicate emails
+  
+  - missing_count(name) = 0:
+      name: Name is required
+  
+  - missing_count(email) = 0:
+      name: Email is required
+  
+  - invalid_count(email) = 0:
+      name: Valid email format
+      valid format: email
+  
+  - failed rows:
+      name: Valid user status
+      fail query: |
+        SELECT * FROM users 
+        WHERE status NOT IN ('active', 'inactive', 'pending')
+  
+  - max(created_at) <= NOW():
+      name: No future registration dates
+
+checks for orders:
+  # Orders table checks
+  - row_count > 0:
+      name: Orders table has data
+  
+  - missing_count(user_id) = 0:
+      name: User ID is required
+  
+  - missing_count(product_name) = 0:
+      name: Product name is required
+  
+  - failed rows:
+      name: Valid order status
+      fail query: |
+        SELECT * FROM orders 
+        WHERE order_status NOT IN ('pending', 'processing', 'shipped', 'delivered', 'cancelled')
+  
+  - failed rows:
+      name: Positive quantity
+      fail query: |
+        SELECT * FROM orders 
+        WHERE quantity <= 0
+  
+  - failed rows:
+      name: Non-negative price
+      fail query: |
+        SELECT * FROM orders 
+        WHERE price < 0
+  
+  - failed rows:
+      name: Valid user references
+      fail query: |
+        SELECT o.* FROM orders o 
+        LEFT JOIN users u ON o.user_id = u.id 
+        WHERE u.id IS NULL
+
+checks for active_users_view:
+  # Active users view checks
+  - row_count > 0:
+      name: Active users view has data
+  
+  - failed rows:
+      name: Valid active users
+      fail query: |
+        SELECT * FROM active_users_view 
+        WHERE days_since_registration < 0
+
+checks for recent_orders_view:
+  # Recent orders view checks
+  - row_count > 0:
+      name: Recent orders view has data
+  
+  - failed rows:
+      name: Valid total amounts
+      fail query: |
+        SELECT * FROM recent_orders_view 
+        WHERE total_amount != (quantity * price)
