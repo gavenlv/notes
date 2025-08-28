@@ -263,4 +263,27 @@ When generating SQL, identify ClickHouse as the data source and apply specific o
 3. **Multi-Fact Table Support**: Support configuring multiple fact tables in a single Dataset (constellation schema), but this would greatly increase complexity.
 4. **Data Source Extension**: Adapt optimization logic to other OLAP databases such as Doris, StarRocks, Druid, etc.
 
+## 6. Implementation Summary
+
+### 6.1. Simplified Design Benefits
+1. **No Frontend Changes**: Leverages existing UI components (Extra field, Sync button)
+2. **Familiar User Experience**: Uses standard Superset column sync workflow
+3. **Reduced Complexity**: No version control or complex state management
+4. **Easy Deployment**: Can be implemented as backend-only changes
+
+### 6.2. Implementation Steps
+1. **Phase 1**: Enhance `sync_columns_from_source()` function to detect star schema config
+2. **Phase 2**: Modify query generation logic to use column metadata 
+3. **Phase 3**: Add ClickHouse-specific optimizations
+4. **Phase 4**: Testing and documentation
+
+### 6.3. User Workflow
+```
+1. Admin configures star schema in Dataset > Settings > Extra
+2. Admin clicks "Sync Columns from Source" 
+3. All fact + dimension columns appear in dataset
+4. End users create pivot tables normally in Explore view
+5. Backend generates optimized star schema SQL automatically
+```
+
 ---

@@ -2,14 +2,15 @@
 # This file defines the overall configuration for the data quality checking system
 
 # ClickHouse Connection Settings
+# Note: Values are now loaded from environment variables for security
 clickhouse:
-  host: "localhost"
-  port: 8123
-  database: "default"
-  user: "admin"
-  password: "admin"
-  secure: false
-  timeout: 30
+  host: "${CLICKHOUSE_HOST}"
+  port: ${CLICKHOUSE_PORT}
+  database: "${CLICKHOUSE_DATABASE}"
+  user: "${CLICKHOUSE_USER}"
+  password: "${CLICKHOUSE_PASSWORD}"
+  secure: ${CLICKHOUSE_SECURE}
+  timeout: ${CLICKHOUSE_TIMEOUT}
 
 # Data Quality Check Settings
 quality_checks:
@@ -22,7 +23,7 @@ quality_checks:
   # Reporting settings
   generate_reports: true
   report_format: ["html", "json", "csv"]
-  report_location: "./reports/"
+  report_location: "${REPORT_LOCATION}"
   
   # Reporting only - alerting removed per user request
 
@@ -30,70 +31,45 @@ quality_checks:
 rule_categories:
   completeness:
     enabled: true
-    priority: "high"
     description: "Check for missing or null values in data"
     
   accuracy:
     enabled: true
-    priority: "high"
     description: "Validate data against business rules and constraints"
     
   consistency:
     enabled: true
-    priority: "medium"
     description: "Ensure data consistency across tables and systems"
     
   timeliness:
     enabled: true
-    priority: "medium"
     description: "Verify data freshness and update frequency"
-
-# Scheduling Configuration
-scheduling:
-  # Cron-like schedule for automated checks
-  schedule: "0 */6 * * *"  # Every 6 hours
-  timezone: "UTC"
-  
-  # Check frequency by category
-  completeness_interval: "1h"
-  accuracy_interval: "6h"
-  consistency_interval: "12h"
-  timeliness_interval: "1h"
 
 # Storage Configuration
 storage:
   # Where to store quality check results
-  results_database: "data_quality"
-  results_table: "quality_results"
+  results_database: "${RESULTS_DATABASE}"
+  results_table: "${RESULTS_TABLE}"
   
   # Retention policy
   retention_days: 90
-  archive_old_results: true
-  
-  # Backup settings
-  backup_enabled: true
-  backup_interval: "1d"
 
 # Monitoring Integration
 monitoring:
   # Prometheus metrics
   enable_metrics: true
-  metrics_port: 9090
+  metrics_port: ${METRICS_PORT}
   
   # Grafana dashboard
   enable_dashboard: true
-  dashboard_url: "http://localhost:3000"
-  
-  # Health checks
-  health_check_enabled: true
-  health_check_interval: "5m"
+  dashboard_url: "${GRAFANA_DASHBOARD_URL}"
 
 # Logging Configuration
 logging:
   level: "INFO"
   format: "json"
   output: "file"
-  log_file: "./logs/data-quality.log"
+  log_file: "${LOG_FILE}"
   max_file_size: "100MB"
   max_files: 10
 
@@ -101,8 +77,122 @@ logging:
 reporting:
   # Report formats and locations
   formats: ["json", "html", "csv"]
-  output_directory: "./reports/"
-  retention_days: 30
+  output_directory: "${REPORT_LOCATION}"
+
+# Table/View-Based Rule Definitions
+table_rules:
+  # Define rules specific to tables or views
+  # Format: table_name or view_name with associated rules
+  
+  # Example table rules
+  users_table:
+    table_name: "users"
+    schema: "default"
+    rules:
+      - name: "user_id_not_null"
+        type: "not_null"
+        column: "user_id"
+        category: "completeness"
+        description: "User ID must not be null"
+        
+      - name: "email_format_validation"
+        type: "regex_pattern"
+        column: "email"
+        pattern: "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
+        category: "accuracy"
+        description: "Email must be in valid format"
+        
+      - name: "age_range_validation"
+        type: "data_range"
+        column: "age"
+        min_value: 0
+        max_value: 150
+        category: "accuracy"
+        description: "Age must be between 0 and 150"
+        
+      - name: "created_at_not_null"
+        type: "not_null"
+        column: "created_at"
+        category: "completeness"
+        description: "Created date must not be null"
+        
+      - name: "created_at_timeliness"
+        type: "freshness_check"
+        column: "created_at"
+        max_age_hours: 24
+        category: "timeliness"
+        description: "Records should be created within last 24 hours"
+
+  # Example view rules
+  user_orders_view:
+    table_name: "user_orders_view"
+    schema: "analytics"
+    rules:
+      - name: "order_amount_positive"
+        type: "data_range"
+        column: "order_amount"
+        min_value: 0.01
+        category: "accuracy"
+        description: "Order amount must be positive"
+        
+      - name: "order_status_valid"
+        type: "value_set"
+        column: "order_status"
+        valid_values: ["pending", "processing", "shipped", "delivered", "cancelled"]
+        category: "accuracy"
+        description: "Order status must be one of the valid values"
+        
+      - name: "customer_id_not_null"
+        type: "not_null"
+        column: "customer_id"
+        category: "completeness"
+        description: "Customer ID must not be null"
+
+  # Template for adding new table rules
+  # new_table_template:
+  #   table_name: "your_table_name"
+  #   schema: "your_schema_name"
+  #   rules:
+  #     - name: "rule_name"
+  #       type: "rule_type"  # not_null, data_range, regex_pattern, value_set, freshness_check, etc.
+  #       column: "column_name"
+  #       category: "completeness|accuracy|consistency|timeliness"
+  #       description: "Description of the rule"
+  #       # Additional parameters based on rule type:
+  #       # For data_range: min_value, max_value
+  #       # For regex_pattern: pattern
+  #       # For value_set: valid_values (array)
+  #       # For freshness_check: max_age_hours
+
+# Rule Type Definitions
+rule_types:
+  not_null:
+    description: "Check that column values are not null"
+    parameters: ["column"]
+    
+  data_range:
+    description: "Check that numeric values fall within specified range"
+    parameters: ["column", "min_value", "max_value"]
+    
+  regex_pattern:
+    description: "Validate column values against regular expression pattern"
+    parameters: ["column", "pattern"]
+    
+  value_set:
+    description: "Check that column values are within a predefined set of valid values"
+    parameters: ["column", "valid_values"]
+    
+  freshness_check:
+    description: "Check that timestamp values are within acceptable age limit"
+    parameters: ["column", "max_age_hours"]
+    
+  uniqueness:
+    description: "Check that column values are unique"
+    parameters: ["column"]
+    
+  referential_integrity:
+    description: "Check foreign key relationships between tables"
+    parameters: ["column", "reference_table", "reference_column"]
 
 # Custom Settings
 custom:
