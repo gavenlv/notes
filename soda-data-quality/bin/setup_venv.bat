@@ -47,8 +47,3 @@ echo.
 echo To run real data quality checks:
 echo    call venv\Scripts\activate.bat
 echo    python src\app.py
-echo.
-echo To run the demo with mock data:
-echo    call venv\Scripts\activate.bat
-echo    python src\demo_with_mock_data.py
-echo.

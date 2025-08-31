@@ -34,6 +34,8 @@ class DataQualityApp:
         self.setup_logging(project_root)
         
         # Configuration
+        # Dynamically generate configuration.yml content
+        self.soda_config_content = self._generate_soda_config()
         self.config_path = Path(project_root) / 'config' / 'configuration.yml'
         self.checks_path = Path(project_root) / 'config' / 'checks'
         self.reports_path = Path(project_root) / 'reports'
@@ -43,7 +45,41 @@ class DataQualityApp:
         
         self.logger = logging.getLogger(__name__)
         self.logger.info("Data Quality App initialized")
-    
+
+    def _generate_soda_config(self) -> str:
+        """Dynamically generates Soda Core configuration YAML content."""
+        postgres_host = os.getenv('POSTGRES_HOST', 'localhost')
+        postgres_port = os.getenv('POSTGRES_PORT', '25011')
+        postgres_database = os.getenv('POSTGRES_DATABASE', 'postgres')
+        postgres_username = os.getenv('POSTGRES_USERNAME', 'postgres')
+        postgres_password = os.getenv('POSTGRES_PASSWORD', 'root')
+
+        clickhouse_host = os.getenv('CLICKHOUSE_HOST', 'localhost')
+        clickhouse_port = os.getenv('CLICKHOUSE_PORT', '9000')
+        clickhouse_database = os.getenv('CLICKHOUSE_DATABASE', 'default')
+        clickhouse_username = os.getenv('CLICKHOUSE_USERNAME', 'admin')
+        clickhouse_password = os.getenv('CLICKHOUSE_PASSWORD', 'admin')
+
+        config_yaml = f"""
+data_source postgresql:
+  type: postgres
+  host: {postgres_host}
+  port: {postgres_port}
+  username: {postgres_username}
+  password: {postgres_password}
+  database: {postgres_database}
+  schema: public
+
+data_source clickhouse:
+  type: clickhouse
+  host: {clickhouse_host}
+  port: {clickhouse_port}
+  username: {clickhouse_username}
+  password: {clickhouse_password}
+  database: {clickhouse_database}
+"""
+        return config_yaml
+
     def setup_logging(self, project_root):
         """Setup logging configuration"""
         # Create logs directory if it doesn't exist
@@ -90,7 +126,7 @@ class DataQualityApp:
             
             # Set configuration
             scan.set_data_source_name(data_source)
-            scan.add_configuration_yaml_file(str(self.config_path))
+            scan.add_configuration_yaml_str(self.soda_config_content)
             
             # Add checks
             if checks_file:
