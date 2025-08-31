@@ -106,7 +106,10 @@ def init_clickhouse():
                 try:
                     client.execute(statement)
                 except Exception as e:
-                    if "already exists" not in str(e).lower():
+                    error_msg = str(e).lower()
+                    if any(skip in error_msg for skip in ["already exists", "doesn't exist", "not found"]):
+                        logger.debug(f"Skipping statement (expected): {str(e)}")
+                    else:
                         logger.warning(f"Warning executing statement: {str(e)}")
         
         # Get summary

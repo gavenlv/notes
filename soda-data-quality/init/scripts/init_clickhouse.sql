@@ -1,7 +1,7 @@
 -- ClickHouse Database Initialization Script
 -- Creates sample tables and views for data quality testing
 
--- Drop existing objects if they exist
+-- Drop existing objects if they exist (with better error handling)
 DROP VIEW IF EXISTS daily_events_summary;
 DROP VIEW IF EXISTS user_activity_view;
 DROP TABLE IF EXISTS user_sessions;

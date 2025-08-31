@@ -1,0 +1,56 @@
+checks for events:
+  # Row count checks
+  - row_count > 0:
+      name: "Table has data"
+  
+  # Missing value checks
+  - missing_count(event_type) = 0:
+      name: "No missing event types"
+  
+  - missing_count(user_id) = 0:
+      name: "No missing user IDs"
+  
+  # Duplicate checks
+  - duplicate_count(event_id) = 0:
+      name: "No duplicate event IDs"
+  
+  # Date checks
+  - failed rows:
+      name: "No future timestamps"
+      fail query: |
+        SELECT * FROM events 
+        WHERE timestamp > now()
+  
+  # Data type checks
+  - failed rows:
+      name: "Valid event types"
+      fail query: |
+        SELECT * FROM events 
+        WHERE event_type NOT IN ('page_view', 'click', 'purchase', 'login', 'logout')
+
+checks for metrics:
+  # Row count checks
+  - row_count > 0:
+      name: "Table has data"
+  
+  # Missing value checks
+  - missing_count(metric_name) = 0:
+      name: "No missing metric names"
+  
+  # Value range checks
+  - min(value) >= 0:
+      name: "Non-negative metric values"
+  
+  # Date checks
+  - failed rows:
+      name: "No future creation dates"
+      fail query: |
+        SELECT * FROM metrics 
+        WHERE created_at > now()
+  
+  # Data type checks
+  - failed rows:
+      name: "Valid metric types"
+      fail query: |
+        SELECT * FROM metrics 
+        WHERE metric_type NOT IN ('counter', 'gauge', 'histogram')

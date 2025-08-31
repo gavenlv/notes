@@ -16,20 +16,32 @@ A comprehensive data quality monitoring application built with **soda-core** for
 
 ```
 soda-data-quality/
-├── app.py                      # Main application
-├── demo_with_mock_data.py      # Demo with SQLite mock data
-├── init_databases.py           # Database initialization script
-├── test_connections.py         # Database connectivity test
-├── environment.env             # Environment configuration
-├── configuration.yml           # Soda configuration
-├── requirements.txt            # Python dependencies
-├── checks/
-│   ├── postgresql_checks.yml   # PostgreSQL data quality checks
-│   └── clickhouse_checks.yml   # ClickHouse data quality checks
-├── scripts/
+├── src/                        # Source code directory
+│   ├── app.py                  # Main application
+│   ├── demo_with_mock_data.py  # Demo with SQLite mock data
+│   └── test_connections.py     # Database connectivity test
+├── init/                       # Database initialization scripts
+│   ├── init_databases.py       # Full database initialization script
+│   ├── init_postgresql_only.py # PostgreSQL-only initialization
 │   ├── init_postgresql.sql     # PostgreSQL schema and data
 │   └── init_clickhouse.sql     # ClickHouse schema and data
-└── reports/                    # Generated reports directory
+├── config/                     # Configuration files
+│   ├── environment.env         # Environment configuration
+│   ├── configuration.yml       # Soda configuration
+│   └── checks/                 # Data quality checks
+│       ├── postgresql_checks.yml   # PostgreSQL data quality checks
+│       └── clickhouse_checks.yml   # ClickHouse data quality checks
+├── bin/                        # Executable scripts
+│   ├── quick_start.bat         # Windows quick start script
+│   ├── quick_start.sh          # Linux/macOS quick start script
+│   ├── setup_venv.bat          # Windows venv setup script
+│   ├── setup_venv.sh           # Linux/macOS venv setup script
+│   ├── run_app.bat             # Windows app runner script
+│   └── run_app.sh              # Linux/macOS app runner script
+├── reports/                    # Generated reports directory
+├── requirements.txt            # Python dependencies
+├── README.md                   # This documentation
+└── venv/                       # Virtual environment (created by setup)
 ```
 
 ## 🛠️ Installation
@@ -38,23 +50,53 @@ soda-data-quality/
 
 - Python 3.8+
 - PostgreSQL (running on localhost:25011)
-- ClickHouse (running on localhost:8123)
+- ClickHouse (running on localhost:9000)
 
 ### Setup
+
+#### Option 1: Quick Setup with Scripts
+
+##### Windows
+```batch
+# Run the setup script
+bin\setup_venv.bat
+```
+
+##### Linux/macOS
+```bash
+# Make scripts executable and run setup
+chmod +x bin/setup_venv.sh bin/run_app.sh
+./bin/setup_venv.sh
+```
+
+#### Option 2: Manual Setup
 
 1. **Clone and navigate to the project:**
    ```bash
    cd soda-data-quality
    ```
 
-2. **Install dependencies:**
+2. **Create and activate virtual environment:**
+   ```bash
+   # Create virtual environment
+   python -m venv venv
+   
+   # Activate virtual environment
+   # Windows:
+   venv\Scripts\activate.bat
+   
+   # Linux/macOS:
+   source venv/bin/activate
+   ```
+
+3. **Install dependencies:**
    ```bash
    pip install -r requirements.txt
    ```
 
-3. **Configure environment variables:**
+4. **Configure environment variables:**
    
-   Update `environment.env` with your database credentials:
+   Update `config/environment.env` with your database credentials:
    ```env
    # PostgreSQL Configuration
    POSTGRES_HOST=localhost
@@ -85,39 +127,111 @@ This creates:
 - **PostgreSQL**: `users` and `orders` tables with `active_users_view` and `recent_orders_view`
 - **ClickHouse**: `events` and `user_sessions` tables with `daily_events_summary` and `user_activity_view`
 
-### Option 2: Manual Setup
+### Database Initialization
+
+#### Option 1: Using Python Scripts
+
+```bash
+# Initialize all databases
+python init/init_databases.py
+
+# Initialize PostgreSQL only
+python init/init_postgresql_only.py
+```
+
+#### Option 2: Manual Setup
 
 Execute the SQL scripts directly:
 
 **PostgreSQL:**
 ```bash
-psql -h localhost -p 25011 -U postgres -d postgres -f scripts/init_postgresql.sql
+psql -h localhost -p 25011 -U postgres -d postgres -f init/init_postgresql.sql
 ```
 
 **ClickHouse:**
 ```bash
-clickhouse-client --host localhost --port 8123 --user admin --password admin < scripts/init_clickhouse.sql
+clickhouse-client --host localhost --port 9000 --user admin --password admin < init/init_clickhouse.sql
 ```
 
 ## 🚀 Usage
 
-### Option 1: Run with Real Databases
+### Option 1: Quick Start (Recommended)
 
-1. **Test connections:**
-   ```bash
-   python test_connections.py
-   ```
-
-2. **Run data quality checks:**
-   ```bash
-   python app.py
-   ```
-
-### Option 2: Run Demo (No Database Required)
-
-```bash
-python demo_with_mock_data.py
+#### Windows
+```batch
+# Quick start - automatically checks venv and runs demo
+bin\quick_start.bat
 ```
+
+#### Linux/macOS
+```bash
+# Quick start - automatically checks venv and runs demo
+chmod +x bin/quick_start.sh
+./bin/quick_start.sh
+```
+
+### Option 2: Advanced Usage
+
+#### Windows
+```batch
+# Run demo (no database required)
+bin\run_app.bat demo
+
+# Test database connections
+bin\run_app.bat test
+
+# Initialize all databases
+bin\run_app.bat init
+
+# Initialize PostgreSQL only
+bin\run_app.bat init-pg
+
+# Run main application
+bin\run_app.bat app
+```
+
+#### Linux/macOS
+```bash
+# Run demo (no database required)
+./bin/run_app.sh demo
+
+# Test database connections
+./bin/run_app.sh test
+
+# Initialize all databases
+./bin/run_app.sh init
+
+# Initialize PostgreSQL only
+./bin/run_app.sh init-pg
+
+# Run main application
+./bin/run_app.sh app
+```
+
+### Option 3: Manual Run (with Virtual Environment)
+
+1. **Activate virtual environment:**
+   ```bash
+   # Windows:
+   venv\Scripts\activate.bat
+   
+   # Linux/macOS:
+   source venv/bin/activate
+   ```
+
+2. **Run with Real Databases:**
+   ```bash
+   # Test connections
+   python src/test_connections.py
+   
+   # Run data quality checks
+   python src/app.py
+   ```
+
+3. **Run Demo (No Database Required):**
+   ```bash
+   python src/demo_with_mock_data.py
+   ```
 
 This runs a complete demo using SQLite to simulate PostgreSQL data quality checks.
 
@@ -221,7 +335,7 @@ Reports are automatically saved in the `reports/` directory with detailed inform
 
 ## 🔧 Configuration
 
-### Soda Configuration (`configuration.yml`)
+### Soda Configuration (`config/configuration.yml`)
 
 ```yaml
 data_source postgresql:
@@ -244,7 +358,7 @@ data_source clickhouse:
 
 ### Custom Checks
 
-Add custom checks in `checks/postgresql_checks.yml` or `checks/clickhouse_checks.yml`:
+Add custom checks in `config/checks/postgresql_checks.yml` or `config/checks/clickhouse_checks.yml`:
 
 ```yaml
 checks for your_table:
@@ -270,9 +384,9 @@ checks for your_table:
 
 The project includes multiple testing approaches:
 
-1. **Connection Test**: `python test_connections.py`
-2. **Mock Demo**: `python demo_with_mock_data.py`
-3. **Full Application**: `python app.py`
+1. **Connection Test**: `python src/test_connections.py`
+2. **Mock Demo**: `python src/demo_with_mock_data.py`
+3. **Full Application**: `python src/app.py`
 
 ## 📋 Dependencies
 

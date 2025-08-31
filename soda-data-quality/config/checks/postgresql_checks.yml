@@ -1,0 +1,51 @@
+checks for users:
+  # Row count checks
+  - row_count > 0:
+      name: "Table has data"
+  
+  # Missing value checks
+  - missing_count(name) = 0:
+      name: "No missing names"
+  
+  - missing_count(email) = 0:
+      name: "No missing emails"
+  
+  # Duplicate checks
+  - duplicate_count(email) = 0:
+      name: "No duplicate emails"
+  
+  # Format checks
+  - invalid_count(email) = 0:
+      name: "Valid email format"
+      valid format: email
+  
+  # Date checks
+  # - failed rows:
+  #     name: "No future registration dates"
+  #     fail query: |
+  #       SELECT * FROM users 
+  #       WHERE registration_date > CURRENT_DATE
+
+checks for orders:
+  # Row count checks
+  - row_count > 0:
+      name: "Table has data"
+  
+  # Missing value checks
+  - missing_count(product_name) = 0:
+      name: "No missing product names"
+  
+  # Value range checks
+  - min(quantity) > 0:
+      name: "Positive quantity"
+  
+  - min(price) >= 0:
+      name: "Non-negative price"
+  
+  # Referential integrity
+  - failed rows:
+      name: "Valid user references"
+      fail query: |
+        SELECT o.* FROM orders o 
+        LEFT JOIN users u ON o.user_id = u.id 
+        WHERE u.id IS NULL

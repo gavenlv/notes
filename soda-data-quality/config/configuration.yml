@@ -1,0 +1,8 @@
+data_source postgresql:
+  type: postgres
+  host: localhost
+  port: 25011
+  username: postgres
+  password: root
+  database: postgres
+  schema: public

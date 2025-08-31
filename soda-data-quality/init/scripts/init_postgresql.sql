@@ -1,11 +1,11 @@
 -- PostgreSQL Database Initialization Script
 -- Creates sample tables and views for data quality testing
 
--- Drop existing objects if they exist
-DROP VIEW IF EXISTS active_users_view;
-DROP VIEW IF EXISTS recent_orders_view;
-DROP TABLE IF EXISTS orders;
-DROP TABLE IF EXISTS users;
+-- Drop existing objects if they exist (with CASCADE to handle dependencies)
+DROP VIEW IF EXISTS active_users_view CASCADE;
+DROP VIEW IF EXISTS recent_orders_view CASCADE;
+DROP TABLE IF EXISTS orders CASCADE;
+DROP TABLE IF EXISTS users CASCADE;
 
 -- Create users table
 CREATE TABLE users (

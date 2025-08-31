@@ -17,7 +17,11 @@ import tempfile
 from dotenv import load_dotenv
 
 # Load environment variables
-load_dotenv('environment.env')
+import os
+current_dir = os.path.dirname(os.path.abspath(__file__))
+project_root = os.path.dirname(current_dir)
+env_path = os.path.join(project_root, 'config', 'environment.env')
+load_dotenv(env_path)
 
 # Setup logging
 logging.basicConfig(
@@ -30,7 +34,10 @@ class MockDataQualityDemo:
     """Demo class using SQLite to simulate PostgreSQL data quality checks"""
     
     def __init__(self):
-        self.reports_path = Path('./reports')
+        # Get the project root directory
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        project_root = os.path.dirname(current_dir)
+        self.reports_path = Path(os.path.join(project_root, 'reports'))
         self.reports_path.mkdir(exist_ok=True)
         
         # Create temporary SQLite databases

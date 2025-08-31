@@ -7,7 +7,11 @@ import os
 from dotenv import load_dotenv
 
 # Load environment variables
-load_dotenv('environment.env')
+import os
+current_dir = os.path.dirname(os.path.abspath(__file__))
+project_root = os.path.dirname(current_dir)
+env_path = os.path.join(project_root, 'config', 'environment.env')
+load_dotenv(env_path)
 
 def test_postgresql():
     """Test PostgreSQL connection"""

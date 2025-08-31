@@ -14,6 +14,7 @@ from typing import Dict, List, Optional
 
 from dotenv import load_dotenv
 from soda.scan import Scan
+from clickhouse_checker import ClickHouseDataQualityChecker
 
 
 class DataQualityApp:
@@ -21,30 +22,40 @@ class DataQualityApp:
     
     def __init__(self):
         """Initialize the application"""
+        # Get the project root directory (parent of src)
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        project_root = os.path.dirname(current_dir)
+        
         # Load environment variables
-        load_dotenv('environment.env')
+        env_path = os.path.join(project_root, 'config', 'environment.env')
+        load_dotenv(env_path)
         
         # Setup logging
-        self.setup_logging()
+        self.setup_logging(project_root)
         
         # Configuration
-        self.config_path = os.getenv('SODA_CONFIG_PATH', './configuration.yml')
-        self.checks_path = os.getenv('SODA_CHECKS_PATH', './checks')
-        self.reports_path = os.getenv('SODA_REPORTS_PATH', './reports')
+        self.config_path = Path(project_root) / 'config' / 'configuration.yml'
+        self.checks_path = Path(project_root) / 'config' / 'checks'
+        self.reports_path = Path(project_root) / 'reports'
         
         # Ensure reports directory exists
-        Path(self.reports_path).mkdir(parents=True, exist_ok=True)
+        self.reports_path.mkdir(parents=True, exist_ok=True)
         
         self.logger = logging.getLogger(__name__)
         self.logger.info("Data Quality App initialized")
     
-    def setup_logging(self):
+    def setup_logging(self, project_root):
         """Setup logging configuration"""
+        # Create logs directory if it doesn't exist
+        log_dir = Path(project_root) / 'logs'
+        log_dir.mkdir(parents=True, exist_ok=True)
+        log_path = log_dir / 'data_quality.log'
+        
         logging.basicConfig(
             level=logging.INFO,
-            format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+            format='%(asctime)s - %(name)s - %(levelname)s - %(filename)s:%(lineno)d - %(funcName)s - %(message)s',
             handlers=[
-                logging.FileHandler('data_quality.log'),
+                logging.FileHandler(log_path),
                 logging.StreamHandler(sys.stdout)
             ]
         )
@@ -79,7 +90,7 @@ class DataQualityApp:
             
             # Set configuration
             scan.set_data_source_name(data_source)
-            scan.add_configuration_yaml_file(self.config_path)
+            scan.add_configuration_yaml_file(str(self.config_path))
             
             # Add checks
             if checks_file:
@@ -91,7 +102,7 @@ class DataQualityApp:
                     self.logger.warning(f"Checks file not found: {checks_path}")
             else:
                 # Add all YAML files in checks directory
-                checks_dir = Path(self.checks_path)
+                checks_dir = self.checks_path
                 for check_file in checks_dir.glob("*.yml"):
                     scan.add_sodacl_yaml_file(str(check_file))
                     self.logger.info(f"Added checks from: {check_file}")
@@ -100,13 +111,15 @@ class DataQualityApp:
             result = scan.execute()
             
             # Process results
+            scan_results_dict = scan.get_scan_results()
+            
             scan_result = {
                 'data_source': data_source,
                 'timestamp': datetime.now().isoformat(),
                 'scan_result': result,
-                'checks_passed': scan.get_scan_results()['checks_passed'],
-                'checks_failed': scan.get_scan_results()['checks_failed'],
-                'checks_warned': scan.get_scan_results()['checks_warned'],
+                'checks_passed': scan_results_dict.get('checks_passed', 0) if scan_results_dict else 0,
+                'checks_failed': scan_results_dict.get('checks_failed', 0) if scan_results_dict else 0,
+                'checks_warned': scan_results_dict.get('checks_warned', 0) if scan_results_dict else 0,
                 'logs': scan.get_logs_text()
             }
             
@@ -157,8 +170,9 @@ class DataQualityApp:
         postgres_result = self.run_data_source_scan('postgresql', 'postgresql_checks.yml')
         results.append(postgres_result)
         
-        # Check ClickHouse
-        clickhouse_result = self.run_data_source_scan('clickhouse', 'clickhouse_checks.yml')
+        # Check ClickHouse using custom checker
+        clickhouse_checker = ClickHouseDataQualityChecker()
+        clickhouse_result = clickhouse_checker.run_all_checks()
         results.append(clickhouse_result)
         
         # Save combined report
