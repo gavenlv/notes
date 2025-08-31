@@ -13,7 +13,7 @@ import psycopg2
 from clickhouse_driver import Client
 
 # Load environment variables
-load_dotenv('environment.env')
+load_dotenv('config/environment.env')
 
 # Setup logging
 logging.basicConfig(
@@ -44,7 +44,7 @@ def init_postgresql():
         cursor = conn.cursor()
         
         # Read and execute SQL script
-        sql_file = Path('scripts/init_postgresql.sql')
+        sql_file = Path(__file__).parent / 'scripts' / 'init_postgresql.sql'
         if not sql_file.exists():
             raise FileNotFoundError(f"SQL script not found: {sql_file}")
         
@@ -91,7 +91,7 @@ def init_clickhouse():
         logger.info(f"Connecting to ClickHouse at {os.getenv('CLICKHOUSE_HOST')}:{os.getenv('CLICKHOUSE_PORT')}")
         
         # Read and execute SQL script
-        sql_file = Path('scripts/init_clickhouse.sql')
+        sql_file = Path(__file__).parent / 'scripts' / 'init_clickhouse.sql'
         if not sql_file.exists():
             raise FileNotFoundError(f"SQL script not found: {sql_file}")
         
