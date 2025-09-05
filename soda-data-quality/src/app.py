@@ -202,14 +202,14 @@ data_source clickhouse:
         
         results = []
         
-        # Check PostgreSQL
-        postgres_result = self.run_data_source_scan('postgresql', 'postgresql_checks.yml')
-        results.append(postgres_result)
-        
         # Check ClickHouse using custom checker
         clickhouse_checker = ClickHouseDataQualityChecker()
         clickhouse_result = clickhouse_checker.run_all_checks()
         results.append(clickhouse_result)
+        
+        # Check PostgreSQL
+        postgres_result = self.run_data_source_scan('postgresql', 'postgresql_checks.yml')
+        results.append(postgres_result)
         
         # Save combined report
         self.save_report(results)

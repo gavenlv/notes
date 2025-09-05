@@ -16,27 +16,39 @@ if %errorlevel% neq 0 (
 echo Python found
 python --version
 
-REM Remove existing venv if it exists
+REM Check if virtual environment already exists
 if exist venv (
-    echo Removing existing virtual environment...
-    rmdir /s /q venv
+    echo Virtual environment already exists.
+    echo Updating dependencies...
+    
+    REM Activate virtual environment
+    echo Activating virtual environment...
+    call venv\Scripts\activate.bat
+    
+    REM Upgrade pip
+    echo Upgrading pip...
+    python -m pip install --upgrade pip
+    
+    REM Install dependencies
+    echo Installing dependencies...
+    pip install -r requirements.txt
+) else (
+    REM Create virtual environment
+    echo Creating virtual environment...
+    python -m venv venv
+    
+    REM Activate virtual environment
+    echo Activating virtual environment...
+    call venv\Scripts\activate.bat
+    
+    REM Upgrade pip
+    echo Upgrading pip...
+    python -m pip install --upgrade pip
+    
+    REM Install dependencies
+    echo Installing dependencies...
+    pip install -r requirements.txt
 )
-
-REM Create virtual environment
-echo Creating virtual environment...
-python -m venv venv
-
-REM Activate virtual environment
-echo Activating virtual environment...
-call venv\Scripts\activate.bat
-
-REM Upgrade pip
-echo Upgrading pip...
-python -m pip install --upgrade pip
-
-REM Install dependencies
-echo Installing dependencies...
-pip install -r requirements.txt
 
 echo.
 echo Virtual environment setup complete!

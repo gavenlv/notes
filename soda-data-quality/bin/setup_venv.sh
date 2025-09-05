@@ -15,27 +15,39 @@ fi
 echo "✅ Python found"
 python3 --version
 
-# Remove existing venv if it exists
+# Check if virtual environment already exists
 if [ -d "venv" ]; then
-    echo "🗑️  Removing existing virtual environment..."
-    rm -rf venv
+    echo "📂 Virtual environment already exists."
+    echo "🔄 Updating dependencies..."
+    
+    # Activate virtual environment
+    echo "🔧 Activating virtual environment..."
+    source venv/bin/activate
+    
+    # Upgrade pip
+    echo "⬆️  Upgrading pip..."
+    python -m pip install --upgrade pip
+    
+    # Install dependencies
+    echo "📚 Installing dependencies..."
+    pip install -r requirements.txt
+else
+    # Create virtual environment
+    echo "📦 Creating virtual environment..."
+    python3 -m venv venv
+    
+    # Activate virtual environment
+    echo "🔧 Activating virtual environment..."
+    source venv/bin/activate
+    
+    # Upgrade pip
+    echo "⬆️  Upgrading pip..."
+    python -m pip install --upgrade pip
+    
+    # Install dependencies
+    echo "📚 Installing dependencies..."
+    pip install -r requirements.txt
 fi
-
-# Create virtual environment
-echo "📦 Creating virtual environment..."
-python3 -m venv venv
-
-# Activate virtual environment
-echo "🔧 Activating virtual environment..."
-source venv/bin/activate
-
-# Upgrade pip
-echo "⬆️  Upgrading pip..."
-python -m pip install --upgrade pip
-
-# Install dependencies
-echo "📚 Installing dependencies..."
-pip install -r requirements.txt
 
 echo
 echo "✅ Virtual environment setup complete!"
@@ -45,9 +57,5 @@ echo "   source venv/bin/activate"
 echo
 echo "🚀 To run the application:"
 echo "   source venv/bin/activate"
-echo "   python app.py"
-echo
-echo "🧪 To run the demo:"
-echo "   source venv/bin/activate"
-echo "   python demo_with_mock_data.py"
+echo "   python src/app.py"
 echo

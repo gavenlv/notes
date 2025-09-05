@@ -9,7 +9,7 @@ import json
 import logging
 from datetime import datetime
 from typing import Dict, List, Any
-from clickhouse_driver import Client
+import clickhouse_connect
 from dotenv import load_dotenv
 from pathlib import Path
 import sys
@@ -42,10 +42,10 @@ class ClickHouseDataQualityChecker:
     
     def __init__(self):
         """Initialize the ClickHouse checker"""
-        self.client = Client(
+        self.client = clickhouse_connect.get_client(
             host=os.getenv('CLICKHOUSE_HOST', 'localhost'),
-            port=int(os.getenv('CLICKHOUSE_PORT', 9000)),
-            user=os.getenv('CLICKHOUSE_USERNAME', 'admin'),
+            port=int(os.getenv('CLICKHOUSE_PORT', 8123)),  # Note: clickhouse_connect uses HTTP port 8123 by default
+            username=os.getenv('CLICKHOUSE_USERNAME', 'admin'),
             password=os.getenv('CLICKHOUSE_PASSWORD', 'admin'),
             database=os.getenv('CLICKHOUSE_DATABASE', 'default')
         )
@@ -55,11 +55,11 @@ class ClickHouseDataQualityChecker:
     def check_table_exists(self, table_name: str) -> bool:
         """Check if a table exists"""
         try:
-            result = self.client.execute(
+            result = self.client.query(
                 "SELECT count() FROM system.tables WHERE database = currentDatabase() AND name = %(table)s",
-                {'table': table_name}
+                parameters={'table': table_name}
             )
-            return result[0][0] > 0
+            return result.first_row[0] > 0
         except Exception as e:
             logger.error(f"Error checking if table {table_name} exists: {e}")
             return False
@@ -78,8 +78,8 @@ class ClickHouseDataQualityChecker:
         
         # Row count check
         try:
-            result = self.client.execute(f"SELECT count() FROM {table_name}")
-            row_count = result[0][0]
+            result = self.client.query(f"SELECT count() FROM {table_name}")
+            row_count = result.first_row[0]
             checks.append({
                 'name': f'{table_name} has data',
                 'result': 'PASS' if row_count > 0 else 'FAIL',
@@ -106,8 +106,8 @@ class ClickHouseDataQualityChecker:
         
         # Missing event_type
         try:
-            result = self.client.execute("SELECT count() FROM events WHERE event_name IS NULL OR event_name = ''")
-            missing_count = result[0][0]
+            result = self.client.query("SELECT count() FROM events WHERE event_name IS NULL OR event_name = ''")
+            missing_count = result.first_row[0]
             checks.append({
                 'name': 'No missing event types',
                 'result': 'PASS' if missing_count == 0 else 'FAIL',
@@ -122,8 +122,8 @@ class ClickHouseDataQualityChecker:
         
         # Missing user_id
         try:
-            result = self.client.execute("SELECT count() FROM events WHERE user_id IS NULL OR user_id = 0")
-            missing_count = result[0][0]
+            result = self.client.query("SELECT count() FROM events WHERE user_id IS NULL OR user_id = 0")
+            missing_count = result.first_row[0]
             checks.append({
                 'name': 'No missing user IDs',
                 'result': 'PASS' if missing_count == 0 else 'FAIL',
@@ -161,8 +161,8 @@ class ClickHouseDataQualityChecker:
         
         # Future timestamps
         try:
-            result = self.client.execute("SELECT count() FROM events WHERE event_time > now()")
-            future_count = result[0][0]
+            result = self.client.query("SELECT count() FROM events WHERE event_time > now()")
+            future_count = result.first_row[0]
             checks.append({
                 'name': 'No future timestamps',
                 'result': 'PASS' if future_count == 0 else 'FAIL',
@@ -177,11 +177,11 @@ class ClickHouseDataQualityChecker:
         
         # Valid event types
         try:
-            result = self.client.execute("""
+            result = self.client.query("""
                 SELECT count() FROM events 
                 WHERE event_name NOT IN ('page_view', 'click', 'purchase', 'login', 'signup', 'view')
             """)
-            invalid_count = result[0][0]
+            invalid_count = result.first_row[0]
             checks.append({
                 'name': 'Valid event types',
                 'result': 'PASS' if invalid_count == 0 else 'FAIL',
