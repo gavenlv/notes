@@ -42,9 +42,20 @@ class ClickHouseDataQualityChecker:
     
     def __init__(self):
         """Initialize the ClickHouse checker"""
+        # clickhouse_connect uses HTTP port (default 8123) instead of native protocol port (9000)
+        # Check if CLICKHOUSE_HTTP_PORT is set, otherwise convert native port to HTTP port
+        if os.getenv('CLICKHOUSE_HTTP_PORT'):
+            ch_port = int(os.getenv('CLICKHOUSE_HTTP_PORT'))
+        else:
+            # If native protocol port is 9000, HTTP port is likely 8123
+            native_port = int(os.getenv('CLICKHOUSE_PORT', 9000))
+            ch_port = 8123 if native_port == 9000 else native_port
+            
+        logger.info(f"Connecting to ClickHouse HTTP port: {ch_port}")
+        
         self.client = clickhouse_connect.get_client(
             host=os.getenv('CLICKHOUSE_HOST', 'localhost'),
-            port=int(os.getenv('CLICKHOUSE_PORT', 8123)),  # Note: clickhouse_connect uses HTTP port 8123 by default
+            port=ch_port,
             username=os.getenv('CLICKHOUSE_USERNAME', 'admin'),
             password=os.getenv('CLICKHOUSE_PASSWORD', 'admin'),
             database=os.getenv('CLICKHOUSE_DATABASE', 'default')
