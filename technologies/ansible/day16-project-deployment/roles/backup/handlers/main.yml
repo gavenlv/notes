@@ -1,0 +1,30 @@
+---
+# 备份角色处理程序
+
+- name: restart backup service
+  service:
+    name: backup
+    state: restarted
+  when: backup_enabled
+  tags: [backup, handler]
+
+- name: reload backup service
+  service:
+    name: backup
+    state: reloaded
+  when: backup_enabled
+  tags: [backup, handler]
+
+- name: start backup service
+  service:
+    name: backup
+    state: started
+  when: backup_enabled
+  tags: [backup, handler]
+
+- name: stop backup service
+  service:
+    name: backup
+    state: stopped
+  when: backup_enabled
+  tags: [backup, handler]

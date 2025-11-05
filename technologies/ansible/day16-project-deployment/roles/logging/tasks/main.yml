@@ -1,0 +1,54 @@
+---
+# 日志角色主任务文件
+
+- name: 包含操作系统特定变量
+  include_vars: "{{ ansible_os_family }}.yml"
+  tags: [logging, setup]
+
+- name: 安装Elasticsearch
+  include_tasks: install_elasticsearch.yml
+  when: "'elasticsearch' in logging_components"
+  tags: [logging, elasticsearch, install]
+
+- name: 配置Elasticsearch
+  include_tasks: configure_elasticsearch.yml
+  when: "'elasticsearch' in logging_components"
+  tags: [logging, elasticsearch, config]
+
+- name: 安装Logstash
+  include_tasks: install_logstash.yml
+  when: "'logstash' in logging_components"
+  tags: [logging, logstash, install]
+
+- name: 配置Logstash
+  include_tasks: configure_logstash.yml
+  when: "'logstash' in logging_components"
+  tags: [logging, logstash, config]
+
+- name: 安装Kibana
+  include_tasks: install_kibana.yml
+  when: "'kibana' in logging_components"
+  tags: [logging, kibana, install]
+
+- name: 配置Kibana
+  include_tasks: configure_kibana.yml
+  when: "'kibana' in logging_components"
+  tags: [logging, kibana, config]
+
+- name: 安装Filebeat
+  include_tasks: install_filebeat.yml
+  when: "'filebeat' in logging_components"
+  tags: [logging, filebeat, install]
+
+- name: 配置Filebeat
+  include_tasks: configure_filebeat.yml
+  when: "'filebeat' in logging_components"
+  tags: [logging, filebeat, config]
+
+- name: 启动日志服务
+  include_tasks: start_services.yml
+  tags: [logging, service]
+
+- name: 验证日志服务
+  include_tasks: verify_services.yml
+  tags: [logging, verify]

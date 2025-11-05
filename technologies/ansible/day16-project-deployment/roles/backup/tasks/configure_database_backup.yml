@@ -1,0 +1,45 @@
+---
+# 配置数据库备份任务
+
+- name: 创建MySQL备份脚本
+  template:
+    src: mysql_backup.sh.j2
+    dest: "{{ backup_script_dir }}/mysql_backup.sh"
+    owner: "{{ backup_user }}"
+    group: "{{ backup_group }}"
+    mode: '0755'
+  when: mysql_backup_enabled
+  notify: restart backup service
+  tags: [backup, database, mysql]
+
+- name: 创建PostgreSQL备份脚本
+  template:
+    src: postgresql_backup.sh.j2
+    dest: "{{ backup_script_dir }}/postgresql_backup.sh"
+    owner: "{{ backup_user }}"
+    group: "{{ backup_group }}"
+    mode: '0755'
+  when: postgresql_backup_enabled
+  notify: restart backup service
+  tags: [backup, database, postgresql]
+
+- name: 创建MongoDB备份脚本
+  template:
+    src: mongodb_backup.sh.j2
+    dest: "{{ backup_script_dir }}/mongodb_backup.sh"
+    owner: "{{ backup_user }}"
+    group: "{{ backup_group }}"
+    mode: '0755'
+  when: mongodb_backup_enabled
+  notify: restart backup service
+  tags: [backup, database, mongodb]
+
+- name: 创建数据库备份配置文件
+  template:
+    src: database_backup.conf.j2
+    dest: "{{ backup_config_dir }}/database_backup.conf"
+    owner: "{{ backup_user }}"
+    group: "{{ backup_group }}"
+    mode: '0644'
+  notify: restart backup service
+  tags: [backup, database]

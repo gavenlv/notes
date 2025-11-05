@@ -1,0 +1,50 @@
+---
+# 备份角色主任务文件
+
+- name: 包含操作系统特定变量
+  include_vars: "{{ ansible_os_family }}.yml"
+  tags: [backup, setup]
+
+- name: 创建备份用户
+  user:
+    name: "{{ backup_user }}"
+    system: yes
+    shell: /bin/bash
+    state: present
+  when: backup_enabled
+  tags: [backup, setup]
+
+- name: 创建备份目录
+  file:
+    path: "{{ backup_local_path }}"
+    state: directory
+    owner: "{{ backup_user }}"
+    group: "{{ backup_group }}"
+    mode: '0755'
+  when: backup_enabled
+  tags: [backup, setup]
+
+- name: 安装备份工具
+  include_tasks: install_tools.yml
+  when: backup_enabled
+  tags: [backup, install]
+
+- name: 配置数据库备份
+  include_tasks: configure_database_backup.yml
+  when: backup_enabled and database_backup_enabled
+  tags: [backup, database]
+
+- name: 配置文件备份
+  include_tasks: configure_file_backup.yml
+  when: backup_enabled and file_backup_enabled
+  tags: [backup, file]
+
+- name: 配置备份计划任务
+  include_tasks: configure_cron.yml
+  when: backup_enabled
+  tags: [backup, cron]
+
+- name: 配置备份通知
+  include_tasks: configure_notification.yml
+  when: backup_enabled and backup_notification_enabled
+  tags: [backup, notification]

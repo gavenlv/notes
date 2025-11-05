@@ -1,0 +1,41 @@
+---
+# Staging Environment Variables
+
+# 应用配置
+app_name: "myapp"
+app_version: "1.2.3-rc1"
+app_environment: "staging"
+app_port: 8080
+
+# 数据库配置
+db_host: "db1.staging.example.com"
+db_port: 5432
+db_name: "myapp_staging"
+db_user: "myapp_user"
+db_password: "{{ vault_db_password }}"
+
+# 缓存配置
+cache_host: "redis.staging.example.com"
+cache_port: 6379
+
+# 外部服务
+external_services:
+  - name: payment_api
+    url: "https://api.staging.payment.com"
+    timeout: 30
+  - name: email_service
+    url: "https://api.staging.email.com"
+    timeout: 30
+
+# 监控配置
+monitoring_enabled: true
+monitoring_endpoint: "http://monitor.staging.example.com"
+
+# 日志配置
+log_level: "info"
+log_path: "/var/log/myapp"
+
+# SSL配置
+ssl_enabled: true
+ssl_cert_path: "/etc/ssl/certs/myapp.crt"
+ssl_key_path: "/etc/ssl/private/myapp.key"

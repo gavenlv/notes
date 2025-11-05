@@ -1,0 +1,38 @@
+---
+- name: Deploy ELK Stack for Log Management
+  hosts: logging
+  become: yes
+  vars:
+    elasticsearch_version: "8.8.1"
+    logstash_version: "8.8.1"
+    kibana_version: "8.8.1"
+    
+  tasks:
+    - name: Deploy Elasticsearch
+      include_tasks: deploy_elasticsearch.yml
+      
+    - name: Deploy Logstash
+      include_tasks: deploy_logstash.yml
+      
+    - name: Deploy Kibana
+      include_tasks: deploy_kibana.yml
+
+- name: Configure Log Collection Agents
+  hosts: all:!logging
+  become: yes
+  tasks:
+    - name: Deploy Filebeat
+      include_tasks: deploy_filebeat.yml
+      
+    - name: Configure Application Logging
+      include_tasks: configure_app_logging.yml
+
+- name: Configure Centralized Logging
+  hosts: logging
+  become: yes
+  tasks:
+    - name: Configure Index Templates
+      include_tasks: configure_index_templates.yml
+      
+    - name: Create Kibana Dashboards
+      include_tasks: create_kibana_dashboards.yml

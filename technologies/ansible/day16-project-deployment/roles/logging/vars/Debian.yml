@@ -1,0 +1,42 @@
+---
+# Debian系列操作系统日志角色变量
+
+# Elasticsearch配置
+elasticsearch_package_list:
+  - "elasticsearch={{ elasticsearch_version }}"
+
+elasticsearch_service_name: "elasticsearch"
+elasticsearch_user: "elasticsearch"
+elasticsearch_group: "elasticsearch"
+elasticsearch_config_file: "/etc/elasticsearch/elasticsearch.yml"
+elasticsearch_systemd_file: "/etc/systemd/system/elasticsearch.service"
+
+# Logstash配置
+logstash_package_list:
+  - "logstash={{ logstash_version }}"
+
+logstash_service_name: "logstash"
+logstash_user: "logstash"
+logstash_group: "logstash"
+logstash_config_file: "/etc/logstash/logstash.yml"
+logstash_systemd_file: "/etc/systemd/system/logstash.service"
+
+# Kibana配置
+kibana_package_list:
+  - "kibana={{ kibana_version }}"
+
+kibana_service_name: "kibana"
+kibana_user: "kibana"
+kibana_group: "kibana"
+kibana_config_file: "/etc/kibana/kibana.yml"
+kibana_systemd_file: "/etc/systemd/system/kibana.service"
+
+# Filebeat配置
+filebeat_package_list:
+  - "filebeat={{ filebeat_version }}"
+
+filebeat_service_name: "filebeat"
+filebeat_user: "filebeat"
+filebeat_group: "filebeat"
+filebeat_config_file: "/etc/filebeat/filebeat.yml"
+filebeat_systemd_file: "/etc/systemd/system/filebeat.service"

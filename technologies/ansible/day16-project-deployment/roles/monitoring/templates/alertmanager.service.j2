@@ -1,0 +1,15 @@
+[Unit]
+Description=Alertmanager
+After=network-online.target
+
+[Service]
+User=alertmanager
+Group=alertmanager
+Type=simple
+ExecStart=/usr/local/bin/alertmanager \
+    --config.file={{ alertmanager_config_dir }}/alertmanager.yml \
+    --storage.path={{ alertmanager_data_dir }} \
+    --web.listen-address=:{{ alertmanager_port }}
+
+[Install]
+WantedBy=multi-user.target

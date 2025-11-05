@@ -1,0 +1,25 @@
+---
+# 配置Node Exporter任务
+
+- name: 配置Node Exporter服务文件
+  template:
+    src: node_exporter.service.j2
+    dest: /etc/systemd/system/node_exporter.service
+    mode: '0644'
+  notify: restart node_exporter
+  tags: [monitoring, node_exporter, config]
+
+- name: 启动Node Exporter服务
+  service:
+    name: node_exporter
+    state: started
+    enabled: yes
+  tags: [monitoring, node_exporter, service]
+
+- name: 等待Node Exporter启动
+  wait_for:
+    port: "{{ node_exporter_port }}"
+    host: "localhost"
+    delay: 5
+    timeout: 30
+  tags: [monitoring, node_exporter, service]

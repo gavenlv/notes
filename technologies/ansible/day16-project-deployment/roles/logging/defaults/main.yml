@@ -1,0 +1,44 @@
+---
+# 日志角色默认变量
+
+# 日志组件配置
+logging_components:
+  - elasticsearch
+  - logstash
+  - kibana
+  - filebeat
+
+# Elasticsearch配置
+elasticsearch_version: "7.17.0"
+elasticsearch_port: 9200
+elasticsearch_data_dir: "/var/lib/elasticsearch"
+elasticsearch_config_dir: "/etc/elasticsearch"
+elasticsearch_user: "elasticsearch"
+elasticsearch_group: "elasticsearch"
+
+# Logstash配置
+logstash_version: "7.17.0"
+logstash_port: 5044
+logstash_config_dir: "/etc/logstash"
+logstash_user: "logstash"
+logstash_group: "logstash"
+
+# Kibana配置
+kibana_version: "7.17.0"
+kibana_port: 5601
+kibana_config_dir: "/etc/kibana"
+kibana_user: "kibana"
+kibana_group: "kibana"
+
+# Filebeat配置
+filebeat_version: "7.17.0"
+filebeat_config_dir: "/etc/filebeat"
+filebeat_user: "filebeat"
+filebeat_group: "filebeat"
+
+# 日志保留策略
+log_retention_days: 30
+
+# 安全配置
+elasticsearch_enable_security: false
+elasticsearch_admin_password: "changeme"

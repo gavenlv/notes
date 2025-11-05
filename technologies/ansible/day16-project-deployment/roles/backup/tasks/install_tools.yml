@@ -1,0 +1,46 @@
+---
+# 安装备份工具任务
+
+- name: 更新软件包缓存 (RedHat)
+  yum:
+    update_cache: yes
+  when: ansible_os_family == "RedHat"
+  tags: [backup, install]
+
+- name: 更新软件包缓存 (Debian)
+  apt:
+    update_cache: yes
+  when: ansible_os_family == "Debian"
+  tags: [backup, install]
+
+- name: 安装备份工具包 (RedHat)
+  yum:
+    name: "{{ backup_package_list }}"
+    state: present
+  when: ansible_os_family == "RedHat"
+  tags: [backup, install]
+
+- name: 安装备份工具包 (Debian)
+  apt:
+    name: "{{ backup_package_list }}"
+    state: present
+  when: ansible_os_family == "Debian"
+  tags: [backup, install]
+
+- name: 创建备份脚本目录
+  file:
+    path: "{{ backup_script_dir }}"
+    state: directory
+    owner: "{{ backup_user }}"
+    group: "{{ backup_group }}"
+    mode: '0755'
+  tags: [backup, install]
+
+- name: 创建备份日志目录
+  file:
+    path: "{{ backup_log_dir }}"
+    state: directory
+    owner: "{{ backup_user }}"
+    group: "{{ backup_group }}"
+    mode: '0755'
+  tags: [backup, install]

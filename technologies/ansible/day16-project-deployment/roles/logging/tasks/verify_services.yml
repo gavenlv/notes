@@ -1,0 +1,62 @@
+---
+# 验证日志服务任务
+
+- name: 验证Elasticsearch运行状态
+  uri:
+    url: "http://localhost:{{ elasticsearch_port }}/_cluster/health"
+    method: GET
+    status_code: 200
+  when: "'elasticsearch' in logging_components"
+  register: elasticsearch_status
+  retries: 5
+  delay: 10
+  tags: [logging, elasticsearch, verify]
+
+- name: 显示Elasticsearch状态
+  debug:
+    msg: "Elasticsearch服务状态: {{ '运行正常' if elasticsearch_status.status == 200 else '运行异常' }}"
+  when: "'elasticsearch' in logging_components and elasticsearch_status is defined"
+  tags: [logging, elasticsearch, verify]
+
+- name: 验证Kibana运行状态
+  uri:
+    url: "http://localhost:{{ kibana_port }}/api/status"
+    method: GET
+    status_code: 200
+  when: "'kibana' in logging_components"
+  register: kibana_status
+  retries: 5
+  delay: 10
+  tags: [logging, kibana, verify]
+
+- name: 显示Kibana状态
+  debug:
+    msg: "Kibana服务状态: {{ '运行正常' if kibana_status.status == 200 else '运行异常' }}"
+  when: "'kibana' in logging_components and kibana_status is defined"
+  tags: [logging, kibana, verify]
+
+- name: 验证Logstash运行状态
+  command: systemctl is-active logstash
+  when: "'logstash' in logging_components"
+  register: logstash_status
+  ignore_errors: yes
+  tags: [logging, logstash, verify]
+
+- name: 显示Logstash状态
+  debug:
+    msg: "Logstash服务状态: {{ '运行正常' if logstash_status.stdout == 'active' else '运行异常' }}"
+  when: "'logstash' in logging_components and logstash_status is defined"
+  tags: [logging, logstash, verify]
+
+- name: 验证Filebeat运行状态
+  command: systemctl is-active filebeat
+  when: "'filebeat' in logging_components"
+  register: filebeat_status
+  ignore_errors: yes
+  tags: [logging, filebeat, verify]
+
+- name: 显示Filebeat状态
+  debug:
+    msg: "Filebeat服务状态: {{ '运行正常' if filebeat_status.stdout == 'active' else '运行异常' }}"
+  when: "'filebeat' in logging_components and filebeat_status is defined"
+  tags: [logging, filebeat, verify]

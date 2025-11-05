@@ -1,0 +1,26 @@
+---
+# 数据库角色处理程序
+
+- name: restart database
+  service:
+    name: "{{ db_service_name }}"
+    state: restarted
+  listen: "restart database"
+
+- name: reload database
+  service:
+    name: "{{ db_service_name }}"
+    state: reloaded
+  listen: "reload database"
+
+- name: stop database
+  service:
+    name: "{{ db_service_name }}"
+    state: stopped
+  listen: "stop database"
+
+- name: start database
+  service:
+    name: "{{ db_service_name }}"
+    state: started
+  listen: "start database"

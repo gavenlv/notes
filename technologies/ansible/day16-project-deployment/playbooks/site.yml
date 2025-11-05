@@ -1,0 +1,44 @@
+---
+# Site-wide deployment playbook
+
+- name: Deploy Application Servers
+  hosts: webservers
+  become: yes
+  roles:
+    - application
+  tags: [application, deploy]
+
+- name: Deploy Database Servers
+  hosts: databases
+  become: yes
+  roles:
+    - database
+  tags: [database, deploy]
+
+- name: Deploy Monitoring Stack
+  hosts: monitoring
+  become: yes
+  roles:
+    - monitoring
+  tags: [monitoring, deploy]
+
+- name: Deploy Load Balancers
+  hosts: loadbalancers
+  become: yes
+  roles:
+    - loadbalancer
+  tags: [loadbalancer, deploy]
+
+- name: Deploy Logging Infrastructure
+  hosts: logging
+  become: yes
+  roles:
+    - logging
+  tags: [logging, deploy]
+
+- name: Deploy Backup System
+  hosts: backup
+  become: yes
+  roles:
+    - backup
+  tags: [backup, deploy]

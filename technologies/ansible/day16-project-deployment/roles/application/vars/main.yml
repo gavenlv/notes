@@ -1,0 +1,19 @@
+---
+# 应用角色变量
+
+# 根据不同操作系统设置服务文件路径
+app_service_file: "{% if ansible_os_family == 'RedHat' %}/etc/systemd/system/{{ app_service_name }}.service{% elif ansible_os_family == 'Debian' %}/etc/systemd/system/{{ app_service_name }}.service{% else %}/etc/systemd/system/{{ app_service_name }}.service{% endif %}"
+
+# 根据不同操作系统设置包管理器
+app_package_manager: "{% if ansible_os_family == 'RedHat' %}yum{% elif ansible_os_family == 'Debian' %}apt{% else %}yum{% endif %}"
+
+# 应用特定依赖包
+app_dependencies:
+  - "{% if ansible_os_family == 'RedHat' %}epel-release{% elif ansible_os_family == 'Debian' %}software-properties-common{% endif %}"
+
+# 默认应用端口列表
+app_ports:
+  - "{{ app_port }}"
+
+# 应用进程管理器配置文件路径
+app_process_config_path: "{% if app_process_manager == 'supervisor' %}/etc/supervisor/conf.d{% elif app_process_manager == 'systemd' %}/etc/systemd/system{% else %}/etc/init{% endif %}"

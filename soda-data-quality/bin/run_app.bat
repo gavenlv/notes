@@ -1,8 +1,8 @@
 @echo off
-REM Run Soda Data Quality App with virtual environment
-REM Windows batch script
+REM Run Refactored Data Quality App with virtual environment
+REM Windows batch script using SOLID architecture
 
-echo Starting Soda Data Quality App
+echo Starting Refactored Data Quality App
 echo.
 
 REM Check if virtual environment exists
@@ -20,8 +20,8 @@ if %errorlevel% neq 0 (
     exit /b 1
 )
 
-REM Run real data quality checks
-echo Running real data quality checks...
+REM Run refactored data quality checks
+echo Running refactored data quality checks...
 python src\app.py
 
 echo.

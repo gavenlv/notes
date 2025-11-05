@@ -1,0 +1,26 @@
+---
+# External roles required for this project
+
+- name: geerlingguy.docker
+  src: https://github.com/geerlingguy/ansible-role-docker
+  version: master
+
+- name: geerlingguy.nginx
+  src: https://github.com/geerlingguy/ansible-role-nginx
+  version: master
+
+- name: geerlingguy.postgresql
+  src: https://github.com/geerlingguy/ansible-role-postgresql
+  version: master
+
+- name: geerlingguy.java
+  src: https://github.com/geerlingguy/ansible-role-java
+  version: master
+
+- name: geerlingguy.elasticsearch
+  src: https://github.com/geerlingguy/ansible-role-elasticsearch
+  version: master
+
+- name: geerlingguy.kafka
+  src: https://github.com/geerlingguy/ansible-role-kafka
+  version: master

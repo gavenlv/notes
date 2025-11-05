@@ -1,0 +1,124 @@
+# {{ ansible_managed }}
+
+user {{ lb_service_user }};
+worker_processes auto;
+error_log {{ lb_log_path }}/error.log;
+pid /run/nginx.pid;
+
+events {
+    worker_connections 1024;
+}
+
+http {
+    log_format {{ lb_log_format }} '$remote_addr - $remote_user [$time_local] "$request" '
+                                   '$status $body_bytes_sent "$http_referer" '
+                                   '"$http_user_agent" "$http_x_forwarded_for"';
+
+    access_log {{ lb_log_path }}/access.log {{ lb_log_format }};
+
+    sendfile            on;
+    tcp_nopush          on;
+    tcp_nodelay         on;
+    keepalive_timeout   65;
+    types_hash_max_size 2048;
+
+    include             /etc/nginx/mime.types;
+    default_type        application/octet-stream;
+
+    # SSL配置
+    ssl_protocols {{ lb_ssl_protocols }};
+    ssl_ciphers {{ lb_ssl_ciphers }};
+    ssl_prefer_server_ciphers on;
+
+    # 代理配置
+    proxy_read_timeout {{ lb_proxy_read_timeout }};
+    proxy_connect_timeout {{ lb_proxy_connect_timeout }};
+    proxy_send_timeout {{ lb_proxy_send_timeout }};
+    client_max_body_size {{ lb_client_max_body_size }};
+    proxy_buffering {{ lb_proxy_buffering }};
+
+    # 负载均衡配置
+    upstream {{ lb_backend_name }} {
+        {% if lb_algorithm == "leastconn" %}
+        least_conn;
+        {% elif lb_algorithm == "source" %}
+        ip_hash;
+        {% else %}
+        # 默认轮询算法
+        {% endif %}
+
+        {% for server in lb_backend_servers %}
+        server {{ server.address }}:{{ server.port }} {% if server.weight is defined %}weight={{ server.weight }}{% endif %} {% if server.backup is defined and server.backup %}backup{% endif %};
+        {% endfor %}
+    }
+
+    # HTTP服务器配置
+    server {
+        listen {{ lb_bind_address }}:{{ lb_port }};
+        server_name _;
+
+        {% if lb_allowed_ips | length > 0 %}
+        # 访问控制
+        {% for ip in lb_allowed_ips %}
+        allow {{ ip }};
+        {% endfor %}
+        deny all;
+        {% endif %}
+
+        location / {
+            proxy_pass http://{{ lb_backend_name }};
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+
+        {% if lb_health_check_enabled %}
+        location {{ lb_health_check_uri }} {
+            access_log off;
+            return 200 "healthy\n";
+            add_header Content-Type text/plain;
+        }
+        {% endif %}
+
+        {% if lb_custom_config != "" %}
+        # 自定义配置
+        {{ lb_custom_config }}
+        {% endif %}
+    }
+
+    # HTTPS服务器配置
+    {% if lb_ssl_enabled %}
+    server {
+        listen {{ lb_bind_address }}:{{ lb_ssl_port }} ssl http2;
+        server_name _;
+
+        ssl_certificate {{ lb_ssl_cert_path }};
+        ssl_certificate_key {{ lb_ssl_key_path }};
+
+        {% if lb_allowed_ips | length > 0 %}
+        # 访问控制
+        {% for ip in lb_allowed_ips %}
+        allow {{ ip }};
+        {% endfor %}
+        deny all;
+        {% endif %}
+
+        location / {
+            proxy_pass http://{{ lb_backend_name }};
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+
+        {% if lb_health_check_enabled %}
+        location {{ lb_health_check_uri }} {
+            access_log off;
+            return 200 "healthy\n";
+            add_header Content-Type text/plain;
+        }
+        {% endif %}
+    }
+    {% endif %}
+}

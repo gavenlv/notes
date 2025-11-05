@@ -1,0 +1,66 @@
+---
+# 备份角色默认变量
+
+# 备份配置
+backup_enabled: true
+backup_schedule: "0 2 * * *"  # 每天凌晨2点执行备份
+backup_user: "backup"
+backup_group: "backup"
+
+# 备份存储配置
+backup_storage_type: "local"  # local, s3, nfs, rsync
+backup_local_path: "/backup"
+backup_remote_path: "/remote/backup"
+backup_retention_days: 30
+
+# 数据库备份配置
+database_backup_enabled: true
+database_backup_types:
+  - mysql
+  - postgresql
+
+# MySQL备份配置
+mysql_backup_enabled: true
+mysql_host: "localhost"
+mysql_port: 3306
+mysql_user: "backup_user"
+mysql_password: "backup_password"
+mysql_databases:
+  - all
+
+# PostgreSQL备份配置
+postgresql_backup_enabled: true
+postgresql_host: "localhost"
+postgresql_port: 5432
+postgresql_user: "backup_user"
+postgresql_password: "backup_password"
+postgresql_databases:
+  - all
+
+# MongoDB备份配置
+mongodb_backup_enabled: false
+mongodb_host: "localhost"
+mongodb_port: 27017
+mongodb_user: "backup_user"
+mongodb_password: "backup_password"
+mongodb_databases:
+  - all
+
+# 文件备份配置
+file_backup_enabled: true
+file_backup_paths:
+  - /etc
+  - /home
+  - /var/log
+
+# 备份压缩配置
+backup_compression_enabled: true
+backup_compression_type: "gzip"  # gzip, bzip2, xz
+
+# 备份加密配置
+backup_encryption_enabled: false
+backup_encryption_key: ""
+
+# 备份通知配置
+backup_notification_enabled: true
+backup_notification_email: "admin@example.com"

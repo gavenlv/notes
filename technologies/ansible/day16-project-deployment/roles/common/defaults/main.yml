@@ -1,0 +1,68 @@
+---
+# 通用角色默认变量
+
+# 系统用户配置
+common_system_users: []
+# 示例:
+# common_system_users:
+#   - name: appuser
+#     uid: 1001
+#     group: appgroup
+#     home: /home/appuser
+#     shell: /bin/bash
+
+# 系统组配置
+common_system_groups: []
+# 示例:
+# common_system_groups:
+#   - name: appgroup
+#     gid: 1001
+
+# 基础软件包
+common_base_packages:
+  - curl
+  - wget
+  - vim
+  - htop
+  - git
+  - rsync
+  - unzip
+  - tar
+  - jq
+
+# 防火墙配置
+common_firewall_enabled: true
+common_firewall_ports:
+  - 22
+  - 80
+  - 443
+
+# 时间同步
+common_ntp_enabled: true
+common_ntp_servers:
+  - 0.pool.ntp.org
+  - 1.pool.ntp.org
+  - 2.pool.ntp.org
+  - 3.pool.ntp.org
+
+# 日志配置
+common_logrotate_enabled: true
+common_logrotate_frequency: daily
+common_logrotate_retention: 30
+
+# 安全配置
+common_ssh_hardening: true
+common_ssh_port: 22
+common_ssh_permit_root_login: false
+common_ssh_password_authentication: false
+
+# 网络配置
+common_network_optimization: true
+common_sysctl_settings:
+  net.ipv4.tcp_fin_timeout: 30
+  net.ipv4.tcp_keepalive_time: 1200
+  net.ipv4.tcp_max_syn_backlog: 8192
+
+# 更新和升级
+common_auto_update: false
+common_update_packages: false

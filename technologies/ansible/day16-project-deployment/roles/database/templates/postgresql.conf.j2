@@ -1,0 +1,92 @@
+# {{ ansible_managed }}
+
+#------------------------------------------------------------------------------
+# FILE LOCATIONS
+#------------------------------------------------------------------------------
+
+data_directory = '{{ db_data_directory }}'
+{% if db_wal_directory != "" %}
+wal_directory = '{{ db_wal_directory }}'
+{% endif %}
+hba_file = '{{ db_auth_file }}'
+ident_file = '/etc/postgresql/{{ db_version }}/main/pg_ident.conf'
+
+#------------------------------------------------------------------------------
+# CONNECTIONS AND AUTHENTICATION
+#------------------------------------------------------------------------------
+
+listen_addresses = '{{ db_listen_addresses }}'
+port = {{ db_port }}
+max_connections = {{ db_max_connections }}
+unix_socket_directories = '/var/run/postgresql'
+
+#------------------------------------------------------------------------------
+# RESOURCE USAGE (except WAL)
+#------------------------------------------------------------------------------
+
+shared_buffers = {{ db_shared_buffers }}
+effective_cache_size = {{ db_effective_cache_size }}
+maintenance_work_mem = {{ db_maintenance_work_mem }}
+checkpoint_completion_target = {{ db_checkpoint_completion_target }}
+wal_buffers = {{ db_wal_buffers }}
+default_statistics_target = {{ db_default_statistics_target }}
+random_page_cost = 1.1
+effective_io_concurrency = 200
+work_mem = {{ db_work_mem }}
+min_wal_size = 1GB
+max_wal_size = 4GB
+
+#------------------------------------------------------------------------------
+# WRITE AHEAD LOG
+#------------------------------------------------------------------------------
+
+wal_level = replica
+fsync = on
+synchronous_commit = on
+wal_sync_method = fsync
+full_page_writes = on
+wal_compression = on
+wal_log_hints = on
+
+#------------------------------------------------------------------------------
+# REPLICATION
+#------------------------------------------------------------------------------
+
+max_wal_senders = 3
+max_replication_slots = 3
+
+#------------------------------------------------------------------------------
+# ERROR REPORTING AND LOGGING
+#------------------------------------------------------------------------------
+
+log_destination = '{{ db_log_destination }}'
+logging_collector = {{ db_logging_collector }}
+log_directory = '{{ db_log_directory }}'
+log_filename = '{{ db_log_filename }}'
+log_statement = '{{ db_log_statement }}'
+log_min_duration_statement = {{ db_log_min_duration_statement }}
+log_line_prefix = '%t [%p]: [%l-1] user=%u,db=%d,app=%a,client=%h '
+log_checkpoints = on
+log_connections = on
+log_disconnections = on
+log_lock_waits = on
+log_temp_files = 0
+
+#------------------------------------------------------------------------------
+# AUTOVACUUM PARAMETERS
+#------------------------------------------------------------------------------
+
+autovacuum = on
+log_autovacuum_min_duration = 0
+
+#------------------------------------------------------------------------------
+# LOCK MANAGEMENT
+#------------------------------------------------------------------------------
+
+deadlock_timeout = 1s
+
+#------------------------------------------------------------------------------
+# VERSION/PLATFORM COMPATIBILITY
+#------------------------------------------------------------------------------
+
+shared_preload_libraries = 'pg_stat_statements'

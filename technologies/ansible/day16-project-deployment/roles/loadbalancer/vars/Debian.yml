@@ -1,0 +1,14 @@
+---
+# Debian系列操作系统负载均衡器变量
+
+# Nginx配置
+lb_packages:
+  - nginx
+
+lb_service_name: nginx
+lb_service_user: www-data
+lb_service_group: www-data
+
+lb_config_file: /etc/nginx/nginx.conf
+lb_ssl_cert_path: /etc/nginx/ssl/cert.pem
+lb_ssl_key_path: /etc/nginx/ssl/key.pem

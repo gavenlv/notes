@@ -1,0 +1,44 @@
+---
+# Monitoring role variables
+
+# Prometheus configuration
+prometheus_version: "2.30.3"
+prometheus_user: prometheus
+prometheus_group: prometheus
+prometheus_install_dir: "/opt/prometheus"
+prometheus_data_dir: "/var/lib/prometheus"
+prometheus_config_dir: "/etc/prometheus"
+prometheus_port: 9090
+
+# Node exporter configuration
+node_exporter_version: "1.2.2"
+node_exporter_user: node_exporter
+node_exporter_group: node_exporter
+node_exporter_port: 9100
+
+# Grafana configuration
+grafana_version: "8.1.5"
+grafana_user: grafana
+grafana_group: grafana
+grafana_install_dir: "/opt/grafana"
+grafana_data_dir: "/var/lib/grafana"
+grafana_config_dir: "/etc/grafana"
+grafana_port: 3000
+
+# Alertmanager configuration
+alertmanager_version: "0.23.0"
+alertmanager_user: alertmanager
+alertmanager_group: alertmanager
+alertmanager_install_dir: "/opt/alertmanager"
+alertmanager_data_dir: "/var/lib/alertmanager"
+alertmanager_config_dir: "/etc/alertmanager"
+alertmanager_port: 9093
+
+# Monitoring targets
+monitoring_targets:
+  - targets: ["localhost:{{ prometheus_port }}"]
+    labels:
+      job: prometheus
+  - targets: ["localhost:{{ node_exporter_port }}"]
+    labels:
+      job: node

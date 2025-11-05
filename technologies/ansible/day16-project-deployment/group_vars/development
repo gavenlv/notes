@@ -1,0 +1,39 @@
+---
+# Development Environment Variables
+
+# 应用配置
+app_name: "myapp"
+app_version: "1.0.0"
+app_environment: "development"
+app_port: 8080
+
+# 数据库配置
+db_host: "localhost"
+db_port: 5432
+db_name: "myapp_dev"
+db_user: "myapp_user"
+db_password: "dev_password"
+
+# 缓存配置
+cache_host: "localhost"
+cache_port: 6379
+
+# 外部服务
+external_services:
+  - name: payment_api
+    url: "https://api.dev.payment.com"
+    timeout: 30
+  - name: email_service
+    url: "https://api.dev.email.com"
+    timeout: 30
+
+# 监控配置
+monitoring_enabled: false
+monitoring_endpoint: "http://localhost:3000"
+
+# 日志配置
+log_level: "debug"
+log_path: "/var/log/myapp"
+
+# SSL配置
+ssl_enabled: false

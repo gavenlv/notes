@@ -1,0 +1,82 @@
+---
+# 安装Grafana任务
+
+- name: 创建Grafana用户
+  user:
+    name: grafana
+    system: yes
+    shell: /bin/false
+    home: "{{ grafana_data_dir }}"
+    state: present
+  tags: [monitoring, grafana, setup]
+
+- name: 创建Grafana目录
+  file:
+    path: "{{ grafana_data_dir }}"
+    state: directory
+    owner: grafana
+    group: grafana
+    mode: '0755'
+  tags: [monitoring, grafana, setup]
+
+- name: 下载Grafana
+  get_url:
+    url: "https://dl.grafana.com/oss/release/grafana-{{ grafana_version }}.linux-amd64.tar.gz"
+    dest: "/tmp/grafana-{{ grafana_version }}.linux-amd64.tar.gz"
+    mode: '0644'
+  tags: [monitoring, grafana, download]
+
+- name: 解压Grafana
+  unarchive:
+    src: "/tmp/grafana-{{ grafana_version }}.linux-amd64.tar.gz"
+    dest: "/tmp"
+    remote_src: yes
+  tags: [monitoring, grafana, extract]
+
+- name: 复制Grafana二进制文件
+  copy:
+    src: "/tmp/grafana-{{ grafana_version }}/bin/grafana-server"
+    dest: "/usr/local/bin/grafana-server"
+    mode: '0755'
+    remote_src: yes
+  tags: [monitoring, grafana, install]
+
+- name: 复制Grafana工具
+  copy:
+    src: "/tmp/grafana-{{ grafana_version }}/bin/grafana-cli"
+    dest: "/usr/local/bin/grafana-cli"
+    mode: '0755'
+    remote_src: yes
+  tags: [monitoring, grafana, install]
+
+- name: 复制Grafana公共文件
+  copy:
+    src: "/tmp/grafana-{{ grafana_version }}/public"
+    dest: "{{ grafana_data_dir }}/public"
+    owner: grafana
+    group: grafana
+    mode: '0644'
+    remote_src: yes
+  tags: [monitoring, grafana, install]
+
+- name: 复制Grafana配置文件
+  copy:
+    src: "/tmp/grafana-{{ grafana_version }}/conf"
+    dest: "/etc/grafana"
+    owner: grafana
+    group: grafana
+    mode: '0644'
+    remote_src: yes
+  tags: [monitoring, grafana, install]
+
+- name: 创建Grafana systemd服务文件
+  template:
+    src: grafana.service.j2
+    dest: /etc/systemd/system/grafana-server.service
+    mode: '0644'
+  tags: [monitoring, grafana, service]
+
+- name: 重新加载systemd
+  systemd:
+    daemon_reload: yes
+  tags: [monitoring, grafana, service]

@@ -1,0 +1,21 @@
+[Unit]
+Description=Filebeat
+Documentation=https://www.elastic.co/guide/en/beats/filebeat/current/index.html
+Requires=network-online.target
+After=network-online.target
+
+[Service]
+Type=simple
+User={{ filebeat_user }}
+Group={{ filebeat_group }}
+Environment=BEAT_HOME=/usr/share/filebeat
+Environment=BEAT_CONFIG={{ filebeat_config_dir }}/filebeat.yml
+ExecStart=/usr/share/filebeat/filebeat -c ${BEAT_CONFIG} -path.home /usr/share/filebeat -path.config ${filebeat_config_dir} -path.data /var/lib/filebeat -path.logs /var/log/filebeat
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=filebeat
+
+[Install]
+WantedBy=multi-user.target

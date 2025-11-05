@@ -1,0 +1,36 @@
+#!/bin/bash
+# {{ ansible_managed }}
+
+# 数据库备份脚本
+
+# 备份配置
+BACKUP_DIR="{{ db_backup_directory }}"
+DATE=$(date +%Y%m%d_%H%M%S)
+RETENTION_DAYS={{ db_backup_retention_days }}
+
+# 创建备份目录
+mkdir -p ${BACKUP_DIR}
+
+# 执行备份
+{% if db_type == "postgresql" %}
+pg_dumpall -U {{ db_admin_user }} > ${BACKUP_DIR}/full_backup_${DATE}.sql
+{% elif db_type == "mysql" %}
+mysqldump -u {{ db_admin_user }} --all-databases > ${BACKUP_DIR}/full_backup_${DATE}.sql
+{% endif %}
+
+# 检查备份是否成功
+if [ $? -eq 0 ]; then
+    echo "[$(date)] 数据库备份成功: full_backup_${DATE}.sql" >> ${BACKUP_DIR}/backup.log
+    
+    # 压缩备份文件
+    gzip ${BACKUP_DIR}/full_backup_${DATE}.sql
+    
+    # 删除过期备份
+    find ${BACKUP_DIR} -name "full_backup_*" -mtime +${RETENTION_DAYS} -delete
+    find ${BACKUP_DIR} -name "full_backup_*.gz" -mtime +${RETENTION_DAYS} -delete
+    
+    echo "[$(date)] 清理过期备份完成" >> ${BACKUP_DIR}/backup.log
+else
+    echo "[$(date)] 数据库备份失败" >> ${BACKUP_DIR}/backup.log
+    exit 1
+fi

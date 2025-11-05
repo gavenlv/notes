@@ -1,8 +1,8 @@
 #!/bin/bash
-# Quick start script for Soda Data Quality App
-# This script checks if venv exists and runs the demo
+# Quick start script for Refactored Data Quality App
+# This script checks if venv exists and runs the refactored application
 
-echo "🚀 Quick Start - Soda Data Quality App"
+echo "🚀 Quick Start - Refactored Data Quality App"
 echo
 
 # Check if virtual environment exists
@@ -18,12 +18,12 @@ else
     echo "✅ Virtual environment found"
 fi
 
-# Activate virtual environment and run demo
+# Activate virtual environment and run refactored app
 echo
-echo "🧪 Running demo with mock data..."
+echo "🧪 Running refactored data quality checks..."
 source venv/bin/activate
-python src/demo_with_mock_data.py
+python src/app.py
 
 echo
-echo "🏁 Demo completed!"
+echo "🏁 Data quality checks completed!"
 

@@ -1,0 +1,156 @@
+---
+# 应用部署 Playbook
+
+- name: 应用预检检查
+  hosts: localhost
+  gather_facts: no
+  vars_prompt:
+    - name: "confirm_deployment"
+      prompt: "确认部署 {{ app_name | default('application') }} 版本 {{ app_version | default('latest') }} 到 {{ target_environment | default('production') }} 环境? (yes/no)"
+      default: "no"
+      private: no
+  
+  tasks:
+    - name: 验证部署确认
+      assert:
+        that:
+          - confirm_deployment == "yes"
+        fail_msg: "部署已被取消"
+        success_msg: "开始部署流程"
+
+- name: 准备部署环境
+  hosts: webservers
+  become: yes
+  vars:
+    backup_dir: "/var/backups/{{ app_name }}_{{ ansible_date_time.iso8601_basic_short }}"
+    
+  pre_tasks:
+    - name: 创建备份目录
+      file:
+        path: "{{ backup_dir }}"
+        state: directory
+        mode: '0755'
+      delegate_to: "{{ inventory_hostname }}"
+      
+    - name: 备份当前应用
+      archive:
+        path: "/var/www/{{ app_name }}"
+        dest: "{{ backup_dir }}/{{ app_name }}_backup.tar.gz"
+      ignore_errors: yes
+      
+    - name: 记录当前版本
+      set_fact:
+        previous_version: "{{ app_version }}"
+      delegate_to: localhost
+      run_once: true
+
+- name: 部署应用
+  hosts: webservers
+  become: yes
+  serial: 1  # 滚动更新
+  
+  tasks:
+    - name: 停止应用服务
+      service:
+        name: "{{ app_name }}"
+        state: stopped
+      ignore_errors: yes
+      
+    - name: 下载应用包
+      get_url:
+        url: "{{ app_package_url | default('https://example.com/' + app_name + '-' + app_version + '.tar.gz') }}"
+        dest: "/tmp/{{ app_name }}-{{ app_version }}.tar.gz"
+        mode: '0644'
+        
+    - name: 解压应用包
+      unarchive:
+        src: "/tmp/{{ app_name }}-{{ app_version }}.tar.gz"
+        dest: "/var/www/"
+        owner: "{{ app_user | default('www-data') }}"
+        group: "{{ app_group | default('www-data') }}"
+        remote_src: yes
+        
+    - name: 应用配置文件
+      template:
+        src: "../configs/app-config.yml.j2"
+        dest: "/etc/{{ app_name }}/config.yml"
+        mode: '0644'
+      notify: reload application
+      
+    - name: 设置文件权限
+      file:
+        path: "/var/www/{{ app_name }}"
+        owner: "{{ app_user | default('www-data') }}"
+        group: "{{ app_group | default('www-data') }}"
+        mode: '0755'
+        recurse: yes
+
+  handlers:
+    - name: reload application
+      service:
+        name: "{{ app_name }}"
+        state: reloaded
+
+- name: 数据库迁移
+  hosts: databases
+  become: yes
+  tasks:
+    - name: 备份数据库
+      mysql_db:
+        name: "{{ db_name }}"
+        state: dump
+        target: "/var/backups/{{ db_name }}_{{ ansible_date_time.iso8601_basic_short }}.sql"
+      when: backup_database | default(true)
+      
+    - name: 应用数据库迁移
+      mysql_db:
+        name: "{{ db_name }}"
+        state: import
+        target: "../configs/db-migrations/{{ app_version }}.sql"
+      when: run_migrations | default(true)
+
+- name: 启动和验证
+  hosts: webservers
+  become: yes
+  serial: 1
+  
+  tasks:
+    - name: 启动应用服务
+      service:
+        name: "{{ app_name }}"
+        state: started
+        enabled: yes
+        
+    - name: 等待应用启动
+      wait_for:
+        port: "{{ app_port | default(8080) }}"
+        host: "{{ ansible_default_ipv4.address }}"
+        delay: 10
+        timeout: 60
+        
+    - name: 健康检查
+      uri:
+        url: "http://{{ ansible_default_ipv4.address }}:{{ app_port | default(8080) }}/health"
+        method: GET
+        status_code: 200
+        timeout: 30
+      retries: 5
+      delay: 10
+      register: health_check
+      
+    - name: 验证部署结果
+      debug:
+        msg: "应用部署成功，健康检查状态: {{ health_check.status }}"
+
+- name: 部署完成通知
+  hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: 发送部署完成通知
+      debug:
+        msg: |
+          部署完成通知:
+          应用名称: {{ app_name | default('application') }}
+          部署版本: {{ app_version | default('latest') }}
+          部署环境: {{ target_environment | default('production') }}
+          部署时间: {{ ansible_date_time.iso8601 }}

@@ -1,0 +1,26 @@
+---
+# 负载均衡器角色处理程序
+
+- name: restart loadbalancer
+  service:
+    name: "{{ lb_service_name }}"
+    state: restarted
+  listen: "restart loadbalancer"
+
+- name: reload loadbalancer
+  service:
+    name: "{{ lb_service_name }}"
+    state: reloaded
+  listen: "reload loadbalancer"
+
+- name: stop loadbalancer
+  service:
+    name: "{{ lb_service_name }}"
+    state: stopped
+  listen: "stop loadbalancer"
+
+- name: start loadbalancer
+  service:
+    name: "{{ lb_service_name }}"
+    state: started
+  listen: "start loadbalancer"

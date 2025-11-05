@@ -1,0 +1,22 @@
+[Unit]
+Description=Logstash
+Documentation=https://www.elastic.co/guide/en/logstash/current/index.html
+Requires=network-online.target
+After=network-online.target
+
+[Service]
+Type=simple
+User={{ logstash_user }}
+Group={{ logstash_group }}
+Environment=LS_HOME=/usr/share/logstash
+Environment=LS_SETTINGS_DIR={{ logstash_config_dir }}
+Environment=LS_OPTS="--path.settings {{ logstash_config_dir }}"
+ExecStart=/usr/share/logstash/bin/logstash --log.format json
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=logstash
+
+[Install]
+WantedBy=multi-user.target

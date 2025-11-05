@@ -1,0 +1,12 @@
+---
+# RedHat 系列操作系统变量
+
+common_ntp_service: chronyd
+common_firewall_service: firewalld
+
+common_sysctl_settings:
+  net.ipv4.tcp_fin_timeout: 30
+  net.ipv4.tcp_keepalive_time: 1200
+  net.ipv4.tcp_max_syn_backlog: 8192
+  net.ipv4.ip_forward: 0
+  net.ipv4.icmp_echo_ignore_broadcasts: 1

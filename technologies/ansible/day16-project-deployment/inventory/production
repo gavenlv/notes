@@ -1,0 +1,33 @@
+# Production Environment Inventory
+
+[webservers]
+web1.prod.example.com ansible_host=192.168.30.10
+web2.prod.example.com ansible_host=192.168.30.11
+web3.prod.example.com ansible_host=192.168.30.12
+web4.prod.example.com ansible_host=192.168.30.13
+
+[databases]
+db1.prod.example.com ansible_host=192.168.30.20
+db2.prod.example.com ansible_host=192.168.30.21
+
+[monitoring]
+monitor1.prod.example.com ansible_host=192.168.30.30
+monitor2.prod.example.com ansible_host=192.168.30.31
+
+[loadbalancers]
+lb1.prod.example.com ansible_host=192.168.30.40
+lb2.prod.example.com ansible_host=192.168.30.41
+
+[logging]
+log1.prod.example.com ansible_host=192.168.30.50
+log2.prod.example.com ansible_host=192.168.30.51
+
+[backup]
+backup1.prod.example.com ansible_host=192.168.30.60
+backup2.prod.example.com ansible_host=192.168.30.61
+
+[all:vars]
+env=production
+app_name=myapp
+app_version=1.0.0
+app_port=8080

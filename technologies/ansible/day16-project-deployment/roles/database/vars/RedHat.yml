@@ -1,0 +1,19 @@
+---
+# RedHat系列操作系统数据库变量
+
+# PostgreSQL配置
+db_packages:
+  - postgresql{{ db_version_suffix | default("") }}
+  - postgresql{{ db_version_suffix | default("") }}-server
+  - python3-psycopg2
+
+db_service_name: "{% if db_type == 'postgresql' %}postgresql{% if db_version_suffix != '' %}-{{ db_version_suffix }}{% endif %}{% elif db_type == 'mysql' %}mysqld{% else %}postgresql{% endif %}"
+
+db_service_user: "{% if db_type == 'postgresql' %}postgres{% elif db_type == 'mysql' %}mysql{% else %}postgres{% endif %}"
+db_service_group: "{% if db_type == 'postgresql' %}postgres{% elif db_type == 'mysql' %}mysql{% else %}postgres{% endif %}"
+
+db_config_file: "{% if db_type == 'postgresql' %}/var/lib/pgsql/{{ db_version }}/data/postgresql.conf{% endif %}"
+
+db_init_command: "{% if db_type == 'postgresql' %}/usr/pgsql-{{ db_version }}/bin/postgresql-{{ db_version }}-setup initdb{% endif %}"
+
+db_version_suffix: "{% if db_version | int >= 10 %}{{ db_version }}{% else %}{{ db_version | regex_replace('\\.', '') }}{% endif %}"

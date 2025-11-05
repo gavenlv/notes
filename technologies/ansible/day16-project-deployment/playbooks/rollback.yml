@@ -1,0 +1,168 @@
+---
+# 应用回滚 Playbook
+
+- name: 应用回滚准备
+  hosts: localhost
+  gather_facts: no
+  vars_prompt:
+    - name: "confirm_rollback"
+      prompt: "确认回滚 {{ app_name | default('application') }} 从版本 {{ current_version | default('current') }} 到 {{ rollback_version | default('previous') }}? (yes/no)"
+      default: "no"
+      private: no
+    - name: "rollback_database"
+      prompt: "是否同时回滚数据库? (yes/no)"
+      default: "no"
+      private: no
+  
+  tasks:
+    - name: 验证回滚确认
+      assert:
+        that:
+          - confirm_rollback == "yes"
+        fail_msg: "回滚已被取消"
+        success_msg: "开始回滚流程"
+
+- name: 停止当前应用
+  hosts: webservers
+  become: yes
+  serial: 1  # 滚动回滚
+  
+  tasks:
+    - name: 停止应用服务
+      service:
+        name: "{{ app_name }}"
+        state: stopped
+      ignore_errors: yes
+
+- name: 回滚应用版本
+  hosts: webservers
+  become: yes
+  serial: 1
+  
+  tasks:
+    - name: 查找备份文件
+      find:
+        paths: "/var/backups/"
+        patterns: "{{ app_name }}_*"
+        file_type: file
+      register: backup_files
+      
+    - name: 验证备份文件存在
+      assert:
+        that:
+          - backup_files.files | length > 0
+        fail_msg: "未找到应用备份文件"
+        
+    - name: 选择回滚版本
+      set_fact:
+        backup_file: "{{ backup_files.files | sort(attribute='mtime') | last }}"
+      when: rollback_version is not defined or rollback_version == "previous"
+      
+    - name: 使用指定版本回滚
+      set_fact:
+        backup_file: "{{ backup_files.files | selectattr('path', 'search', rollback_version) | first }}"
+      when: rollback_version is defined and rollback_version != "previous"
+      ignore_errors: yes
+      
+    - name: 验证回滚文件
+      assert:
+        that:
+          - backup_file is defined
+        fail_msg: "未找到指定的回滚版本文件"
+        
+    - name: 恢复备份的应用版本
+      unarchive:
+        src: "{{ backup_file.path }}"
+        dest: "/var/www/"
+        owner: "{{ app_user | default('www-data') }}"
+        group: "{{ app_group | default('www-data') }}"
+        remote_src: yes
+        
+    - name: 应用配置文件
+      template:
+        src: "../configs/app-config.yml.j2"
+        dest: "/etc/{{ app_name }}/config.yml"
+        mode: '0644'
+      notify: reload application
+
+  handlers:
+    - name: reload application
+      service:
+        name: "{{ app_name }}"
+        state: reloaded
+
+- name: 回滚数据库
+  hosts: databases
+  become: yes
+  tasks:
+    - name: 查找数据库备份
+      find:
+        paths: "/var/backups/"
+        patterns: "{{ db_name }}_*"
+        file_type: file
+      register: db_backup_files
+      when: rollback_database == "yes"
+      
+    - name: 验证数据库备份存在
+      assert:
+        that:
+          - db_backup_files.files | length > 0
+        fail_msg: "未找到数据库备份文件"
+      when: rollback_database == "yes"
+        
+    - name: 选择数据库回滚版本
+      set_fact:
+        db_backup_file: "{{ db_backup_files.files | sort(attribute='mtime') | last }}"
+      when: rollback_database == "yes"
+      
+    - name: 恢复数据库备份
+      mysql_db:
+        name: "{{ db_name }}"
+        state: import
+        target: "{{ db_backup_file.path }}"
+      when: rollback_database == "yes"
+
+- name: 启动和验证回滚
+  hosts: webservers
+  become: yes
+  serial: 1
+  
+  tasks:
+    - name: 启动应用服务
+      service:
+        name: "{{ app_name }}"
+        state: started
+        enabled: yes
+        
+    - name: 等待应用启动
+      wait_for:
+        port: "{{ app_port | default(8080) }}"
+        host: "{{ ansible_default_ipv4.address }}"
+        delay: 10
+        timeout: 60
+        
+    - name: 健康检查
+      uri:
+        url: "http://{{ ansible_default_ipv4.address }}:{{ app_port | default(8080) }}/health"
+        method: GET
+        status_code: 200
+        timeout: 30
+      retries: 5
+      delay: 10
+      register: health_check
+      
+    - name: 验证回滚结果
+      debug:
+        msg: "应用回滚成功，健康检查状态: {{ health_check.status }}"
+
+- name: 回滚完成通知
+  hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: 发送回滚完成通知
+      debug:
+        msg: |
+          回滚完成通知:
+          应用名称: {{ app_name | default('application') }}
+          回滚版本: {{ rollback_version | default('previous') }}
+          回滚时间: {{ ansible_date_time.iso8601 }}

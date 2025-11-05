@@ -1,0 +1,31 @@
+---
+# 配置Logstash任务
+
+- name: 配置Logstash主配置文件
+  template:
+    src: logstash.yml.j2
+    dest: "{{ logstash_config_file }}"
+    owner: "{{ logstash_user }}"
+    group: "{{ logstash_group }}"
+    mode: '0644'
+  notify: restart logstash
+  tags: [logging, logstash, config]
+
+- name: 创建Logstash管道配置目录
+  file:
+    path: "{{ logstash_config_dir }}/pipeline"
+    state: directory
+    owner: "{{ logstash_user }}"
+    group: "{{ logstash_group }}"
+    mode: '0755'
+  tags: [logging, logstash, config]
+
+- name: 配置Logstash管道
+  template:
+    src: pipeline.conf.j2
+    dest: "{{ logstash_config_dir }}/pipeline/logstash.conf"
+    owner: "{{ logstash_user }}"
+    group: "{{ logstash_group }}"
+    mode: '0644'
+  notify: restart logstash
+  tags: [logging, logstash, config]

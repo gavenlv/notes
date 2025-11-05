@@ -1,0 +1,28 @@
+[Unit]
+Description=Elasticsearch
+Documentation=https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html
+Requires=network-online.target
+After=network-online.target
+
+[Service]
+Type=notify
+User={{ elasticsearch_user }}
+Group={{ elasticsearch_group }}
+Environment=ES_HOME=/usr/share/elasticsearch
+Environment=ES_PATH_CONF={{ elasticsearch_config_dir }}
+Environment=JAVA_HOME={{ elasticsearch_java_home | default('/usr/lib/jvm/default-java') }}
+ExecStart=/usr/share/elasticsearch/bin/elasticsearch -p /var/run/elasticsearch/elasticsearch.pid
+ExecReload=/bin/kill -HUP $MAINPID
+PIDFile=/var/run/elasticsearch/elasticsearch.pid
+Restart=always
+RestartSec=10
+WorkingDirectory={{ elasticsearch_data_dir }}
+LimitMEMLOCK=infinity
+LimitNOFILE=65536
+LimitNPROC=4096
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=elasticsearch
+
+[Install]
+WantedBy=multi-user.target

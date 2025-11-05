@@ -1,0 +1,40 @@
+---
+- name: Deploy Complete Monitoring Solution
+  hosts: monitoring
+  become: yes
+  vars:
+    prometheus_version: "2.45.0"
+    node_exporter_version: "1.6.1"
+    grafana_version: "10.0.3"
+    
+  tasks:
+    - name: Deploy Prometheus Server
+      include_tasks: deploy_prometheus.yml
+      
+    - name: Deploy Node Exporter on all hosts
+      include_tasks: deploy_node_exporter.yml
+      delegate_to: "{{ item }}"
+      loop: "{{ groups['all'] }}"
+      
+    - name: Deploy Grafana
+      include_tasks: deploy_grafana.yml
+
+- name: Configure Application Monitoring
+  hosts: webservers
+  become: yes
+  tasks:
+    - name: Deploy Application Exporter
+      include_tasks: deploy_app_exporter.yml
+      
+    - name: Configure Log Rotation
+      include_tasks: configure_log_rotation.yml
+
+- name: Deploy Alerting
+  hosts: monitoring
+  become: yes
+  tasks:
+    - name: Deploy Alertmanager
+      include_tasks: deploy_alertmanager.yml
+      
+    - name: Configure Alert Rules
+      include_tasks: configure_alert_rules.yml

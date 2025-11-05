@@ -1,0 +1,44 @@
+---
+# 高级 Web 服务器角色使用示例
+
+- name: 配置 Web 服务器
+  hosts: webservers
+  become: yes
+  
+  roles:
+    - role: advanced_webserver
+      webserver_ssl_enabled: true
+      webserver_ssl_certificate: /etc/ssl/certs/example.com.crt
+      webserver_ssl_certificate_key: /etc/ssl/private/example.com.key
+      webserver_vhosts:
+        - name: example_com
+          server_name: example.com www.example.com
+          document_root: /var/www/example.com
+          ssl_enabled: true
+        - name: api_example_com
+          server_name: api.example.com
+          document_root: /var/www/api.example.com
+          ssl_enabled: true
+      webserver_monitoring_enabled: true
+
+- name: 配置负载均衡器
+  hosts: loadbalancers
+  become: yes
+  
+  tasks:
+    - name: 安装 HAProxy
+      package:
+        name: haproxy
+        state: present
+        
+    - name: 配置 HAProxy
+      template:
+        src: haproxy.cfg.j2
+        dest: /etc/haproxy/haproxy.cfg
+      notify: restart haproxy
+      
+  handlers:
+    - name: restart haproxy
+      service:
+        name: haproxy
+        state: restarted

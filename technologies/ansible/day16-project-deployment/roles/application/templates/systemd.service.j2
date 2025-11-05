@@ -1,0 +1,19 @@
+[Unit]
+Description={{ app_name|title }} Application Service
+After=network.target
+
+[Service]
+Type=simple
+User={{ app_user }}
+Group={{ app_group }}
+WorkingDirectory={{ app_working_directory }}
+EnvironmentFile={{ app_config_path }}/environment
+ExecStart={{ app_deploy_path }}/{{ app_name }}
+Restart=always
+RestartSec=10
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier={{ app_name }}
+
+[Install]
+WantedBy=multi-user.target

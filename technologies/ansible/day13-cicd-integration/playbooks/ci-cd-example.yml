@@ -1,0 +1,157 @@
+---
+- name: CI/CD Integration Example
+  hosts: all
+  become: yes
+  vars:
+    # 应用配置
+    app_name: "myapp"
+    app_version: "1.0.0"
+    app_port: 8080
+    
+    # 部署路径
+    deploy_path: "/opt/{{ app_name }}"
+    backup_path: "/opt/{{ app_name }}_backup"
+    
+    # 用户和组
+    app_user: "{{ app_name }}"
+    app_group: "{{ app_name }}"
+    
+  tasks:
+    # 1. 系统准备
+    - name: Ensure required packages are installed
+      package:
+        name:
+          - python3
+          - python3-pip
+          - git
+          - nginx
+        state: present
+      tags: setup
+
+    - name: Create application group
+      group:
+        name: "{{ app_group }}"
+        state: present
+      tags: setup
+
+    - name: Create application user
+      user:
+        name: "{{ app_user }}"
+        group: "{{ app_group }}"
+        system: yes
+        shell: /bin/false
+        home: "{{ deploy_path }}"
+      tags: setup
+
+    # 2. 备份现有应用
+    - name: Create backup directory
+      file:
+        path: "{{ backup_path }}"
+        state: directory
+        owner: "{{ app_user }}"
+        group: "{{ app_group }}"
+        mode: '0755'
+      tags: deploy
+
+    - name: Backup current application
+      command: cp -r {{ deploy_path }} {{ backup_path }}/backup_{{ ansible_date_time.epoch }}
+      args:
+        creates: "{{ backup_path }}/backup_{{ ansible_date_time.epoch }}"
+      when: deploy_path is directory
+      tags: deploy
+
+    # 3. 应用部署
+    - name: Create deployment directory
+      file:
+        path: "{{ deploy_path }}"
+        state: directory
+        owner: "{{ app_user }}"
+        group: "{{ app_group }}"
+        mode: '0755'
+      tags: deploy
+
+    - name: Clone application repository
+      git:
+        repo: "https://github.com/example/{{ app_name }}.git"
+        dest: "{{ deploy_path }}"
+        version: "{{ app_version }}"
+        force: yes
+      tags: deploy
+
+    - name: Install Python dependencies
+      pip:
+        requirements: "{{ deploy_path }}/requirements.txt"
+        virtualenv: "{{ deploy_path }}/venv"
+        virtualenv_python: python3
+      tags: deploy
+
+    # 4. 配置管理
+    - name: Create configuration from template
+      template:
+        src: app_config.j2
+        dest: "{{ deploy_path }}/config/app.conf"
+        owner: "{{ app_user }}"
+        group: "{{ app_group }}"
+        mode: '0644'
+      tags: configure
+
+    - name: Copy systemd service file
+      template:
+        src: app.service.j2
+        dest: "/etc/systemd/system/{{ app_name }}.service"
+        mode: '0644'
+      notify: reload systemd
+      tags: configure
+
+    - name: Configure Nginx
+      template:
+        src: nginx.conf.j2
+        dest: "/etc/nginx/sites-available/{{ app_name }}"
+        mode: '0644'
+      notify: restart nginx
+      tags: configure
+
+    - name: Enable Nginx site
+      file:
+        src: "/etc/nginx/sites-available/{{ app_name }}"
+        dest: "/etc/nginx/sites-enabled/{{ app_name }}"
+        state: link
+      notify: restart nginx
+      tags: configure
+
+    # 5. 服务管理
+    - name: Start and enable application service
+      systemd:
+        name: "{{ app_name }}"
+        state: started
+        enabled: yes
+        daemon_reload: yes
+      tags: deploy
+
+    # 6. 健康检查
+    - name: Check if application is responding
+      uri:
+        url: "http://localhost:{{ app_port }}/health"
+        method: GET
+        status_code: 200
+      retries: 5
+      delay: 10
+      tags: health
+
+    # 7. 清理旧备份
+    - name: Clean up old backups (keep last 5)
+      shell: ls -t {{ backup_path }}/backup_* | tail -n +6 | xargs rm -rf
+      args:
+        warn: false
+      when: backup_path is directory
+      tags: cleanup
+
+  handlers:
+    - name: reload systemd
+      systemd:
+        daemon_reload: yes
+
+    - name: restart nginx
+      systemd:
+        name: nginx
+        state: restarted

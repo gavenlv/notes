@@ -1,0 +1,19 @@
+---
+# Debian 系列操作系统变量
+
+webserver_packages:
+  - nginx
+  - python3-selinux
+
+webserver_service: nginx
+webserver_config_dir: /etc/nginx
+webserver_main_config: /etc/nginx/nginx.conf
+webserver_ssl_config: /etc/nginx/conf.d/ssl.conf
+webserver_security_config: /etc/nginx/conf.d/security.conf
+webserver_vhosts_dir: /etc/nginx/sites-available
+webserver_monitoring_config: /etc/nginx/conf.d/monitoring.conf
+
+webserver_user: www-data
+webserver_group: www-data
+
+webserver_check_config_cmd: nginx -t

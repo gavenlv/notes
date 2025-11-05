@@ -1,0 +1,73 @@
+---
+# 安装Prometheus任务
+
+- name: 创建Prometheus用户
+  user:
+    name: prometheus
+    system: yes
+    shell: /bin/false
+    home: "{{ prometheus_data_dir }}"
+    state: present
+  tags: [monitoring, prometheus, setup]
+
+- name: 创建Prometheus目录
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: prometheus
+    group: prometheus
+    mode: '0755'
+  loop:
+    - "{{ prometheus_config_dir }}"
+    - "{{ prometheus_data_dir }}"
+  tags: [monitoring, prometheus, setup]
+
+- name: 下载Prometheus
+  get_url:
+    url: "https://github.com/prometheus/prometheus/releases/download/v{{ prometheus_version }}/prometheus-{{ prometheus_version }}.linux-amd64.tar.gz"
+    dest: "/tmp/prometheus-{{ prometheus_version }}.linux-amd64.tar.gz"
+    mode: '0644'
+  tags: [monitoring, prometheus, download]
+
+- name: 解压Prometheus
+  unarchive:
+    src: "/tmp/prometheus-{{ prometheus_version }}.linux-amd64.tar.gz"
+    dest: "/tmp"
+    remote_src: yes
+  tags: [monitoring, prometheus, extract]
+
+- name: 复制Prometheus二进制文件
+  copy:
+    src: "/tmp/prometheus-{{ prometheus_version }}.linux-amd64/{{ item }}"
+    dest: "/usr/local/bin/{{ item }}"
+    mode: '0755'
+    remote_src: yes
+  loop:
+    - prometheus
+    - promtool
+  tags: [monitoring, prometheus, install]
+
+- name: 复制Prometheus控制台和库文件
+  copy:
+    src: "/tmp/prometheus-{{ prometheus_version }}.linux-amd64/{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: prometheus
+    group: prometheus
+    mode: '0644'
+    remote_src: yes
+  loop:
+    - { src: "consoles", dest: "{{ prometheus_config_dir }}/consoles" }
+    - { src: "console_libraries", dest: "{{ prometheus_config_dir }}/console_libraries" }
+  tags: [monitoring, prometheus, install]
+
+- name: 创建Prometheus systemd服务文件
+  template:
+    src: prometheus.service.j2
+    dest: /etc/systemd/system/prometheus.service
+    mode: '0644'
+  tags: [monitoring, prometheus, service]
+
+- name: 重新加载systemd
+  systemd:
+    daemon_reload: yes
+  tags: [monitoring, prometheus, service]

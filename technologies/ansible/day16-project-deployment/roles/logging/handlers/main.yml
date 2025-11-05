@@ -1,0 +1,30 @@
+---
+# 日志角色处理程序
+
+- name: restart elasticsearch
+  service:
+    name: elasticsearch
+    state: restarted
+  when: "'elasticsearch' in logging_components"
+  tags: [logging, elasticsearch, handler]
+
+- name: restart logstash
+  service:
+    name: logstash
+    state: restarted
+  when: "'logstash' in logging_components"
+  tags: [logging, logstash, handler]
+
+- name: restart kibana
+  service:
+    name: kibana
+    state: restarted
+  when: "'kibana' in logging_components"
+  tags: [logging, kibana, handler]
+
+- name: restart filebeat
+  service:
+    name: filebeat
+    state: restarted
+  when: "'filebeat' in logging_components"
+  tags: [logging, filebeat, handler]

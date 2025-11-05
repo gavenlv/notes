@@ -1,0 +1,8 @@
+---
+# Webserver variables for Debian-based systems
+
+webserver_user: www-data
+webserver_group: www-data
+webserver_config_path: /etc/nginx/nginx.conf
+webserver_sites_path: /etc/nginx/sites-available
+webserver_enabled_sites_path: /etc/nginx/sites-enabled

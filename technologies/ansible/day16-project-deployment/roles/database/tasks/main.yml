@@ -1,0 +1,147 @@
+---
+# 数据库角色主任务文件
+
+- name: 包含操作系统特定变量
+  include_vars: "{{ ansible_os_family }}.yml"
+  tags: [database, setup]
+
+- name: 安装数据库包 (PostgreSQL)
+  package:
+    name: "{{ db_packages }}"
+    state: present
+  when: db_type == "postgresql"
+  tags: [database, setup]
+
+- name: 安装数据库包 (MySQL)
+  package:
+    name: "{{ db_packages }}"
+    state: present
+  when: db_type == "mysql"
+  tags: [database, setup]
+
+- name: 创建数据库数据目录
+  file:
+    path: "{{ db_data_directory }}"
+    state: directory
+    owner: "{{ db_service_user }}"
+    group: "{{ db_service_group }}"
+    mode: '0700'
+  tags: [database, setup]
+
+- name: 创建WAL目录 (如果指定)
+  file:
+    path: "{{ db_wal_directory }}"
+    state: directory
+    owner: "{{ db_service_user }}"
+    group: "{{ db_service_group }}"
+    mode: '0700'
+  when: db_wal_directory != ""
+  tags: [database, setup]
+
+- name: 配置数据库 (PostgreSQL)
+  template:
+    src: postgresql.conf.j2
+    dest: "{{ db_config_file }}"
+    owner: "{{ db_service_user }}"
+    group: "{{ db_service_group }}"
+    mode: '0644'
+  when: db_type == "postgresql"
+  notify: restart database
+  tags: [database, config]
+
+- name: 配置认证 (PostgreSQL)
+  template:
+    src: pg_hba.conf.j2
+    dest: "{{ db_auth_file }}"
+    owner: "{{ db_service_user }}"
+    group: "{{ db_service_group }}"
+    mode: '0640'
+  when: db_type == "postgresql"
+  notify: restart database
+  tags: [database, config]
+
+- name: 初始化数据库集群 (PostgreSQL)
+  command: "{{ db_init_command }}"
+  args:
+    creates: "{{ db_data_directory }}/PG_VERSION"
+  when: db_type == "postgresql"
+  tags: [database, setup]
+
+- name: 启动数据库服务
+  service:
+    name: "{{ db_service_name }}"
+    state: started
+    enabled: yes
+  tags: [database, service]
+
+- name: 等待数据库启动
+  wait_for:
+    port: "{{ db_port }}"
+    host: "{{ db_listen_addresses.split(',')[0] }}"
+    delay: 10
+    timeout: 60
+  tags: [database, service]
+
+- name: 创建数据库用户
+  postgresql_user:
+    name: "{{ item.name }}"
+    password: "{{ item.password }}"
+    privileges: "{{ item.privileges | default(omit) }}"
+    expires: "{{ item.expires | default(omit) }}"
+    state: present
+  loop: "{{ db_users }}"
+  when: db_type == "postgresql" and db_users | length > 0
+  become: yes
+  become_user: "{{ db_admin_user }}"
+  tags: [database, users]
+
+- name: 创建数据库
+  postgresql_db:
+    name: "{{ item.name }}"
+    owner: "{{ item.owner | default(omit) }}"
+    encoding: "{{ item.encoding | default(omit) }}"
+    state: present
+  loop: "{{ db_databases }}"
+  when: db_type == "postgresql" and db_databases | length > 0
+  become: yes
+  become_user: "{{ db_admin_user }}"
+  tags: [database, databases]
+
+- name: 安装数据库扩展 (PostgreSQL)
+  postgresql_ext:
+    name: "{{ item.name }}"
+    db: "{{ item.database | default(item.name) }}"
+    state: present
+  loop: "{{ db_extensions }}"
+  when: db_type == "postgresql" and db_extensions | length > 0
+  become: yes
+  become_user: "{{ db_admin_user }}"
+  tags: [database, extensions]
+
+- name: 配置数据库备份
+  template:
+    src: backup.sh.j2
+    dest: "/usr/local/bin/database-backup.sh"
+    mode: '0755'
+  when: db_backup_enabled
+  tags: [database, backup]
+
+- name: 配置备份定时任务
+  cron:
+    name: "Database Backup"
+    minute: "0"
+    hour: "2"
+    job: "/usr/local/bin/database-backup.sh"
+    user: "{{ db_service_user }}"
+  when: db_backup_enabled
+  tags: [database, backup]
+
+- name: 创建备份目录
+  file:
+    path: "{{ db_backup_directory }}"
+    state: directory
+    owner: "{{ db_service_user }}"
+    group: "{{ db_service_group }}"
+    mode: '0755'
+  when: db_backup_enabled
+  tags: [database, backup]

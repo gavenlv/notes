@@ -1,0 +1,39 @@
+---
+# Common role variables
+
+# Timezone configuration
+timezone: UTC
+
+# NTP servers
+ntp_servers:
+  - 0.pool.ntp.org
+  - 1.pool.ntp.org
+  - 2.pool.ntp.org
+  - 3.pool.ntp.org
+
+# Package management
+common_packages:
+  - curl
+  - wget
+  - vim
+  - htop
+  - git
+  - rsync
+  - unzip
+  - tar
+
+# User management
+app_user: "{{ app_name | default('app') }}"
+app_group: "{{ app_user }}"
+app_uid: 1001
+app_gid: 1001
+
+# Directory structure
+app_base_dir: "/opt/{{ app_name }}"
+app_log_dir: "/var/log/{{ app_name }}"
+app_config_dir: "/etc/{{ app_name }}"
+app_data_dir: "/var/lib/{{ app_name }}"
+
+# Service configuration
+service_user: "{{ app_user }}"
+service_group: "{{ app_group }}"

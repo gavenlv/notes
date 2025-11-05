@@ -1,0 +1,33 @@
+---
+# 配置Elasticsearch任务
+
+- name: 配置Elasticsearch主配置文件
+  template:
+    src: elasticsearch.yml.j2
+    dest: "{{ elasticsearch_config_file }}"
+    owner: "{{ elasticsearch_user }}"
+    group: "{{ elasticsearch_group }}"
+    mode: '0644'
+  notify: restart elasticsearch
+  tags: [logging, elasticsearch, config]
+
+- name: 配置Elasticsearch JVM选项
+  template:
+    src: jvm.options.j2
+    dest: "{{ elasticsearch_config_dir }}/jvm.options"
+    owner: "{{ elasticsearch_user }}"
+    group: "{{ elasticsearch_group }}"
+    mode: '0644'
+  notify: restart elasticsearch
+  tags: [logging, elasticsearch, config]
+
+- name: 设置Elasticsearch安全配置
+  template:
+    src: elasticsearch-security.yml.j2
+    dest: "{{ elasticsearch_config_dir }}/elasticsearch-security.yml"
+    owner: "{{ elasticsearch_user }}"
+    group: "{{ elasticsearch_group }}"
+    mode: '0644'
+  when: elasticsearch_enable_security
+  notify: restart elasticsearch
+  tags: [logging, elasticsearch, config]

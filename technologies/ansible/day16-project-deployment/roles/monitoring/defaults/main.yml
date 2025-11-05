@@ -1,0 +1,70 @@
+---
+# 监控角色默认变量
+
+# 监控组件配置
+monitoring_components:
+  - prometheus
+  - grafana
+  - node_exporter
+
+# Prometheus配置
+prometheus_version: "2.30.3"
+prometheus_port: 9090
+prometheus_retention: "15d"
+prometheus_data_dir: "/var/lib/prometheus"
+prometheus_config_dir: "/etc/prometheus"
+
+# Prometheus scrape配置
+prometheus_scrape_interval: "15s"
+prometheus_evaluation_interval: "15s"
+
+# 默认scrape配置
+prometheus_scrape_configs:
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+  - job_name: 'node'
+    static_configs:
+      - targets: ['localhost:9100']
+
+# Prometheus告警规则文件
+prometheus_rule_files:
+  - "{{ prometheus_config_dir }}/rules/*.yml"
+
+# Grafana配置
+grafana_version: "8.1.5"
+grafana_port: 3000
+grafana_admin_user: "admin"
+grafana_admin_password: "admin"
+grafana_data_dir: "/var/lib/grafana"
+
+# Node Exporter配置
+node_exporter_version: "1.2.2"
+node_exporter_port: 9100
+
+# Alertmanager配置
+alertmanager_version: "0.23.0"
+alertmanager_port: 9093
+alertmanager_config_dir: "/etc/alertmanager"
+
+# 监控告警配置
+monitoring_alerts_enabled: true
+monitoring_alert_rules: []
+# 示例:
+# monitoring_alert_rules:
+#   - name: InstanceDown
+#     expr: up == 0
+#     for: "5m"
+#     labels:
+#       severity: page
+#     annotations:
+#       summary: "Instance {{ $labels.instance }} down"
+#       description: "{{ $labels.instance }} of job {{ $labels.job }} has been down for more than 5 minutes."
+
+# 监控通知配置
+monitoring_notification_channels: []
+# 示例:
+# monitoring_notification_channels:
+#   - name: slack
+#     type: slack
+#     url: https://hooks.slack.com/services/XXX

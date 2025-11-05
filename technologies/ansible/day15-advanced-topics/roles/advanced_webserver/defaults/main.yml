@@ -1,0 +1,47 @@
+---
+# Web 服务器配置
+webserver_type: nginx
+webserver_port: 80
+webserver_ssl_port: 443
+
+# SSL 配置
+webserver_ssl_enabled: false
+webserver_ssl_certificate: /etc/ssl/certs/webserver.crt
+webserver_ssl_certificate_key: /etc/ssl/private/webserver.key
+webserver_ssl_protocols: "TLSv1.2 TLSv1.3"
+webserver_ssl_ciphers: "ECDHE-RSA-AES256-GCM-SHA512:DHE-RSA-AES256-GCM-SHA512:ECDHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES256-GCM-SHA384"
+
+# 安全配置
+webserver_security_headers: true
+webserver_hsts_enabled: true
+webserver_hsts_max_age: 31536000
+webserver_hsts_include_subdomains: true
+webserver_x_frame_options: "SAMEORIGIN"
+webserver_x_content_type_options: "nosniff"
+webserver_x_xss_protection: "1; mode=block"
+
+# 性能配置
+webserver_worker_processes: auto
+webserver_worker_connections: 1024
+webserver_keepalive_timeout: 65
+webserver_client_max_body_size: "100M"
+webserver_gzip_enabled: true
+webserver_gzip_comp_level: 6
+
+# 日志配置
+webserver_access_log: /var/log/{{ webserver_type }}/access.log
+webserver_error_log: /var/log/{{ webserver_type }}/error.log
+webserver_log_format: combined
+
+# 虚拟主机配置
+webserver_vhosts: []
+# 示例:
+# webserver_vhosts:
+#   - name: example.com
+#     server_name: example.com www.example.com
+#     document_root: /var/www/example.com
+#     ssl_enabled: false
+
+# 监控配置
+webserver_monitoring_enabled: false
+webserver_monitoring_endpoint: /health

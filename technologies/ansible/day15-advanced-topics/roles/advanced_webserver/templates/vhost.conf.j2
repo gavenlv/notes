@@ -1,0 +1,47 @@
+# {{ item.name }} virtual host configuration
+
+server {
+    listen {{ webserver_port }};
+    
+    {% if webserver_ssl_enabled and item.ssl_enabled | default(false) %}
+    listen {{ webserver_ssl_port }} ssl http2;
+    ssl_certificate {{ webserver_ssl_certificate }};
+    ssl_certificate_key {{ webserver_ssl_certificate_key }};
+    ssl_protocols {{ webserver_ssl_protocols }};
+    ssl_ciphers {{ webserver_ssl_ciphers }};
+    {% endif %}
+    
+    server_name {{ item.server_name }};
+    root {{ item.document_root | default('/var/www/html') }};
+    index index.html index.htm index.php;
+    
+    {% if webserver_security_headers %}
+    # Security headers
+    add_header X-Frame-Options "{{ webserver_x_frame_options }}" always;
+    add_header X-Content-Type-Options "{{ webserver_x_content_type_options }}" always;
+    add_header X-XSS-Protection "{{ webserver_x_xss_protection }}" always;
+    
+    {% if webserver_hsts_enabled %}
+    add_header Strict-Transport-Security "max-age={{ webserver_hsts_max_age }}{% if webserver_hsts_include_subdomains %}; includeSubDomains{% endif %}" always;
+    {% endif %}
+    {% endif %}
+    
+    # Client limits
+    client_max_body_size {{ webserver_client_max_body_size }};
+    
+    location / {
+        try_files $uri $uri/ =404;
+    }
+    
+    {% if webserver_monitoring_enabled %}
+    location {{ webserver_monitoring_endpoint }} {
+        access_log off;
+        return 200 "healthy\n";
+        add_header Content-Type text/plain;
+    }
+    {% endif %}
+    
+    # Logging
+    access_log {{ webserver_access_log }} main;
+    error_log {{ webserver_error_log }} warn;
+}

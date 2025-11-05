@@ -1,0 +1,27 @@
+# {{ ansible_managed }}
+
+# 应用环境变量配置
+{% for key, value in app_environment_variables.items() %}
+{{ key }}={{ value }}
+{% endfor %}
+
+# 应用基本信息
+APP_NAME={{ app_name }}
+APP_VERSION={{ app_version }}
+APP_ENV={{ app_environment }}
+APP_PORT={{ app_port }}
+
+# 数据库配置
+DB_HOST={{ app_db_host }}
+DB_PORT={{ app_db_port }}
+DB_NAME={{ app_db_name }}
+DB_USER={{ app_db_user }}
+DB_PASSWORD={{ app_db_password }}
+
+# 缓存配置
+CACHE_HOST={{ app_cache_host }}
+CACHE_PORT={{ app_cache_port }}
+
+# 日志配置
+LOG_LEVEL={{ app_log_level }}
+LOG_PATH={{ app_log_path }}

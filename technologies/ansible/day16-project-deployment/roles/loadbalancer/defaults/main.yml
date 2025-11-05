@@ -1,0 +1,62 @@
+---
+# 负载均衡器角色默认变量
+
+# 负载均衡器类型 (nginx, haproxy)
+lb_type: "nginx"
+
+# 监听配置
+lb_bind_address: "0.0.0.0"
+lb_port: 80
+lb_ssl_port: 443
+
+# SSL配置
+lb_ssl_enabled: false
+lb_ssl_certificate: ""
+lb_ssl_certificate_key: ""
+lb_ssl_protocols: "TLSv1.2 TLSv1.3"
+lb_ssl_ciphers: "ECDHE-RSA-AES256-GCM-SHA512:DHE-RSA-AES256-GCM-SHA512:ECDHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES256-GCM-SHA384"
+
+# 负载均衡算法
+lb_algorithm: "round-robin"  # round-robin, leastconn, source
+
+# 后端服务器配置
+lb_backend_name: "backend_servers"
+lb_backend_servers: []
+# 示例:
+# lb_backend_servers:
+#   - name: web1
+#     address: 10.0.1.10
+#     port: 8080
+#     weight: 1
+#     backup: false
+
+# 健康检查配置
+lb_health_check_enabled: true
+lb_health_check_uri: "/health"
+lb_health_check_interval: 2
+lb_health_check_fails: 3
+lb_health_check_rise: 2
+
+# 访问控制
+lb_allowed_ips: []
+# 示例:
+# lb_allowed_ips:
+#   - 10.0.0.0/8
+#   - 172.16.0.0/12
+
+# 日志配置
+lb_log_enabled: true
+lb_log_format: "main"
+lb_log_path: "/var/log/{{ lb_type }}"
+
+# 超时配置
+lb_proxy_read_timeout: 60
+lb_proxy_connect_timeout: 5
+lb_proxy_send_timeout: 60
+
+# HTTP头部配置
+lb_client_max_body_size: "100M"
+lb_proxy_buffering: "on"
+
+# 自定义配置片段
+lb_custom_config: ""

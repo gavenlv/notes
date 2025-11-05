@@ -1,0 +1,129 @@
+---
+# 应用角色主任务文件
+
+- name: 创建应用用户和组
+  group:
+    name: "{{ app_group }}"
+    state: present
+  tags: [application, setup]
+
+- name: 创建应用用户
+  user:
+    name: "{{ app_user }}"
+    group: "{{ app_group }}"
+    system: yes
+    shell: /bin/false
+    home: "{{ app_deploy_path }}"
+    state: present
+  tags: [application, setup]
+
+- name: 创建应用目录结构
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ app_user }}"
+    group: "{{ app_group }}"
+    mode: '0755'
+  loop:
+    - "{{ app_deploy_path }}"
+    - "{{ app_config_path }}"
+    - "{{ app_log_path }}"
+    - "{{ app_temp_path }}"
+  tags: [application, setup]
+
+- name: 下载应用包
+  get_url:
+    url: "{{ app_package_url }}"
+    dest: "/tmp/{{ app_name }}-{{ app_version }}.{{ app_package_type }}"
+    checksum: "{{ app_package_checksum | default(omit) }}"
+    mode: '0644'
+  when: app_package_url != ""
+  tags: [application, deploy]
+
+- name: 解压应用包
+  unarchive:
+    src: "/tmp/{{ app_name }}-{{ app_version }}.{{ app_package_type }}"
+    dest: "{{ app_deploy_path }}"
+    owner: "{{ app_user }}"
+    group: "{{ app_group }}"
+    remote_src: yes
+  when: app_package_url != ""
+  notify: restart application
+  tags: [application, deploy]
+
+- name: 应用配置文件
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: "{{ app_user }}"
+    group: "{{ app_group }}"
+    mode: "{{ item.mode | default('0644') }}"
+  loop: "{{ app_config_files }}"
+  when: app_config_files | length > 0
+  notify: reload application
+  tags: [application, config]
+
+- name: 创建环境变量文件
+  template:
+    src: environment.j2
+    dest: "{{ app_config_path }}/environment"
+    owner: "{{ app_user }}"
+    group: "{{ app_group }}"
+    mode: '0644'
+  when: app_environment_variables | length > 0
+  tags: [application, config]
+
+- name: 配置应用服务
+  template:
+    src: "{{ app_process_manager }}.service.j2"
+    dest: "{{ app_service_file }}"
+    mode: '0644'
+  notify: restart application
+  tags: [application, service]
+
+- name: 启动应用服务
+  service:
+    name: "{{ app_service_name }}"
+    state: started
+    enabled: yes
+  tags: [application, service]
+
+- name: 等待应用启动
+  wait_for:
+    port: "{{ app_port }}"
+    host: "{{ ansible_default_ipv4.address }}"
+    delay: 10
+    timeout: 60
+  tags: [application, service]
+
+- name: 健康检查
+  uri:
+    url: "http://{{ ansible_default_ipv4.address }}:{{ app_port }}{{ app_monitoring_endpoint }}"
+    method: GET
+    status_code: 200
+    timeout: 30
+  retries: 5
+  delay: 10
+  register: health_check
+  tags: [application, health]
+
+- name: 显示健康检查结果
+  debug:
+    msg: "应用健康检查状态: {{ health_check.status }}"
+  tags: [application, health]
+
+- name: 配置日志轮转
+  template:
+    src: logrotate.conf.j2
+    dest: "/etc/logrotate.d/{{ app_name }}"
+    mode: '0644'
+  tags: [application, logging]
+
+- name: 设置文件权限
+  file:
+    path: "{{ app_deploy_path }}"
+    owner: "{{ app_user }}"
+    group: "{{ app_group }}"
+    mode: '0755'
+    recurse: yes
+  tags: [application, setup]

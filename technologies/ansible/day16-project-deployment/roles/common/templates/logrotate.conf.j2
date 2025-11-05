@@ -1,0 +1,15 @@
+# {{ ansible_managed }}
+
+/var/log/*.log {
+    {{ common_logrotate_frequency }}
+    rotate {{ common_logrotate_retention }}
+    compress
+    delaycompress
+    missingok
+    notifempty
+    create 644 root root
+    sharedscripts
+    postrotate
+        systemctl reload rsyslog > /dev/null 2>&1 || true
+    endscript
+}

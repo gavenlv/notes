@@ -1,0 +1,32 @@
+# Prometheus Configuration Template
+global:
+  scrape_interval: {{ prometheus_scrape_interval | default('15s') }}
+  evaluation_interval: {{ prometheus_evaluation_interval | default('15s') }}
+
+rule_files:
+  - "rules/*.yml"
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+          - {{ alertmanager_host | default('localhost:9093') }}
+
+scrape_configs:
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  - job_name: 'node'
+    static_configs:
+      - targets: 
+{% for host in groups['webservers'] %}
+        - {{ host }}:9100
+{% endfor %}
+
+  - job_name: 'application'
+    static_configs:
+      - targets: 
+{% for host in groups['webservers'] %}
+        - {{ host }}:{{ app_port | default('8080') }}
+{% endfor %}

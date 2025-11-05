@@ -1,0 +1,27 @@
+---
+# Staging Environment Deployment
+
+- name: Deploy to Staging Environment
+  hosts: all
+  become: yes
+  vars:
+    target_environment: staging
+  pre_tasks:
+    - name: Confirm deployment to staging
+      pause:
+        prompt: "Ready to deploy to staging environment. Continue?"
+  roles:
+    - application
+    - database
+    - monitoring
+    - loadbalancer
+  post_tasks:
+    - name: Run health checks
+      uri:
+        url: "http://{{ inventory_hostname }}:{{ app_port }}/health"
+        method: GET
+        status_code: 200
+      delegate_to: localhost
+    - name: Deployment completed
+      debug:
+        msg: "Staging deployment completed successfully"

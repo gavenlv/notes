@@ -1,0 +1,13 @@
+{{ webserver_access_log }} {{ webserver_error_log }} {
+    daily
+    missingok
+    rotate 52
+    compress
+    delaycompress
+    notifempty
+    create 644 {{ webserver_user }} {{ webserver_group }}
+    sharedscripts
+    postrotate
+        [ -f /var/run/{{ webserver_service }}.pid ] && kill -USR1 `cat /var/run/{{ webserver_service }}.pid`
+    endscript
+}

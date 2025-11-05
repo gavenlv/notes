@@ -1,0 +1,19 @@
+---
+# 高级 Web 服务器角色处理程序
+
+- name: restart webserver
+  service:
+    name: "{{ webserver_service }}"
+    state: restarted
+  listen: "restart webserver"
+
+- name: reload webserver
+  service:
+    name: "{{ webserver_service }}"
+    state: reloaded
+  listen: "reload webserver"
+
+- name: check webserver config
+  command: "{{ webserver_check_config_cmd }}"
+  listen: "check webserver config"
+  changed_when: false

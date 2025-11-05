@@ -1,0 +1,12 @@
+---
+# Webserver defaults
+
+webserver_package: nginx
+webserver_service: nginx
+webserver_port: 80
+webserver_ssl_port: 443
+webserver_user: nginx
+webserver_group: nginx
+webserver_config_path: /etc/nginx/nginx.conf
+webserver_sites_path: /etc/nginx/sites-available
+webserver_enabled_sites_path: /etc/nginx/sites-enabled

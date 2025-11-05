@@ -1,0 +1,63 @@
+---
+# 安装Filebeat任务
+
+- name: 创建Filebeat用户
+  user:
+    name: "{{ filebeat_user }}"
+    system: yes
+    shell: /bin/false
+    state: present
+  tags: [logging, filebeat, setup]
+
+- name: 创建Filebeat目录
+  file:
+    path: "{{ filebeat_config_dir }}"
+    state: directory
+    owner: "{{ filebeat_user }}"
+    group: "{{ filebeat_group }}"
+    mode: '0755'
+  tags: [logging, filebeat, setup]
+
+- name: 下载Filebeat
+  get_url:
+    url: "https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-{{ filebeat_version }}-linux-x86_64.tar.gz"
+    dest: "/tmp/filebeat-{{ filebeat_version }}-linux-x86_64.tar.gz"
+    mode: '0644'
+  tags: [logging, filebeat, download]
+
+- name: 解压Filebeat
+  unarchive:
+    src: "/tmp/filebeat-{{ filebeat_version }}-linux-x86_64.tar.gz"
+    dest: "/tmp"
+    remote_src: yes
+  tags: [logging, filebeat, extract]
+
+- name: 复制Filebeat二进制文件
+  copy:
+    src: "/tmp/filebeat-{{ filebeat_version }}/filebeat"
+    dest: "/usr/local/bin/filebeat"
+    mode: '0755'
+    remote_src: yes
+  tags: [logging, filebeat, install]
+
+- name: 复制Filebeat配置文件
+  copy:
+    src: "/tmp/filebeat-{{ filebeat_version }}/filebeat.yml"
+    dest: "{{ filebeat_config_file }}"
+    owner: "{{ filebeat_user }}"
+    group: "{{ filebeat_group }}"
+    mode: '0644'
+    remote_src: yes
+  tags: [logging, filebeat, install]
+
+- name: 创建Filebeat systemd服务文件
+  template:
+    src: filebeat.service.j2
+    dest: "{{ filebeat_systemd_file }}"
+    mode: '0644'
+  tags: [logging, filebeat, service]
+
+- name: 重新加载systemd
+  systemd:
+    daemon_reload: yes
+  tags: [logging, filebeat, service]

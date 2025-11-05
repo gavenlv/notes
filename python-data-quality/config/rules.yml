@@ -1,0 +1,228 @@
+# Data Quality Rules Configuration
+# This file defines the data quality rules to be executed by the framework
+
+# 数据质量规则定义 - 按类型分类的示例
+
+# 1. 完整性检查规则 (Completeness Rules)
+completeness_rules:
+  # 1.1 主键完整性
+  - name: "用户表主键完整性"
+    type: "completeness"
+    table: "users"
+    column: "user_id"
+    description: "检查用户ID主键字段的完整性（非空且唯一）"
+    enabled: true
+    threshold: 0.99
+    
+  - name: "订单表主键完整性"
+    type: "completeness"
+    table: "orders"
+    column: "order_id"
+    description: "检查订单ID主键字段的完整性"
+    enabled: true
+    threshold: 0.99
+    
+  # 1.2 关键业务字段完整性
+  - name: "用户邮箱完整性"
+    type: "completeness"
+    table: "users"
+    column: "email"
+    description: "检查用户邮箱字段的完整性"
+    enabled: true
+    threshold: 0.95
+    
+  - name: "订单金额完整性"
+    type: "completeness"
+    table: "orders"
+    column: "amount"
+    description: "检查订单金额字段的完整性"
+    enabled: true
+    threshold: 0.98
+
+# 2. 准确性检查规则 (Accuracy Rules)
+accuracy_rules:
+  # 2.1 数据格式准确性
+  - name: "邮箱格式验证"
+    type: "accuracy"
+    table: "users"
+    column: "email"
+    description: "验证邮箱格式是否符合标准"
+    enabled: true
+    validation_type: "email_format"
+    
+  - name: "手机号格式验证"
+    type: "accuracy"
+    table: "users"
+    column: "phone"
+    description: "验证手机号格式是否正确"
+    enabled: true
+    validation_type: "phone_format"
+    
+  # 2.2 数据范围准确性
+  - name: "年龄范围验证"
+    type: "accuracy"
+    table: "users"
+    column: "age"
+    description: "验证年龄在合理范围内（0-150）"
+    enabled: true
+    validation_type: "range"
+    min_value: 0
+    max_value: 150
+    
+  - name: "订单金额范围验证"
+    type: "accuracy"
+    table: "orders"
+    column: "amount"
+    description: "验证订单金额在合理范围内"
+    enabled: true
+    validation_type: "range"
+    min_value: 0
+    max_value: 1000000
+
+# 3. 自定义SQL检查规则 (Custom SQL Rules)
+custom_sql_rules:
+  # 3.1 业务逻辑检查
+  - name: "收入一致性检查"
+    type: "custom_sql"
+    description: "检查用户总收入和订单收入是否一致"
+    enabled: true
+    sql: |
+      SELECT 
+        u.user_id,
+        u.total_income,
+        SUM(o.amount) as order_total
+      FROM users u
+      LEFT JOIN orders o ON u.user_id = o.user_id
+      GROUP BY u.user_id, u.total_income
+      HAVING ABS(u.total_income - COALESCE(SUM(o.amount), 0)) > 0.01
+    expected_result: "empty"
+    
+  # 3.2 数据新鲜度检查
+  - name: "数据新鲜度检查"
+    type: "custom_sql"
+    description: "检查最近7天是否有数据更新"
+    enabled: true
+    sql: |
+      SELECT COUNT(*) as recent_records
+      FROM orders 
+      WHERE order_date >= DATE_SUB(NOW(), INTERVAL 7 DAY)
+    expected_result: "not_empty"
+    min_records: 1
+    
+  # 3.3 引用完整性检查
+  - name: "订单用户引用完整性"
+    type: "custom_sql"
+    description: "检查订单表中的用户ID是否在用户表中存在"
+    enabled: true
+    sql: |
+      SELECT o.order_id, o.user_id
+      FROM orders o
+      LEFT JOIN users u ON o.user_id = u.user_id
+      WHERE u.user_id IS NULL
+    expected_result: "empty"
+
+# 4. 通用检查规则 (Generic Check Rules)
+generic_checks:
+  # 4.1 表行数检查
+  - name: "用户表行数检查"
+    type: "generic"
+    description: "检查用户表是否有数据"
+    enabled: true
+    check_type: "row_count"
+    table: "users"
+    min_rows: 1
+    max_rows: 1000000
+    
+  # 4.2 数据分布检查
+  - name: "订单状态分布检查"
+    type: "generic"
+    description: "检查订单状态分布是否合理"
+    enabled: true
+    check_type: "value_distribution"
+    table: "orders"
+    column: "status"
+    expected_distribution:
+      "pending": 0.1
+      "completed": 0.8
+      "cancelled": 0.1
+
+# 5. 高级检查规则 (Advanced Rules)
+advanced_rules:
+  # 5.1 跨表一致性检查
+  - name: "跨表数据一致性"
+    type: "cross_table"
+    description: "检查用户表和用户档案表的数据一致性"
+    enabled: true
+    tables: ["users", "user_profiles"]
+    join_condition: "users.user_id = user_profiles.user_id"
+    comparison_columns: ["name", "email"]
+    
+  # 5.2 趋势分析检查
+  - name: "订单趋势分析"
+    type: "trend_analysis"
+    description: "分析订单量的周环比趋势"
+    enabled: true
+    table: "orders"
+    date_column: "order_date"
+    value_column: "amount"
+    time_period: "week"
+    max_decline_rate: 0.3
+
+# Framework Configuration
+framework:
+  # Execution Settings
+  parallel_execution: true
+  max_parallel_checks: 5
+  default_timeout_seconds: 300
+  
+  # Reporting Settings
+  report_format: "html"  # html, json, or both
+  output_directory: "reports/"
+  
+  # Logging Settings
+  log_level: "INFO"  # DEBUG, INFO, WARNING, ERROR
+  
+  # Notification Settings
+  email_notifications: false
+  slack_notifications: false
+  
+# Database Configuration (can be overridden by environment variables)
+database:
+  clickhouse:
+    host: "${CLICKHOUSE_HOST:-localhost}"
+    port: ${CLICKHOUSE_PORT:-9440}
+    database: "${CLICKHOUSE_DATABASE:-default}"
+    ssl_enabled: ${CLICKHOUSE_SSL_ENABLED:-true}
+
+# Custom Validation Functions
+custom_validations:
+  - name: "revenue_trend_validation"
+    description: "Custom revenue trend analysis"
+    sql: |
+      WITH daily_revenue AS (
+        SELECT 
+          DATE(created_at) as date,
+          SUM(amount) as revenue
+        FROM orders
+        WHERE created_at >= today() - 60
+        GROUP BY DATE(created_at)
+      )
+      SELECT 
+        CORR(EXTRACT(DAY FROM date), revenue) as trend_correlation
+      FROM daily_revenue
+    validation: "trend_correlation > 0"  # Positive trend expected
+
+# Threshold Configuration
+thresholds:
+  completeness: 0.95  # 95% completeness threshold
+  accuracy: 0.98      # 98% accuracy threshold
+  freshness_hours: 24  # Data should be updated within 24 hours
+
+# Alert Configuration
+alerts:
+  critical:
+    - "table_row_count_check"
+    - "referential_integrity"
+  warning:
+    - "user_email_accuracy"
+    - "data_freshness"

@@ -1,0 +1,26 @@
+---
+# 配置Kibana任务
+
+- name: 配置Kibana主配置文件
+  template:
+    src: kibana.yml.j2
+    dest: "{{ kibana_config_file }}"
+    owner: "{{ kibana_user }}"
+    group: "{{ kibana_group }}"
+    mode: '0644'
+  notify: restart kibana
+  tags: [logging, kibana, config]
+
+- name: 配置Kibana SSL证书
+  copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: "{{ kibana_user }}"
+    group: "{{ kibana_group }}"
+    mode: '0600'
+  loop:
+    - { src: "kibana.crt", dest: "{{ kibana_config_dir }}/kibana.crt" }
+    - { src: "kibana.key", dest: "{{ kibana_config_dir }}/kibana.key" }
+  when: kibana_ssl_enabled is defined and kibana_ssl_enabled
+  notify: restart kibana
+  tags: [logging, kibana, config]

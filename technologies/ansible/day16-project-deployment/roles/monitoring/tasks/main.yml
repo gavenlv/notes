@@ -1,0 +1,54 @@
+---
+# 监控角色主任务文件
+
+- name: 包含操作系统特定变量
+  include_vars: "{{ ansible_os_family }}.yml"
+  tags: [monitoring, setup]
+
+- name: 安装Prometheus
+  include_tasks: install_prometheus.yml
+  when: "'prometheus' in monitoring_components"
+  tags: [monitoring, prometheus]
+
+- name: 配置Prometheus
+  include_tasks: configure_prometheus.yml
+  when: "'prometheus' in monitoring_components"
+  tags: [monitoring, prometheus]
+
+- name: 安装Grafana
+  include_tasks: install_grafana.yml
+  when: "'grafana' in monitoring_components"
+  tags: [monitoring, grafana]
+
+- name: 配置Grafana
+  include_tasks: configure_grafana.yml
+  when: "'grafana' in monitoring_components"
+  tags: [monitoring, grafana]
+
+- name: 安装Node Exporter
+  include_tasks: install_node_exporter.yml
+  when: "'node_exporter' in monitoring_components"
+  tags: [monitoring, node_exporter]
+
+- name: 配置Node Exporter
+  include_tasks: configure_node_exporter.yml
+  when: "'node_exporter' in monitoring_components"
+  tags: [monitoring, node_exporter]
+
+- name: 安装Alertmanager
+  include_tasks: install_alertmanager.yml
+  when: "'alertmanager' in monitoring_components"
+  tags: [monitoring, alertmanager]
+
+- name: 配置Alertmanager
+  include_tasks: configure_alertmanager.yml
+  when: "'alertmanager' in monitoring_components"
+  tags: [monitoring, alertmanager]
+
+- name: 启动监控服务
+  include_tasks: start_services.yml
+  tags: [monitoring, service]
+
+- name: 验证监控服务
+  include_tasks: verify_services.yml
+  tags: [monitoring, verify]

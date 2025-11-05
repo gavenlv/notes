@@ -1,0 +1,20 @@
+---
+# Development Environment Deployment
+
+- name: Deploy to Development Environment
+  hosts: all
+  become: yes
+  vars:
+    target_environment: development
+  pre_tasks:
+    - name: Confirm deployment to development
+      pause:
+        prompt: "Ready to deploy to development environment. Continue?"
+  roles:
+    - application
+    - database
+    - monitoring
+  post_tasks:
+    - name: Deployment completed
+      debug:
+        msg: "Development deployment completed successfully"

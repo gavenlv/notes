@@ -1,0 +1,29 @@
+---
+# Production Environment Deployment
+
+- name: Deploy to Production Environment
+  hosts: all
+  become: yes
+  vars:
+    target_environment: production
+  pre_tasks:
+    - name: Confirm deployment to production
+      pause:
+        prompt: "Ready to deploy to production environment. Continue?"
+  roles:
+    - application
+    - database
+    - monitoring
+    - loadbalancer
+    - logging
+    - backup
+  post_tasks:
+    - name: Run comprehensive health checks
+      uri:
+        url: "http://{{ inventory_hostname }}:{{ app_port }}/health"
+        method: GET
+        status_code: 200
+      delegate_to: localhost
+    - name: Notify deployment completion
+      debug:
+        msg: "Production deployment completed successfully"

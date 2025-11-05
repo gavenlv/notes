@@ -1,0 +1,29 @@
+---
+# Debian系列操作系统备份角色变量
+
+# 备份工具包列表
+backup_package_list:
+  - "mysql-client"
+  - "postgresql-client"
+  - "mongodb-clients"
+  - "rsync"
+  - "gzip"
+  - "bzip2"
+  - "xz-utils"
+  - "cron"
+
+# 备份服务配置
+backup_service_name: "backup"
+backup_user: "backup"
+backup_group: "backup"
+backup_config_dir: "/etc/backup"
+backup_script_dir: "/usr/local/bin/backup"
+backup_log_dir: "/var/log/backup"
+
+# 数据库客户端路径
+mysql_client_path: "/usr/bin/mysql"
+mysqldump_path: "/usr/bin/mysqldump"
+postgresql_client_path: "/usr/bin/psql"
+pg_dump_path: "/usr/bin/pg_dump"
+mongodb_client_path: "/usr/bin/mongo"
+mongodump_path: "/usr/bin/mongodump"

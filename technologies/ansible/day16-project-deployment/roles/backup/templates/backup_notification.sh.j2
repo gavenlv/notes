@@ -1,0 +1,81 @@
+#!/bin/bash
+# 备份通知脚本
+
+# 设置环境变量
+export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+export LANG=en_US.UTF-8
+
+# 通知配置
+LOG_FILE="{{ backup_log_dir }}/backup_notification.log"
+EMAIL="{{ backup_notification_email }}"
+
+# 日志函数
+log_message() {
+    echo "$(date '+%Y-%m-%d %H:%M:%S') - $1" >> ${LOG_FILE}
+}
+
+# 发送邮件通知
+send_email() {
+    local subject="$1"
+    local message="$2"
+    
+    # 检查邮件命令是否存在
+    if command -v mail >/dev/null 2>&1; then
+        echo "${message}" | mail -s "${subject}" ${EMAIL}
+        log_message "发送邮件通知: ${subject}"
+    else
+        log_message "警告: mail命令不可用，无法发送邮件通知"
+    fi
+}
+
+# 发送Slack通知
+send_slack() {
+    local message="$1"
+    
+    # 检查是否配置了Slack webhook
+    {% if backup_notification_slack_webhook is defined %}
+    # 这里需要安装jq工具来处理JSON
+    if command -v curl >/dev/null 2>&1 && command -v jq >/dev/null 2>&1; then
+        payload=$(jq -n --arg text "${message}" '{text: $text}')
+        curl -X POST -H 'Content-type: application/json' --data "${payload}" "{{ backup_notification_slack_webhook }}"
+        log_message "发送Slack通知: ${message}"
+    else
+        log_message "警告: curl或jq命令不可用，无法发送Slack通知"
+    fi
+    {% endif %}
+}
+
+# 主逻辑
+if [ $# -ne 2 ]; then
+    echo "用法: $0 <LEVEL> <MESSAGE>"
+    echo "LEVEL: INFO, WARNING, ERROR"
+    echo "MESSAGE: 通知内容"
+    exit 1
+fi
+
+LEVEL="$1"
+MESSAGE="$2"
+SUBJECT="[备份通知][${LEVEL}] $(hostname) - $(date '+%Y-%m-%d %H:%M:%S')"
+
+# 记录日志
+log_message "${LEVEL}: ${MESSAGE}"
+
+# 发送通知
+case "${LEVEL}" in
+    "INFO")
+        send_email "${SUBJECT}" "${MESSAGE}"
+        send_slack "${MESSAGE}"
+        ;;
+    "WARNING")
+        send_email "${SUBJECT}" "${MESSAGE}"
+        send_slack "${MESSAGE}"
+        ;;
+    "ERROR")
+        send_email "${SUBJECT}" "${MESSAGE}"
+        send_slack "${MESSAGE}"
+        ;;
+    *)
+        echo "未知的通知级别: ${LEVEL}"
+        exit 1
+        ;;
+esac

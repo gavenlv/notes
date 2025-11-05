@@ -1,0 +1,35 @@
+---
+# Backup role variables
+
+# Backup directories
+backup_base_dir: "/var/backups"
+app_backup_dir: "{{ backup_base_dir }}/{{ app_name }}"
+db_backup_dir: "{{ backup_base_dir }}/database"
+config_backup_dir: "{{ backup_base_dir }}/config"
+
+# Backup retention settings
+backup_retention_days: 7
+backup_retention_count: 10
+
+# Backup schedules (cron format)
+app_backup_schedule: "0 1 * * *"  # Daily at 1 AM
+db_backup_schedule: "0 2 * * *"   # Daily at 2 AM
+config_backup_schedule: "0 3 * * 0"  # Weekly on Sunday at 3 AM
+
+# Backup tools
+backup_tools:
+  - rsync
+  - tar
+  - gzip
+  - pg_dump
+  - mysqldump
+  - mongodump
+
+# Database backup settings
+db_backup_user: backup
+db_backup_password: "backup123"
+db_backup_compression: true
+
+# Notification settings
+backup_notification_email: "admin@{{ app_name }}.com"
+backup_notification_slack_webhook: ""

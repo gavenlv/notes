@@ -1,0 +1,71 @@
+---
+# 数据库角色默认变量
+
+# 数据库类型 (postgresql, mysql, mongodb)
+db_type: "postgresql"
+
+# 数据库版本
+db_version: "13"
+
+# 数据库管理员用户
+db_admin_user: "{% if db_type == 'postgresql' %}postgres{% elif db_type == 'mysql' %}root{% else %}mongodb{% endif %}"
+
+# 数据库监听配置
+db_listen_addresses: "localhost"
+db_port: "{% if db_type == 'postgresql' %}5432{% elif db_type == 'mysql' %}3306{% elif db_type == 'mongodb' %}27017{% else %}5432{% endif %}"
+
+# 数据库存储配置
+db_data_directory: "{% if db_type == 'postgresql' %}/var/lib/postgresql/{{ db_version }}/main{% elif db_type == 'mysql' %}/var/lib/mysql{% else %}/var/lib/mongodb{% endif %}"
+db_wal_directory: ""
+
+# 数据库认证配置
+db_auth_method: "md5"
+db_auth_file: "{% if db_type == 'postgresql' %}/etc/postgresql/{{ db_version }}/main/pg_hba.conf{% elif db_type == 'mysql' %}/etc/mysql/mysql.conf.d/mysqld.cnf{% else %}/etc/mongodb.conf{% endif %}"
+
+# 数据库内存配置
+db_shared_buffers: "128MB"
+db_effective_cache_size: "4GB"
+db_maintenance_work_mem: "64MB"
+db_checkpoint_completion_target: 0.9
+db_wal_buffers: "16MB"
+db_default_statistics_target: 100
+
+# 数据库连接配置
+db_max_connections: 100
+db_work_mem: "4MB"
+
+# 数据库日志配置
+db_log_destination: "stderr"
+db_logging_collector: "on"
+db_log_directory: "log"
+db_log_filename: "postgresql-%Y-%m-%d_%H%M%S.log"
+db_log_statement: "none"
+db_log_min_duration_statement: 1000
+
+# 数据库备份配置
+db_backup_enabled: true
+db_backup_directory: "/backup/database"
+db_backup_retention_days: 30
+
+# 数据库用户和数据库
+db_users: []
+# 示例:
+# db_users:
+#   - name: myapp_user
+#     password: securepassword
+#     privileges: "CREATEDB"
+#     expires: "infinity"
+
+db_databases: []
+# 示例:
+# db_databases:
+#   - name: myapp_production
+#     owner: myapp_user
+#     encoding: UTF8
+
+# 数据库扩展 (仅适用于PostgreSQL)
+db_extensions: []
+# 示例:
+# db_extensions:
+#   - name: pg_stat_statements
+#   - name: uuid-ossp

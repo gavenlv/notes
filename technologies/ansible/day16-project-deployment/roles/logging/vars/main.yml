@@ -1,0 +1,42 @@
+---
+# Logging role variables
+
+# Elasticsearch configuration
+elasticsearch_version: "7.15.0"
+elasticsearch_user: elasticsearch
+elasticsearch_group: elasticsearch
+elasticsearch_install_dir: "/opt/elasticsearch"
+elasticsearch_data_dir: "/var/lib/elasticsearch"
+elasticsearch_log_dir: "/var/log/elasticsearch"
+elasticsearch_config_dir: "/etc/elasticsearch"
+elasticsearch_heap_size: "1g"
+elasticsearch_port: 9200
+
+# Logstash configuration
+logstash_version: "7.15.0"
+logstash_user: logstash
+logstash_group: logstash
+logstash_install_dir: "/opt/logstash"
+logstash_config_dir: "/etc/logstash"
+logstash_pipeline_dir: "/etc/logstash/pipeline"
+logstash_port: 5044
+
+# Kibana configuration
+kibana_version: "7.15.0"
+kibana_user: kibana
+kibana_group: kibana
+kibana_install_dir: "/opt/kibana"
+kibana_config_dir: "/etc/kibana"
+kibana_port: 5601
+
+# Filebeat configuration
+filebeat_version: "7.15.0"
+filebeat_user: filebeat
+filebeat_group: filebeat
+filebeat_install_dir: "/opt/filebeat"
+filebeat_config_dir: "/etc/filebeat"
+filebeat_port: 5066
+
+# Logging settings
+log_retention_days: 30
+log_rotation_size: "100M"

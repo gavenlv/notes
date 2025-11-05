@@ -1,9 +1,9 @@
 #!/bin/bash
-# Run Real Data Quality Checks
-# This script runs data quality checks against real PostgreSQL and ClickHouse databases
+# Run Refactored Data Quality Checks
+# This script runs data quality checks using the new SOLID architecture
 
 echo "========================================"
-echo "Real Data Quality Checks"
+echo "Refactored Data Quality Checks"
 echo "========================================"
 echo
 
@@ -22,27 +22,10 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-# Test database connections first
+# Run refactored data quality checks
 echo
-echo "Testing database connections..."
-python src/test_connections.py
-if [ $? -ne 0 ]; then
-    echo
-    echo "WARNING: Database connection test failed!"
-    echo "Please ensure PostgreSQL and ClickHouse are running"
-    echo "and check your configuration in config/environment.env"
-    echo
-    read -p "Continue anyway? (y/N): " continue
-    if [[ ! $continue =~ ^[Yy]$ ]]; then
-        echo "Aborting..."
-        exit 1
-    fi
-fi
-
-# Run real data quality checks
-echo
-echo "Running real data quality checks..."
-echo "This will check PostgreSQL and ClickHouse databases"
+echo "Running refactored data quality checks..."
+echo "This will check PostgreSQL and ClickHouse databases using SOLID architecture"
 echo
 python src/app.py
 
@@ -51,4 +34,5 @@ echo "========================================"
 echo "Data Quality Checks Completed"
 echo "========================================"
 echo "Check the reports directory for detailed results"
+echo "Check ClickHouse database for stored results"
 echo

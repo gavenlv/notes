@@ -1,0 +1,37 @@
+---
+# 监控角色处理程序
+
+- name: restart prometheus
+  service:
+    name: prometheus
+    state: restarted
+  when: "'prometheus' in monitoring_components"
+  tags: [monitoring, prometheus, handler]
+
+- name: reload prometheus
+  service:
+    name: prometheus
+    state: reloaded
+  when: "'prometheus' in monitoring_components"
+  tags: [monitoring, prometheus, handler]
+
+- name: restart grafana
+  service:
+    name: grafana-server
+    state: restarted
+  when: "'grafana' in monitoring_components"
+  tags: [monitoring, grafana, handler]
+
+- name: restart node_exporter
+  service:
+    name: node_exporter
+    state: restarted
+  when: "'node_exporter' in monitoring_components"
+  tags: [monitoring, node_exporter, handler]
+
+- name: restart alertmanager
+  service:
+    name: alertmanager
+    state: restarted
+  when: "'alertmanager' in monitoring_components"
+  tags: [monitoring, alertmanager, handler]

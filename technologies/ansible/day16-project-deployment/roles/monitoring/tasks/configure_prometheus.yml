@@ -1,0 +1,41 @@
+---
+# 配置Prometheus任务
+
+- name: 配置Prometheus主配置文件
+  template:
+    src: prometheus.yml.j2
+    dest: "{{ prometheus_config_dir }}/prometheus.yml"
+    owner: prometheus
+    group: prometheus
+    mode: '0644'
+  notify: restart prometheus
+  tags: [monitoring, prometheus, config]
+
+- name: 创建Prometheus规则目录
+  file:
+    path: "{{ prometheus_config_dir }}/rules"
+    state: directory
+    owner: prometheus
+    group: prometheus
+    mode: '0755'
+  tags: [monitoring, prometheus, config]
+
+- name: 配置Prometheus告警规则
+  template:
+    src: alert-rules.yml.j2
+    dest: "{{ prometheus_config_dir }}/rules/alert-rules.yml"
+    owner: prometheus
+    group: prometheus
+    mode: '0644'
+  when: monitoring_alerts_enabled
+  notify: reload prometheus
+  tags: [monitoring, prometheus, config]
+
+- name: 设置Prometheus配置文件权限
+  file:
+    path: "{{ prometheus_config_dir }}"
+    owner: prometheus
+    group: prometheus
+    mode: '0755'
+    recurse: yes
+  tags: [monitoring, prometheus, config]

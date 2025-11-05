@@ -1,0 +1,27 @@
+# Alertmanager配置文件
+# 由Ansible管理，请勿手动修改
+
+global:
+  smtp_smarthost: '{{ alertmanager_smtp_smarthost }}'
+  smtp_from: '{{ alertmanager_smtp_from }}'
+  smtp_auth_username: '{{ alertmanager_smtp_auth_username }}'
+  smtp_auth_password: '{{ alertmanager_smtp_auth_password }}'
+
+route:
+  group_by: ['alertname']
+  group_wait: 10s
+  group_interval: 10s
+  repeat_interval: 1h
+  receiver: '{{ alertmanager_default_receiver }}'
+
+receivers:
+{% for receiver in alertmanager_receivers %}
+  - name: '{{ receiver.name }}'
+{% if receiver.email_configs is defined %}
+    email_configs:
+{% for email_config in receiver.email_configs %}
+      - to: '{{ email_config.to }}'
+        send_resolved: {{ email_config.send_resolved | lower }}
+{% endfor %}
+{% endif %}
+{% endfor %}

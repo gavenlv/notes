@@ -1,0 +1,144 @@
+---
+# 通用角色主任务文件
+
+- name: 包含操作系统特定变量
+  include_vars: "{{ ansible_os_family }}.yml"
+  tags: [common, setup]
+
+- name: 创建系统组
+  group:
+    name: "{{ item.name }}"
+    gid: "{{ item.gid | default(omit) }}"
+    state: present
+  loop: "{{ common_system_groups }}"
+  when: common_system_groups | length > 0
+  tags: [common, users]
+
+- name: 创建系统用户
+  user:
+    name: "{{ item.name }}"
+    uid: "{{ item.uid | default(omit) }}"
+    group: "{{ item.group | default(omit) }}"
+    home: "{{ item.home | default(omit) }}"
+    shell: "{{ item.shell | default('/bin/bash') }}"
+    state: present
+  loop: "{{ common_system_users }}"
+  when: common_system_users | length > 0
+  tags: [common, users]
+
+- name: 安装基础软件包
+  package:
+    name: "{{ common_base_packages }}"
+    state: present
+  tags: [common, packages]
+
+- name: 配置防火墙
+  firewalld:
+    port: "{{ item }}/tcp"
+    permanent: yes
+    state: enabled
+    immediate: yes
+  loop: "{{ common_firewall_ports }}"
+  when: common_firewall_enabled and ansible_os_family == "RedHat"
+  notify: restart firewalld
+  tags: [common, firewall]
+
+- name: 配置UFW防火墙
+  ufw:
+    rule: allow
+    port: "{{ item }}"
+  loop: "{{ common_firewall_ports }}"
+  when: common_firewall_enabled and ansible_os_family == "Debian"
+  tags: [common, firewall]
+
+- name: 配置NTP时间同步
+  package:
+    name: chrony
+    state: present
+  when: common_ntp_enabled and ansible_os_family == "RedHat"
+  tags: [common, ntp]
+
+- name: 配置NTP时间同步 (Debian)
+  package:
+    name: ntp
+    state: present
+  when: common_ntp_enabled and ansible_os_family == "Debian"
+  tags: [common, ntp]
+
+- name: 配置NTP服务器
+  template:
+    src: chrony.conf.j2
+    dest: /etc/chrony.conf
+  when: common_ntp_enabled and ansible_os_family == "RedHat"
+  notify: restart chronyd
+  tags: [common, ntp]
+
+- name: 配置NTP服务器 (Debian)
+  template:
+    src: ntp.conf.j2
+    dest: /etc/ntp.conf
+  when: common_ntp_enabled and ansible_os_family == "Debian"
+  notify: restart ntp
+  tags: [common, ntp]
+
+- name: 启动时间同步服务
+  service:
+    name: "{{ common_ntp_service }}"
+    state: started
+    enabled: yes
+  when: common_ntp_enabled
+  tags: [common, ntp]
+
+- name: 配置日志轮转
+  template:
+    src: logrotate.conf.j2
+    dest: /etc/logrotate.d/common
+  when: common_logrotate_enabled
+  tags: [common, logging]
+
+- name: SSH安全配置
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+    backup: yes
+  loop:
+    - { regexp: '^#?Port ', line: 'Port {{ common_ssh_port }}' }
+    - { regexp: '^#?PermitRootLogin ', line: 'PermitRootLogin {{ "yes" if common_ssh_permit_root_login else "no" }}' }
+    - { regexp: '^#?PasswordAuthentication ', line: 'PasswordAuthentication {{ "yes" if common_ssh_password_authentication else "no" }}' }
+  when: common_ssh_hardening
+  notify: restart sshd
+  tags: [common, security]
+
+- name: 应用系统内核参数
+  sysctl:
+    name: "{{ item.key }}"
+    value: "{{ item.value }}"
+    sysctl_set: yes
+    state: present
+    reload: yes
+  loop: "{{ common_sysctl_settings | dict2items }}"
+  when: common_network_optimization
+  tags: [common, network]
+
+- name: 系统软件包更新
+  package:
+    name: "*"
+    state: latest
+  when: common_update_packages
+  tags: [common, packages]
+
+- name: 配置自动更新
+  template:
+    src: yum-cron.conf.j2
+    dest: /etc/yum/yum-cron.conf
+  when: common_auto_update and ansible_os_family == "RedHat"
+  tags: [common, updates]
+
+- name: 启动自动更新服务
+  service:
+    name: yum-cron
+    state: started
+    enabled: yes
+  when: common_auto_update and ansible_os_family == "RedHat"
+  tags: [common, updates]

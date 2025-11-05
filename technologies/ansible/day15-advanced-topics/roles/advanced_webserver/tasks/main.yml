@@ -1,0 +1,79 @@
+---
+# 高级 Web 服务器角色任务文件
+
+- name: Include OS-specific variables
+  include_vars: "{{ ansible_os_family }}.yml"
+  tags: [webserver, config]
+
+- name: Install web server packages
+  package:
+    name: "{{ webserver_packages }}"
+    state: present
+  notify: restart webserver
+  tags: [webserver, install]
+
+- name: Create web server configuration directory
+  file:
+    path: "{{ webserver_config_dir }}"
+    state: directory
+    mode: '0755'
+  tags: [webserver, config]
+
+- name: Configure main web server
+  template:
+    src: "{{ webserver_type }}.conf.j2"
+    dest: "{{ webserver_main_config }}"
+    mode: '0644'
+  notify: restart webserver
+  tags: [webserver, config]
+
+- name: Configure SSL if enabled
+  template:
+    src: ssl.conf.j2
+    dest: "{{ webserver_ssl_config }}"
+    mode: '0644'
+  when: webserver_ssl_enabled
+  notify: restart webserver
+  tags: [webserver, ssl, config]
+
+- name: Configure security headers
+  template:
+    src: security.conf.j2
+    dest: "{{ webserver_security_config }}"
+    mode: '0644'
+  when: webserver_security_headers
+  notify: restart webserver
+  tags: [webserver, security, config]
+
+- name: Configure virtual hosts
+  template:
+    src: vhost.conf.j2
+    dest: "{{ webserver_vhosts_dir }}/{{ item.name }}.conf"
+    mode: '0644'
+  loop: "{{ webserver_vhosts }}"
+  when: webserver_vhosts | length > 0
+  notify: reload webserver
+  tags: [webserver, vhost, config]
+
+- name: Ensure web server is started and enabled
+  service:
+    name: "{{ webserver_service }}"
+    state: started
+    enabled: yes
+  tags: [webserver, service]
+
+- name: Configure log rotation
+  template:
+    src: logrotate.conf.j2
+    dest: /etc/logrotate.d/{{ webserver_type }}
+    mode: '0644'
+  tags: [webserver, logging]
+
+- name: Configure monitoring endpoint
+  template:
+    src: monitoring.conf.j2
+    dest: "{{ webserver_monitoring_config }}"
+    mode: '0644'
+  when: webserver_monitoring_enabled
+  notify: reload webserver
+  tags: [webserver, monitoring, config]

@@ -1,0 +1,145 @@
+---
+# 应用健康检查 Playbook
+
+- name: 应用健康检查
+  hosts: webservers
+  become: no
+  vars:
+    health_check_timeout: 30
+    health_check_retries: 5
+    
+  tasks:
+    - name: 检查HTTP服务状态
+      uri:
+        url: "http://{{ ansible_default_ipv4.address }}:{{ app_port | default(8080) }}/health"
+        method: GET
+        status_code: 200
+        timeout: "{{ health_check_timeout }}"
+      retries: "{{ health_check_retries }}"
+      delay: 10
+      register: http_health
+      
+    - name: 检查应用详细状态
+      uri:
+        url: "http://{{ ansible_default_ipv4.address }}:{{ app_port | default(8080) }}/status"
+        method: GET
+        status_code: 200
+        timeout: "{{ health_check_timeout }}"
+      retries: "{{ health_check_retries }}"
+      delay: 5
+      register: app_status
+      ignore_errors: yes
+      
+    - name: 检查数据库连接
+      uri:
+        url: "http://{{ ansible_default_ipv4.address }}:{{ app_port | default(8080) }}/db-health"
+        method: GET
+        status_code: 200
+        timeout: "{{ health_check_timeout }}"
+      retries: "{{ health_check_retries }}"
+      delay: 5
+      register: db_health
+      ignore_errors: yes
+      
+    - name: 检查缓存服务
+      uri:
+        url: "http://{{ ansible_default_ipv4.address }}:{{ app_port | default(8080) }}/cache-health"
+        method: GET
+        status_code: 200
+        timeout: "{{ health_check_timeout }}"
+      retries: "{{ health_check_retries }}"
+      delay: 5
+      register: cache_health
+      ignore_errors: yes
+      
+    - name: 检查外部服务依赖
+      uri:
+        url: "{{ item.url }}"
+        method: GET
+        status_code: "{{ item.status_code | default(200) }}"
+        timeout: "{{ health_check_timeout }}"
+      loop: "{{ external_services | default([]) }}"
+      retries: "{{ health_check_retries }}"
+      delay: 5
+      register: service_health
+      ignore_errors: yes
+      
+    - name: 收集系统资源信息
+      shell: |
+        echo "CPU Usage: $(top -bn1 | grep "Cpu(s)" | awk '{print $2}' | cut -d'%' -f1)"
+        echo "Memory Usage: $(free | grep Mem | awk '{printf("%.2f%%"), $3/$2 * 100.0}')"
+        echo "Disk Usage: $(df -h / | awk 'NR==2{print $5}')"
+      register: system_resources
+      
+    - name: 验证应用进程
+      shell: "pgrep -f {{ app_name | default('application') }}"
+      register: app_process
+      ignore_errors: yes
+      
+    - name: 检查应用日志错误
+      shell: "tail -n 100 /var/log/{{ app_name | default('application') }}/app.log | grep -i error || echo 'No errors found'"
+      register: app_logs
+      
+    - name: 生成健康检查报告
+      set_fact:
+        health_report:
+          timestamp: "{{ ansible_date_time.iso8601 }}"
+          server: "{{ inventory_hostname }}"
+          http_status: "{{ http_health.status }}"
+          app_status: "{{ app_status.status | default('N/A') }}"
+          db_status: "{{ db_health.status | default('N/A') }}"
+          cache_status: "{{ cache_health.status | default('N/A') }}"
+          service_status: "{{ service_health.results | map(attribute='status') | list | default('N/A') }}"
+          process_count: "{{ app_process.stdout_lines | length | default(0) }}"
+          system_resources: "{{ system_resources.stdout }}"
+          log_errors: "{{ app_logs.stdout }}"
+          
+    - name: 显示健康检查结果
+      debug:
+        msg: |
+          健康检查报告 ({{ inventory_hostname }}):
+          HTTP服务: {{ http_health.status }}
+          应用状态: {{ app_status.status | default('N/A') }}
+          数据库连接: {{ db_health.status | default('N/A') }}
+          缓存服务: {{ cache_health.status | default('N/A') }}
+          进程数量: {{ app_process.stdout_lines | length | default(0) }}
+          系统资源: 
+          {{ system_resources.stdout | indent(4) }}
+          
+    - name: 检查是否存在严重错误
+      assert:
+        that:
+          - http_health.status == 200
+          - app_process.stdout_lines | length > 0
+        fail_msg: "健康检查失败 - HTTP状态: {{ http_health.status }}, 进程数量: {{ app_process.stdout_lines | length | default(0) }}"
+        success_msg: "健康检查通过"
+        
+    - name: 发送健康检查结果到监控系统
+      uri:
+        url: "{{ monitoring_endpoint | default('http://monitoring.example.com/api/health') }}"
+        method: POST
+        body_format: json
+        body: "{{ health_report | to_json }}"
+        status_code: 201
+      when: monitoring_endpoint is defined
+      ignore_errors: yes
+
+- name: 负载均衡器健康检查
+  hosts: loadbalancers
+  become: yes
+  tasks:
+    - name: 检查后端服务器状态
+      shell: "curl -s http://localhost:{{ lb_stats_port | default(1936) }}/stats"
+      register: lb_stats
+      ignore_errors: yes
+      
+    - name: 验证后端服务器可用性
+      assert:
+        that:
+          - "'DOWN' not in lb_stats.stdout"
+        fail_msg: "发现DOWN状态的后端服务器"
+        success_msg: "所有后端服务器正常运行"
+        
+    - name: 显示负载均衡器状态
+      debug:
+        msg: "负载均衡器状态检查完成"

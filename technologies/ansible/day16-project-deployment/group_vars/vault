@@ -1,0 +1,16 @@
+---
+# Vault文件 - 存储敏感信息
+
+# 数据库密码
+vault_db_password: "secure_production_password"
+
+# 外部服务API密钥
+vault_payment_api_key: "payment_api_secret_key"
+vault_email_api_key: "email_api_secret_key"
+
+# SSL证书密码
+vault_ssl_cert_password: "ssl_certificate_password"
+
+# 监控系统凭证
+vault_monitoring_username: "monitoring_user"
+vault_monitoring_password: "monitoring_password"

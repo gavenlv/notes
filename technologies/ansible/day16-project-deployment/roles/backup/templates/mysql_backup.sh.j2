@@ -1,0 +1,61 @@
+#!/bin/bash
+# MySQL备份脚本
+
+# 设置环境变量
+export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+export LANG=en_US.UTF-8
+
+# 备份配置
+BACKUP_DIR="{{ backup_local_path }}/mysql"
+DATE=$(date +%Y%m%d_%H%M%S)
+LOG_FILE="{{ backup_log_dir }}/mysql_backup.log"
+
+# 创建备份目录
+mkdir -p ${BACKUP_DIR}
+chown {{ backup_user }}:{{ backup_group }} ${BACKUP_DIR}
+
+# 日志函数
+log_message() {
+    echo "$(date '+%Y-%m-%d %H:%M:%S') - $1" >> ${LOG_FILE}
+}
+
+# 开始备份
+log_message "开始MySQL备份"
+
+# 备份所有数据库
+{% if 'all' in mysql_databases %}
+{{ mysqldump_path }} -h {{ mysql_host }} -P {{ mysql_port }} -u {{ mysql_user }} -p{{ mysql_password }} --all-databases > ${BACKUP_DIR}/mysql_all_${DATE}.sql
+{% else %}
+{% for db in mysql_databases %}
+{{ mysqldump_path }} -h {{ mysql_host }} -P {{ mysql_port }} -u {{ mysql_user }} -p{{ mysql_password }} {{ db }} > ${BACKUP_DIR}/mysql_{{ db }}_${DATE}.sql
+{% endfor %}
+{% endif %}
+
+# 检查备份是否成功
+if [ $? -eq 0 ]; then
+    log_message "MySQL备份成功完成"
+    
+    # 压缩备份文件
+    {% if backup_compression_enabled %}
+    {% if backup_compression_type == "gzip" %}
+    gzip ${BACKUP_DIR}/mysql_*.sql
+    {% elif backup_compression_type == "bzip2" %}
+    bzip2 ${BACKUP_DIR}/mysql_*.sql
+    {% elif backup_compression_type == "xz" %}
+    xz ${BACKUP_DIR}/mysql_*.sql
+    {% endif %}
+    {% endif %}
+    
+    # 加密备份文件
+    {% if backup_encryption_enabled %}
+    # TODO: 实现备份加密功能
+    {% endif %}
+else
+    log_message "MySQL备份失败"
+    exit 1
+fi
+
+# 清理旧备份
+find ${BACKUP_DIR} -name "mysql_*.sql*" -mtime +{{ backup_retention_days }} -delete
+
+log_message "MySQL备份任务完成"

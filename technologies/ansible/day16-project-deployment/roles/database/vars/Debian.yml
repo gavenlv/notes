@@ -1,0 +1,17 @@
+---
+# Debian系列操作系统数据库变量
+
+# PostgreSQL配置
+db_packages:
+  - postgresql
+  - postgresql-contrib
+  - python3-psycopg2
+
+db_service_name: "{% if db_type == 'postgresql' %}postgresql{% elif db_type == 'mysql' %}mysql{% else %}postgresql{% endif %}"
+
+db_service_user: "{% if db_type == 'postgresql' %}postgres{% elif db_type == 'mysql' %}mysql{% else %}postgres{% endif %}"
+db_service_group: "{% if db_type == 'postgresql' %}postgres{% elif db_type == 'mysql' %}mysql{% else %}postgres{% endif %}"
+
+db_config_file: "{% if db_type == 'postgresql' %}/etc/postgresql/{{ db_version }}/main/postgresql.conf{% endif %}"
+
+db_init_command: "{% if db_type == 'postgresql' %}postgresql-{{ db_version }}-setup initdb{% endif %}"

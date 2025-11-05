@@ -1,0 +1,38 @@
+#!/bin/bash
+# 备份清理脚本
+
+# 设置环境变量
+export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+export LANG=en_US.UTF-8
+
+# 备份配置
+BACKUP_DIR="{{ backup_local_path }}"
+RETENTION_DAYS={{ backup_retention_days }}
+LOG_FILE="{{ backup_log_dir }}/cleanup_backups.log"
+
+# 日志函数
+log_message() {
+    echo "$(date '+%Y-%m-%d %H:%M:%S') - $1" >> ${LOG_FILE}
+}
+
+# 开始清理
+log_message "开始清理过期备份文件"
+
+# 清理MySQL备份
+find ${BACKUP_DIR}/mysql -name "mysql_*.sql*" -mtime +${RETENTION_DAYS} -delete
+log_message "MySQL备份清理完成"
+
+# 清理PostgreSQL备份
+find ${BACKUP_DIR}/postgresql -name "postgresql_*.dump*" -mtime +${RETENTION_DAYS} -delete
+log_message "PostgreSQL备份清理完成"
+
+# 清理MongoDB备份
+find ${BACKUP_DIR}/mongodb -name "mongodb_*.tar.*" -mtime +${RETENTION_DAYS} -delete
+log_message "MongoDB备份清理完成"
+
+# 清理文件备份
+find ${BACKUP_DIR}/files -name "files_*.tar.*" -mtime +${RETENTION_DAYS} -delete
+find ${BACKUP_DIR}/files -name "[0-9]*" -type d -mtime +${RETENTION_DAYS} -exec rm -rf {} \; 2>/dev/null
+log_message "文件备份清理完成"
+
+log_message "备份清理任务完成"

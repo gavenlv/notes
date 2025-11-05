@@ -1,0 +1,26 @@
+# Development Environment Inventory
+
+[webservers]
+web1.dev.example.com ansible_host=192.168.10.10
+web2.dev.example.com ansible_host=192.168.10.11
+
+[databases]
+db1.dev.example.com ansible_host=192.168.10.20
+
+[monitoring]
+monitor.dev.example.com ansible_host=192.168.10.30
+
+[loadbalancers]
+lb.dev.example.com ansible_host=192.168.10.40
+
+[logging]
+log.dev.example.com ansible_host=192.168.10.50
+
+[backup]
+backup.dev.example.com ansible_host=192.168.10.60
+
+[all:vars]
+env=development
+app_name=myapp
+app_version=1.0.0
+app_port=8080

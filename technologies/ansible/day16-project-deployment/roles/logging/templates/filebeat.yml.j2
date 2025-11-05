@@ -1,0 +1,39 @@
+# Filebeat配置文件
+# 由Ansible管理，请勿手动修改
+
+filebeat.inputs:
+- type: log
+  enabled: true
+  paths:
+    - /var/log/*.log
+    - /var/log/messages
+    - /var/log/syslog
+  fields:
+    service: system
+  fields_under_root: true
+
+- type: log
+  enabled: true
+  paths:
+    - /var/log/nginx/access.log
+    - /var/log/nginx/error.log
+  fields:
+    service: nginx
+  fields_under_root: true
+
+- type: log
+  enabled: true
+  paths:
+    - /var/log/apache2/access.log
+    - /var/log/apache2/error.log
+  fields:
+    service: apache
+  fields_under_root: true
+
+output.logstash:
+  hosts: ["{{ logstash_host | default('localhost') }}:{{ logstash_beats_port | default(5044) }}"]
+
+processors:
+  - add_host_metadata: ~
+  - add_cloud_metadata: ~
+  - add_docker_metadata: ~

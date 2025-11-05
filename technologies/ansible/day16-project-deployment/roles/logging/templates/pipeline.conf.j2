@@ -1,0 +1,37 @@
+# Logstash管道配置
+# 由Ansible管理，请勿手动修改
+
+input {
+  beats {
+    port => {{ logstash_beats_port | default(5044) }}
+  }
+  
+  tcp {
+    port => {{ logstash_tcp_port | default(5000) }}
+    codec => json
+  }
+}
+
+filter {
+  if [type] == "syslog" {
+    grok {
+      match => { "message" => "%{SYSLOGTIMESTAMP:syslog_timestamp} %{SYSLOGHOST:syslog_hostname} %{DATA:syslog_program}(?:\[%{POSINT:syslog_pid}\])?: %{GREEDYDATA:syslog_message}" }
+      add_field => [ "received_at", "%{@timestamp}" ]
+      add_field => [ "received_from", "%{host}" ]
+    }
+    date {
+      match => [ "syslog_timestamp", "MMM  d HH:mm:ss", "MMM dd HH:mm:ss" ]
+    }
+  }
+}
+
+output {
+  elasticsearch {
+    hosts => ["{{ elasticsearch_host | default('localhost') }}:{{ elasticsearch_port }}"]
+    index => "logstash-%{+YYYY.MM.dd}"
+  }
+  
+  stdout {
+    codec => rubydebug
+  }
+}

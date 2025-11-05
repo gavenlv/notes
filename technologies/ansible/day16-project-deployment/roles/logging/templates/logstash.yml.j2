@@ -1,0 +1,22 @@
+# Logstash配置文件
+# 由Ansible管理，请勿手动修改
+
+http.host: "{{ logstash_http_host | default('localhost') }}"
+http.port: {{ logstash_port }}
+
+path.data: {{ logstash_data_dir | default('/var/lib/logstash') }}
+path.logs: {{ logstash_log_dir | default('/var/log/logstash') }}
+
+pipeline.workers: {{ logstash_pipeline_workers | default(4) }}
+pipeline.output.workers: {{ logstash_output_workers | default(1) }}
+pipeline.batch.size: {{ logstash_batch_size | default(125) }}
+pipeline.batch.delay: {{ logstash_batch_delay | default(50) }}
+
+config.reload.automatic: true
+config.reload.interval: 3s
+
+{% if logstash_enable_ssl %}
+# SSL配置
+ssl.certificate: /etc/logstash/ssl/logstash.crt
+ssl.key: /etc/logstash/ssl/logstash.key
+{% endif %}

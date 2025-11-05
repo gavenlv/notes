@@ -1,8 +1,8 @@
 @echo off
-REM Quick start script for Soda Data Quality App
-REM This script checks if venv exists and runs the real data quality checks
+REM Quick start script for Refactored Data Quality App
+REM This script checks if venv exists and runs the refactored data quality checks
 
-echo Quick Start - Soda Data Quality App
+echo Quick Start - Refactored Data Quality App
 echo.
 
 REM Check if virtual environment exists
@@ -19,9 +19,9 @@ if not exist venv (
     echo Virtual environment found
 )
 
-REM Activate virtual environment and run real data quality checks
+REM Activate virtual environment and run refactored data quality checks
 echo.
-echo Running real data quality checks...
+echo Running refactored data quality checks...
 call venv\Scripts\activate.bat
 python src\app.py
 

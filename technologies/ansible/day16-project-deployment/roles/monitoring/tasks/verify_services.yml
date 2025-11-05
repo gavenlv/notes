@@ -1,0 +1,70 @@
+---
+# 验证监控服务任务
+
+- name: 验证Prometheus运行状态
+  uri:
+    url: "http://localhost:{{ prometheus_port }}/status"
+    method: GET
+    status_code: 200
+  when: "'prometheus' in monitoring_components"
+  register: prometheus_status
+  retries: 5
+  delay: 10
+  tags: [monitoring, prometheus, verify]
+
+- name: 显示Prometheus状态
+  debug:
+    msg: "Prometheus服务状态: {{ '运行正常' if prometheus_status.status == 200 else '运行异常' }}"
+  when: "'prometheus' in monitoring_components and prometheus_status is defined"
+  tags: [monitoring, prometheus, verify]
+
+- name: 验证Grafana运行状态
+  uri:
+    url: "http://localhost:{{ grafana_port }}/api/health"
+    method: GET
+    status_code: 200
+  when: "'grafana' in monitoring_components"
+  register: grafana_status
+  retries: 5
+  delay: 10
+  tags: [monitoring, grafana, verify]
+
+- name: 显示Grafana状态
+  debug:
+    msg: "Grafana服务状态: {{ '运行正常' if grafana_status.status == 200 else '运行异常' }}"
+  when: "'grafana' in monitoring_components and grafana_status is defined"
+  tags: [monitoring, grafana, verify]
+
+- name: 验证Node Exporter运行状态
+  uri:
+    url: "http://localhost:{{ node_exporter_port }}/metrics"
+    method: GET
+    status_code: 200
+  when: "'node_exporter' in monitoring_components"
+  register: node_exporter_status
+  retries: 5
+  delay: 10
+  tags: [monitoring, node_exporter, verify]
+
+- name: 显示Node Exporter状态
+  debug:
+    msg: "Node Exporter服务状态: {{ '运行正常' if node_exporter_status.status == 200 else '运行异常' }}"
+  when: "'node_exporter' in monitoring_components and node_exporter_status is defined"
+  tags: [monitoring, node_exporter, verify]
+
+- name: 验证Alertmanager运行状态
+  uri:
+    url: "http://localhost:{{ alertmanager_port }}/"
+    method: GET
+    status_code: 200
+  when: "'alertmanager' in monitoring_components"
+  register: alertmanager_status
+  retries: 5
+  delay: 10
+  tags: [monitoring, alertmanager, verify]
+
+- name: 显示Alertmanager状态
+  debug:
+    msg: "Alertmanager服务状态: {{ '运行正常' if alertmanager_status.status == 200 else '运行异常' }}"
+  when: "'alertmanager' in monitoring_components and alertmanager_status is defined"
+  tags: [monitoring, alertmanager, verify]

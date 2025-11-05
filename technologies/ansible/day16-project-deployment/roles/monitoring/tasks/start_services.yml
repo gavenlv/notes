@@ -1,0 +1,53 @@
+---
+# 启动监控服务任务
+
+- name: 启动Prometheus服务
+  service:
+    name: prometheus
+    state: started
+    enabled: yes
+  when: "'prometheus' in monitoring_components"
+  tags: [monitoring, prometheus, service]
+
+- name: 等待Prometheus启动
+  wait_for:
+    port: "{{ prometheus_port }}"
+    host: "localhost"
+    delay: 10
+    timeout: 60
+  when: "'prometheus' in monitoring_components"
+  tags: [monitoring, prometheus, service]
+
+- name: 启动Grafana服务
+  service:
+    name: grafana-server
+    state: started
+    enabled: yes
+  when: "'grafana' in monitoring_components"
+  tags: [monitoring, grafana, service]
+
+- name: 等待Grafana启动
+  wait_for:
+    port: "{{ grafana_port }}"
+    host: "localhost"
+    delay: 10
+    timeout: 60
+  when: "'grafana' in monitoring_components"
+  tags: [monitoring, grafana, service]
+
+- name: 启动Alertmanager服务
+  service:
+    name: alertmanager
+    state: started
+    enabled: yes
+  when: "'alertmanager' in monitoring_components"
+  tags: [monitoring, alertmanager, service]
+
+- name: 等待Alertmanager启动
+  wait_for:
+    port: "{{ alertmanager_port }}"
+    host: "localhost"
+    delay: 10
+    timeout: 60
+  when: "'alertmanager' in monitoring_components"
+  tags: [monitoring, alertmanager, service]

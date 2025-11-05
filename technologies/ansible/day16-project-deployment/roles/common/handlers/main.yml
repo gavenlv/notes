@@ -1,0 +1,30 @@
+---
+# 通用角色处理程序
+
+- name: restart firewalld
+  service:
+    name: firewalld
+    state: restarted
+  listen: "restart firewalld"
+
+- name: restart chronyd
+  service:
+    name: chronyd
+    state: restarted
+  listen: "restart chronyd"
+
+- name: restart ntp
+  service:
+    name: ntp
+    state: restarted
+  listen: "restart ntp"
+
+- name: restart sshd
+  service:
+    name: sshd
+    state: restarted
+  listen: "restart sshd"
+
+- name: reload sysctl
+  command: sysctl -p
+  listen: "reload sysctl"

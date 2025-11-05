@@ -1,0 +1,39 @@
+# {{ ansible_managed }}
+
+# NTP服务器配置
+{% for server in common_ntp_servers %}
+server {{ server }} iburst
+{% endfor %}
+
+# 本地时钟源
+stratumweight 0
+
+# 记录目录
+driftfile /var/lib/chrony/drift
+
+# 日志配置
+logdir /var/log/chrony
+log measurements statistics tracking
+
+# 允许客户端网络
+allow {{ chrony_allow_network | default('10.0.0.0/8') }}
+
+# 本地时钟配置
+local stratum 10
+
+# 密钥文件
+keyfile /etc/chrony.keys
+
+# 命令密钥
+commandkey 1
+
+# 生成的密钥
+generatecommandkey
+
+# 使能RTC同步
+rtcsync
+
+# 启用硬件时间戳
+{% if chrony_hardware_timestamp | default(true) %}
+hwtimestamp *
+{% endif %}

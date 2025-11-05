@@ -1,0 +1,21 @@
+[Unit]
+Description=Kibana
+Documentation=https://www.elastic.co/guide/en/kibana/current/index.html
+Requires=network-online.target
+After=network-online.target
+
+[Service]
+Type=simple
+User={{ kibana_user }}
+Group={{ kibana_group }}
+Environment=KIBANA_HOME=/usr/share/kibana
+Environment=KIBANA_CONFIG={{ kibana_config_dir }}/kibana.yml
+ExecStart=/usr/share/kibana/bin/kibana -c ${KIBANA_CONFIG}
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=kibana
+
+[Install]
+WantedBy=multi-user.target

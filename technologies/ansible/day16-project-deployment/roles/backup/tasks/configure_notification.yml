@@ -1,0 +1,32 @@
+---
+# 配置备份通知任务
+
+- name: 创建通知脚本
+  template:
+    src: backup_notification.sh.j2
+    dest: "{{ backup_script_dir }}/backup_notification.sh"
+    owner: "{{ backup_user }}"
+    group: "{{ backup_group }}"
+    mode: '0755'
+  notify: restart backup service
+  tags: [backup, notification]
+
+- name: 创建邮件通知模板
+  template:
+    src: backup_notification_email.j2
+    dest: "{{ backup_config_dir }}/backup_notification_email.template"
+    owner: "{{ backup_user }}"
+    group: "{{ backup_group }}"
+    mode: '0644'
+  tags: [backup, notification]
+
+- name: 创建Slack通知脚本
+  template:
+    src: slack_notification.sh.j2
+    dest: "{{ backup_script_dir }}/slack_notification.sh"
+    owner: "{{ backup_user }}"
+    group: "{{ backup_group }}"
+    mode: '0755'
+  when: backup_notification_slack_webhook is defined
+  notify: restart backup service
+  tags: [backup, notification, slack]

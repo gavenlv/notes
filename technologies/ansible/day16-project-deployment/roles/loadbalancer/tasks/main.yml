@@ -1,0 +1,107 @@
+---
+# 负载均衡器角色主任务文件
+
+- name: 包含操作系统特定变量
+  include_vars: "{{ ansible_os_family }}.yml"
+  tags: [loadbalancer, setup]
+
+- name: 安装Nginx
+  package:
+    name: "{{ lb_packages }}"
+    state: present
+  when: lb_type == "nginx"
+  tags: [loadbalancer, setup]
+
+- name: 安装HAProxy
+  package:
+    name: "{{ lb_packages }}"
+    state: present
+  when: lb_type == "haproxy"
+  tags: [loadbalancer, setup]
+
+- name: 创建日志目录
+  file:
+    path: "{{ lb_log_path }}"
+    state: directory
+    owner: "{{ lb_service_user }}"
+    group: "{{ lb_service_group }}"
+    mode: '0755'
+  tags: [loadbalancer, setup]
+
+- name: 配置Nginx负载均衡
+  template:
+    src: nginx.conf.j2
+    dest: "{{ lb_config_file }}"
+    owner: "{{ lb_service_user }}"
+    group: "{{ lb_service_group }}"
+    mode: '0644'
+  when: lb_type == "nginx"
+  notify: restart loadbalancer
+  tags: [loadbalancer, config]
+
+- name: 配置HAProxy负载均衡
+  template:
+    src: haproxy.cfg.j2
+    dest: "{{ lb_config_file }}"
+    owner: "{{ lb_service_user }}"
+    group: "{{ lb_service_group }}"
+    mode: '0644'
+  when: lb_type == "haproxy"
+  notify: restart loadbalancer
+  tags: [loadbalancer, config]
+
+- name: 配置SSL证书
+  copy:
+    content: "{{ lb_ssl_certificate }}"
+    dest: "{{ lb_ssl_cert_path }}"
+    owner: "{{ lb_service_user }}"
+    group: "{{ lb_service_group }}"
+    mode: '0644'
+  when: lb_ssl_enabled and lb_ssl_certificate != ""
+  notify: restart loadbalancer
+  tags: [loadbalancer, ssl]
+
+- name: 配置SSL私钥
+  copy:
+    content: "{{ lb_ssl_certificate_key }}"
+    dest: "{{ lb_ssl_key_path }}"
+    owner: "{{ lb_service_user }}"
+    group: "{{ lb_service_group }}"
+    mode: '0600'
+  when: lb_ssl_enabled and lb_ssl_certificate_key != ""
+  notify: restart loadbalancer
+  tags: [loadbalancer, ssl]
+
+- name: 启动负载均衡器服务
+  service:
+    name: "{{ lb_service_name }}"
+    state: started
+    enabled: yes
+  tags: [loadbalancer, service]
+
+- name: 等待负载均衡器启动
+  wait_for:
+    port: "{{ lb_port }}"
+    host: "{{ lb_bind_address }}"
+    delay: 5
+    timeout: 30
+  tags: [loadbalancer, service]
+
+- name: 验证后端服务器状态
+  uri:
+    url: "http://{{ item.address }}:{{ item.port }}{{ lb_health_check_uri }}"
+    method: GET
+    status_code: 200
+    timeout: 5
+  loop: "{{ lb_backend_servers }}"
+  when: lb_health_check_enabled and lb_backend_servers | length > 0
+  register: backend_status
+  ignore_errors: yes
+  tags: [loadbalancer, health]
+
+- name: 显示后端服务器状态
+  debug:
+    msg: "后端服务器 {{ item.item.name }} 状态: {{ '在线' if item.status == 200 else '离线' }}"
+  loop: "{{ backend_status.results }}"
+  when: lb_health_check_enabled and backend_status.results | length > 0
+  tags: [loadbalancer, health]

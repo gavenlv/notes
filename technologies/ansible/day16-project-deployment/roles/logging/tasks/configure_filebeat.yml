@@ -1,0 +1,26 @@
+---
+# 配置Filebeat任务
+
+- name: 配置Filebeat主配置文件
+  template:
+    src: filebeat.yml.j2
+    dest: "{{ filebeat_config_file }}"
+    owner: "{{ filebeat_user }}"
+    group: "{{ filebeat_group }}"
+    mode: '0644'
+  notify: restart filebeat
+  tags: [logging, filebeat, config]
+
+- name: 配置Filebeat模块
+  template:
+    src: "{{ item }}.j2"
+    dest: "{{ filebeat_config_dir }}/modules.d/{{ item }}"
+    owner: "{{ filebeat_user }}"
+    group: "{{ filebeat_group }}"
+    mode: '0644'
+  loop:
+    - system.yml
+    - nginx.yml
+    - apache.yml
+  notify: restart filebeat
+  tags: [logging, filebeat, config]

@@ -1,0 +1,21 @@
+---
+# 示例：使用 Ansible Vault 加密的变量文件
+# 此文件应使用 ansible-vault encrypt 进行加密
+
+# 数据库凭证
+db_username: "admin"
+db_password: "secure_password_123"
+db_host: "db.example.com"
+db_port: 3306
+
+# API 密钥
+api_key: "sk-abcdefghijklmnopqrstuvwxyz"
+api_secret: "secret_key_for_api_access"
+
+# SSL 证书信息
+ssl_cert: "/etc/ssl/certs/example.com.crt"
+ssl_key: "/etc/ssl/private/example.com.key"
+
+# 用户凭证
+admin_user: "administrator"
+admin_password: "complex_password_with_symbols!"

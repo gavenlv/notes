@@ -1,0 +1,78 @@
+##################### Grafana Configuration Example #####################
+#
+# Everything has defaults so you only need to uncomment things you want to
+# change
+
+# possible values : production, development
+app_mode = {{ grafana_app_mode | default('production') }}
+
+#################################### Paths ####################################
+[paths]
+# Path to where grafana can store temp files, sessions, and the sqlite3 db (if that is used)
+data = {{ grafana_data_path | default('/var/lib/grafana') }}
+
+#################################### Server ####################################
+[server]
+# Protocol (http, https, h2, socket)
+protocol = {{ grafana_protocol | default('http') }}
+
+# The ip address to bind to, empty will bind to all interfaces
+http_addr = {{ grafana_http_addr | default('') }}
+
+# The http port to use
+http_port = {{ grafana_http_port | default('3000') }}
+
+# The public facing domain name used to access grafana from a browser
+domain = {{ grafana_domain | default('localhost') }}
+
+# Redirect to correct domain if host header does not match domain
+# Prevents DNS rebinding attacks
+enforce_domain = {{ grafana_enforce_domain | default('false') }}
+
+#################################### Database ####################################
+[database]
+# You can configure the database connection by specifying type, host, name, user and password
+# as separate properties or as on string using the url properties.
+type = {{ grafana_db_type | default('sqlite3') }}
+host = {{ grafana_db_host | default('127.0.0.1:3306') }}
+name = {{ grafana_db_name | default('grafana') }}
+user = {{ grafana_db_user | default('root') }}
+password = {{ grafana_db_password | default('') }}
+
+#################################### Session ####################################
+[session]
+# Either "memory", "file", "redis", "mysql", "postgres", "memcache"
+provider = {{ session_provider | default('file') }}
+
+#################################### Analytics ####################################
+[analytics]
+# Server reporting, sends usage counters to stats.grafana.org every 24 hours.
+# No ip addresses are being tracked, only simple counters to track
+# running instances, dashboard and error counts. It is very helpful to us.
+# Change this option to false to disable reporting.
+reporting_enabled = {{ reporting_enabled | default('false') }}
+
+#################################### Security ####################################
+[security]
+# default admin user, created on startup
+admin_user = {{ grafana_admin_user | default('admin') }}
+
+# default admin password, can be changed before first start of grafana, or in profile settings
+admin_password = {{ grafana_admin_password | default('admin') }}
+
+# used for signing
+secret_key = {{ grafana_secret_key | default('SW2YcwTIb9zpOOhoPsMm') }}
+
+#################################### Users ####################################
+[users]
+# disable user signup / registration
+allow_sign_up = {{ allow_sign_up | default('false') }}
+
+#################################### Anonymous Auth ##########################
+[auth.anonymous]
+# enable anonymous access
+enabled = {{ anonymous_auth_enabled | default('false') }}
+
+#################################### Basic Auth ##########################
+[auth.basic]
+enabled = {{ basic_auth_enabled | default('true') }}

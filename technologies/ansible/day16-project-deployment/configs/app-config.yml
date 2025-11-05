@@ -1,0 +1,52 @@
+# Application Configuration
+
+# Database settings
+database:
+  host: "{{ db_host | default('localhost') }}"
+  port: "{{ db_port | default(5432) }}"
+  name: "{{ db_name | default('myapp') }}"
+  user: "{{ db_user | default('myapp_user') }}"
+  password: "{{ db_password | default('myapp_pass') }}"
+
+# Redis settings
+redis:
+  host: "{{ redis_host | default('localhost') }}"
+  port: "{{ redis_port | default(6379) }}"
+
+# Logging settings
+logging:
+  level: "{{ log_level | default('INFO') }}"
+  file: "/var/log/{{ app_name }}/application.log"
+
+# Monitoring settings
+monitoring:
+  enabled: true
+  endpoint: "http://{{ monitor_host | default('localhost') }}:9090"
+
+# Feature flags
+features:
+  new_ui: "{{ feature_new_ui | default(false) }}"
+  beta_features: "{{ feature_beta | default(false) }}"
+
+# Environment-specific overrides
+environments:
+  development:
+    logging:
+      level: DEBUG
+    features:
+      new_ui: true
+      beta_features: true
+      
+  staging:
+    logging:
+      level: INFO
+    features:
+      new_ui: true
+      beta_features: false
+      
+  production:
+    logging:
+      level: WARN
+    features:
+      new_ui: false
+      beta_features: false

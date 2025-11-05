@@ -1,0 +1,59 @@
+---
+- name: Use Custom Module Example
+  hosts: localhost
+  vars:
+    test_dir: "/tmp/ansible_test"
+  tasks:
+    - name: Create test directory using custom module
+      custom_module:
+        path: "{{ test_dir }}"
+        state: directory
+        mode: "0755"
+        
+    - name: Create test file with content
+      custom_module:
+        path: "{{ test_dir }}/test.txt"
+        state: file
+        content: |
+          This is a test file created by our custom Ansible module.
+          It demonstrates how to create custom modules for specific needs.
+        mode: "0644"
+        
+    - name: Verify file creation
+      stat:
+        path: "{{ test_dir }}/test.txt"
+      register: file_stat
+      
+    - name: Show file details
+      debug:
+        msg: "File exists: {{ file_stat.stat.exists }}, Size: {{ file_stat.stat.size }} bytes"
+        
+    - name: Update file content
+      custom_module:
+        path: "{{ test_dir }}/test.txt"
+        state: file
+        content: |
+          This is an updated test file created by our custom Ansible module.
+          It demonstrates how to update existing files with new content.
+        mode: "0644"
+        
+    - name: Create another file
+      custom_module:
+        path: "{{ test_dir }}/config.ini"
+        state: file
+        content: |
+          [database]
+          host=localhost
+          port=5432
+          name=testdb
+          
+          [server]
+          port=8080
+          debug=false
+        mode: "0644"
+        
+    - name: Clean up test directory
+      custom_module:
+        path: "{{ test_dir }}"
+        state: absent
+      ignore_errors: yes

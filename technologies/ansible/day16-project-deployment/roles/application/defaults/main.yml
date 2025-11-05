@@ -1,0 +1,77 @@
+---
+# 应用角色默认变量
+
+# 应用基本信息
+app_name: "myapp"
+app_version: "1.0.0"
+app_user: "appuser"
+app_group: "appgroup"
+
+# 部署配置
+app_deploy_path: "/var/www/{{ app_name }}"
+app_config_path: "/etc/{{ app_name }}"
+app_log_path: "/var/log/{{ app_name }}"
+app_temp_path: "/tmp/{{ app_name }}"
+
+# 服务配置
+app_service_name: "{{ app_name }}"
+app_port: 8080
+app_environment: "production"
+app_working_directory: "{{ app_deploy_path }}"
+
+# 进程管理
+app_process_manager: "systemd"  # systemd, supervisor, upstart
+app_process_count: 1
+
+# 应用包配置
+app_package_url: ""
+app_package_checksum: ""
+app_package_type: "tar.gz"  # tar.gz, zip, jar
+
+# 配置文件
+app_config_files: []
+# 示例:
+# app_config_files:
+#   - src: app.conf.j2
+#     dest: "{{ app_config_path }}/app.conf"
+
+# 环境变量
+app_environment_variables: {}
+# 示例:
+# app_environment_variables:
+#   NODE_ENV: production
+#   DATABASE_URL: postgresql://user:pass@host:port/db
+
+# 数据库配置
+app_db_host: "localhost"
+app_db_port: 5432
+app_db_name: "{{ app_name }}"
+app_db_user: "{{ app_name }}_user"
+app_db_password: ""
+
+# 缓存配置
+app_cache_host: "localhost"
+app_cache_port: 6379
+
+# 外部服务
+app_external_services: []
+# 示例:
+# app_external_services:
+#   - name: payment_api
+#     url: https://api.payment.com
+#     timeout: 30
+
+# 监控配置
+app_monitoring_enabled: true
+app_monitoring_endpoint: "/health"
+app_monitoring_port: "{{ app_port }}"
+
+# 日志配置
+app_log_level: "info"
+app_log_format: "json"
+app_log_rotation: "daily"
+
+# 安全配置
+app_ssl_enabled: false
+app_ssl_certificate: ""
+app_ssl_certificate_key: ""

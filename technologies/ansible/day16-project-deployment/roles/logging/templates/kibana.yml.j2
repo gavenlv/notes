@@ -1,0 +1,28 @@
+# Kibana配置文件
+# 由Ansible管理，请勿手动修改
+
+server.host: "{{ kibana_server_host | default('localhost') }}"
+server.port: {{ kibana_port }}
+
+elasticsearch.hosts: ["{{ elasticsearch_host | default('localhost') }}:{{ elasticsearch_port }}"]
+
+server.name: "{{ kibana_server_name | default('kibana') }}"
+
+path.data: {{ kibana_data_dir | default('/var/lib/kibana') }}
+path.logs: {{ kibana_log_dir | default('/var/log/kibana') }}
+
+{% if kibana_ssl_enabled is defined and kibana_ssl_enabled %}
+# SSL配置
+server.ssl.enabled: true
+server.ssl.certificate: {{ kibana_config_dir }}/kibana.crt
+server.ssl.key: {{ kibana_config_dir }}/kibana.key
+
+elasticsearch.ssl.certificateAuthorities: {{ kibana_config_dir }}/ca.crt
+elasticsearch.ssl.verificationMode: certificate
+{% endif %}
+
+{% if kibana_elasticsearch_username is defined and kibana_elasticsearch_password is defined %}
+# Elasticsearch认证
+elasticsearch.username: {{ kibana_elasticsearch_username }}
+elasticsearch.password: {{ kibana_elasticsearch_password }}
+{% endif %}

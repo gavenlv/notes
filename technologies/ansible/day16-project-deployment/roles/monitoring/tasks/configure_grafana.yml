@@ -1,0 +1,51 @@
+---
+# 配置Grafana任务
+
+- name: 配置Grafana主配置文件
+  template:
+    src: grafana.ini.j2
+    dest: "/etc/grafana/grafana.ini"
+    owner: grafana
+    group: grafana
+    mode: '0644'
+  notify: restart grafana
+  tags: [monitoring, grafana, config]
+
+- name: 配置Grafana数据源
+  template:
+    src: datasource.yml.j2
+    dest: "{{ grafana_data_dir }}/conf/provisioning/datasources/prometheus.yml"
+    owner: grafana
+    group: grafana
+    mode: '0644'
+  when: "'prometheus' in monitoring_components"
+  notify: restart grafana
+  tags: [monitoring, grafana, config]
+
+- name: 创建Grafana仪表板目录
+  file:
+    path: "{{ grafana_data_dir }}/conf/provisioning/dashboards"
+    state: directory
+    owner: grafana
+    group: grafana
+    mode: '0755'
+  tags: [monitoring, grafana, config]
+
+- name: 配置Grafana仪表板
+  template:
+    src: dashboard.yml.j2
+    dest: "{{ grafana_data_dir }}/conf/provisioning/dashboards/default.yml"
+    owner: grafana
+    group: grafana
+    mode: '0644'
+  notify: restart grafana
+  tags: [monitoring, grafana, config]
+
+- name: 创建默认仪表板目录
+  file:
+    path: "{{ grafana_data_dir }}/dashboards"
+    state: directory
+    owner: grafana
+    group: grafana
+    mode: '0755'
+  tags: [monitoring, grafana, config]

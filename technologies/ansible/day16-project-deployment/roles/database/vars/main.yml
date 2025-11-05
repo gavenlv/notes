@@ -1,0 +1,30 @@
+---
+# Database role variables
+
+# Database service configuration
+db_service_name: postgresql
+db_port: 5432
+db_user: "{{ app_name | default('myapp') }}"
+db_password: "{{ db_user }}123"
+db_name: "{{ app_user }}_db"
+
+# Database installation paths
+db_data_dir: "/var/lib/postgresql/{{ postgresql_version }}/main"
+db_config_dir: "/etc/postgresql/{{ postgresql_version }}/main"
+db_log_dir: "/var/log/postgresql"
+
+# PostgreSQL specific settings
+postgresql_version: "13"
+postgresql_packages:
+  - postgresql-{{ postgresql_version }}
+  - postgresql-client-{{ postgresql_version }}
+  - python3-psycopg2
+
+# Database backup settings
+db_backup_dir: "/var/backups/database"
+db_backup_retention_days: 7
+db_backup_schedule: "0 2 * * *"
+
+# Database migration settings
+db_migration_dir: "/opt/{{ app_name }}/migrations"
+db_migration_table: "schema_migrations"

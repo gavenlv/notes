@@ -1,0 +1,29 @@
+---
+# Load Balancer role variables
+
+# HAProxy configuration
+haproxy_user: haproxy
+haproxy_group: haproxy
+haproxy_config_dir: "/etc/haproxy"
+haproxy_port: 80
+haproxy_ssl_port: 443
+haproxy_stats_port: 1936
+
+# Nginx configuration
+nginx_user: nginx
+nginx_group: nginx
+nginx_config_dir: "/etc/nginx"
+nginx_port: 80
+nginx_ssl_port: 443
+
+# Load balancer settings
+lb_algorithm: "roundrobin"
+lb_protocol: "http"
+lb_backend_port: "{{ app_port | default(8080) }}"
+lb_health_check_uri: "/health"
+lb_health_check_timeout: 5
+lb_health_check_interval: 2
+
+# SSL configuration
+ssl_certificate_path: "/etc/ssl/certs/{{ app_name }}.crt"
+ssl_certificate_key_path: "/etc/ssl/private/{{ app_name }}.key"

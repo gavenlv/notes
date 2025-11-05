@@ -1,0 +1,66 @@
+---
+# 安装Elasticsearch任务
+
+- name: 创建Elasticsearch用户
+  user:
+    name: "{{ elasticsearch_user }}"
+    system: yes
+    shell: /bin/false
+    state: present
+  tags: [logging, elasticsearch, setup]
+
+- name: 创建Elasticsearch目录
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ elasticsearch_user }}"
+    group: "{{ elasticsearch_group }}"
+    mode: '0755'
+  loop:
+    - "{{ elasticsearch_data_dir }}"
+    - "{{ elasticsearch_config_dir }}"
+  tags: [logging, elasticsearch, setup]
+
+- name: 下载Elasticsearch
+  get_url:
+    url: "https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-{{ elasticsearch_version }}-linux-x86_64.tar.gz"
+    dest: "/tmp/elasticsearch-{{ elasticsearch_version }}-linux-x86_64.tar.gz"
+    mode: '0644'
+  tags: [logging, elasticsearch, download]
+
+- name: 解压Elasticsearch
+  unarchive:
+    src: "/tmp/elasticsearch-{{ elasticsearch_version }}-linux-x86_64.tar.gz"
+    dest: "/tmp"
+    remote_src: yes
+  tags: [logging, elasticsearch, extract]
+
+- name: 复制Elasticsearch二进制文件
+  copy:
+    src: "/tmp/elasticsearch-{{ elasticsearch_version }}/bin/elasticsearch"
+    dest: "/usr/local/bin/elasticsearch"
+    mode: '0755'
+    remote_src: yes
+  tags: [logging, elasticsearch, install]
+
+- name: 复制Elasticsearch配置文件
+  copy:
+    src: "/tmp/elasticsearch-{{ elasticsearch_version }}/config/"
+    dest: "{{ elasticsearch_config_dir }}"
+    owner: "{{ elasticsearch_user }}"
+    group: "{{ elasticsearch_group }}"
+    mode: '0644'
+    remote_src: yes
+  tags: [logging, elasticsearch, install]
+
+- name: 创建Elasticsearch systemd服务文件
+  template:
+    src: elasticsearch.service.j2
+    dest: "{{ elasticsearch_systemd_file }}"
+    mode: '0644'
+  tags: [logging, elasticsearch, service]
+
+- name: 重新加载systemd
+  systemd:
+    daemon_reload: yes
+  tags: [logging, elasticsearch, service]

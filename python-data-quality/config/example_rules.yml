@@ -1,0 +1,294 @@
+# 数据质量规则示例配置
+# 按业务场景分类的完整示例
+
+# 电商业务场景示例
+ecommerce_rules:
+  # 用户数据质量检查
+  user_data_quality:
+    - name: "用户注册信息完整性"
+      type: "completeness"
+      table: "users"
+      column: "email"
+      description: "检查用户邮箱字段完整性"
+      enabled: true
+      threshold: 0.98
+      
+    - name: "用户年龄范围验证"
+      type: "accuracy"
+      table: "users"
+      column: "age"
+      description: "验证用户年龄在合理范围内"
+      enabled: true
+      validation_type: "range"
+      min_value: 13
+      max_value: 120
+      
+    - name: "用户注册时间合理性"
+      type: "custom_sql"
+      description: "检查用户注册时间是否合理"
+      enabled: true
+      sql: |
+        SELECT user_id, registration_date
+        FROM users
+        WHERE registration_date > CURRENT_DATE() 
+           OR registration_date < '2020-01-01'
+      expected_result: "empty"
+
+  # 订单数据质量检查
+  order_data_quality:
+    - name: "订单金额完整性"
+      type: "completeness"
+      table: "orders"
+      column: "amount"
+      description: "检查订单金额字段完整性"
+      enabled: true
+      threshold: 0.99
+      
+    - name: "订单状态验证"
+      type: "accuracy"
+      table: "orders"
+      column: "status"
+      description: "验证订单状态值有效性"
+      enabled: true
+      validation_type: "enum"
+      allowed_values: ["pending", "confirmed", "shipped", "delivered", "cancelled"]
+      
+    - name: "订单用户引用完整性"
+      type: "custom_sql"
+      description: "检查订单用户ID引用完整性"
+      enabled: true
+      sql: |
+        SELECT o.order_id, o.user_id
+        FROM orders o
+        LEFT JOIN users u ON o.user_id = u.user_id
+        WHERE u.user_id IS NULL
+      expected_result: "empty"
+
+  # 库存数据质量检查
+  inventory_data_quality:
+    - name: "产品SKU唯一性"
+      type: "generic"
+      description: "检查产品SKU是否唯一"
+      enabled: true
+      check_type: "uniqueness"
+      table: "products"
+      column: "sku"
+      
+    - name: "库存数量合理性"
+      type: "accuracy"
+      table: "products"
+      column: "stock_quantity"
+      description: "验证库存数量非负"
+      enabled: true
+      validation_type: "range"
+      min_value: 0
+      max_value: 100000
+
+# 金融业务场景示例
+financial_rules:
+  # 账户数据质量检查
+  account_data_quality:
+    - name: "账户余额完整性"
+      type: "completeness"
+      table: "accounts"
+      column: "balance"
+      description: "检查账户余额字段完整性"
+      enabled: true
+      threshold: 0.999
+      
+    - name: "账户状态验证"
+      type: "accuracy"
+      table: "accounts"
+      column: "status"
+      description: "验证账户状态有效性"
+      enabled: true
+      validation_type: "enum"
+      allowed_values: ["active", "inactive", "frozen", "closed"]
+
+  # 交易数据质量检查
+  transaction_data_quality:
+    - name: "交易金额范围验证"
+      type: "accuracy"
+      table: "transactions"
+      column: "amount"
+      description: "验证交易金额在合理范围内"
+      enabled: true
+      validation_type: "range"
+      min_value: 0.01
+      max_value: 1000000
+      
+    - name: "交易时间顺序性"
+      type: "custom_sql"
+      description: "检查交易时间顺序合理性"
+      enabled: true
+      sql: |
+        SELECT t1.transaction_id, t1.transaction_time, t2.transaction_time
+        FROM transactions t1
+        JOIN transactions t2 ON t1.account_id = t2.account_id
+        WHERE t1.transaction_time > t2.transaction_time
+          AND t1.transaction_id < t2.transaction_id
+      expected_result: "empty"
+
+# 医疗业务场景示例
+healthcare_rules:
+  # 患者数据质量检查
+  patient_data_quality:
+    - name: "患者基本信息完整性"
+      type: "completeness"
+      table: "patients"
+      columns: ["patient_id", "name", "birth_date", "gender"]
+      description: "检查患者基本信息完整性"
+      enabled: true
+      threshold: 0.95
+      
+    - name: "患者年龄验证"
+      type: "accuracy"
+      table: "patients"
+      column: "age"
+      description: "验证患者年龄合理性"
+      enabled: true
+      validation_type: "range"
+      min_value: 0
+      max_value: 150
+
+  # 医疗记录质量检查
+  medical_record_quality:
+    - name: "诊断代码有效性"
+      type: "accuracy"
+      table: "medical_records"
+      column: "diagnosis_code"
+      description: "验证诊断代码格式"
+      enabled: true
+      validation_type: "regex"
+      pattern: "^[A-Z][0-9]{2}(\.[0-9]{1,3})?$"
+      
+    - name: "就诊时间合理性"
+      type: "custom_sql"
+      description: "检查就诊时间逻辑"
+      enabled: true
+      sql: |
+        SELECT record_id, visit_date, discharge_date
+        FROM medical_records
+        WHERE discharge_date < visit_date
+          OR visit_date > CURRENT_DATE()
+      expected_result: "empty"
+
+# 通用业务规则示例
+general_rules:
+  # 数据新鲜度检查
+  data_freshness:
+    - name: "数据更新及时性"
+      type: "custom_sql"
+      description: "检查关键数据表是否定期更新"
+      enabled: true
+      sql: |
+        SELECT 
+          table_name,
+          MAX(last_updated) as last_update
+        FROM (
+          SELECT 'users' as table_name, MAX(updated_at) as last_updated FROM users
+          UNION ALL
+          SELECT 'orders' as table_name, MAX(updated_at) as last_updated FROM orders
+          UNION ALL
+          SELECT 'products' as table_name, MAX(updated_at) as last_updated FROM products
+        ) t
+        WHERE last_updated < DATE_SUB(NOW(), INTERVAL 1 DAY)
+      expected_result: "empty"
+
+  # 数据一致性检查
+  data_consistency:
+    - name: "关键指标一致性"
+      type: "custom_sql"
+      description: "检查业务指标计算一致性"
+      enabled: true
+      sql: |
+        SELECT 
+          'revenue_consistency' as check_type,
+          SUM(o.amount) as total_orders,
+          (SELECT SUM(amount) FROM daily_revenue) as total_revenue,
+          ABS(SUM(o.amount) - (SELECT SUM(amount) FROM daily_revenue)) as difference
+        FROM orders o
+        WHERE o.order_date >= DATE_SUB(NOW(), INTERVAL 30 DAY)
+        HAVING difference > 1000
+      expected_result: "empty"
+
+# 高级监控规则示例
+advanced_monitoring:
+  # 趋势分析
+  trend_analysis:
+    - name: "业务量趋势监控"
+      type: "custom_sql"
+      description: "监控订单量周环比趋势"
+      enabled: true
+      sql: |
+        WITH weekly_orders AS (
+          SELECT 
+            YEARWEEK(order_date) as week_num,
+            COUNT(*) as order_count
+          FROM orders
+          WHERE order_date >= DATE_SUB(NOW(), INTERVAL 8 WEEK)
+          GROUP BY YEARWEEK(order_date)
+        ),
+        weekly_growth AS (
+          SELECT 
+            w1.week_num,
+            w1.order_count,
+            w2.order_count as prev_week_count,
+            (w1.order_count - w2.order_count) / w2.order_count as growth_rate
+          FROM weekly_orders w1
+          LEFT JOIN weekly_orders w2 ON w1.week_num = w2.week_num + 1
+        )
+        SELECT week_num, growth_rate
+        FROM weekly_growth
+        WHERE growth_rate < -0.3 OR growth_rate > 0.5
+      expected_result: "empty"
+
+  # 异常检测
+  anomaly_detection:
+    - name: "异常交易检测"
+      type: "custom_sql"
+      description: "检测异常大额交易"
+      enabled: true
+      sql: |
+        SELECT 
+          transaction_id,
+          amount,
+          account_id,
+          transaction_time
+        FROM transactions
+        WHERE amount > (
+          SELECT AVG(amount) + 3 * STDDEV(amount) 
+          FROM transactions 
+          WHERE transaction_time >= DATE_SUB(NOW(), INTERVAL 30 DAY)
+        )
+        AND transaction_time >= DATE_SUB(NOW(), INTERVAL 1 DAY)
+      expected_result: "not_empty"
+      max_records: 10  # 允许少量异常交易
+
+# 框架配置
+framework_config:
+  execution:
+    parallel_checks: true
+    max_parallel_checks: 5
+    timeout_seconds: 300
+  
+  reporting:
+    format: "html"
+    output_directory: "./reports"
+    include_details: true
+  
+  logging:
+    level: "INFO"
+    file: "./logs/data_quality.log"
+  
+  notifications:
+    enabled: false
+    email_recipients: []
+    slack_webhook: ""
+
+# 使用说明
+# 1. 复制此文件到 config/rules.yml
+# 2. 根据实际业务需求修改表名和字段名
+# 3. 调整阈值和参数以适应具体场景
+# 4. 启用/禁用相关规则
+# 5. 运行数据质量检查框架

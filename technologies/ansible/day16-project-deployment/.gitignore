@@ -1,0 +1,27 @@
+# Log files
+logs/*.log
+logs/*.log.*
+
+# Backup files
+*.bak
+*~
+.~*
+
+# Temporary files
+*.tmp
+*.temp
+
+# Ansible retry files
+*.retry
+
+# Vault files (unencrypted)
+*vault*.yml
+*vault*.yaml
+
+# Environment files
+.env
+.environment
+
+# IDE files
+*.swp
+*.swo

@@ -1,6 +1,6 @@
-# Ansible 学习路径 - 从入门到精通
+# Ansible 学习路径 - 从入门到专家
 
-这是一个完整的 Ansible 学习路径，包含 15 天的学习内容，从基础安装到高级项目实施。每天的内容都包含理论知识、实践示例和可运行的代码。
+这是一个完整的 Ansible 学习路径，包含 16 天的学习内容，从基础安装到专家级应用。每天的内容都包含理论知识、实践示例和可运行的代码。
 
 ## 📚 学习路径
 
@@ -22,10 +22,11 @@
 - **Day 11**: [性能优化](./day11-performance-optimization/performance-optimization.md)
 - **Day 12**: [安全与 Vault](./day12-security-vault/security-vault.md)
 
-### 企业应用 (Day 13-15)
+### 企业应用 (Day 13-16)
 - **Day 13**: [CI/CD 集成](./day13-cicd-integration/cicd-integration.md)
 - **Day 14**: [监控与日志](./day14-monitoring-logging/monitoring-logging.md)
 - **Day 15**: [项目实战](./day15-project-implementation/project-implementation.md)
+- **Day 16**: [项目部署实战](./day16-project-deployment/README.md) - 完整的企业级部署解决方案
 
 ## 🛠️ 环境要求
 
@@ -33,6 +34,7 @@
 - **Python**: 3.6+
 - **Ansible**: 2.9+ (推荐最新版本)
 - **虚拟机**: VirtualBox/VMware (用于测试)
+- **容器**: Docker (可选，用于容器化部署)
 
 ## 🚀 快速开始
 
@@ -54,6 +56,12 @@ ansible --version
 ansible localhost -m ping
 ```
 
+4. **尝试完整项目部署**
+```bash
+cd day16-project-deployment
+# 按照 README.md 的指引进行完整项目部署
+```
+
 ## 📁 目录结构
 
 每个学习日期的目录包含：
@@ -62,6 +70,17 @@ ansible localhost -m ping
 - **examples/**: 实践示例
 - **scripts/**: 自动化脚本
 - **playbooks/**: Playbook 示例 (适用时)
+
+### 特别说明：Day 16 项目部署实战
+
+第16天的学习内容是一个完整的企业级Ansible部署项目，包含：
+- **完整项目结构**: 生产就绪的Ansible项目布局
+- **多环境支持**: 开发、测试、生产环境配置
+- **部署脚本**: Bash和PowerShell版本的自动化部署脚本
+- **CI/CD集成**: Makefile和流水线配置
+- **监控与日志**: 完整的监控和日志管理方案
+- **安全配置**: Ansible Vault和权限管理
+- **文档齐全**: 快速入门指南、项目总结、部署流程图
 
 ## 🎯 学习目标
 
@@ -74,6 +93,7 @@ ansible localhost -m ping
 - ✅ 在企业环境中应用 Ansible 最佳实践
 - ✅ 集成 Ansible 到 CI/CD 流水线
 - ✅ 实施安全和监控策略
+- ✅ 设计和实施完整的企业级部署解决方案
 
 ## 💡 学习建议
 
@@ -82,6 +102,43 @@ ansible localhost -m ping
 3. **环境搭建**: 准备测试环境，避免在生产环境练习
 4. **文档记录**: 记录学习笔记和遇到的问题
 5. **社区参与**: 积极参与 Ansible 社区讨论
+6. **项目实战**: 在第16天完整实施一个企业级项目
+
+## 🏆 学习成果展示
+
+### 基础技能 (Day 1-4)
+- 环境搭建与配置
+- 核心概念理解
+- 清单管理
+- Playbook编写
+
+### 进阶技能 (Day 5-8)
+- 变量与模板应用
+- 条件判断与循环
+- 角色设计与开发
+- 模块与插件开发
+
+### 高级技能 (Day 9-12)
+- 高级特性应用
+- 错误处理与调试
+- 性能优化
+- 安全与权限管理
+
+### 企业级应用 (Day 13-16)
+- CI/CD集成
+- 监控与日志管理
+- 项目实战
+- 完整部署解决方案
+
+## 📈 学习路径进度
+
+```
+基础入门 ████████████████████████████████████ 100%
+核心功能 ████████████████████████████████████ 100%
+高级特性 ████████████████████████████████████ 100%
+企业应用 ████████████████████████████████████ 100%
+总体进度 ████████████████████████████████████ 100%
+```
 
 ## 🤝 贡献
 
@@ -89,10 +146,16 @@ ansible localhost -m ping
 
 ## 📖 参考资源
 
+- [快速入门指南](./day16-project-deployment/QUICKSTART.md)
+- [项目总结](./day16-project-deployment/project-summary.md)
+- [部署流程图](./day16-project-deployment/docs/deployment-flow.md)
 - [Ansible 官方文档](https://docs.ansible.com/)
 - [Ansible Galaxy](https://galaxy.ansible.com/)
 - [Ansible GitHub](https://github.com/ansible/ansible)
 - [Red Hat Ansible](https://www.redhat.com/en/technologies/management/ansible)
 
 ---
+
 **开始你的 Ansible 学习之旅吧！** 🚀 
+
+**完成16天学习后，你将成为一名真正的Ansible专家！** 🎯

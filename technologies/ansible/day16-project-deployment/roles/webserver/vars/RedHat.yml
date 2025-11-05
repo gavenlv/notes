@@ -1,0 +1,8 @@
+---
+# Webserver variables for RedHat-based systems
+
+webserver_user: nginx
+webserver_group: nginx
+webserver_config_path: /etc/nginx/nginx.conf
+webserver_sites_path: /etc/nginx/conf.d
+webserver_enabled_sites_path: /etc/nginx/conf.d

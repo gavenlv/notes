@@ -1,0 +1,26 @@
+---
+# 应用角色处理程序
+
+- name: restart application
+  service:
+    name: "{{ app_service_name }}"
+    state: restarted
+  listen: "restart application"
+
+- name: reload application
+  service:
+    name: "{{ app_service_name }}"
+    state: reloaded
+  listen: "reload application"
+
+- name: stop application
+  service:
+    name: "{{ app_service_name }}"
+    state: stopped
+  listen: "stop application"
+
+- name: start application
+  service:
+    name: "{{ app_service_name }}"
+    state: started
+  listen: "start application"

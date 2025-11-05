@@ -1,0 +1,27 @@
+# Staging Environment Inventory
+
+[webservers]
+web1.stg.example.com ansible_host=192.168.20.10
+web2.stg.example.com ansible_host=192.168.20.11
+web3.stg.example.com ansible_host=192.168.20.12
+
+[databases]
+db1.stg.example.com ansible_host=192.168.20.20
+
+[monitoring]
+monitor.stg.example.com ansible_host=192.168.20.30
+
+[loadbalancers]
+lb.stg.example.com ansible_host=192.168.20.40
+
+[logging]
+log.stg.example.com ansible_host=192.168.20.50
+
+[backup]
+backup.stg.example.com ansible_host=192.168.20.60
+
+[all:vars]
+env=staging
+app_name=myapp
+app_version=1.0.0
+app_port=8080

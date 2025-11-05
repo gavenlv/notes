@@ -1,0 +1,61 @@
+---
+# 启动日志服务任务
+
+- name: 启动Elasticsearch服务
+  service:
+    name: elasticsearch
+    state: started
+    enabled: yes
+  when: "'elasticsearch' in logging_components"
+  tags: [logging, elasticsearch, service]
+
+- name: 等待Elasticsearch启动
+  wait_for:
+    port: "{{ elasticsearch_port }}"
+    host: "localhost"
+    delay: 15
+    timeout: 120
+  when: "'elasticsearch' in logging_components"
+  tags: [logging, elasticsearch, service]
+
+- name: 启动Logstash服务
+  service:
+    name: logstash
+    state: started
+    enabled: yes
+  when: "'logstash' in logging_components"
+  tags: [logging, logstash, service]
+
+- name: 等待Logstash启动
+  wait_for:
+    port: "{{ logstash_port }}"
+    host: "localhost"
+    delay: 10
+    timeout: 60
+  when: "'logstash' in logging_components"
+  tags: [logging, logstash, service]
+
+- name: 启动Kibana服务
+  service:
+    name: kibana
+    state: started
+    enabled: yes
+  when: "'kibana' in logging_components"
+  tags: [logging, kibana, service]
+
+- name: 等待Kibana启动
+  wait_for:
+    port: "{{ kibana_port }}"
+    host: "localhost"
+    delay: 10
+    timeout: 60
+  when: "'kibana' in logging_components"
+  tags: [logging, kibana, service]
+
+- name: 启动Filebeat服务
+  service:
+    name: filebeat
+    state: started
+    enabled: yes
+  when: "'filebeat' in logging_components"
+  tags: [logging, filebeat, service]

@@ -1,0 +1,72 @@
+input {
+  beats {
+    port => 5044
+  }
+  
+  file {
+    path => "/var/log/*.log"
+    start_position => "beginning"
+    sincedb_path => "/dev/null"
+    ignore_older => 0
+  }
+  
+  file {
+    path => "/var/log/application/*.log"
+    start_position => "beginning"
+    codec => "json"
+  }
+}
+
+filter {
+  # 处理系统日志
+  if [type] == "syslog" {
+    grok {
+      match => { "message" => "%{SYSLOGTIMESTAMP:syslog_timestamp} %{SYSLOGHOST:syslog_hostname} %{DATA:syslog_program}(?:\[%{POSINT:syslog_pid}\])?: %{GREEDYDATA:syslog_message}" }
+      add_field => [ "received_at", "%{@timestamp}" ]
+      add_field => [ "received_from", "%{host}" ]
+    }
+    syslog_pri { }
+    date {
+      match => [ "syslog_timestamp", "MMM  d HH:mm:ss", "MMM dd HH:mm:ss" ]
+    }
+  }
+  
+  # 处理应用程序日志
+  if [type] == "application" {
+    json {
+      source => "message"
+    }
+    
+    # 添加环境标签
+    if [environment] == "production" {
+      mutate {
+        add_tag => [ "production" ]
+      }
+    }
+    
+    if [environment] == "staging" {
+      mutate {
+        add_tag => [ "staging" ]
+      }
+    }
+  }
+  
+  # 通用过滤器
+  mutate {
+    remove_field => [ "message", "@version", "tags" ]
+  }
+}
+
+output {
+  elasticsearch {
+    hosts => ["{{ elasticsearch_host | default('localhost:9200') }}"]
+    index => "logs-%{+YYYY.MM.dd}"
+  }
+  
+  # 输出到文件用于调试
+  if [environment] == "development" {
+    file {
+      path => "/tmp/logstash-debug.log"
+    }
+  }
+}

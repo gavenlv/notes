@@ -1,0 +1,69 @@
+---
+- name: ELK Stack Configuration Example
+  hosts: logging
+  become: yes
+  vars:
+    elasticsearch_heap_size: "2g"
+    logstash_heap_size: "1g"
+    kibana_server_port: 5601
+    
+  tasks:
+    # Elasticsearch Configuration
+    - name: Configure Elasticsearch
+      template:
+        src: elasticsearch.yml.j2
+        dest: /etc/elasticsearch/elasticsearch.yml
+        mode: '0644'
+      notify: restart elasticsearch
+
+    - name: Configure Elasticsearch JVM options
+      lineinfile:
+        path: /etc/elasticsearch/jvm.options
+        regexp: "{{ item.regexp }}"
+        line: "{{ item.line }}"
+      loop:
+        - { regexp: '^-Xms', line: "-Xms{{ elasticsearch_heap_size }}" }
+        - { regexp: '^-Xmx', line: "-Xmx{{ elasticsearch_heap_size }}" }
+      notify: restart elasticsearch
+
+    # Logstash Configuration
+    - name: Create Logstash pipeline configuration
+      template:
+        src: logstash_pipeline.conf.j2
+        dest: /etc/logstash/conf.d/main.conf
+        mode: '0644'
+      notify: restart logstash
+
+    - name: Configure Logstash JVM options
+      lineinfile:
+        path: /etc/logstash/jvm.options
+        regexp: "{{ item.regexp }}"
+        line: "{{ item.line }}"
+      loop:
+        - { regexp: '^-Xms', line: "-Xms{{ logstash_heap_size }}" }
+        - { regexp: '^-Xmx', line: "-Xmx{{ logstash_heap_size }}" }
+      notify: restart logstash
+
+    # Kibana Configuration
+    - name: Configure Kibana
+      template:
+        src: kibana.yml.j2
+        dest: /etc/kibana/kibana.yml
+        mode: '0644'
+      notify: restart kibana
+
+  handlers:
+    - name: restart elasticsearch
+      systemd:
+        name: elasticsearch
+        state: restarted
+
+    - name: restart logstash
+      systemd:
+        name: logstash
+        state: restarted
+
+    - name: restart kibana
+      systemd:
+        name: kibana
+        state: restarted

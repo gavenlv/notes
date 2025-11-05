@@ -1,0 +1,41 @@
+---
+# Production Environment Variables
+
+# 应用配置
+app_name: "myapp"
+app_version: "1.2.3"
+app_environment: "production"
+app_port: 8080
+
+# 数据库配置
+db_host: "db1.prod.example.com"
+db_port: 5432
+db_name: "myapp_production"
+db_user: "myapp_user"
+db_password: "{{ vault_db_password }}"
+
+# 缓存配置
+cache_host: "redis.prod.example.com"
+cache_port: 6379
+
+# 外部服务
+external_services:
+  - name: payment_api
+    url: "https://api.payment.com"
+    timeout: 30
+  - name: email_service
+    url: "https://api.email.com"
+    timeout: 30
+
+# 监控配置
+monitoring_enabled: true
+monitoring_endpoint: "http://monitor.prod.example.com"
+
+# 日志配置
+log_level: "warn"
+log_path: "/var/log/myapp"
+
+# SSL配置
+ssl_enabled: true
+ssl_cert_path: "/etc/ssl/certs/myapp.crt"
+ssl_key_path: "/etc/ssl/private/myapp.key"

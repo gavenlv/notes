@@ -1,0 +1,67 @@
+# {{ ansible_managed }}
+
+global
+    log         127.0.0.1 local2
+    chroot      /var/lib/haproxy
+    pidfile     /var/run/haproxy.pid
+    maxconn     4000
+    user        {{ lb_service_user }}
+    group       {{ lb_service_group }}
+    daemon
+
+    # turn on stats unix socket
+    stats socket /var/lib/haproxy/stats
+
+defaults
+    mode                    http
+    log                     global
+    option                  httplog
+    option                  dontlognull
+    option                  http-server-close
+    option                  forwardfor except 127.0.0.0/8
+    option                  redispatch
+    retries                 3
+    timeout http-request    10s
+    timeout queue           1m
+    timeout connect         10s
+    timeout client          1m
+    timeout server          1m
+    timeout http-keep-alive 10s
+    timeout check           10s
+    maxconn                 3000
+
+frontend main
+    bind {{ lb_bind_address }}:{{ lb_port }}
+    {% if lb_ssl_enabled %}
+    bind {{ lb_bind_address }}:{{ lb_ssl_port }} ssl crt {{ lb_ssl_cert_path }}
+    {% endif %}
+
+    {% if lb_allowed_ips | length > 0 %}
+    # 访问控制
+    tcp-request connection accept if { src -f /etc/haproxy/allowed_ips.lst }
+    {% endif %}
+
+    default_backend {{ lb_backend_name }}
+
+    {% if lb_health_check_enabled %}
+    # 健康检查端点
+    monitor-uri {{ lb_health_check_uri }}
+    {% endif %}
+
+backend {{ lb_backend_name }}
+    balance {{ lb_algorithm_map[lb_algorithm] | default('roundrobin') }}
+    
+    {% if lb_health_check_enabled %}
+    option httpchk GET {{ lb_health_check_uri }}
+    http-check expect status 200
+    default-server inter {{ lb_health_check_interval }}s fall {{ lb_health_check_fails }} rise {{ lb_health_check_rise }}
+    {% endif %}
+
+    {% for server in lb_backend_servers %}
+    server {{ server.name }} {{ server.address }}:{{ server.port }} {% if server.weight is defined %}weight {{ server.weight }}{% endif %} {% if server.backup is defined and server.backup %}backup{% endif %} check
+    {% endfor %}
+
+{% if lb_custom_config != "" %}
+# 自定义配置
+{{ lb_custom_config }}
+{% endif %}

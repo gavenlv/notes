@@ -1,0 +1,37 @@
+# Sentinel 策略示例：限制实例类型
+
+import "tfplan"
+
+# 允许的实例类型列表
+allowed_types = [
+  "t2.micro",
+  "t2.small",
+  "t2.medium",
+  "m5.large",
+  "m5.xlarge",
+]
+
+# 主策略规则
+main = rule {
+  # 检查所有 aws_instance 资源
+  all tfplan.resources.aws_instance as _, instances {
+    # 检查每个实例
+    all instances as _, instance {
+      # 确保实例类型在允许列表中
+      instance.applied.instance_type in allowed_types
+    }
+  }
+}
+
+# 附加规则：生产环境必须使用特定实例类型
+production_instances = rule {
+  # 仅在生产环境中应用
+  terraform.workspace == "prod" ? 
+    all tfplan.resources.aws_instance as _, instances {
+      all instances as _, instance {
+        # 生产环境必须使用 m5.large 或更大的实例
+        instance.applied.instance_type in ["m5.large", "m5.xlarge", "m5.2xlarge"]
+      }
+    }
+    : true
+}

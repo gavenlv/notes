@@ -1,0 +1,24 @@
+# Elasticsearch配置文件
+# 由Ansible管理，请勿手动修改
+
+cluster.name: {{ elasticsearch_cluster_name | default('elasticsearch') }}
+node.name: {{ elasticsearch_node_name | default('node-1') }}
+path.data: {{ elasticsearch_data_dir }}
+path.logs: /var/log/elasticsearch
+network.host: {{ elasticsearch_network_host | default('localhost') }}
+http.port: {{ elasticsearch_port }}
+
+discovery.type: single-node
+
+{% if elasticsearch_enable_security %}
+xpack.security.enabled: true
+xpack.security.transport.ssl.enabled: true
+xpack.security.http.ssl.enabled: true
+xpack.security.transport.ssl.verification_mode: certificate
+xpack.security.transport.ssl.key: certs/elasticsearch/elasticsearch.key
+xpack.security.transport.ssl.certificate: certs/elasticsearch/elasticsearch.crt
+xpack.security.transport.ssl.certificate_authorities: certs/ca/ca.crt
+xpack.security.http.ssl.key: certs/elasticsearch/elasticsearch.key
+xpack.security.http.ssl.certificate: certs/elasticsearch/elasticsearch.crt
+xpack.security.http.ssl.certificate_authorities: certs/ca/ca.crt
+{% endif %}
