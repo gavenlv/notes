@@ -1,0 +1,489 @@
+# Apache Airflow自动扩缩容配置示例
+# 包含Kubernetes HPA、KEDA和自定义扩缩容策略配置
+
+# Kubernetes HPA配置
+kubernetes_hpa:
+  # Worker自动扩缩容配置
+  worker_hpa:
+    apiVersion: autoscaling/v2
+    kind: HorizontalPodAutoscaler
+    metadata:
+      name: airflow-worker-hpa
+      namespace: airflow
+    spec:
+      scaleTargetRef:
+        apiVersion: apps/v1
+        kind: Deployment
+        name: airflow-worker
+      minReplicas: 3
+      maxReplicas: 20
+      metrics:
+        # 基于CPU使用率扩缩容
+        - type: Resource
+          resource:
+            name: cpu
+            target:
+              type: Utilization
+              averageUtilization: 70
+        
+        # 基于内存使用率扩缩容
+        - type: Resource
+          resource:
+            name: memory
+            target:
+              type: Utilization
+              averageUtilization: 80
+        
+        # 基于自定义指标扩缩容
+        - type: Pods
+          pods:
+            metric:
+              name: airflow_task_queued
+            target:
+              type: AverageValue
+              averageValue: "5"
+      
+      # 扩缩容行为配置
+      behavior:
+        scaleDown:
+          stabilizationWindowSeconds: 300
+          policies:
+            - type: Percent
+              value: 10
+              periodSeconds: 60
+            - type: Pods
+              value: 2
+              periodSeconds: 60
+          selectPolicy: Min
+        scaleUp:
+          stabilizationWindowSeconds: 60
+          policies:
+            - type: Percent
+              value: 50
+              periodSeconds: 60
+            - type: Pods
+              value: 5
+              periodSeconds: 60
+          selectPolicy: Max
+  
+  # Webserver自动扩缩容配置
+  webserver_hpa:
+    apiVersion: autoscaling/v2
+    kind: HorizontalPodAutoscaler
+    metadata:
+      name: airflow-webserver-hpa
+      namespace: airflow
+    spec:
+      scaleTargetRef:
+        apiVersion: apps/v1
+        kind: Deployment
+        name: airflow-webserver
+      minReplicas: 2
+      maxReplicas: 10
+      metrics:
+        # 基于CPU使用率扩缩容
+        - type: Resource
+          resource:
+            name: cpu
+            target:
+              type: Utilization
+              averageUtilization: 75
+        
+        # 基于内存使用率扩缩容
+        - type: Resource
+          resource:
+            name: memory
+            target:
+              type: Utilization
+              averageUtilization: 85
+        
+        # 基于HTTP请求速率扩缩容
+        - type: Pods
+          pods:
+            metric:
+              name: http_requests_per_second
+            target:
+              type: AverageValue
+              averageValue: "100"
+      
+      # 扩缩容行为配置
+      behavior:
+        scaleDown:
+          stabilizationWindowSeconds: 300
+          policies:
+            - type: Percent
+              value: 10
+              periodSeconds: 60
+          selectPolicy: Min
+        scaleUp:
+          stabilizationWindowSeconds: 60
+          policies:
+            - type: Percent
+              value: 50
+              periodSeconds: 60
+          selectPolicy: Max
+  
+  # Scheduler自动扩缩容配置
+  scheduler_hpa:
+    apiVersion: autoscaling/v2
+    kind: HorizontalPodAutoscaler
+    metadata:
+      name: airflow-scheduler-hpa
+      namespace: airflow
+    spec:
+      scaleTargetRef:
+        apiVersion: apps/v1
+        kind: Deployment
+        name: airflow-scheduler
+      minReplicas: 2
+      maxReplicas: 5
+      metrics:
+        # 基于CPU使用率扩缩容
+        - type: Resource
+          resource:
+            name: cpu
+            target:
+              type: Utilization
+              averageUtilization: 70
+        
+        # 基于内存使用率扩缩容
+        - type: Resource
+          resource:
+            name: memory
+            target:
+              type: Utilization
+              averageUtilization: 80
+      
+      # 扩缩容行为配置
+      behavior:
+        scaleDown:
+          stabilizationWindowSeconds: 300
+          policies:
+            - type: Percent
+              value: 10
+              periodSeconds: 60
+          selectPolicy: Min
+        scaleUp:
+          stabilizationWindowSeconds: 60
+          policies:
+            - type: Percent
+              value: 50
+              periodSeconds: 60
+          selectPolicy: Max
+
+# KEDA配置（用于基于外部指标的扩缩容）
+keda_config:
+  #_scaledObject配置
+  scaled_object:
+    apiVersion: keda.sh/v1alpha1
+    kind: ScaledObject
+    metadata:
+      name: airflow-worker-scaledobject
+      namespace: airflow
+    spec:
+      scaleTargetRef:
+        name: airflow-worker
+      pollingInterval: 30
+      cooldownPeriod: 300
+      minReplicaCount: 3
+      maxReplicaCount: 20
+      triggers:
+        # 基于Redis队列长度扩缩容
+        - type: redis
+          metadata:
+            address: airflow-redis-master:6379
+            passwordFromEnv: REDIS_PASSWORD
+            listName: airflow
+            listLength: "10"
+            enableTLS: "false"
+            databaseIndex: "1"
+        
+        # 基于Prometheus指标扩缩容
+        - type: prometheus
+          metadata:
+            serverAddress: http://prometheus-server.monitoring.svc.cluster.local:9090
+            metricName: airflow_task_queued
+            threshold: "5"
+            query: sum(airflow_task_queued)
+        
+        # 基于外部HTTP API扩缩容
+        - type: external
+          metadata:
+            scalerAddress: airflow-scaler:8080
+            metricType: External
+            targetValue: "10"
+  
+  # TriggerAuthentication配置
+  trigger_authentication:
+    apiVersion: keda.sh/v1alpha1
+    kind: TriggerAuthentication
+    metadata:
+      name: airflow-trigger-auth
+      namespace: airflow
+    spec:
+      secretTargetRef:
+        - parameter: password
+          name: airflow-redis
+          key: redis-password
+
+# 自定义扩缩容策略
+custom_scaling_policies:
+  # 基于任务队列长度的扩缩容策略
+  queue_based_scaling:
+    # 队列长度阈值
+    queue_thresholds:
+      - min_queue_length: 0
+        max_queue_length: 10
+        target_replicas: 3
+      - min_queue_length: 11
+        max_queue_length: 50
+        target_replicas: 5
+      - min_queue_length: 51
+        max_queue_length: 100
+        target_replicas: 10
+      - min_queue_length: 101
+        max_queue_length: 999999
+        target_replicas: 20
+    
+    # 扩容冷却时间（秒）
+    scale_up_cooldown: 60
+    
+    # 缩容冷却时间（秒）
+    scale_down_cooldown: 300
+  
+  # 基于时间的扩缩容策略
+  time_based_scaling:
+    # 工作时间扩缩容
+    work_hours:
+      start_time: "09:00"
+      end_time: "18:00"
+      timezone: "Asia/Shanghai"
+      target_replicas: 10
+      days:
+        - Monday
+        - Tuesday
+        - Wednesday
+        - Thursday
+        - Friday
+    
+    # 非工作时间扩缩容
+    off_hours:
+      target_replicas: 3
+    
+    # 周末扩缩容
+    weekend:
+      target_replicas: 2
+      days:
+        - Saturday
+        - Sunday
+  
+  # 基于DAG调度的扩缩容策略
+  dag_based_scaling:
+    # 高优先级DAG扩缩容
+    high_priority_dags:
+      - dag_id: "critical_daily_processing"
+        target_replicas: 15
+        scale_up_time: "01:00"
+        scale_down_time: "06:00"
+      - dag_id: "monthly_report_generation"
+        target_replicas: 12
+        scale_up_time: "02:00"
+        scale_down_time: "08:00"
+    
+    # 低优先级DAG扩缩容
+    low_priority_dags:
+      - dag_id: "data_cleanup"
+        target_replicas: 5
+        scale_up_time: "03:00"
+        scale_down_time: "05:00"
+
+# 资源配额配置
+resource_quotas:
+  # 命名空间资源配额
+  namespace_quota:
+    apiVersion: v1
+    kind: ResourceQuota
+    metadata:
+      name: airflow-quota
+      namespace: airflow
+    spec:
+      hard:
+        requests.cpu: "20"
+        requests.memory: 40Gi
+        limits.cpu: "40"
+        limits.memory: 80Gi
+        persistentvolumeclaims: "20"
+        services: "30"
+        secrets: "50"
+        configmaps: "50"
+  
+  # 配额限制范围
+  limit_range:
+    apiVersion: v1
+    kind: LimitRange
+    metadata:
+      name: airflow-limit-range
+      namespace: airflow
+    spec:
+      limits:
+        # Worker资源限制
+        - type: Container
+          default:
+            cpu: "1"
+            memory: 2Gi
+          defaultRequest:
+            cpu: 500m
+            memory: 1Gi
+          max:
+            cpu: "2"
+            memory: 4Gi
+          min:
+            cpu: 250m
+            memory: 512Mi
+          maxLimitRequestRatio:
+            cpu: 2
+            memory: 2
+        
+        # Webserver资源限制
+        - type: Container
+          default:
+            cpu: "1"
+            memory: 2Gi
+          defaultRequest:
+            cpu: 500m
+            memory: 1Gi
+          max:
+            cpu: "2"
+            memory: 4Gi
+          min:
+            cpu: 250m
+            memory: 512Mi
+        
+        # Scheduler资源限制
+        - type: Container
+          default:
+            cpu: "1"
+            memory: 2Gi
+          defaultRequest:
+            cpu: 500m
+            memory: 1Gi
+          max:
+            cpu: "2"
+            memory: 4Gi
+          min:
+            cpu: 250m
+            memory: 512Mi
+
+# 扩缩容监控指标
+scaling_metrics:
+  # 核心指标
+  core_metrics:
+    # 任务队列长度
+    task_queue_length:
+      description: "Number of tasks waiting to be executed"
+      type: "gauge"
+      query: "SELECT COUNT(*) FROM task_instance WHERE state='queued'"
+    
+    # 活跃任务数
+    active_task_count:
+      description: "Number of currently running tasks"
+      type: "gauge"
+      query: "SELECT COUNT(*) FROM task_instance WHERE state='running'"
+    
+    # Worker节点数
+    worker_count:
+      description: "Number of active worker nodes"
+      type: "gauge"
+      query: "SELECT COUNT(*) FROM worker"
+    
+    # CPU使用率
+    cpu_usage:
+      description: "Average CPU usage across all worker nodes"
+      type: "gauge"
+      query: "SELECT AVG(cpu_usage) FROM worker_metrics"
+    
+    # 内存使用率
+    memory_usage:
+      description: "Average memory usage across all worker nodes"
+      type: "gauge"
+      query: "SELECT AVG(memory_usage) FROM worker_metrics"
+  
+  # 自定义指标
+  custom_metrics:
+    # DAG执行延迟
+    dag_execution_delay:
+      description: "Average delay in DAG execution start time"
+      type: "gauge"
+      query: "SELECT AVG(EXTRACT(EPOCH FROM (start_date - execution_date))) FROM dag_run WHERE state='success'"
+    
+    # 任务失败率
+    task_failure_rate:
+      description: "Percentage of failed tasks in the last hour"
+      type: "gauge"
+      query: "SELECT (COUNT(CASE WHEN state='failed' THEN 1 END) * 100.0 / COUNT(*)) FROM task_instance WHERE start_date > NOW() - INTERVAL '1 hour'"
+    
+    # 数据库连接数
+    database_connections:
+      description: "Number of active database connections"
+      type: "gauge"
+      query: "SELECT COUNT(*) FROM pg_stat_activity WHERE state='active'"
+    
+    # Redis队列长度
+    redis_queue_length:
+      description: "Length of task queue in Redis"
+      type: "gauge"
+      query: "LLEN airflow"
+
+# 扩缩容策略配置文件
+scaling_policy_config:
+  # 扩容策略
+  scale_up_policy:
+    # 触发条件
+    triggers:
+      - metric: "task_queue_length"
+        threshold: 10
+        comparison: "greater_than"
+      - metric: "active_task_count"
+        threshold: 50
+        comparison: "greater_than"
+      - metric: "cpu_usage"
+        threshold: 70
+        comparison: "greater_than"
+    
+    # 扩容动作
+    actions:
+      - target: "worker"
+        scale_factor: 1.5
+        max_replicas: 20
+      - target: "webserver"
+        scale_factor: 1.2
+        max_replicas: 10
+    
+    # 冷却时间
+    cooldown: 60
+  
+  # 缩容策略
+  scale_down_policy:
+    # 触发条件
+    triggers:
+      - metric: "task_queue_length"
+        threshold: 5
+        comparison: "less_than"
+      - metric: "active_task_count"
+        threshold: 10
+        comparison: "less_than"
+      - metric: "cpu_usage"
+        threshold: 30
+        comparison: "less_than"
+    
+    # 缩容动作
+    actions:
+      - target: "worker"
+        scale_factor: 0.8
+        min_replicas: 3
+      - target: "webserver"
+        scale_factor: 0.9
+        min_replicas: 2
+    
+    # 冷却时间
+    cooldown: 300

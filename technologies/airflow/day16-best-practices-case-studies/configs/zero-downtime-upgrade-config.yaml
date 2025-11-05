@@ -1,0 +1,234 @@
+# Airflow 零停机升级配置
+
+# 滚动更新配置
+rolling_update:
+  # 启用滚动更新
+  enabled: true
+  # 更新策略
+  strategy: RollingUpdate
+  # 最大不可用副本数
+  max_unavailable: 25%
+  # 最大 surge 副本数
+  max_surge: 25%
+  # 更新间隔时间(秒)
+  update_period_seconds: 30
+  # 健康检查配置
+  health_check:
+    # 初始化延迟时间(秒)
+    initial_delay_seconds: 30
+    # 健康检查周期(秒)
+    period_seconds: 10
+    # 超时时间(秒)
+    timeout_seconds: 5
+    # 成功阈值
+    success_threshold: 1
+    # 失败阈值
+    failure_threshold: 3
+  
+  # 更新前钩子
+  pre_update_hooks:
+    - name: backup_database
+      command: ["/bin/sh", "-c", "pg_dump -h postgresql -U airflow airflow > /tmp/airflow_backup.sql"]
+      
+    - name: validate_config
+      command: ["airflow", "config", "validate"]
+  
+  # 更新后钩子
+  post_update_hooks:
+    - name: run_migrations
+      command: ["airflow", "db", "migrate"]
+      
+    - name: clear_task_instances
+      command: ["airflow", "tasks", "clear", "--all"]
+
+# 蓝绿部署配置
+blue_green_deployment:
+  # 启用蓝绿部署
+  enabled: false
+  # 蓝环境配置
+  blue_environment:
+    # 环境名称
+    name: blue
+    # 副本数
+    replicas: 3
+    # 服务标签
+    service_label: blue
+    # 部署标签
+    deployment_label: blue
+  
+  # 绿环境配置
+  green_environment:
+    # 环境名称
+    name: green
+    # 副本数
+    replicas: 3
+    # 服务标签
+    service_label: green
+    # 部署标签
+    deployment_label: green
+  
+  # 流量切换配置
+  traffic_switch:
+    # 切换前测试
+    pre_switch_tests:
+      - name: health_check
+        endpoint: /health
+        expected_status: 200
+      - name: api_test
+        endpoint: /api/v1/dags
+        expected_status: 200
+    
+    # 切换策略
+    switch_strategy: gradual
+    # 切换步骤
+    switch_steps:
+      - percentage: 10
+        duration_minutes: 5
+      - percentage: 30
+        duration_minutes: 10
+      - percentage: 60
+        duration_minutes: 15
+      - percentage: 100
+        duration_minutes: 0
+    
+    # 回滚配置
+    rollback:
+      # 自动回滚条件
+      auto_rollback_conditions:
+        - metric: error_rate
+          threshold: 5
+          comparison: greater_than
+        - metric: response_time
+          threshold: 5000
+          comparison: greater_than
+      
+      # 回滚通知
+      notifications:
+        email:
+          enabled: true
+          recipients:
+            - admin@example.com
+        slack:
+          enabled: true
+          webhook_url: https://hooks.slack.com/services/your-slack-webhook
+
+# 数据库迁移配置
+database_migration:
+  # 启用数据库迁移
+  enabled: true
+  # 迁移前备份
+  backup_before_migration: true
+  # 迁移后验证
+  validate_after_migration: true
+  # 迁移脚本路径
+  migration_scripts:
+    - /opt/airflow/migrations/001_init.sql
+    - /opt/airflow/migrations/002_add_columns.sql
+  # 迁移超时时间(分钟)
+  migration_timeout_minutes: 30
+
+# 版本兼容性配置
+version_compatibility:
+  # 支持的Airflow版本
+  supported_versions:
+    - 2.5.0
+    - 2.5.1
+    - 2.5.2
+    - 2.5.3
+  # 不兼容的变更
+  incompatible_changes:
+    - version: 2.5.0
+      changes:
+        - removed_api_endpoints: ["/api/experimental/dags"]
+        - deprecated_configs: ["executor", "sql_alchemy_conn"]
+    - version: 2.6.0
+      changes:
+        - removed_api_endpoints: ["/api/experimental/latest_runs"]
+        - deprecated_configs: ["celery_broker_transport_options"]
+
+# 升级测试配置
+upgrade_testing:
+  # 启用升级测试
+  enabled: true
+  # 测试环境配置
+  test_environment:
+    # 测试集群名称
+    cluster_name: airflow-test
+    # 测试命名空间
+    namespace: airflow-test
+    # 测试资源配置
+    resources:
+      cpu: "2"
+      memory: 4Gi
+  
+  # 测试用例
+  test_cases:
+    - name: dag_execution_test
+      description: "测试DAG能否正常执行"
+      dag_id: test_dag
+      expected_duration_seconds: 300
+    - name: api_connectivity_test
+      description: "测试API接口连通性"
+      endpoints:
+        - /api/v1/dags
+        - /api/v1/dags/{dag_id}/dagRuns
+        - /health
+      expected_status_codes: [200, 404]
+    - name: ui_accessibility_test
+      description: "测试UI界面可访问性"
+      urls:
+        - /
+        - /home
+        - /dags
+      expected_status_codes: [200]
+  
+  # 测试报告配置
+  test_reports:
+    # 报告格式
+    format: html
+    # 报告存储位置
+    storage:
+      type: s3
+      bucket: airflow-test-reports
+      path: /upgrade-tests/
+    # 通知配置
+    notifications:
+      email:
+        enabled: true
+        recipients:
+          - dev-team@example.com
+      slack:
+        enabled: true
+        webhook_url: https://hooks.slack.com/services/your-slack-webhook
+
+# 回滚配置
+rollback:
+  # 启用回滚
+  enabled: true
+  # 回滚触发条件
+  rollback_triggers:
+    - condition: deployment_failure
+      threshold: 3
+      window_minutes: 5
+    - condition: high_error_rate
+      threshold: 10
+      window_minutes: 10
+  
+  # 回滚步骤
+  rollback_steps:
+    - name: stop_new_deployments
+      command: ["kubectl", "rollout", "pause", "deployment/airflow"]
+    - name: rollback_to_previous_version
+      command: ["kubectl", "rollout", "undo", "deployment/airflow"]
+    - name: validate_rollback
+      command: ["./scripts/validate_rollback.sh"]
+  
+  # 回滚通知
+  notifications:
+    email:
+      enabled: true
+      recipients:
+        - ops-team@example.com
+    slack:
+      enabled: true
+      webhook_url: https://hooks.slack.com/services/your-slack-webhook

@@ -1,0 +1,455 @@
+# Airflow监控告警示例配置
+
+# Prometheus配置文件
+# prometheus.yml
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+rule_files:
+  - "alert-rules.yml"
+
+scrape_configs:
+  # Airflow指标抓取配置
+  - job_name: 'airflow'
+    static_configs:
+      - targets: ['airflow-webserver:8080']
+    metrics_path: '/api/v1/monitoring/metrics'
+    basic_auth:
+      username: prometheus
+      password: prometheus_password
+
+  # Airflow健康检查端点
+  - job_name: 'airflow-health'
+    static_configs:
+      - targets: ['airflow-webserver:8080', 'airflow-scheduler:8080']
+    metrics_path: '/health'
+
+  # PostgreSQL监控
+  - job_name: 'postgresql'
+    static_configs:
+      - targets: ['postgres:9187']
+    metrics_path: '/metrics'
+
+  # Redis监控
+  - job_name: 'redis'
+    static_configs:
+      - targets: ['redis-exporter:9121']
+    metrics_path: '/metrics'
+
+# alert-rules.yml
+groups:
+  - name: airflow.rules
+    rules:
+      # 调度器健康检查
+      - alert: AirflowSchedulerDown
+        expr: absent(airflow_scheduler_heartbeat) > 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Airflow scheduler is down"
+          description: "Airflow scheduler has not sent heartbeat for more than 1 minute"
+
+      # Webserver健康检查
+      - alert: AirflowWebserverDown
+        expr: absent(up{job="airflow"}) > 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Airflow webserver is down"
+          description: "Airflow webserver is not responding"
+
+      # 高任务失败率
+      - alert: HighTaskFailureRate
+        expr: rate(airflow_task_failures_total[5m]) > 0.1
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High task failure rate"
+          description: "Task failure rate is above 10% in the last 5 minutes"
+
+      # 长时间运行的任务
+      - alert: LongRunningTasks
+        expr: airflow_task_duration_seconds > 3600
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Long running tasks detected"
+          description: "Some tasks are running for more than 1 hour"
+
+      # Worker节点不可用
+      - alert: AirflowWorkerUnavailable
+        expr: airflow_workers_running < 1
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "No Airflow workers available"
+          description: "There are no workers available to execute tasks"
+
+      # 数据库连接问题
+      - alert: DatabaseConnectionIssues
+        expr: airflow_database_connection_errors_total > 10
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Database connection issues"
+          description: "Multiple database connection errors detected"
+
+      # DAG解析失败
+      - alert: DAGParseFailures
+        expr: airflow_dag_parse_failures_total > 5
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "DAG parsing failures"
+          description: "Multiple DAG parsing failures detected"
+
+# Grafana仪表板配置
+# airflow-dashboard.json
+{
+  "dashboard": {
+    "id": null,
+    "title": "Airflow Monitoring",
+    "timezone": "browser",
+    "schemaVersion": 16,
+    "version": 0,
+    "refresh": "30s",
+    "panels": [
+      {
+        "id": 1,
+        "type": "graph",
+        "title": "Task Duration",
+        "gridPos": {
+          "x": 0,
+          "y": 0,
+          "w": 12,
+          "h": 8
+        },
+        "targets": [
+          {
+            "expr": "rate(airflow_task_duration_seconds_sum[5m]) / rate(airflow_task_duration_seconds_count[5m])",
+            "legendFormat": "{{ dag_id }}.{{ task_id }}",
+            "refId": "A"
+          }
+        ],
+        "xaxis": {
+          "mode": "time"
+        },
+        "yaxes": [
+          {
+            "format": "s",
+            "label": "Duration"
+          },
+          {
+            "format": "short"
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "type": "stat",
+        "title": "Active Tasks",
+        "gridPos": {
+          "x": 12,
+          "y": 0,
+          "w": 6,
+          "h": 4
+        },
+        "targets": [
+          {
+            "expr": "airflow_task_instances_running",
+            "refId": "A"
+          }
+        ],
+        "options": {
+          "reduceOptions": {
+            "calcs": [
+              "lastNotNull"
+            ]
+          }
+        }
+      },
+      {
+        "id": 3,
+        "type": "stat",
+        "title": "Failed Tasks",
+        "gridPos": {
+          "x": 18,
+          "y": 0,
+          "w": 6,
+          "h": 4
+        },
+        "targets": [
+          {
+            "expr": "increase(airflow_task_failures_total[1h])",
+            "refId": "A"
+          }
+        ],
+        "options": {
+          "reduceOptions": {
+            "calcs": [
+              "lastNotNull"
+            ]
+          }
+        }
+      },
+      {
+        "id": 4,
+        "type": "graph",
+        "title": "Scheduler Heartbeat",
+        "gridPos": {
+          "x": 0,
+          "y": 8,
+          "w": 12,
+          "h": 8
+        },
+        "targets": [
+          {
+            "expr": "airflow_scheduler_heartbeat",
+            "legendFormat": "Heartbeat",
+            "refId": "A"
+          }
+        ],
+        "xaxis": {
+          "mode": "time"
+        },
+        "yaxes": [
+          {
+            "format": "none",
+            "label": "Heartbeat"
+          },
+          {
+            "format": "short"
+          }
+        ]
+      },
+      {
+        "id": 5,
+        "type": "table",
+        "title": "DAG Status",
+        "gridPos": {
+          "x": 12,
+          "y": 4,
+          "w": 12,
+          "h": 12
+        },
+        "targets": [
+          {
+            "expr": "airflow_dag_status",
+            "legendFormat": "{{ dag_id }} - {{ status }}",
+            "refId": "A"
+          }
+        ],
+        "transformations": [
+          {
+            "id": "seriesToColumns",
+            "options": {}
+          }
+        ]
+      }
+    ]
+  }
+}
+
+# 告警通知渠道配置
+# alertmanager.yml
+global:
+  smtp_smarthost: 'smtp.example.com:587'
+  smtp_from: 'alerts@example.com'
+  smtp_auth_username: 'alerts@example.com'
+  smtp_auth_password: 'smtp_password'
+
+route:
+  group_by: ['alertname']
+  group_wait: 10s
+  group_interval: 10s
+  repeat_interval: 1h
+  receiver: 'team-mails'
+
+receivers:
+  - name: 'team-mails'
+    email_configs:
+      - to: 'data-team@example.com'
+        send_resolved: true
+
+  - name: 'slack-notifications'
+    slack_configs:
+      - api_url: 'https://hooks.slack.com/services/YOUR/SLACK/WEBHOOK'
+        channel: '#airflow-alerts'
+        send_resolved: true
+        title: '{{ template "slack.title" . }}'
+        text: '{{ template "slack.text" . }}'
+
+# Kubernetes监控配置示例
+
+# servicemonitor.yaml
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: airflow-monitor
+  namespace: airflow
+  labels:
+    app: airflow
+spec:
+  selector:
+    matchLabels:
+      app: airflow
+  endpoints:
+  - port: metrics
+    interval: 30s
+    path: /api/v1/monitoring/metrics
+    basicAuth:
+      username:
+        name: airflow-prometheus-secret
+        key: username
+      password:
+        name: airflow-prometheus-secret
+        key: password
+
+# prometheus-rules.yaml
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: airflow-rules
+  namespace: airflow
+spec:
+  groups:
+  - name: airflow.rules
+    rules:
+    - alert: AirflowSchedulerDown
+      expr: absent(airflow_scheduler_heartbeat) > 0
+      for: 1m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Airflow scheduler is down"
+        description: "Airflow scheduler has not sent heartbeat for more than 1 minute"
+
+    - alert: HighTaskFailureRate
+      expr: rate(airflow_task_failures_total[5m]) > 0.1
+      for: 2m
+      labels:
+        severity: warning
+      annotations:
+        summary: "High task failure rate"
+        description: "Task failure rate is above 10% in the last 5 minutes"
+
+# 自定义指标导出器配置
+
+# airflow-metrics-exporter.py
+import time
+import logging
+from prometheus_client import start_http_server, Gauge, Counter, Histogram
+
+# 初始化指标
+TASK_DURATION = Histogram('custom_airflow_task_duration_seconds', 'Task duration in seconds', ['dag_id', 'task_id'])
+TASK_FAILURES = Counter('custom_airflow_task_failures_total', 'Total task failures', ['dag_id', 'task_id'])
+ACTIVE_WORKERS = Gauge('custom_airflow_workers_running', 'Number of active workers')
+
+class MetricsExporter:
+    def __init__(self):
+        self.logger = logging.getLogger(__name__)
+        
+    def collect_metrics(self):
+        """收集自定义指标"""
+        try:
+            # 这里应该是从Airflow API或数据库收集实际指标
+            # 示例代码仅展示如何更新指标
+            
+            # 更新任务持续时间（示例）
+            # TASK_DURATION.labels(dag_id='example_dag', task_id='example_task').observe(task_duration)
+            
+            # 更新任务失败次数（示例）
+            # TASK_FAILURES.labels(dag_id='example_dag', task_id='example_task').inc()
+            
+            # 更新活跃Worker数量（示例）
+            # ACTIVE_WORKERS.set(active_workers_count)
+            
+            self.logger.info("Metrics collected successfully")
+        except Exception as e:
+            self.logger.error(f"Error collecting metrics: {e}")
+
+    def start_exporter(self, port=9102):
+        """启动指标导出器"""
+        start_http_server(port)
+        self.logger.info(f"Metrics exporter started on port {port}")
+        
+        while True:
+            self.collect_metrics()
+            time.sleep(60)  # 每分钟收集一次
+
+# Docker配置示例（用于容器化部署）
+
+# docker-compose.monitoring.yml
+version: '3.8'
+services:
+  prometheus:
+    image: prom/prometheus:v2.40.0
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./monitoring/alert-rules.yml:/etc/prometheus/alert-rules.yml
+      - prometheus_data:/prometheus
+    ports:
+      - "9090:9090"
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=15d'
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:9.2.0
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./monitoring/dashboards:/etc/grafana/provisioning/dashboards
+      - ./monitoring/datasources:/etc/grafana/provisioning/datasources
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin_password
+      - GF_USERS_ALLOW_SIGN_UP=false
+    restart: unless-stopped
+
+  alertmanager:
+    image: prom/alertmanager:v0.24.0
+    volumes:
+      - ./monitoring/alertmanager.yml:/etc/alertmanager/alertmanager.yml
+      - alertmanager_data:/alertmanager
+    ports:
+      - "9093:9093"
+    command:
+      - '--config.file=/etc/alertmanager/alertmanager.yml'
+      - '--storage.path=/alertmanager'
+    restart: unless-stopped
+
+  postgres-exporter:
+    image: wrouesnel/postgres_exporter:v0.11.1
+    environment:
+      - DATA_SOURCE_NAME=postgresql://airflow:password@postgres:5432/airflow?sslmode=disable
+    ports:
+      - "9187:9187"
+    restart: unless-stopped
+
+  redis-exporter:
+    image: oliver006/redis_exporter:v1.45.0
+    environment:
+      - REDIS_ADDR=redis://redis:6379
+    ports:
+      - "9121:9121"
+    restart: unless-stopped
+
+volumes:
+  prometheus_data:
+  grafana_data:
+  alertmanager_data:

@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Day 12: Airflow 安全与权限管理 - 学习成果展示</title>
+    <style>
+        :root {
+            --primary-color: #1a73e8;
+            --secondary-color: #34a853;
+            --accent-color: #f9ab00;
+            --danger-color: #ea4335;
+            --dark-color: #202124;
+            --light-color: #f8f9fa;
+            --border-color: #dadce0;
+            --success-bg: #e6f4ea;
+            --info-bg: #e8f0fe;
+            --warning-bg: #fef7e0;
+            --danger-bg: #fce8e6;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f7fa;
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--primary-color), #0d47a1);
+            color: white;
+            padding: 2rem 0;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 0;
+        }
+        
+        h1, h2, h3 {
+            margin-bottom: 1rem;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        h2 {
+            font-size: 1.8rem;
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 0.5rem;
+            margin-top: 2rem;
+        }
+        
+        h3 {
+            font-size: 1.4rem;
+            color: var(--dark-color);
+        }
+        
+        p {
+            margin-bottom: 1rem;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        
+        .card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .card-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            font-size: 1.2rem;
+        }
+        
+        .icon-blue {
+            background-color: var(--info-bg);
+            color: var(--primary-color);
+        }
+        
+        .icon-green {
+            background-color: var(--success-bg);
+            color: var(--secondary-color);
+        }
+        
+        .icon-yellow {
+            background-color: var(--warning-bg);
+            color: var(--accent-color);
+        }
+        
+        .icon-red {
+            background-color: var(--danger-bg);
+            color: var(--danger-color);
+        }
+        
+        .progress-container {
+            background-color: #e0e0e0;
+            border-radius: 10px;
+            height: 20px;
+            margin: 2rem 0;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            border-radius: 10px;
+            background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+            text-align: center;
+            line-height: 20px;
+            color: white;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin: 0.5rem 0;
+        }
+        
+        .stat-label {
+            color: #666;
+            font-size: 1rem;
+        }
+        
+        .code-block {
+            background-color: #f1f3f4;
+            border-left: 4px solid var(--primary-color);
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 0 4px 4px 0;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+        }
+        
+        .btn {
+            display: inline-block;
+            background-color: var(--primary-color);
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+            border: none;
+            cursor: pointer;
+            margin: 0.5rem;
+        }
+        
+        .btn:hover {
+            background-color: #0d47a1;
+        }
+        
+        .btn-secondary {
+            background-color: var(--secondary-color);
+        }
+        
+        .btn-secondary:hover {
+            background-color: #2e8b47;
+        }
+        
+        .btn-accent {
+            background-color: var(--accent-color);
+            color: var(--dark-color);
+        }
+        
+        .btn-accent:hover {
+            background-color: #e39e00;
+        }
+        
+        .timeline {
+            position: relative;
+            max-width: 800px;
+            margin: 2rem auto;
+        }
+        
+        .timeline::after {
+            content: '';
+            position: absolute;
+            width: 4px;
+            background-color: var(--primary-color);
+            top: 0;
+            bottom: 0;
+            left: 50%;
+            margin-left: -2px;
+        }
+        
+        .timeline-item {
+            padding: 10px 40px;
+            position: relative;
+            width: 50%;
+        }
+        
+        .timeline-item::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            right: -10px;
+            background-color: white;
+            border: 4px solid var(--primary-color);
+            top: 15px;
+            border-radius: 50%;
+            z-index: 1;
+        }
+        
+        .left {
+            left: 0;
+        }
+        
+        .right {
+            left: 50%;
+        }
+        
+        .right::after {
+            left: -10px;
+        }
+        
+        .timeline-content {
+            padding: 20px;
+            background-color: white;
+            border-radius: 6px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        
+        .checklist {
+            list-style-type: none;
+            margin: 1rem 0;
+        }
+        
+        .checklist li {
+            margin-bottom: 0.5rem;
+            padding-left: 30px;
+            position: relative;
+        }
+        
+        .checklist li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: var(--secondary-color);
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+        
+        footer {
+            background-color: var(--dark-color);
+            color: white;
+            text-align: center;
+            padding: 2rem 0;
+            margin-top: 3rem;
+        }
+        
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .timeline::after {
+                left: 31px;
+            }
+            
+            .timeline-item {
+                width: 100%;
+                padding-left: 70px;
+                padding-right: 25px;
+            }
+            
+            .timeline-item::after {
+                left: 21px;
+            }
+            
+            .right {
+                left: 0%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Day 12: Airflow 安全与权限管理</h1>
+            <p>学习成果展示</p>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="card">
+            <div class="card-header">
+                <div class="card-icon icon-blue">🔒</div>
+                <h2>学习进度概览</h2>
+            </div>
+            <p>今天完成了 Airflow 安全与权限管理的全面学习，掌握了企业级安全配置的关键技能。</p>
+            
+            <div class="progress-container">
+                <div class="progress-bar" style="width: 100%">100%</div>
+            </div>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number">6</div>
+                    <div class="stat-label">核心主题</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">12</div>
+                    <div class="stat-label">实践练习</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">5</div>
+                    <div class="stat-label">配置示例</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">3</div>
+                    <div class="stat-label">安全工具</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <div class="card-icon icon-green">📚</div>
+                <h2>学习内容概览</h2>
+            </div>
+            <p>今天的学习涵盖了 Airflow 安全管理的各个方面，包括：</p>
+            
+            <ul class="checklist">
+                <li>Airflow 安全架构设计原则</li>
+                <li>RBAC（基于角色的访问控制）实现</li>
+                <li>LDAP 和 OAuth 身份验证集成</li>
+                <li>密钥管理和 Vault 集成</li>
+                <li>网络安全配置（HTTPS、防火墙）</li>
+                <li>审计日志和监控告警</li>
+            </ul>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <div class="card-icon icon-yellow">💻</div>
+                <h2>实践成果展示</h2>
+            </div>
+            
+            <h3>1. RBAC 权限管理系统</h3>
+            <p>创建了自定义角色和权限分配机制：</p>
+            <div class="code-block">
+# 创建 DataAnalyst 角色<br>
+role = security_manager.add_role("DataAnalyst")<br><br>
+# 分配只读权限<br>
+permissions = [<br>
+&nbsp;&nbsp;("can_dag_read", "DAG"),<br>
+&nbsp;&nbsp;("can_task_instance_read", "DAG"),<br>
+&nbsp;&nbsp;("can_log_read", "DAG")<br>
+]<br>
+for perm_name, view_menu in permissions:<br>
+&nbsp;&nbsp;perm_view = security_manager.add_permission_view_menu(perm_name, view_menu)<br>
+&nbsp;&nbsp;security_manager.add_permission_role(role, perm_view)
+            </div>
+            
+            <h3>2. LDAP 身份验证集成</h3>
+            <p>配置了企业级 LDAP 身份验证：</p>
+            <div class="code-block">
+[ldap]<br>
+uri = ldap://ldap.example.com:389<br>
+user_filter = objectClass=*<br>
+user_name_attr = uid<br>
+bind_user = cn=Manager,dc=example,dc=com<br>
+basedn = dc=example,dc=com<br>
+superuser_filter = memberOf=cn=airflow_admins,ou=groups,dc=example,dc=com
+            </div>
+            
+            <h3>3. HashiCorp Vault 密钥管理</h3>
+            <p>实现了安全的密钥存储和检索：</p>
+            <div class="code-block">
+# Vault 后端配置<br>
+[secrets]<br>
+backend = airflow.providers.hashicorp.secrets.vault.VaultBackend<br>
+backend_kwargs = {"connections_path": "airflow/connections", "variables_path": "airflow/variables", "url": "http://vault:8200"}<br><br>
+# 在 DAG 中使用<br>
+conn = BaseHook.get_connection('postgres_default')<br>
+# 密码从 Vault 安全获取
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <div class="card-icon icon-red">🎯</div>
+                <h2>技能掌握情况</h2>
+            </div>
+            
+            <h3>核心技能</h3>
+            <ul class="checklist">
+                <li>✅ 配置和管理 RBAC 权限系统</li>
+                <li>✅ 集成企业 LDAP 身份验证</li>
+                <li>✅ 实现 OAuth 单点登录</li>
+                <li>✅ 配置 HTTPS 安全通信</li>
+                <li>✅ 集成 HashiCorp Vault 密钥管理</li>
+                <li>✅ 实施安全审计和监控</li>
+            </ul>
+            
+            <h3>进阶技能</h3>
+            <ul class="checklist">
+                <li>✅ 自定义安全权限检查</li>
+                <li>✅ 多因素身份验证实现</li>
+                <li>✅ 安全事件监控仪表板</li>
+                <li>✅ 密码策略和轮换机制</li>
+                <li>✅ 数据血缘安全追踪</li>
+            </ul>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <div class="card-icon icon-blue">📝</div>
+                <h2>学习心得与总结</h2>
+            </div>
+            
+            <h3>关键学习点</h3>
+            <p>通过今天的学习，我深刻理解了 Airflow 安全管理的重要性：</p>
+            
+            <div class="timeline">
+                <div class="timeline-item left">
+                    <div class="timeline-content">
+                        <h3>安全架构设计</h3>
+                        <p>Airflow 的安全架构需要从多个层面考虑，包括身份验证、授权、数据加密和审计日志等。</p>
+                    </div>
+                </div>
+                <div class="timeline-item right">
+                    <div class="timeline-content">
+                        <h3>RBAC 实践</h3>
+                        <p>通过自定义角色和权限分配，可以精确控制用户对不同 DAG 和资源的访问权限。</p>
+                    </div>
+                </div>
+                <div class="timeline-item left">
+                    <div class="timeline-content">
+                        <h3>密钥管理</h3>
+                        <p>使用 HashiCorp Vault 等专业密钥管理工具，可以大幅提升密钥存储的安全性。</p>
+                    </div>
+                </div>
+                <div class="timeline-item right">
+                    <div class="timeline-content">
+                        <h3>监控与审计</h3>
+                        <p>建立完善的安全监控和审计机制，能够及时发现和响应安全威胁。</p>
+                    </div>
+                </div>
+            </div>
+            
+            <h3>挑战与解决方案</h3>
+            <p>在实践过程中遇到的主要挑战及解决方案：</p>
+            <ul>
+                <li><strong>LDAP 集成复杂性：</strong>通过仔细配置 LDAP 连接参数和测试连接，成功实现了企业身份验证集成。</li>
+                <li><strong>权限粒度控制：</strong>通过自定义安全管理器，实现了基于用户组的细粒度 DAG 访问控制。</li>
+                <li><strong>密钥轮换机制：</strong>设计了自动化的密钥轮换流程，确保密钥安全性。</li>
+            </ul>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <div class="card-icon icon-green">🚀</div>
+                <h2>下一步学习计划</h2>
+            </div>
+            
+            <h3>即将学习的内容</h3>
+            <ul class="checklist">
+                <li>Day 13: 高级调度和触发器</li>
+                <li>Day 14: 数据管道监控和告警</li>
+                <li>Day 15: 性能调优和扩展</li>
+                <li>Day 16: 云原生部署和容器化</li>
+            </ul>
+            
+            <h3>实践项目规划</h3>
+            <p>计划在接下来的学习中完成以下实践项目：</p>
+            <ol>
+                <li>构建企业级 Airflow 安全平台</li>
+                <li>实现多租户 Airflow 环境</li>
+                <li>开发自定义安全插件</li>
+                <li>部署高可用 Airflow 集群</li>
+            </ol>
+            
+            <div style="text-align: center; margin-top: 2rem;">
+                <button class="btn" onclick="window.location.href='../day11-performance-optimization/examples/learning_summary.html'">← 查看第11天</button>
+                <button class="btn btn-secondary" onclick="window.location.href='security_examples.py'">查看示例代码</button>
+                <button class="btn btn-accent" onclick="window.location.href='../../PROGRESS.md'">查看总体进度</button>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>Apache Airflow 安全与权限管理学习 | Day 12 完成</p>
+            <p>© 2024 Airflow 学习计划 - 企业级数据工程实践</p>
+        </div>
+    </footer>
+</body>
+</html>

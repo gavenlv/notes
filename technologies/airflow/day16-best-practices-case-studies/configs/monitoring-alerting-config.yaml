@@ -1,0 +1,144 @@
+# Airflow 监控告警配置
+
+# Prometheus 配置
+prometheus:
+  # 全局配置
+  global:
+    scrape_interval: 15s
+    evaluation_interval: 15s
+  
+  # 规则文件
+  rule_files:
+    - "airflow_rules.yml"
+  
+  # 告警管理器配置
+  alerting:
+    alertmanagers:
+      - static_configs:
+          - targets:
+            - alertmanager:9093
+  
+  # 抓取配置
+  scrape_configs:
+    # Airflow Webserver 指标
+    - job_name: 'airflow-webserver'
+      static_configs:
+        - targets: ['airflow-webserver:8080']
+      metrics_path: '/admin/metrics/'
+    
+    # Airflow Scheduler 指标
+    - job_name: 'airflow-scheduler'
+      static_configs:
+        - targets: ['airflow-scheduler:8080']
+      metrics_path: '/admin/metrics/'
+    
+    # PostgreSQL 指标
+    - job_name: 'postgresql'
+      static_configs:
+        - targets: ['postgresql:9187']
+    
+    # Redis 指标
+    - job_name: 'redis'
+      static_configs:
+        - targets: ['redis-exporter:9121']
+
+# Grafana 配置
+grafana:
+  # 数据源配置
+  datasources:
+    - name: Prometheus
+      type: prometheus
+      access: proxy
+      url: http://prometheus:9090
+      isDefault: true
+  
+  # 仪表板配置
+  dashboards:
+    - name: Airflow Dashboard
+      folder: Airflow
+      provisioning:
+        path: /etc/grafana/provisioning/dashboards/airflow.json
+  
+  # 告警通道配置
+  alerting:
+    channels:
+      - name: email
+        type: email
+        settings:
+          addresses: 'admin@example.com'
+      - name: slack
+        type: slack
+        settings:
+          url: 'https://hooks.slack.com/services/YOUR/SLACK/WEBHOOK'
+
+# 告警规则
+alert_rules:
+  # 调度器健康检查
+  - alert: AirflowSchedulerDown
+    expr: absent(airflow_scheduler_heartbeat)
+    for: 5m
+    labels:
+      severity: critical
+    annotations:
+      summary: "Airflow scheduler is down"
+      description: "Airflow scheduler has disappeared from Prometheus target discovery."
+  
+  # Webserver 状态检查
+  - alert: AirflowWebserverDown
+    expr: absent(airflow_webserver_health)
+    for: 5m
+    labels:
+      severity: critical
+    annotations:
+      summary: "Airflow webserver is down"
+      description: "Airflow webserver has disappeared from Prometheus target discovery."
+  
+  # 任务失败率过高
+  - alert: HighTaskFailureRate
+    expr: rate(airflow_task_failures_total[5m]) > 0.05
+    for: 10m
+    labels:
+      severity: warning
+    annotations:
+      summary: "High task failure rate"
+      description: "The task failure rate is above 5% in the last 5 minutes."
+  
+  # 数据库连接问题
+  - alert: DatabaseConnectionIssues
+    expr: airflow_database_connection_errors > 10
+    for: 5m
+    labels:
+      severity: critical
+    annotations:
+      summary: "Database connection issues"
+      description: "There are more than 10 database connection errors."
+  
+  # Redis 连接问题
+  - alert: RedisConnectionIssues
+    expr: airflow_redis_connection_errors > 10
+    for: 5m
+    labels:
+      severity: critical
+    annotations:
+      summary: "Redis connection issues"
+      description: "There are more than 10 Redis connection errors."
+  
+  # 内存使用率过高
+  - alert: HighMemoryUsage
+    expr: (container_memory_usage_bytes{container="airflow-webserver"} / container_spec_memory_limit_bytes{container="airflow-webserver"}) > 0.8
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "High memory usage"
+      description: "Airflow webserver memory usage is above 80%."
+  
+  # CPU 使用率过高
+  - alert: HighCPUUsage
+    expr: rate(container_cpu_usage_seconds_total{container="airflow-webserver"}[5m]) > 0.8
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "High CPU usage"
+      description: "Airflow webserver CPU usage is above 80%."

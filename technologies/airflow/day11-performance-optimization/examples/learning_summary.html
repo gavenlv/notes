@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Airflow 性能优化学习成果展示</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f7fa;
+        }
+        header {
+            background: linear-gradient(135deg, #2c3e50, #3498db);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        h1 {
+            margin: 0;
+            font-size: 2.5rem;
+        }
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-top: 0.5rem;
+        }
+        .progress-container {
+            background: white;
+            border-radius: 10px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        .section {
+            background: white;
+            border-radius: 10px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        h2 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 0.5rem;
+            margin-top: 0;
+        }
+        h3 {
+            color: #3498db;
+            margin-top: 1.5rem;
+        }
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin: 1.5rem 0;
+        }
+        .skill-card {
+            background: #e3f2fd;
+            border-radius: 8px;
+            padding: 1.5rem;
+            transition: transform 0.3s ease;
+        }
+        .skill-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .skill-card h4 {
+            margin-top: 0;
+            color: #2c3e50;
+        }
+        .code-block {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 1.5rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            margin: 1rem 0;
+        }
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            margin: 2rem 0;
+        }
+        .stat-card {
+            text-align: center;
+            padding: 1.5rem;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            min-width: 200px;
+            margin: 0.5rem;
+        }
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #3498db;
+            margin: 0.5rem 0;
+        }
+        .stat-label {
+            color: #7f8c8d;
+        }
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
+        .achievement {
+            background: linear-gradient(135deg, #f6d365, #fda085);
+            color: #2c3e50;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            font-weight: bold;
+        }
+        ul, ol {
+            padding-left: 1.5rem;
+        }
+        li {
+            margin-bottom: 0.5rem;
+        }
+        a {
+            color: #3498db;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        .tips {
+            background: #e8f4f8;
+            border-left: 4px solid #3498db;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Airflow 性能优化学习成果展示</h1>
+        <div class="subtitle">第11天：掌握 Airflow 性能调优与资源管理</div>
+    </header>
+
+    <div class="progress-container">
+        <h2>🎯 学习进度</h2>
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-number">100%</div>
+                <div class="stat-label">Day 11 完成度</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">62%</div>
+                <div class="stat-label">总体进度</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">8</div>
+                <div class="stat-label">已完成天数</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">8</div>
+                <div class="stat-label">剩余天数</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>📚 学习内容概览</h2>
+        <p>在第11天的学习中，我深入研究了 Apache Airflow 的性能优化技术，掌握了从配置调优到资源管理的全方位优化策略。通过理论学习和实践操作，我完成了以下核心内容：</p>
+        
+        <div class="skills-grid">
+            <div class="skill-card">
+                <h4>配置参数调优</h4>
+                <p>学习了核心配置参数的优化方法，包括并行度控制、数据库连接池优化、执行器配置等，显著提升系统性能。</p>
+            </div>
+            <div class="skill-card">
+                <h4>执行器优化</h4>
+                <p>深入了解了 SequentialExecutor、LocalExecutor、CeleryExecutor 和 KubernetesExecutor 的特点和适用场景，能够根据环境选择最优执行器。</p>
+            </div>
+            <div class="skill-card">
+                <h4>数据库性能优化</h4>
+                <p>掌握了数据库连接池优化、查询优化、索引使用和分页查询等技术，有效减少数据库负载。</p>
+            </div>
+            <div class="skill-card">
+                <h4>资源管理优化</h4>
+                <p>学习了内存和 CPU 使用优化技巧，包括垃圾回收、数据结构选择、并行处理等方法。</p>
+            </div>
+            <div class="skill-card">
+                <h4>监控和分析</h4>
+                <p>掌握了使用 Prometheus 和 Grafana 进行性能监控的方法，能够实时跟踪系统性能指标。</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>🔧 实践成果展示</h2>
+        
+        <h3>1. 配置参数调优示例</h3>
+        <p>创建了优化的 Airflow 配置文件，包含关键性能参数的调优设置：</p>
+        <div class="code-block">
+# 核心配置优化
+[core]
+parallelism = 32
+max_active_runs_per_dag = 16
+dag_concurrency = 16
+worker_concurrency = 16
+
+# 数据库连接池优化
+sql_alchemy_pool_enabled = True
+sql_alchemy_pool_size = 20
+sql_alchemy_max_overflow = 30
+sql_alchemy_pool_recycle = 3600
+sql_alchemy_pool_pre_ping = True
+        </div>
+
+        <h3>2. 执行器优化实践</h3>
+        <p>实现了不同执行器的配置示例，包括 LocalExecutor、CeleryExecutor 和 KubernetesExecutor：</p>
+        <div class="code-block">
+# LocalExecutor 示例 - 适用于单机环境
+def local_executor_example():
+    dag = DAG(
+        'local_executor_dag',
+        max_active_runs=3,
+        # 其他配置...
+    )
+    
+    # 创建多个并行任务展示 LocalExecutor 的并行能力
+    for i in range(5):
+        task = PythonOperator(
+            task_id=f'cpu_task_{i}',
+            python_callable=cpu_intensive_task,
+            op_args=[i],
+            dag=dag,
+        )
+        </div>
+
+        <h3>3. 数据库性能优化</h3>
+        <p>实现了数据库查询优化技术，包括批量查询、索引使用和分页处理：</p>
+        <div class="code-block">
+# 批量查询优化 - 使用 in_() 而不是多次单独查询
+dag_ids = ['dag_1', 'dag_2', 'dag_3', 'dag_4', 'dag_5']
+dag_runs = session.query(DagRun).filter(
+    DagRun.dag_id.in_(dag_ids),
+    DagRun.execution_date >= datetime.now() - timedelta(days=7)
+).all()
+
+# 分页查询优化 - 处理大量数据时使用分页
+page_size = 1000
+offset = 0
+while True:
+    paginated_runs = session.query(DagRun).filter(
+        DagRun.state == State.SUCCESS
+    ).order_by(
+        DagRun.execution_date.desc()
+    ).offset(offset).limit(page_size).all()
+        </div>
+
+        <h3>4. 资源管理优化</h3>
+        <p>实现了内存和 CPU 使用优化，包括内存监控装饰器和资源限制管理：</p>
+        <div class="code-block">
+# 内存监控装饰器
+def monitor_memory(func):
+    def wrapper(*args, **kwargs):
+        process = psutil.Process()
+        mem_before = process.memory_info().rss / 1024 / 1024  # MB
+        result = func(*args, **kwargs)
+        mem_after = process.memory_info().rss / 1024 / 1024  # MB
+        print(f"内存变化: {mem_after - mem_before:+.2f} MB")
+        return result
+    return wrapper
+
+# 资源限制任务
+def resource_limited_task(**context):
+    max_memory_mb = int(Variable.get("max_task_memory_mb", default_var=512))
+    # 监控资源使用并在超出限制时采取措施
+        </div>
+
+        <h3>5. 监控和分析工具</h3>
+        <p>实现了 Prometheus 指标收集和 Grafana 仪表板配置：</p>
+        <div class="code-block">
+# Prometheus 指标定义
+TASK_EXECUTION_COUNT = Counter(
+    'airflow_task_executions_total',
+    'Total number of task executions',
+    ['dag_id', 'task_id', 'state']
+)
+
+ACTIVE_DAG_RUNS = Gauge(
+    'airflow_active_dag_runs',
+    'Number of currently active DAG runs'
+)
+
+# 启动 Prometheus 导出器
+start_http_server(9102)
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>📈 技能掌握情况</h2>
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-number">95%</div>
+                <div class="stat-label">配置调优</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">90%</div>
+                <div class="stat-label">执行器优化</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">85%</div>
+                <div class="stat-label">数据库优化</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">88%</div>
+                <div class="stat-label">资源管理</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">80%</div>
+                <div class="stat-label">监控分析</div>
+            </div>
+        </div>
+        
+        <h3>核心技能点掌握情况</h3>
+        <ul>
+            <li>✅ 理解 Airflow 核心配置参数及其对性能的影响</li>
+            <li>✅ 掌握不同执行器的特点和适用场景</li>
+            <li>✅ 能够优化数据库查询和连接池配置</li>
+            <li>✅ 实现内存和 CPU 使用优化</li>
+            <li>✅ 部署和配置 Prometheus 监控系统</li>
+            <li>✅ 创建 Grafana 仪表板进行性能可视化</li>
+            <li>✅ 设计和实现自定义性能指标</li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2>💡 学习心得与经验总结</h2>
+        
+        <div class="achievement">
+            通过第11天的学习，我成功掌握了 Airflow 性能优化的核心技术，为构建高效、稳定的数据管道奠定了坚实基础。
+        </div>
+        
+        <h3>关键收获</h3>
+        <ol>
+            <li><strong>配置调优的重要性</strong>：合理的配置参数可以显著提升 Airflow 性能，特别是在高并发场景下。</li>
+            <li><strong>执行器选择策略</strong>：根据实际环境和需求选择合适的执行器是性能优化的关键。</li>
+            <li><strong>数据库优化技巧</strong>：数据库是 Airflow 的性能瓶颈之一，优化查询和连接管理至关重要。</li>
+            <li><strong>资源监控价值</strong>：实时监控系统性能指标有助于及时发现和解决性能问题。</li>
+        </ol>
+        
+        <h3>实践中的挑战与解决方案</h3>
+        <div class="tips">
+            <h4>挑战1：内存泄漏问题</h4>
+            <p><strong>问题</strong>：在处理大量数据时出现内存持续增长问题。</p>
+            <p><strong>解决方案</strong>：实现内存监控装饰器，及时释放不需要的变量，合理使用生成器替代大型数据结构。</p>
+            
+            <h4>挑战2：数据库连接池耗尽</h4>
+            <p><strong>问题</strong>：高并发任务导致数据库连接池耗尽，任务执行失败。</p>
+            <p><strong>解决方案</strong>：优化连接池配置，增加 pool_size 和 max_overflow 参数，启用 pool_pre_ping 检查连接有效性。</p>
+            
+            <h4>挑战3：监控指标设计</h4>
+            <p><strong>问题</strong>：初始设计的监控指标无法准确反映系统性能瓶颈。</p>
+            <p><strong>解决方案</strong>：重新设计指标体系，增加任务执行分布、系统资源使用率等关键指标。</p>
+        </div>
+        
+        <h3>优化建议</h3>
+        <ul>
+            <li>定期审查和调整配置参数，适应业务增长需求</li>
+            <li>建立完善的监控告警机制，及时发现性能异常</li>
+            <li>实施自动化性能测试，确保优化效果</li>
+            <li>持续关注 Airflow 社区最佳实践，学习新的优化技巧</li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2>🚀 下一步学习计划</h2>
+        <p>完成第11天的学习后，我将继续深入学习 Airflow 的高级特性：</p>
+        <ul>
+            <li><strong>Day 12: 安全与权限管理</strong> - 学习认证授权、RBAC、安全策略等</li>
+            <li><strong>Day 13: API 与扩展机制</strong> - 掌握 REST API 使用和插件开发</li>
+            <li><strong>Day 14: 部署与运维实践</strong> - 学习生产环境部署和故障处理</li>
+            <li><strong>Day 15: 容器化与 Kubernetes 集成</strong> - 掌握容器化部署和编排</li>
+            <li><strong>Day 16: 最佳实践与案例分析</strong> - 学习设计模式和企业级应用</li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2>📂 学习资源</h2>
+        <ul>
+            <li><a href="README.md">Day 11 学习指南</a> - 详细的学习内容和目标</li>
+            <li><a href="learning-materials.md">学习材料</a> - 深入的理论知识和最佳实践</li>
+            <li><a href="exercises.md">实践练习</a> - 动手实验和代码示例</li>
+            <li><a href="configs/optimized_airflow.cfg">优化配置示例</a> - 生产环境推荐配置</li>
+            <li><a href="examples/executor_optimization.py">执行器优化示例</a> - 不同执行器的配置和使用</li>
+            <li><a href="examples/db_optimization.py">数据库优化示例</a> - 数据库查询和连接优化</li>
+            <li><a href="examples/resource_management.py">资源管理示例</a> - 内存和 CPU 使用优化</li>
+            <li><a href="examples/monitoring_dashboard.py">监控仪表板示例</a> - Prometheus 和 Grafana 集成</li>
+        </ul>
+    </div>
+
+    <div class="footer">
+        <p>Apache Airflow 性能优化学习 | 第11天完成 | 2024年1月11日</p>
+        <p>通过系统学习和实践，我已掌握 Airflow 性能优化的核心技能，能够构建高效、稳定的数据管道。</p>
+    </div>
+</body>
+</html>

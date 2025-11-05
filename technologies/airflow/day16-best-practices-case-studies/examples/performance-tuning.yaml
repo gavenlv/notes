@@ -1,0 +1,318 @@
+# Airflow性能调优配置示例
+
+# airflow.cfg - 核心性能配置
+[core]
+# 并行执行的任务实例数
+parallelism = 32
+
+# 每个DAG的最大活跃任务数
+max_active_tasks_per_dag = 16
+
+# 每个DAG运行的最大活跃DAG运行数
+max_active_runs_per_dag = 16
+
+# 子进程池大小（用于LocalExecutor）
+max_threads = 20
+
+# 数据库连接池配置
+sql_alchemy_pool_enabled = True
+sql_alchemy_pool_size = 20
+sql_alchemy_max_overflow = 30
+sql_alchemy_pool_recycle = 3600
+sql_alchemy_pool_pre_ping = True
+
+# DAG序列化（推荐在生产环境中启用）
+store_serialized_dags = True
+min_serialized_dag_update_interval = 30
+
+# 任务序列化
+store_dag_code = True
+
+# 日志配置
+logging_level = INFO
+fab_logging_level = WARN
+
+# 任务重启配置
+max_db_retries = 3
+
+[logging]
+# 日志文件位置
+base_log_folder = /opt/airflow/logs
+dag_processor_manager_log_location = /opt/airflow/logs/dag_processor_manager/dag_processor_manager.log
+
+# 任务日志文件名模板
+log_filename_template = {{ ti.dag_id }}/{{ ti.task_id }}/{{ ts }}/{{ try_number }}.log
+
+# DAG处理日志文件名模板
+dag_processor_manager_log_location = /opt/airflow/logs/dag_processor_manager/dag_processor_manager.log
+
+[metrics]
+# 启用指标收集
+metrics_enabled = True
+
+# StatsD配置
+statsd_on = True
+statsd_host = localhost
+statsd_port = 8125
+statsd_prefix = airflow
+
+[scheduler]
+# 调度器配置
+scheduler_heartbeat_sec = 5
+scheduler_idle_sleep_time = 1
+scheduler_health_check_threshold = 30
+
+# 任务扫描间隔
+processor_poll_interval = 1
+
+# 并行处理DAG文件的数量
+max_threads = 20
+
+# 调度器可以运行的最大DAG数量
+max_dagruns_per_loop_to_schedule = 20
+
+# 任务实例状态更改批处理大小
+max_tis_per_query = 512
+
+# 调度器是否应该解析文件一次然后创建DAG_RUN
+use_row_level_locking = True
+
+# 当使用行级锁定时，每次查询要锁定的任务实例数
+max_tis_per_query = 512
+
+[celery]
+# Celery执行器配置
+worker_concurrency = 16
+worker_prefetch_multiplier = 1
+worker_enable_remote_control = False
+
+# 任务确认配置
+task_acks_late = True
+task_reject_on_worker_lost = True
+
+# 结果后端配置
+result_backend = db+postgresql://user:password@host:port/db
+result_expires = 3600
+
+# 代理配置
+broker_transport_options = {"visibility_timeout": 3600}
+
+[celery_broker_transport_options]
+# 传输选项
+master_name = master
+visibility_timeout = 3600
+
+[kubernetes]
+# Kubernetes执行器配置
+worker_container_repository = apache/airflow
+worker_container_tag = 2.7.0
+worker_container_image_pull_policy = IfNotPresent
+
+# 资源请求和限制
+worker_resources:
+  limits:
+    memory: 2Gi
+    cpu: 1
+  requests:
+    memory: 1Gi
+    cpu: 500m
+
+# 环境变量
+worker_pods_creation_batch_size = 10
+multi_namespace_mode = False
+
+# 健康检查
+pod_mutation_hook = airflow.providers.cncf.kubernetes.utils.pod_mutation_hook
+
+[webserver]
+# Web服务器配置
+workers = 4
+worker_class = sync
+worker_connections = 1000
+max_requests = 0
+max_requests_jitter = 0
+
+# Web服务器超时配置
+web_server_master_timeout = 120
+web_server_worker_timeout = 120
+
+# 请求体大小限制
+max_request_body_size = 10485760
+
+# 启用压缩
+enable_proxy_fix = True
+
+[api]
+# API配置
+auth_backends = airflow.api.auth.backend.basic_auth
+maximum_page_limit = 1000
+fallback_page_limit = 100
+
+[lineage]
+# 血缘追踪
+backend = airflow.lineage.backend.atlas
+
+[atlas]
+# Atlas配置
+host = atlas-host
+port = 21000
+username = atlas
+password = atlas
+
+# Docker配置示例（用于容器化部署）
+
+# docker-compose.yml
+version: '3.8'
+services:
+  postgres:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: airflow
+      POSTGRES_PASSWORD: airflow
+      POSTGRES_DB: airflow
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "airflow"]
+      interval: 10s
+      retries: 5
+      start_period: 30s
+    command: |
+      postgres -c shared_buffers=256MB 
+      -c effective_cache_size=1GB 
+      -c maintenance_work_mem=64MB 
+      -c checkpoint_completion_target=0.9 
+      -c wal_buffers=16MB 
+      -c default_statistics_target=100 
+      -c random_page_cost=1.1 
+      -c effective_io_concurrency=200 
+      -c work_mem=32MB 
+      -c min_wal_size=1GB 
+      -c max_wal_size=4GB
+
+  redis:
+    image: redis:6
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+
+  airflow-webserver:
+    image: apache/airflow:2.7.0
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      &airflow_environment
+      AIRFLOW__CORE__EXECUTOR: CeleryExecutor
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql://airflow:airflow@postgres/airflow
+      AIRFLOW__CELERY__RESULT_BACKEND: db+postgresql://airflow:airflow@postgres/airflow
+      AIRFLOW__CELERY__BROKER_URL: redis://redis:6379/0
+      AIRFLOW__CORE__FERNET_KEY: ''
+      AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: 'true'
+      AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
+      AIRFLOW__API__AUTH_BACKENDS: 'airflow.api.auth.backend.basic_auth'
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./logs:/opt/airflow/logs
+      - ./config/airflow.cfg:/opt/airflow/airflow.cfg
+    ports:
+      - "8080:8080"
+    command: webserver
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 2G
+        reservations:
+          cpus: '0.5'
+          memory: 1G
+
+  airflow-scheduler:
+    image: apache/airflow:2.7.0
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      <<: *airflow_environment
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./logs:/opt/airflow/logs
+      - ./config/airflow.cfg:/opt/airflow/airflow.cfg
+    command: scheduler
+    healthcheck:
+      test: ["CMD-SHELL", 'airflow jobs check --job-type SchedulerJob --hostname "$${HOSTNAME}"']
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 1G
+        reservations:
+          cpus: '0.25'
+          memory: 512M
+
+  airflow-worker:
+    image: apache/airflow:2.7.0
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      <<: *airflow_environment
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./logs:/opt/airflow/logs
+      - ./config/airflow.cfg:/opt/airflow/airflow.cfg
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: celery worker
+    healthcheck:
+      test: ["CMD-SHELL", 'celery --app airflow.providers.celery.executors.celery_executor.app inspect ping -d "celery@$${HOSTNAME}" || exit 1']
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 2G
+        reservations:
+          cpus: '0.5'
+          memory: 1G
+
+  flower:
+    image: apache/airflow:2.7.0
+    depends_on:
+      redis:
+        condition: service_healthy
+    environment:
+      <<: *airflow_environment
+    ports:
+      - "5555:5555"
+    command: celery flower
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:5555/"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+volumes:
+  postgres_data:
+  redis_data:

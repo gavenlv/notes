@@ -1,0 +1,96 @@
+# Airflow 安全配置
+
+# Fernet密钥配置
+fernet_key: "your-fernet-key-here"
+
+# Webserver配置
+webserver:
+  # 启用身份验证
+  authenticate: True
+  # 身份验证后端
+  auth_backend: airflow.contrib.auth.backends.password_auth
+  # 启用CSRF保护
+  enable_csrf_protection: True
+  # 启用HTTPS
+  secure_proxy_ssl_header: X-Forwarded-Proto,https
+  # Cookie安全设置
+  cookie_secure: True
+  cookie_httponly: True
+
+# API配置
+api:
+  # 启用API身份验证
+  auth_backend: airflow.api.auth.backend.basic_auth
+  # API访问控制
+  access_control_allow_headers: "*"
+  access_control_allow_methods: "*"
+  access_control_allow_origins: "*"
+
+# LDAP配置
+ldap:
+  # 启用LDAP
+  ldap_enable: False
+  # LDAP URI
+  ldap_uri: ldap://ldap.example.com
+  # LDAP搜索基础DN
+  ldap_search_base: dc=example,dc=com
+  # LDAP用户搜索过滤器
+  ldap_user_filter: (memberOf=cn=airflow-users,ou=groups,dc=example,dc=com)
+  # LDAP组搜索过滤器
+  ldap_group_filter: (memberOf=cn=airflow-admins,ou=groups,dc=example,dc=com)
+
+# OAuth配置
+oauth:
+  # 启用OAuth
+  oauth_enable: False
+  # OAuth提供商
+  oauth_provider: google
+  # OAuth客户端ID
+  oauth_client_id: your-client-id
+  # OAuth客户端密钥
+  oauth_client_secret: your-client-secret
+  # OAuth回调URL
+  oauth_redirect_uri: https://airflow.example.com/oauth/callback
+
+# 数据库安全配置
+database:
+  # 数据库连接URL
+  sql_alchemy_conn: postgresql+psycopg2://airflow:airflow@postgres/airflow
+  # 启用SSL连接
+  ssl_cert_reqs: CERT_REQUIRED
+  # SSL CA证书路径
+  ssl_ca: /path/to/ca.crt
+  # SSL客户端证书路径
+  ssl_cert: /path/to/client.crt
+  # SSL客户端密钥路径
+  ssl_key: /path/to/client.key
+
+# 敏感变量保护
+sensitive_vars:
+  - password
+  - secret
+  - key
+  - token
+
+# Kubernetes安全配置
+kubernetes:
+  # 启用RBAC
+  rbac_enabled: True
+  # 默认服务账户
+  service_account: airflow
+  # 安全上下文
+  security_context:
+    run_as_user: 1000
+    fs_group: 2000
+  # 网络策略
+  network_policy:
+    ingress:
+      - from:
+        - namespaceSelector:
+            matchLabels:
+              name: airflow
+    egress:
+      - to:
+        - namespaceSelector:
+            matchLabels:
+              name: kube-system

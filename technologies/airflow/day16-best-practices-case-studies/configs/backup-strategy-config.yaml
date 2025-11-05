@@ -1,0 +1,135 @@
+# Airflow 备份策略配置
+
+# 数据库备份配置
+database_backup:
+  # 启用数据库备份
+  enabled: true
+  # 备份频率
+  schedule: "0 2 * * *"  # 每天凌晨2点执行
+  # 备份保留天数
+  retention_days: 30
+  # 数据库连接信息
+  database:
+    host: postgresql
+    port: 5432
+    user: airflow
+    password: airflow123
+    database: airflow
+  # 备份存储位置
+  storage:
+    type: s3
+    bucket: airflow-backups
+    path: /database/
+  # 备份加密
+  encryption:
+    enabled: true
+    key_id: your-kms-key-id
+  # 备份压缩
+  compression:
+    enabled: true
+    algorithm: gzip
+
+# DAG备份配置
+dag_backup:
+  # 启用DAG备份
+  enabled: true
+  # 备份频率
+  schedule: "0 3 * * *"  # 每天凌晨3点执行
+  # 备份保留天数
+  retention_days: 7
+  # DAG目录路径
+  dag_directory: /opt/airflow/dags
+  # 备份存储位置
+  storage:
+    type: s3
+    bucket: airflow-backups
+    path: /dags/
+  # 备份加密
+  encryption:
+    enabled: true
+    key_id: your-kms-key-id
+  # 备份压缩
+  compression:
+    enabled: true
+    algorithm: gzip
+
+# 配置文件备份配置
+config_backup:
+  # 启用配置文件备份
+  enabled: true
+  # 备份频率
+  schedule: "0 4 * * *"  # 每天凌晨4点执行
+  # 备份保留天数
+  retention_days: 30
+  # 配置文件路径
+  config_files:
+    - /opt/airflow/airflow.cfg
+    - /opt/airflow/webserver_config.py
+  # 备份存储位置
+  storage:
+    type: s3
+    bucket: airflow-backups
+    path: /configs/
+  # 备份加密
+  encryption:
+    enabled: true
+    key_id: your-kms-key-id
+  # 备份压缩
+  compression:
+    enabled: true
+    algorithm: gzip
+
+# 日志备份配置
+log_backup:
+  # 启用日志备份
+  enabled: true
+  # 备份频率
+  schedule: "0 5 * * *"  # 每天凌晨5点执行
+  # 备份保留天数
+  retention_days: 7
+  # 日志目录路径
+  log_directory: /opt/airflow/logs
+  # 备份存储位置
+  storage:
+    type: s3
+    bucket: airflow-backups
+    path: /logs/
+  # 备份加密
+  encryption:
+    enabled: true
+    key_id: your-kms-key-id
+  # 备份压缩
+  compression:
+    enabled: true
+    algorithm: gzip
+
+# 备份验证配置
+backup_validation:
+  # 启用备份验证
+  enabled: true
+  # 验证频率
+  schedule: "0 6 * * *"  # 每天凌晨6点执行
+  # 验证脚本路径
+  validation_script: /opt/airflow/scripts/validate_backup.sh
+  # 通知配置
+  notifications:
+    email:
+      enabled: true
+      recipients:
+        - admin@example.com
+    slack:
+      enabled: true
+      webhook_url: https://hooks.slack.com/services/your-slack-webhook
+
+# 灾难恢复配置
+disaster_recovery:
+  # 启用灾难恢复
+  enabled: true
+  # 恢复脚本路径
+  recovery_script: /opt/airflow/scripts/disaster_recovery.sh
+  # 恢复测试频率
+  test_schedule: "0 0 1 * *"  # 每月1号执行
+  # 恢复点目标(RPO)
+  rpo_hours: 24
+  # 恢复时间目标(RTO)
+  rto_hours: 4

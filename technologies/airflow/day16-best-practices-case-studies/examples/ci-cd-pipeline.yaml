@@ -1,0 +1,1122 @@
+# Apache Airflow CI/CD 流水线配置
+
+## 1. 概述
+
+本文档详细描述了Apache Airflow项目的完整CI/CD流水线配置，涵盖代码质量检查、自动化测试、安全扫描、构建打包、部署发布等环节。该流水线基于GitOps理念设计，支持多环境部署和蓝绿发布策略。
+
+## 2. 流水线架构
+
+```mermaid
+graph TD
+    A[代码提交] --> B{静态代码分析}
+    B --> C[单元测试]
+    C --> D{代码覆盖率检查}
+    D --> E[安全扫描]
+    E --> F{安全门禁}
+    F --> G[构建Docker镜像]
+    G --> H[Docker镜像扫描]
+    H --> I{镜像安全检查}
+    I --> J[推送到镜像仓库]
+    J --> K[部署到Staging环境]
+    K --> L{集成测试}
+    L --> M[部署到Production环境]
+    M --> N[蓝绿切换]
+    N --> O[监控和告警]
+```
+
+## 3. CI/CD工具链
+
+### 3.1 核心工具
+
+| 工具 | 用途 | 版本 |
+|------|------|------|
+| GitHub Actions | CI/CD平台 | 最新 |
+| SonarQube | 代码质量分析 | 9.9 LTS |
+| pytest | 单元测试框架 | 7.x |
+| Trivy | 安全漏洞扫描 | 0.40+ |
+| Docker | 容器化平台 | 20.10+ |
+| Helm | Kubernetes包管理 | 3.11+ |
+| ArgoCD | GitOps部署工具 | 2.6+ |
+| Prometheus | 监控系统 | 2.43+ |
+| Grafana | 可视化平台 | 9.5+ |
+
+### 3.2 集成服务
+
+| 服务 | 用途 |
+|------|------|
+| Slack | 通知和告警 |
+| Jira | 问题跟踪 |
+| Nexus | 私有镜像仓库 |
+| Vault | 密钥管理 |
+| Datadog | APM监控 |
+
+## 4. 流水线阶段配置
+
+### 4.1 代码质量检查阶段
+
+```yaml
+# .github/workflows/code-quality.yml
+name: Code Quality
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  code-quality:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v3
+      
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+        
+    - name: Install Dependencies
+      run: |
+        pip install -r requirements.txt
+        pip install -r requirements-dev.txt
+        
+    - name: Run Linting
+      run: |
+        flake8 .
+        black --check .
+        isort --check-only .
+        
+    - name: Static Code Analysis
+      run: |
+        sonar-scanner \
+          -Dsonar.projectKey=apache-airflow \
+          -Dsonar.sources=. \
+          -Dsonar.host.url=${{ secrets.SONAR_URL }} \
+          -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+          
+    - name: Upload Coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./coverage.xml
+        flags: unittests
+        name: codecov-umbrella
+```
+
+### 4.2 自动化测试阶段
+
+```yaml
+# .github/workflows/testing.yml
+name: Automated Testing
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  unit-tests:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.8, 3.9, 3.10]
+        
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v3
+      
+    - name: Setup Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+        
+    - name: Install Dependencies
+      run: |
+        pip install -r requirements.txt
+        pip install -r requirements-test.txt
+        
+    - name: Run Unit Tests
+      run: |
+        pytest tests/unit/ -v --cov=airflow --cov-report=xml
+        
+    - name: Upload Test Results
+      uses: actions/upload-artifact@v3
+      with:
+        name: unit-test-results-${{ matrix.python-version }}
+        path: test-results/
+        
+  integration-tests:
+    runs-on: ubuntu-latest
+    needs: unit-tests
+    
+    services:
+      postgres:
+        image: postgres:13
+        env:
+          POSTGRES_PASSWORD: airflow
+          POSTGRES_USER: airflow
+          POSTGRES_DB: airflow
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+          
+      redis:
+        image: redis:6-alpine
+        ports:
+          - 6379:6379
+          
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v3
+      
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+        
+    - name: Install Dependencies
+      run: |
+        pip install -r requirements.txt
+        pip install -r requirements-test.txt
+        
+    - name: Run Integration Tests
+      run: |
+        pytest tests/integration/ -v --cov=airflow --cov-report=xml
+        
+    - name: Upload Test Results
+      uses: actions/upload-artifact@v3
+      with:
+        name: integration-test-results
+        path: test-results/
+```
+
+### 4.3 安全扫描阶段
+
+```yaml
+# .github/workflows/security-scan.yml
+name: Security Scan
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    - cron: '0 2 * * 1'  # 每周一凌晨2点
+
+jobs:
+  security-scan:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v3
+      
+    - name: Run SAST Scan
+      uses: aquasecurity/trivy-action@master
+      with:
+        scan-type: 'fs'
+        ignore-unfixed: true
+        format: 'sarif'
+        output: 'trivy-results.sarif'
+        severity: 'CRITICAL,HIGH'
+        
+    - name: Upload SARIF file
+      uses: github/codeql-action/upload-sarif@v2
+      with:
+        sarif_file: 'trivy-results.sarif'
+        
+    - name: Dependency Vulnerability Scan
+      run: |
+        pip install safety
+        safety check --full-report
+        
+    - name: Secret Detection
+      uses: trufflesecurity/trufflehog@main
+      with:
+        path: .
+        base: ${{ github.event.pull_request.base.sha }}
+```
+
+### 4.4 构建和打包阶段
+
+```yaml
+# .github/workflows/build.yml
+name: Build and Package
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v3
+      
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+      
+    - name: Login to Container Registry
+      uses: docker/login-action@v2
+      with:
+        registry: ${{ secrets.REGISTRY_URL }}
+        username: ${{ secrets.REGISTRY_USERNAME }}
+        password: ${{ secrets.REGISTRY_PASSWORD }}
+        
+    - name: Extract Metadata
+      id: meta
+      uses: docker/metadata-action@v4
+      with:
+        images: ${{ secrets.IMAGE_NAME }}
+        tags: |
+          type=ref,event=tag
+          type=sha,prefix={{branch}}-
+          
+    - name: Build and Push Docker Image
+      uses: docker/build-push-action@v4
+      with:
+        context: .
+        platforms: linux/amd64,linux/arm64
+        push: true
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+        
+    - name: Generate SBOM
+      uses: anchore/sbom-action@v0
+      with:
+        image: ${{ secrets.IMAGE_NAME }}:${{ github.ref_name }}
+        format: spdx-json
+        
+    - name: Upload SBOM
+      uses: actions/upload-artifact@v3
+      with:
+        name: sbom-${{ github.ref_name }}
+        path: bom.spdx.json
+```
+
+### 4.5 部署阶段
+
+```yaml
+# .github/workflows/deploy.yml
+name: Deploy
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy-staging:
+    runs-on: ubuntu-latest
+    environment: staging
+    
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v3
+      
+    - name: Setup Kubectl
+      uses: azure/setup-kubectl@v3
+      with:
+        version: 'latest'
+        
+    - name: Setup Helm
+      uses: azure/setup-helm@v3
+      with:
+        version: 'v3.11.0'
+        
+    - name: Configure Kubernetes
+      run: |
+        echo "${{ secrets.KUBECONFIG_STAGING }}" | base64 -d > kubeconfig
+        export KUBECONFIG=kubeconfig
+        
+    - name: Deploy to Staging
+      run: |
+        helm upgrade --install airflow ./charts/airflow \
+          --namespace airflow-staging \
+          --set image.tag=${{ github.sha }} \
+          --set environment=staging \
+          --timeout 10m
+          
+    - name: Run Smoke Tests
+      run: |
+        kubectl apply -f tests/smoke/staging.yaml
+        kubectl wait --for=condition=complete job/smoke-test --timeout=300s
+        
+  deploy-production:
+    runs-on: ubuntu-latest
+    needs: deploy-staging
+    environment: production
+    
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v3
+      
+    - name: Setup Kubectl
+      uses: azure/setup-kubectl@v3
+      with:
+        version: 'latest'
+        
+    - name: Setup Helm
+      uses: azure/setup-helm@v3
+      with:
+        version: 'v3.11.0'
+        
+    - name: Configure Kubernetes
+      run: |
+        echo "${{ secrets.KUBECONFIG_PRODUCTION }}" | base64 -d > kubeconfig
+        export KUBECONFIG=kubeconfig
+        
+    - name: Blue-Green Deployment
+      run: |
+        # 获取当前活动版本
+        CURRENT_VERSION=$(kubectl get svc airflow-webserver -o jsonpath='{.spec.selector.version}')
+        
+        # 部署新版本
+        helm upgrade --install airflow-green ./charts/airflow \
+          --namespace airflow-production \
+          --set image.tag=${{ github.sha }} \
+          --set environment=production \
+          --set selector.version=green \
+          --timeout 10m
+          
+        # 运行集成测试
+        kubectl apply -f tests/integration/production.yaml
+        kubectl wait --for=condition=complete job/integration-test --timeout=600s
+        
+        # 切换流量
+        kubectl patch svc airflow-webserver -p '{"spec":{"selector":{"version":"green"}}}'
+        
+        # 清理旧版本
+        kubectl delete deployment airflow-blue
+```
+
+## 5. GitOps 配置
+
+### 5.1 ArgoCD 应用配置
+
+```yaml
+# argocd/application.yaml
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: airflow-production
+  namespace: argocd
+spec:
+  project: default
+  
+  source:
+    repoURL: 'https://github.com/example/airflow-deployments.git'
+    targetRevision: HEAD
+    path: production/
+    
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: airflow-production
+    
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ApplyOutOfSyncOnly=true
+      
+  ignoreDifferences:
+    - group: apps
+      kind: Deployment
+      jsonPointers:
+        - /spec/replicas
+        
+  info:
+    - name: url
+      value: https://airflow.example.com
+```
+
+### 5.2 Helm Chart 结构
+
+```
+charts/airflow/
+├── Chart.yaml
+├── values.yaml
+├── templates/
+│   ├── _helpers.tpl
+│   ├── configmap.yaml
+│   ├── secret.yaml
+│   ├── deployment-webserver.yaml
+│   ├── deployment-scheduler.yaml
+│   ├── deployment-worker.yaml
+│   ├── service.yaml
+│   ├── ingress.yaml
+│   ├── hpa.yaml
+│   └── tests/
+│       └── test-connection.yaml
+└── README.md
+```
+
+## 6. 监控和告警
+
+### 6.1 Prometheus 监控配置
+
+```yaml
+# prometheus/rules/airflow.rules.yaml
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: airflow-rules
+  namespace: monitoring
+spec:
+  groups:
+  - name: airflow.rules
+    rules:
+    - alert: AirflowSchedulerDown
+      expr: absent(up{job="airflow-scheduler"})
+      for: 5m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Airflow scheduler is down"
+        description: "Airflow scheduler has disappeared from Prometheus target discovery."
+        
+    - alert: HighTaskFailureRate
+      expr: rate(airflow_task_failures_total[5m]) > 0.1
+      for: 10m
+      labels:
+        severity: warning
+      annotations:
+        summary: "High task failure rate"
+        description: "The task failure rate is above 10% in the last 5 minutes."
+        
+    - alert: DatabaseConnectionIssues
+      expr: airflow_database_connection_failures_total > 10
+      for: 5m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Database connection issues"
+        description: "There have been more than 10 database connection failures."
+```
+
+### 6.2 Grafana 仪表板配置
+
+```json
+{
+  "dashboard": {
+    "title": "Airflow Production Metrics",
+    "panels": [
+      {
+        "title": "Task Success Rate",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "rate(airflow_task_successes_total[5m])",
+            "legendFormat": "Success Rate"
+          }
+        ]
+      },
+      {
+        "title": "Scheduler Heartbeat",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "airflow_scheduler_heartbeat",
+            "legendFormat": "Heartbeat"
+          }
+        ]
+      },
+      {
+        "title": "Active DAG Runs",
+        "type": "gauge",
+        "targets": [
+          {
+            "expr": "airflow_dag_runs_active",
+            "legendFormat": "Active Runs"
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+## 7. 通知和沟通
+
+### 7.1 Slack 通知配置
+
+```yaml
+# .github/workflows/notifications.yml
+name: Notifications
+
+on:
+  workflow_run:
+    workflows: ["Deploy"]
+    types:
+      - completed
+
+    steps:
+    - name: Send Slack Notification
+      uses: 8398a7/action-slack@v3
+      with:
+        status: ${{ job.status }}
+        channel: '#airflow-deployments'
+        webhook_url: ${{ secrets.SLACK_WEBHOOK }}
+      if: always()
+      
+  notify-jira:
+    runs-on: ubuntu-latest
+    needs: [deploy-staging, deploy-production]
+    if: failure()
+    
+    steps:
+    - name: Create Jira Issue
+      uses: atlassian/gajira-create@v3
+      with:
+        project: AIR
+        issuetype: Bug
+        summary: "Deployment failed for commit ${{ github.sha }}"
+        description: |
+          Deployment pipeline failed.
+          Commit: ${{ github.sha }}
+          Branch: ${{ github.ref }}
+          Job URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        
+      env:
+        JIRA_BASE_URL: ${{ secrets.JIRA_BASE_URL }}
+        JIRA_USER_EMAIL: ${{ secrets.JIRA_USER_EMAIL }}
+        JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
+```
+
+## 8. 环境变量和密钥管理
+
+### 8.1 环境变量配置
+
+```yaml
+# .github/workflows/env-vars.yml
+env:
+  # Airflow 配置
+  AIRFLOW__CORE__EXECUTOR: KubernetesExecutor
+  AIRFLOW__CORE__FERNET_KEY: ${{ secrets.AIRFLOW_FERNET_KEY }}
+  AIRFLOW__CORE__SQL_ALCHEMY_CONN: ${{ secrets.DATABASE_URL }}
+  AIRFLOW__WEBSERVER__SECRET_KEY: ${{ secrets.WEBSERVER_SECRET_KEY }}
+  
+  # Kubernetes 配置
+  KUBECONFIG: /etc/kubeconfig
+  
+  # 镜像仓库配置
+  REGISTRY_URL: ${{ secrets.REGISTRY_URL }}
+  IMAGE_NAME: ${{ secrets.IMAGE_NAME }}
+  
+  # 监控配置
+  PROMETHEUS_URL: ${{ secrets.PROMETHEUS_URL }}
+  GRAFANA_URL: ${{ secrets.GRAFANA_URL }}
+```
+
+### 8.2 密钥管理策略
+
+```markdown
+## 密钥管理最佳实践
+
+1. **密钥存储**
+   - 所有密钥存储在GitHub Secrets中
+   - 敏感信息绝不硬编码在代码中
+   - 使用HashiCorp Vault进行外部密钥管理
+
+2. **密钥轮换**
+   - 定期轮换密钥（每90天）
+   - 实施自动密钥轮换机制
+   - 保留旧密钥以支持回滚
+
+3. **访问控制**
+   - 最小权限原则
+   - 审计密钥访问日志
+   - 实施多因素认证
+
+4. **密钥类型**
+   - 数据库连接字符串
+   - API密钥和令牌
+   - SSL证书和密钥
+   - 加密密钥（Fernet, Secret Key等）
+```
+
+## 9. 多环境配置
+
+### 9.1 环境变量文件
+
+```yaml
+# values/development.yaml
+airflow:
+  image:
+    tag: latest
+  
+  config:
+    core:
+      executor: LocalExecutor
+      load_examples: true
+    
+  resources:
+    limits:
+      cpu: 500m
+      memory: 1Gi
+    requests:
+      cpu: 200m
+      memory: 512Mi
+      
+  ingress:
+    enabled: false
+
+---
+
+# values/staging.yaml
+airflow:
+  image:
+    tag: staging-latest
+  
+  config:
+    core:
+      executor: KubernetesExecutor
+      load_examples: false
+    
+  resources:
+    limits:
+      cpu: 1
+      memory: 2Gi
+    requests:
+      cpu: 500m
+      memory: 1Gi
+      
+  ingress:
+    enabled: true
+    hosts:
+      - staging.airflow.example.com
+
+---
+
+# values/production.yaml
+airflow:
+  image:
+    tag: production-latest
+  
+  replicas:
+    webserver: 3
+    scheduler: 2
+    
+  config:
+    core:
+      executor: KubernetesExecutor
+      load_examples: false
+      
+    scheduler:
+      catchup_by_default: false
+      
+    webserver:
+      expose_config: false
+      
+  resources:
+    limits:
+      cpu: 2
+      memory: 4Gi
+    requests:
+      cpu: 1
+      memory: 2Gi
+      
+  autoscaling:
+    enabled: true
+    minReplicas: 3
+    maxReplicas: 10
+    
+  ingress:
+    enabled: true
+    hosts:
+      - airflow.example.com
+      
+  monitoring:
+    enabled: true
+    prometheus:
+      serviceMonitor:
+        enabled: true
+```
+
+## 10. 回滚策略
+
+### 10.1 自动回滚配置
+
+```yaml
+# .github/workflows/rollback.yml
+name: Rollback
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to rollback'
+        required: true
+        default: 'staging'
+      version:
+        description: 'Version to rollback to'
+        required: true
+
+jobs:
+  rollback:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v3
+      
+    - name: Setup Kubectl
+      uses: azure/setup-kubectl@v3
+      with:
+        version: 'latest'
+        
+    - name: Configure Kubernetes
+      run: |
+        echo "${{ secrets.KUBECONFIG_${{ github.event.inputs.environment }} }}" | base64 -d > kubeconfig
+        export KUBECONFIG=kubeconfig
+        
+    - name: Rollback Deployment
+      run: |
+        helm rollback airflow ${{ github.event.inputs.version }} \
+          --namespace airflow-${{ github.event.inputs.environment }}
+          
+    - name: Verify Rollback
+      run: |
+        kubectl rollout status deployment/airflow-webserver \
+          --namespace airflow-${{ github.event.inputs.environment }} \
+          --timeout=300s
+          
+    - name: Send Notification
+      uses: 8398a7/action-slack@v3
+      with:
+        status: ${{ job.status }}
+        channel: '#airflow-deployments'
+        webhook_url: ${{ secrets.SLACK_WEBHOOK }}
+      if: always()
+```
+
+## 11. 性能和容量规划
+
+### 11.1 资源基准测试
+
+```yaml
+# tests/performance/benchmark.yaml
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: airflow-benchmark
+spec:
+  template:
+    spec:
+      containers:
+      - name: benchmark
+        image: apache/airflow:benchmark
+        command: ["/bin/bash", "-c"]
+        args:
+        - |
+          # 模拟DAG执行负载
+          airflow dags test example_dag $(date +%Y-%m-%d) --no-store-serialized-dag
+          
+          # 测量调度器性能
+          time airflow scheduler --num-runs 10
+          
+          # 测量Worker执行效率
+          time python -m celery -A airflow.executors.celery_executor.app worker --pool=solo
+        
+        resources:
+          requests:
+            cpu: "1"
+            memory: "2Gi"
+          limits:
+            cpu: "2"
+            memory: "4Gi"
+      
+      restartPolicy: Never
+  backoffLimit: 4
+```
+
+### 11.2 容量规划指南
+
+```markdown
+## 容量规划
+
+### 资源估算公式
+
+1. **调度器资源**
+   - CPU = (DAG数量 × 平均DAG复杂度 × 0.1) + 0.5
+   - 内存 = (DAG数量 × 50MB) + 512MB
+
+2. **Worker资源**
+   - CPU = 并发任务数 × 0.5
+   - 内存 = 并发任务数 × 256MB + 1GB
+
+3. **Webserver资源**
+   - CPU = 并发用户数 × 0.1
+   - 内存 = 并发用户数 × 100MB + 512MB
+
+### 扩展策略
+
+1. **水平扩展**
+   - 增加Worker节点
+   - 增加调度器实例
+   - 增加Webserver实例
+
+2. **垂直扩展**
+   - 增加单个组件的资源
+   - 优化数据库性能
+   - 优化网络配置
+```
+
+## 12. 安全合规
+
+### 12.1 安全扫描配置
+
+```yaml
+# .github/workflows/security-compliance.yml
+name: Security Compliance
+
+on:
+  schedule:
+    - cron: '0 3 * * 0'  # 每周日凌晨3点
+  workflow_dispatch:
+
+jobs:
+  compliance-check:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v3
+      
+    - name: Run CIS Benchmark
+      uses: aquasecurity/kube-bench-action@main
+      with:
+        target: master
+        
+    - name: Run PCI DSS Scan
+      run: |
+        docker run --rm -v $(pwd):/app \
+          aquasec/trivy:latest config --compliance pci-dss /app
+          
+    - name: Generate Compliance Report
+      run: |
+        echo "# Security Compliance Report" > compliance-report.md
+        echo "Date: $(date)" >> compliance-report.md
+        echo "Commit: ${{ github.sha }}" >> compliance-report.md
+        
+    - name: Upload Report
+      uses: actions/upload-artifact@v3
+      with:
+        name: compliance-report
+        path: compliance-report.md
+```
+
+### 12.2 合规性检查清单
+
+```markdown
+## 合规性检查清单
+
+### 数据保护
+- [ ] 实施数据加密（传输中和静态）
+- [ ] 配置数据保留和删除策略
+- [ ] 实施数据访问控制
+- [ ] 符合GDPR/CCPA要求
+
+### 身份和访问管理
+- [ ] 实施多因素认证
+- [ ] 配置基于角色的访问控制
+- [ ] 定期审查用户权限
+- [ ] 实施会话管理
+
+### 审计和监控
+- [ ] 启用详细审计日志
+- [ ] 实施实时监控和告警
+- [ ] 定期安全评估
+- [ ] 符合SOC 2要求
+```
+
+## 13. 灾难恢复
+
+### 13.1 备份策略
+
+```yaml
+# backup/backup-policy.yaml
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: airflow-backup
+spec:
+  schedule: "0 2 * * *"  # 每天凌晨2点
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: backup
+            image: postgres:13
+            command:
+            - /bin/bash
+            - -c
+            - |
+              # 备份数据库
+              pg_dump -h $DB_HOST -U $DB_USER -d $DB_NAME > /backup/airflow-$(date +%Y%m%d).sql
+              
+              # 备份DAG文件
+              tar -czf /backup/dags-$(date +%Y%m%d).tar.gz /opt/airflow/dags
+              
+              # 上传到S3
+              aws s3 cp /backup/ s3://airflow-backups/ --recursive
+            
+            env:
+            - name: DB_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: airflow-db
+                  key: host
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: airflow-db
+                  key: user
+            - name: DB_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: airflow-db
+                  key: database
+                  
+            volumeMounts:
+            - name: backup-storage
+              mountPath: /backup
+              
+          volumes:
+          - name: backup-storage
+            persistentVolumeClaim:
+              claimName: backup-pvc
+              
+          restartPolicy: OnFailure
+```
+
+### 13.2 恢复流程
+
+```markdown
+## 灾难恢复流程
+
+### 恢复步骤
+
+1. **评估损坏程度**
+   - 确定受影响的组件
+   - 评估数据丢失情况
+   - 确定恢复优先级
+
+2. **准备恢复环境**
+   - 启动备用基础设施
+   - 配置网络和安全设置
+   - 验证环境准备情况
+
+3. **执行数据恢复**
+   - 从备份恢复数据库
+   - 恢复DAG文件和配置
+   - 验证数据完整性
+
+4. **启动服务**
+   - 启动Airflow组件
+   - 验证服务状态
+   - 执行健康检查
+
+5. **验证和测试**
+   - 运行Smoke测试
+   - 验证关键功能
+   - 确认业务连续性
+```
+
+## 14. 监控和可观测性
+
+### 14.1 Prometheus 配置
+
+```yaml
+# prometheus/config.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-config
+data:
+  prometheus.yml: |
+    global:
+      scrape_interval: 15s
+      
+    scrape_configs:
+    - job_name: 'airflow'
+      static_configs:
+      - targets: ['airflow-webserver:8080', 'airflow-scheduler:8080']
+      
+    - job_name: 'kubernetes-pods'
+      kubernetes_sd_configs:
+      - role: pod
+      relabel_configs:
+      - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scrape]
+        action: keep
+        regex: true
+```
+
+### 14.2 Grafana 仪表板
+
+```json
+{
+  "dashboard": {
+    "title": "Airflow Production Overview",
+    "tags": ["airflow", "production"],
+    "panels": [
+      {
+        "title": "DAG Execution Status",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "airflow_dag_status",
+            "legendFormat": "{{ status }}"
+          }
+        ]
+      },
+      {
+        "title": "Task Duration",
+        "type": "heatmap",
+        "targets": [
+          {
+            "expr": "airflow_task_duration_seconds",
+            "format": "heatmap"
+          }
+        ]
+      },
+      {
+        "title": "Scheduler Heartbeat",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "airflow_scheduler_heartbeat",
+            "instant": true
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+## 15. 最佳实践总结
+
+通过实施这套完整的CI/CD流水线配置，您可以确保Airflow部署的高质量、安全性和可靠性。关键要点包括：
+
+1. **自动化优先** - 尽可能自动化所有流程，减少人为错误
+2. **安全左移** - 在开发早期集成安全检查
+3. **监控驱动** - 建立全面的监控和告警机制
+4. **可追溯性** - 确保所有变更都有完整记录
+5. **持续改进** - 定期审查和优化流程
+
+这套配置为生产环境的Airflow部署提供了坚实的基础，可根据具体需求进行调整和扩展。

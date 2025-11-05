@@ -1,0 +1,152 @@
+# Airflow 自动扩缩容配置
+
+# Kubernetes Horizontal Pod Autoscaler 配置
+hpa:
+  # Webserver HPA 配置
+  webserver:
+    # 最小副本数
+    min_replicas: 2
+    # 最大副本数
+    max_replicas: 10
+    # 目标CPU使用率
+    target_cpu_utilization_percentage: 70
+    # 目标内存使用率
+    target_memory_utilization_percentage: 80
+    # 扩容冷却时间(秒)
+    scale_up_cooldown: 300
+    # 缩容冷却时间(秒)
+    scale_down_cooldown: 600
+  
+  # Scheduler HPA 配置
+  scheduler:
+    # 最小副本数
+    min_replicas: 1
+    # 最大副本数
+    max_replicas: 5
+    # 目标CPU使用率
+    target_cpu_utilization_percentage: 75
+    # 目标内存使用率
+    target_memory_utilization_percentage: 85
+    # 扩容冷却时间(秒)
+    scale_up_cooldown: 300
+    # 缩容冷却时间(秒)
+    scale_down_cooldown: 600
+  
+  # Worker HPA 配置
+  worker:
+    # 最小副本数
+    min_replicas: 3
+    # 最大副本数
+    max_replicas: 20
+    # 目标CPU使用率
+    target_cpu_utilization_percentage: 80
+    # 目标内存使用率
+    target_memory_utilization_percentage: 85
+    # 扩容冷却时间(秒)
+    scale_up_cooldown: 180
+    # 缩容冷却时间(秒)
+    scale_down_cooldown: 300
+
+# 自定义指标扩缩容配置
+custom_metrics_autoscaling:
+  # 基于任务队列长度的扩缩容
+  task_queue_length:
+    # 启用基于任务队列长度的扩缩容
+    enabled: true
+    # 最小任务队列长度阈值
+    min_queue_length: 10
+    # 最大任务队列长度阈值
+    max_queue_length: 100
+    # 每个Worker处理的任务数
+    tasks_per_worker: 5
+    # 扩容步长
+    scale_up_step: 2
+    # 缩容步长
+    scale_down_step: 1
+  
+  # 基于任务失败率的扩缩容
+  task_failure_rate:
+    # 启用基于任务失败率的扩缩容
+    enabled: true
+    # 任务失败率阈值
+    failure_rate_threshold: 0.05
+    # 扩容步长
+    scale_up_step: 1
+    # 缩容步长
+    scale_down_step: 1
+
+# 资源配额配置
+resource_quotas:
+  # CPU配额
+  cpu:
+    # 请求
+    request: "1000m"
+    # 限制
+    limit: "2000m"
+  
+  # 内存配额
+  memory:
+    # 请求
+    request: "2Gi"
+    # 限制
+    limit: "4Gi"
+  
+  # 存储配额
+  storage:
+    # 请求
+    request: "10Gi"
+    # 限制
+    limit: "20Gi"
+
+# 节点亲和性配置
+node_affinity:
+  # Webserver节点亲和性
+  webserver:
+    # 必需的节点标签
+    required:
+      - key: node-role.kubernetes.io/webserver
+        operator: In
+        values:
+          - "true"
+    # 首选的节点标签
+    preferred:
+      - weight: 1
+        preference:
+          - key: node-performance
+            operator: In
+            values:
+              - "high"
+  
+  # Scheduler节点亲和性
+  scheduler:
+    # 必需的节点标签
+    required:
+      - key: node-role.kubernetes.io/scheduler
+        operator: In
+        values:
+          - "true"
+    # 首选的节点标签
+    preferred:
+      - weight: 1
+        preference:
+          - key: node-performance
+            operator: In
+            values:
+              - "high"
+  
+  # Worker节点亲和性
+  worker:
+    # 必需的节点标签
+    required:
+      - key: node-role.kubernetes.io/worker
+        operator: In
+        values:
+          - "true"
+    # 首选的节点标签
+    preferred:
+      - weight: 1
+        preference:
+          - key: node-performance
+            operator: In
+            values:
+              - "high"

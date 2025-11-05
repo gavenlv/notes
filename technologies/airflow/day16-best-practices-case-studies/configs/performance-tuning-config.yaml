@@ -1,0 +1,77 @@
+# Airflow 性能调优配置
+
+# 核心配置
+core:
+  # 并行任务数
+  parallelism: 32
+  # 每个DAG的最大活跃任务数
+  max_active_tasks_per_dag: 16
+  # 数据库连接池大小
+  sql_alchemy_pool_size: 20
+  # 数据库连接池回收时间(秒)
+  sql_alchemy_pool_recycle: 3600
+  # 启用DAG序列化以提高性能
+  store_serialized_dags: true
+  # 启用任务实例依赖检查缓存
+  enable_task_instance_dependencies: true
+
+# 调度器配置
+scheduler:
+  # 调度器心跳间隔(秒)
+  scheduler_heartbeat_sec: 5
+  # 每次调度循环处理的DAG数
+  max_dagruns_per_loop_to_schedule: 10
+  # 调度器进程数
+  scheduler_process_count: 2
+  # 子进程数
+  scheduler_worker_count: 4
+  # 启用Zombie检测
+  enable_health_check: true
+  # Zombie检测间隔(秒)
+  zombie_detection_interval: 300
+
+# 数据库配置
+database:
+  # 数据库连接URL
+  sql_alchemy_conn: postgresql+psycopg2://airflow:airflow@postgres/airflow
+  # 连接池预加载
+  sql_alchemy_pre_ping: true
+  # 连接池超时(秒)
+  sql_alchemy_pool_timeout: 30
+
+# 执行器配置
+celery:
+  # Celery Broker URL
+  broker_url: redis://redis:6379/0
+  # Celery Result Backend
+  result_backend: db+postgresql://airflow:airflow@postgres/airflow
+  # Celery Worker并发数
+  worker_concurrency: 16
+  # 任务确认
+  task_acks_late: true
+  # 预取乘数
+  worker_prefetch_multiplier: 1
+
+# Webserver配置
+webserver:
+  # Webserver工作进程数
+  workers: 4
+  # 每个工作进程的线程数
+  worker_class: sync
+  # 请求超时(秒)
+  web_server_worker_timeout: 120
+  # 启用Gunicorn访问日志
+  access_logfile: '-'
+  # 启用Gunicorn错误日志
+  error_logfile: '-'
+
+# 日志配置
+logging:
+  # 日志级别
+  logging_level: INFO
+  # 启用任务日志存储到数据库
+  store_task_logs_in_db: true
+  # 启用远程日志
+  remote_logging: true
+  # 远程日志连接
+  remote_base_log_folder: s3://my-airflow-logs/logs

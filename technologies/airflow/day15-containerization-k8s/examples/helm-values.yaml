@@ -1,0 +1,240 @@
+# Airflow Helm Chart Values for Production Deployment
+
+# Airflow配置
+airflow:
+  # 镜像配置
+  image:
+    repository: apache/airflow
+    tag: 2.7.0
+    pullPolicy: IfNotPresent
+  
+  # 执行器配置
+  executor: "CeleryExecutor"
+  
+  # 配置参数
+  config:
+    AIRFLOW__CORE__LOAD_EXAMPLES: "False"
+    AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: "True"
+    AIRFLOW__WEBSERVER__EXPOSE_CONFIG: "False"
+    AIRFLOW__CORE__STORED_PASSWORD: "False"
+  
+  # 用户配置
+  users:
+    - username: admin
+      password: admin
+      role: Admin
+      email: admin@example.com
+      firstName: admin
+      lastName: user
+  
+  # 连接配置
+  connections:
+    - id: example_conn
+      type: postgres
+      host: postgres.example.com
+      port: 5432
+      login: airflow
+      password: airflow
+      schema: airflow
+      extra: ""
+  
+  # 变量配置
+  variables:
+    - key: example_var
+      value: "example_value"
+
+# 数据库配置
+postgresql:
+  enabled: true
+  postgresqlPassword: airflow
+  persistence:
+    enabled: true
+    size: 8Gi
+
+# Redis配置（CeleryExecutor需要）
+redis:
+  enabled: true
+  auth:
+    enabled: false
+  master:
+    persistence:
+      enabled: true
+      size: 8Gi
+
+# Webserver配置
+webserver:
+  replicas: 2
+  # 资源限制
+  resources:
+    limits:
+      cpu: 1
+      memory: 2Gi
+    requests:
+      cpu: 500m
+      memory: 1Gi
+  # 服务配置
+  service:
+    type: ClusterIP
+    port: 8080
+  # Ingress配置
+  ingress:
+    enabled: true
+    hosts:
+      - host: airflow.example.com
+        paths:
+          - path: /
+            pathType: ImplementationSpecific
+    tls:
+      - secretName: airflow-tls
+        hosts:
+          - airflow.example.com
+
+# Scheduler配置
+scheduler:
+  replicas: 2
+  resources:
+    limits:
+      cpu: 1
+      memory: 2Gi
+    requests:
+      cpu: 500m
+      memory: 1Gi
+  # 调度器配置
+  config:
+    AIRFLOW__SCHEDULER__CATCHUP_BY_DEFAULT: "False"
+    AIRFLOW__SCHEDULER__MAX_TIS_PER_QUERY: "16"
+    AIRFLOW__SCHEDULER__USE_ROW_LEVEL_LOCKING: "True"
+
+# Worker配置（CeleryExecutor需要）
+workers:
+  replicas: 3
+  resources:
+    limits:
+      cpu: 1
+      memory: 4Gi
+    requests:
+      cpu: 500m
+      memory: 2Gi
+  # 自动扩缩容配置
+  autoscaling:
+    enabled: true
+    minReplicas: 1
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 80
+    targetMemoryUtilizationPercentage: 80
+
+# 触发器配置（Airflow 2.2+）
+triggerer:
+  replicas: 1
+  resources:
+    limits:
+      cpu: 500m
+      memory: 1Gi
+    requests:
+      cpu: 250m
+      memory: 512Mi
+
+# Flower配置（Celery监控）
+flower:
+  enabled: true
+  resources:
+    limits:
+      cpu: 250m
+      memory: 512Mi
+    requests:
+      cpu: 100m
+      memory: 256Mi
+  service:
+    type: ClusterIP
+    port: 5555
+  ingress:
+    enabled: true
+    hosts:
+      - host: flower.example.com
+        paths:
+          - path: /
+            pathType: ImplementationSpecific
+
+# DAGs配置
+dags:
+  # 持久化卷配置
+  persistence:
+    enabled: true
+    storageClass: ""
+    accessMode: ReadWriteMany
+    size: 10Gi
+  # Git同步配置
+  gitSync:
+    enabled: true
+    repo: https://github.com/example/airflow-dags.git
+    branch: main
+    rev: HEAD
+    depth: 1
+    maxFailures: 0
+    subPath: "dags"
+    wait: 60
+    containerName: git-sync
+    uid: 65533
+    securityContext: {}
+
+# 日志配置
+logs:
+  persistence:
+    enabled: true
+    storageClass: ""
+    accessMode: ReadWriteMany
+    size: 100Gi
+
+# 外部依赖配置
+externalDatabase:
+  type: postgres
+  host: postgres.example.com
+  port: 5432
+  user: airflow
+  password: airflow
+  database: airflow
+
+externalRedis:
+  host: redis.example.com
+  port: 6379
+  password: ""
+  databaseNumber: 1
+
+# 网络策略
+networkPolicies:
+  enabled: true
+
+# 安全上下文
+securityContext:
+  fsGroup: 65534
+  runAsUser: 50000
+  runAsGroup: 0
+
+# 服务账户
+serviceAccount:
+  create: true
+  name: airflow
+  annotations: {}
+
+# RBAC
+rbac:
+  create: true
+  rules:
+    - apiGroups:
+        - ""
+      resources:
+        - "pods"
+        - "pods/log"
+      verbs:
+        - "create"
+        - "get"
+        - "delete"
+        - "list"
+        - "watch"
+    - apiGroups:
+        - ""
+      resources:
+        - "pods/exec"
+      verbs:
+        - "create"
+        - "get"

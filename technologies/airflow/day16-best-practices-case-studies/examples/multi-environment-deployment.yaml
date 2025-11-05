@@ -1,0 +1,1038 @@
+# Apache Airflow多环境部署配置示例
+# 包含开发、测试、预生产和生产环境的配置
+
+# 开发环境配置
+development:
+  # 基础配置
+  fullnameOverride: "airflow-dev"
+  
+  # 镜像配置
+  images:
+    airflow:
+      repository: apache/airflow
+      tag: 2.7.0-python3.9-dev
+    useDefaultImageForMigration: true
+    pullPolicy: IfNotPresent
+  
+  # 资源配置
+  resources:
+    limits:
+      cpu: 500m
+      memory: 1Gi
+    requests:
+      cpu: 250m
+      memory: 512Mi
+  
+  # Webserver配置
+  webserver:
+    enabled: true
+    replicas: 1
+    resources:
+      limits:
+        cpu: 500m
+        memory: 1Gi
+      requests:
+        cpu: 250m
+        memory: 512Mi
+    service:
+      type: ClusterIP
+      ports:
+        - name: airflow-ui
+          port: 8080
+    readinessProbe:
+      enabled: true
+      initialDelaySeconds: 30
+      periodSeconds: 10
+      timeoutSeconds: 5
+      failureThreshold: 3
+    livenessProbe:
+      enabled: true
+      initialDelaySeconds: 60
+      periodSeconds: 30
+      timeoutSeconds: 5
+      failureThreshold: 3
+  
+  # Scheduler配置
+  scheduler:
+    enabled: true
+    replicas: 1
+    resources:
+      limits:
+        cpu: 500m
+        memory: 1Gi
+      requests:
+        cpu: 250m
+        memory: 512Mi
+  
+  # Worker配置
+  workers:
+    enabled: true
+    replicas: 1
+    resources:
+      limits:
+        cpu: 500m
+        memory: 1Gi
+      requests:
+        cpu: 250m
+        memory: 512Mi
+  
+  # Triggerer配置
+  triggerer:
+    enabled: true
+    replicas: 1
+    resources:
+      limits:
+        cpu: 250m
+        memory: 512Mi
+      requests:
+        cpu: 100m
+        memory: 256Mi
+  
+  # 数据库配置（使用SQLite for dev）
+  postgresql:
+    enabled: false
+  
+  externalDatabase:
+    type: sqlite
+    host: ""
+    port: 0
+    user: ""
+    password: ""
+    database: "/opt/airflow/airflow.db"
+  
+  # Redis配置（用于CeleryExecutor）
+  redis:
+    enabled: false
+  
+  externalRedis:
+    host: localhost
+    port: 6379
+    password: ""
+    databaseNumber: 1
+  
+  # DAGs配置
+  dags:
+    persistence:
+      enabled: false
+    gitSync:
+      enabled: true
+      repo: https://github.com/example/airflow-dags-dev.git
+      branch: develop
+      rev: HEAD
+      depth: 1
+      maxFailures: 0
+      subPath: "dags"
+      wait: 60
+      containerName: git-sync
+      resources:
+        limits:
+          cpu: 50m
+          memory: 64Mi
+        requests:
+          cpu: 25m
+          memory: 32Mi
+  
+  # 日志配置
+  logs:
+    persistence:
+      enabled: false
+  
+  # 网络策略
+  networkPolicies:
+    enabled: false
+  
+  # RBAC配置
+  rbac:
+    create: true
+    enabled: true
+  
+  # 服务账户
+  serviceAccount:
+    create: true
+    name: "airflow-dev"
+  
+  # Ingress配置
+  ingress:
+    enabled: true
+    web:
+      annotations:
+        kubernetes.io/ingress.class: nginx
+        nginx.ingress.kubernetes.io/rewrite-target: /
+      hosts:
+        - name: airflow-dev.example.com
+          path: /
+  
+  # 监控配置
+  prometheusRule:
+    enabled: false
+  
+  # 节点选择器
+  nodeSelector: {}
+  
+  # 容忍度
+  tolerations: []
+  
+  # 亲和性
+  affinity: {}
+
+# 测试环境配置
+testing:
+  # 基础配置
+  fullnameOverride: "airflow-test"
+  
+  # 镜像配置
+  images:
+    airflow:
+      repository: apache/airflow
+      tag: 2.7.0-python3.9-test
+    useDefaultImageForMigration: true
+    pullPolicy: IfNotPresent
+  
+  # 资源配置
+  resources:
+    limits:
+      cpu: "1"
+      memory: 2Gi
+    requests:
+      cpu: 500m
+      memory: 1Gi
+  
+  # Webserver配置
+  webserver:
+    enabled: true
+    replicas: 2
+    resources:
+      limits:
+        cpu: "1"
+        memory: 2Gi
+      requests:
+        cpu: 500m
+        memory: 1Gi
+    service:
+      type: ClusterIP
+      ports:
+        - name: airflow-ui
+          port: 8080
+    readinessProbe:
+      enabled: true
+      initialDelaySeconds: 30
+      periodSeconds: 10
+      timeoutSeconds: 5
+      failureThreshold: 3
+    livenessProbe:
+      enabled: true
+      initialDelaySeconds: 60
+      periodSeconds: 30
+      timeoutSeconds: 5
+      failureThreshold: 3
+    podDisruptionBudget:
+      enabled: true
+      maxUnavailable: 1
+  
+  # Scheduler配置
+  scheduler:
+    enabled: true
+    replicas: 2
+    resources:
+      limits:
+        cpu: "1"
+        memory: 2Gi
+      requests:
+        cpu: 500m
+        memory: 1Gi
+    podDisruptionBudget:
+      enabled: true
+      maxUnavailable: 1
+  
+  # Worker配置
+  workers:
+    enabled: true
+    replicas: 2
+    resources:
+      limits:
+        cpu: "1"
+        memory: 2Gi
+      requests:
+        cpu: 500m
+        memory: 1Gi
+    podDisruptionBudget:
+      enabled: true
+      maxUnavailable: 1
+  
+  # Triggerer配置
+  triggerer:
+    enabled: true
+    replicas: 1
+    resources:
+      limits:
+        cpu: 500m
+        memory: 1Gi
+      requests:
+        cpu: 250m
+        memory: 512Mi
+    podDisruptionBudget:
+      enabled: true
+      maxUnavailable: 1
+  
+  # 数据库配置
+  postgresql:
+    enabled: true
+    postgresqlUsername: airflow
+    postgresqlDatabase: airflow
+    postgresqlPassword: airflow123
+    persistence:
+      enabled: true
+      size: 10Gi
+      storageClass: ""
+    resources:
+      limits:
+        cpu: 500m
+        memory: 1Gi
+      requests:
+        cpu: 250m
+        memory: 512Mi
+  
+  # Redis配置（用于CeleryExecutor）
+  redis:
+    enabled: true
+    auth:
+      enabled: false
+    master:
+      persistence:
+        enabled: true
+        size: 4Gi
+        storageClass: ""
+      resources:
+        limits:
+          cpu: 500m
+          memory: 1Gi
+        requests:
+          cpu: 250m
+          memory: 512Mi
+  
+  # DAGs配置
+  dags:
+    persistence:
+      enabled: true
+      size: 5Gi
+      storageClass: ""
+    gitSync:
+      enabled: true
+      repo: https://github.com/example/airflow-dags-test.git
+      branch: test
+      rev: HEAD
+      depth: 1
+      maxFailures: 0
+      subPath: "dags"
+      wait: 60
+      containerName: git-sync
+      resources:
+        limits:
+          cpu: 100m
+          memory: 128Mi
+        requests:
+          cpu: 50m
+          memory: 64Mi
+  
+  # 日志配置
+  logs:
+    persistence:
+      enabled: true
+      size: 10Gi
+      storageClass: ""
+  
+  # 网络策略
+  networkPolicies:
+    enabled: true
+  
+  # RBAC配置
+  rbac:
+    create: true
+    enabled: true
+  
+  # 服务账户
+  serviceAccount:
+    create: true
+    name: "airflow-test"
+  
+  # Ingress配置
+  ingress:
+    enabled: true
+    web:
+      annotations:
+        kubernetes.io/ingress.class: nginx
+        nginx.ingress.kubernetes.io/rewrite-target: /
+      hosts:
+        - name: airflow-test.example.com
+          path: /
+  
+  # 监控配置
+  prometheusRule:
+    enabled: true
+    additionalLabels: {}
+    namespace: ""
+    rules:
+      - alert: AirflowSchedulerDown
+        expr: airflow_scheduler_heartbeat <= 0
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Airflow scheduler is down"
+          description: "Airflow scheduler has not heartbeated for more than 5 minutes"
+  
+  # 节点选择器
+  nodeSelector: {}
+  
+  # 容忍度
+  tolerations: []
+  
+  # 亲和性
+  affinity: 
+    podAntiAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 100
+        podAffinityTerm:
+          labelSelector:
+            matchExpressions:
+            - key: component
+              operator: In
+              values:
+              - webserver
+              - scheduler
+              - worker
+          topologyKey: kubernetes.io/hostname
+
+# 预生产环境配置
+staging:
+  # 基础配置
+  fullnameOverride: "airflow-staging"
+  
+  # 镜像配置
+  images:
+    airflow:
+      repository: apache/airflow
+      tag: 2.7.0-python3.9-staging
+    useDefaultImageForMigration: true
+    pullPolicy: IfNotPresent
+  
+  # 并发配置
+  config:
+    core:
+      # 并行执行任务数
+      parallelism: 16
+      # 每个DAG最大活跃任务数
+      max_active_tasks_per_dag: 8
+      # 最大主动运行的DAG数
+      max_active_runs_per_dag: 8
+      # 启用DAG序列化
+      store_serialized_dags: "True"
+      # 启用DAG fetching
+      store_dag_code: "True"
+    scheduler:
+      # 调度器心跳间隔
+      scheduler_heartbeat_sec: 5
+      # 调度器处理的DAG文件数
+      max_dagruns_per_loop_to_schedule: 10
+      # 调度器处理的文件解析进程数
+      parsing_processes: 2
+      # 文件处理超时时间
+      file_process_timeout: 120
+      # 调度器运行周期
+      scheduler_idle_sleep_time: 1
+      # 最小文件处理间隔
+      min_file_process_interval: 30
+      # 调度器Pod数量
+      scheduler_replicas: 2
+    webserver:
+      # Webserver worker数
+      workers: 2
+      # Webserver worker类
+      worker_class: sync
+      # Webserver超时时间
+      web_server_worker_timeout: 300
+      # Webserver最大请求
+      worker_max_requests: 1000
+      # Webserver最大请求抖动
+      worker_max_requests_jitter: 100
+    celery:
+      # Celery worker并发数
+      worker_concurrency: 8
+    logging:
+      # 日志级别
+      logging_level: INFO
+      # 启用远程日志
+      remote_logging: "True"
+  
+  # Webserver配置
+  webserver:
+    enabled: true
+    replicas: 2
+    resources:
+      limits:
+        cpu: "1"
+        memory: 2Gi
+      requests:
+        cpu: 500m
+        memory: 1Gi
+    service:
+      type: ClusterIP
+      ports:
+        - name: airflow-ui
+          port: 8080
+    readinessProbe:
+      enabled: true
+      initialDelaySeconds: 60
+      periodSeconds: 30
+      timeoutSeconds: 10
+      failureThreshold: 5
+    livenessProbe:
+      enabled: true
+      initialDelaySeconds: 300
+      periodSeconds: 60
+      timeoutSeconds: 10
+      failureThreshold: 5
+    podDisruptionBudget:
+      enabled: true
+      maxUnavailable: 1
+  
+  # Scheduler配置
+  scheduler:
+    enabled: true
+    replicas: 2
+    resources:
+      limits:
+        cpu: "1"
+        memory: 2Gi
+      requests:
+        cpu: 500m
+        memory: 1Gi
+    podDisruptionBudget:
+      enabled: true
+      maxUnavailable: 1
+  
+  # Worker配置
+  workers:
+    enabled: true
+    replicas: 3
+    resources:
+      limits:
+        cpu: "1"
+        memory: 2Gi
+      requests:
+        cpu: 500m
+        memory: 1Gi
+    podDisruptionBudget:
+      enabled: true
+      maxUnavailable: 1
+    autoscaling:
+      enabled: true
+      minReplicas: 2
+      maxReplicas: 5
+      targetCPUUtilizationPercentage: 80
+  
+  # Triggerer配置
+  triggerer:
+    enabled: true
+    replicas: 2
+    resources:
+      limits:
+        cpu: 500m
+        memory: 1Gi
+      requests:
+        cpu: 250m
+        memory: 512Mi
+    podDisruptionBudget:
+      enabled: true
+      maxUnavailable: 1
+  
+  # 数据库配置
+  postgresql:
+    enabled: true
+    postgresqlUsername: airflow
+    postgresqlDatabase: airflow
+    existingSecret: airflow-postgresql-staging
+    persistence:
+      enabled: true
+      size: 20Gi
+      storageClass: ""
+    resources:
+      limits:
+        cpu: 1
+        memory: 2Gi
+      requests:
+        cpu: 500m
+        memory: 1Gi
+    replication:
+      enabled: true
+      readReplicas: 1
+  
+  # Redis配置（用于CeleryExecutor）
+  redis:
+    enabled: true
+    auth:
+      enabled: true
+      existingSecret: airflow-secrets-staging
+      existingSecretPasswordKey: redis-password
+    master:
+      persistence:
+        enabled: true
+        size: 8Gi
+        storageClass: ""
+      resources:
+        limits:
+          cpu: 1
+          memory: 2Gi
+        requests:
+          cpu: 500m
+          memory: 1Gi
+    replica:
+      replicaCount: 1
+      resources:
+        limits:
+          cpu: 500m
+          memory: 1Gi
+        requests:
+          cpu: 250m
+          memory: 512Mi
+  
+  # DAGs配置
+  dags:
+    persistence:
+      enabled: true
+      size: 10Gi
+      storageClass: ""
+    gitSync:
+      enabled: true
+      repo: https://github.com/example/airflow-dags-staging.git
+      branch: staging
+      rev: HEAD
+      depth: 1
+      maxFailures: 0
+      subPath: "dags"
+      wait: 60
+      containerName: git-sync
+      resources:
+        limits:
+          cpu: 100m
+          memory: 128Mi
+        requests:
+          cpu: 50m
+          memory: 64Mi
+  
+  # 日志配置
+  logs:
+    persistence:
+      enabled: true
+      size: 20Gi
+      storageClass: ""
+  
+  # 网络策略
+  networkPolicies:
+    enabled: true
+  
+  # RBAC配置
+  rbac:
+    create: true
+    enabled: true
+  
+  # 服务账户
+  serviceAccount:
+    create: true
+    name: "airflow-staging"
+  
+  # Ingress配置
+  ingress:
+    enabled: true
+    web:
+      annotations:
+        kubernetes.io/ingress.class: nginx
+        nginx.ingress.kubernetes.io/rewrite-target: /
+      hosts:
+        - name: airflow-staging.example.com
+          path: /
+      tls:
+        - secretName: airflow-staging-tls
+          hosts:
+            - airflow-staging.example.com
+  
+  # 监控配置
+  prometheusRule:
+    enabled: true
+    additionalLabels: {}
+    namespace: ""
+    rules:
+      - alert: AirflowSchedulerDown
+        expr: airflow_scheduler_heartbeat <= 0
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Airflow scheduler is down"
+          description: "Airflow scheduler has not heartbeated for more than 5 minutes"
+  
+  # 资源配额
+  resources:
+    limits:
+      cpu: "2"
+      memory: 4Gi
+    requests:
+      cpu: "1"
+      memory: 2Gi
+  
+  # 节点选择器
+  nodeSelector: {}
+  
+  # 容忍度
+  tolerations: []
+  
+  # 亲和性
+  affinity: 
+    podAntiAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 100
+        podAffinityTerm:
+          labelSelector:
+            matchExpressions:
+            - key: component
+              operator: In
+              values:
+              - webserver
+              - scheduler
+              - worker
+          topologyKey: kubernetes.io/hostname
+
+# 生产环境配置
+production:
+  # 基础配置
+  fullnameOverride: "airflow-prod"
+  
+  # 镜像配置
+  images:
+    airflow:
+      repository: apache/airflow
+      tag: 2.7.0-python3.9
+    useDefaultImageForMigration: true
+    pullPolicy: IfNotPresent
+  
+  # 并发配置
+  config:
+    core:
+      # 并行执行任务数
+      parallelism: 32
+      # 每个DAG最大活跃任务数
+      max_active_tasks_per_dag: 16
+      # 最大主动运行的DAG数
+      max_active_runs_per_dag: 16
+      # 启用DAG序列化
+      store_serialized_dags: "True"
+      # 启用DAG fetching
+      store_dag_code: "True"
+    scheduler:
+      # 调度器心跳间隔
+      scheduler_heartbeat_sec: 5
+      # 调度器处理的DAG文件数
+      max_dagruns_per_loop_to_schedule: 10
+      # 调度器处理的文件解析进程数
+      parsing_processes: 4
+      # 文件处理超时时间
+      file_process_timeout: 120
+      # 调度器运行周期
+      scheduler_idle_sleep_time: 1
+      # 最小文件处理间隔
+      min_file_process_interval: 30
+      # 调度器Pod数量
+      scheduler_replicas: 3
+    webserver:
+      # Webserver worker数
+      workers: 4
+      # Webserver worker类
+      worker_class: sync
+      # Webserver超时时间
+      web_server_worker_timeout: 300
+      # Webserver最大请求
+      worker_max_requests: 1000
+      # Webserver最大请求抖动
+      worker_max_requests_jitter: 100
+    celery:
+      # Celery worker并发数
+      worker_concurrency: 16
+    logging:
+      # 日志级别
+      logging_level: INFO
+      # 启用远程日志
+      remote_logging: "True"
+  
+  # Webserver配置
+  webserver:
+    enabled: true
+    replicas: 3
+    resources:
+      limits:
+        cpu: "2"
+        memory: 4Gi
+      requests:
+        cpu: "1"
+        memory: 2Gi
+    service:
+      type: ClusterIP
+      ports:
+        - name: airflow-ui
+          port: 8080
+    readinessProbe:
+      enabled: true
+      initialDelaySeconds: 60
+      periodSeconds: 30
+      timeoutSeconds: 10
+      failureThreshold: 10
+    livenessProbe:
+      enabled: true
+      initialDelaySeconds: 300
+      periodSeconds: 60
+      timeoutSeconds: 10
+      failureThreshold: 5
+    podDisruptionBudget:
+      enabled: true
+      maxUnavailable: 1
+  
+  # Scheduler配置
+  scheduler:
+    enabled: true
+    replicas: 3
+    resources:
+      limits:
+        cpu: "2"
+        memory: 4Gi
+      requests:
+        cpu: "1"
+        memory: 2Gi
+    podDisruptionBudget:
+      enabled: true
+      maxUnavailable: 1
+  
+  # Worker配置
+  workers:
+    enabled: true
+    replicas: 5
+    resources:
+      limits:
+        cpu: "2"
+        memory: 4Gi
+      requests:
+        cpu: "1"
+        memory: 2Gi
+    podDisruptionBudget:
+      enabled: true
+      maxUnavailable: 1
+    autoscaling:
+      enabled: true
+      minReplicas: 3
+      maxReplicas: 10
+      targetCPUUtilizationPercentage: 80
+  
+  # Triggerer配置
+  triggerer:
+    enabled: true
+    replicas: 2
+    resources:
+      limits:
+        cpu: 1
+        memory: 2Gi
+      requests:
+        cpu: 500m
+        memory: 1Gi
+    podDisruptionBudget:
+      enabled: true
+      maxUnavailable: 1
+  
+  # 数据库配置
+  postgresql:
+    enabled: true
+    postgresqlUsername: airflow
+    postgresqlDatabase: airflow
+    existingSecret: airflow-postgresql
+    persistence:
+      enabled: true
+      size: 50Gi
+      storageClass: ""
+    resources:
+      limits:
+        cpu: "2"
+        memory: 4Gi
+      requests:
+        cpu: "1"
+        memory: 2Gi
+    replication:
+      enabled: true
+      readReplicas: 2
+    service:
+      ports:
+        postgresql: 5432
+  
+  # Redis配置（用于CeleryExecutor）
+  redis:
+    enabled: true
+    auth:
+      enabled: true
+      existingSecret: airflow-secrets
+      existingSecretPasswordKey: redis-password
+    master:
+      persistence:
+        enabled: true
+        size: 16Gi
+        storageClass: ""
+      resources:
+        limits:
+          cpu: "1"
+          memory: 2Gi
+        requests:
+          cpu: 500m
+          memory: 1Gi
+    replica:
+      replicaCount: 3
+      resources:
+        limits:
+          cpu: "1"
+          memory: 2Gi
+        requests:
+          cpu: 500m
+          memory: 1Gi
+    sentinel:
+      enabled: true
+      masterSet: airflowsentinel
+      quorum: 2
+      parallelSyncs: 1
+      downAfterMilliseconds: 60000
+      failoverTimeout: 180000
+  
+  # 外部数据库配置（如果使用外部数据库）
+  # externalDatabase:
+  #   type: postgres
+  #   host: external-db.example.com
+  #   port: 5432
+  #   user: airflow
+  #   passwordSecret: external-database-secrets
+  #   passwordSecretKey: connection
+  #   database: airflow
+  
+  # 外部Redis配置（如果使用外部Redis）
+  # externalRedis:
+  #   host: external-redis.example.com
+  #   port: 6379
+  #   passwordSecret: airflow-secrets
+  #   passwordSecretKey: redis-password
+  #   databaseNumber: 1
+  
+  # DAGs配置
+  dags:
+    persistence:
+      enabled: true
+      size: 20Gi
+      storageClass: ""
+    gitSync:
+      enabled: true
+      repo: https://github.com/example/airflow-dags.git
+      branch: main
+      rev: HEAD
+      depth: 1
+      maxFailures: 0
+      subPath: "dags"
+      wait: 60
+      containerName: git-sync
+      resources:
+        limits:
+          cpu: 200m
+          memory: 256Mi
+        requests:
+          cpu: 100m
+          memory: 128Mi
+  
+  # 日志配置
+  logs:
+    persistence:
+      enabled: true
+      size: 50Gi
+      storageClass: ""
+  
+  # 网络策略
+  networkPolicies:
+    enabled: true
+  
+  # RBAC配置
+  rbac:
+    create: true
+    enabled: true
+  
+  # 服务账户
+  serviceAccount:
+    create: true
+    name: "airflow"
+  
+  # Ingress配置
+  ingress:
+    enabled: true
+    web:
+      annotations:
+        kubernetes.io/ingress.class: nginx
+        nginx.ingress.kubernetes.io/rewrite-target: /
+      hosts:
+        - name: airflow.example.com
+          path: /
+      tls:
+        - secretName: airflow-tls
+          hosts:
+            - airflow.example.com
+  
+  # 监控配置
+  prometheusRule:
+    enabled: true
+    additionalLabels: {}
+    namespace: ""
+    rules:
+      - alert: AirflowSchedulerDown
+        expr: airflow_scheduler_heartbeat <= 0
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Airflow scheduler is down"
+          description: "Airflow scheduler has not heartbeated for more than 5 minutes"
+      - alert: HighTaskFailureRate
+        expr: rate(airflow_task_failures[5m]) > 0.1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High task failure rate"
+          description: "Task failure rate is above 10% in the last 5 minutes"
+  
+  # 资源配额
+  resources:
+    limits:
+      cpu: "4"
+      memory: 8Gi
+    requests:
+      cpu: "2"
+      memory: 4Gi
+  
+  # 节点选择器
+  nodeSelector: {}
+  
+  # 容忍度
+  tolerations: []
+  
+  # 亲和性
+  affinity: 
+    podAntiAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 100
+        podAffinityTerm:
+          labelSelector:
+            matchExpressions:
+            - key: component
+              operator: In
+              values:
+              - webserver
+              - scheduler
+              - worker
+          topologyKey: kubernetes.io/hostname

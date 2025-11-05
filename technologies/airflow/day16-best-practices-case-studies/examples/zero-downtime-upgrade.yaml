@@ -1,0 +1,528 @@
+# Apache Airflow零停机升级方案示例
+# 包含蓝绿部署、滚动升级和金丝雀发布策略
+
+# 蓝绿部署配置
+blue_green_deployment:
+  # 蓝环境配置
+  blue_environment:
+    name: "airflow-blue"
+    namespace: "airflow-blue"
+    version: "2.6.3"
+    replicas:
+      webserver: 3
+      scheduler: 2
+      worker: 5
+      triggerer: 2
+    resources:
+      webserver:
+        requests:
+          cpu: "500m"
+          memory: "1Gi"
+        limits:
+          cpu: "1"
+          memory: "2Gi"
+      scheduler:
+        requests:
+          cpu: "500m"
+          memory: "1Gi"
+        limits:
+          cpu: "1"
+          memory: "2Gi"
+      worker:
+        requests:
+          cpu: "1"
+          memory: "2Gi"
+        limits:
+          cpu: "2"
+          memory: "4Gi"
+    
+    # 网络配置
+    networking:
+      service:
+        type: "ClusterIP"
+        ports:
+          - name: "airflow-ui"
+            port: 8080
+      ingress:
+        enabled: true
+        hosts:
+          - "airflow-blue.example.com"
+        tls:
+          - secretName: "airflow-blue-tls"
+            hosts:
+              - "airflow-blue.example.com"
+    
+    # 数据库配置
+    database:
+      type: "postgresql"
+      host: "airflow-postgresql-blue"
+      port: 5432
+      database: "airflow"
+      username: "airflow"
+      passwordSecret: "airflow-postgresql-blue"
+    
+    # Redis配置
+    redis:
+      host: "airflow-redis-blue-master"
+      port: 6379
+      passwordSecret: "airflow-redis-blue"
+  
+  # 绿环境配置
+  green_environment:
+    name: "airflow-green"
+    namespace: "airflow-green"
+    version: "2.7.0"
+    replicas:
+      webserver: 3
+      scheduler: 2
+      worker: 5
+      triggerer: 2
+    resources:
+      webserver:
+        requests:
+          cpu: "500m"
+          memory: "1Gi"
+        limits:
+          cpu: "1"
+          memory: "2Gi"
+      scheduler:
+        requests:
+          cpu: "500m"
+          memory: "1Gi"
+        limits:
+          cpu: "1"
+          memory: "2Gi"
+      worker:
+        requests:
+          cpu: "1"
+          memory: "2Gi"
+        limits:
+          cpu: "2"
+          memory: "4Gi"
+    
+    # 网络配置
+    networking:
+      service:
+        type: "ClusterIP"
+        ports:
+          - name: "airflow-ui"
+            port: 8080
+      ingress:
+        enabled: true
+        hosts:
+          - "airflow-green.example.com"
+        tls:
+          - secretName: "airflow-green-tls"
+            hosts:
+              - "airflow-green.example.com"
+    
+    # 数据库配置
+    database:
+      type: "postgresql"
+      host: "airflow-postgresql-green"
+      port: 5432
+      database: "airflow"
+      username: "airflow"
+      passwordSecret: "airflow-postgresql-green"
+    
+    # Redis配置
+    redis:
+      host: "airflow-redis-green-master"
+      port: 6379
+      passwordSecret: "airflow-redis-green"
+  
+  # 流量切换配置
+  traffic_switching:
+    # 切换前检查
+    pre_switch_checks:
+      - name: "health_check"
+        type: "http"
+        url: "http://airflow-green.example.com/health"
+        expected_status: 200
+      - name: "database_connectivity"
+        type: "tcp"
+        host: "airflow-postgresql-green"
+        port: 5432
+      - name: "redis_connectivity"
+        type: "tcp"
+        host: "airflow-redis-green-master"
+        port: 6379
+      - name: "dag_validation"
+        type: "command"
+        command: "airflow dags list-import-errors"
+    
+    # 流量切换
+    switch_traffic:
+      steps:
+        # 逐步切换流量
+        - percentage: 10
+          duration: "5m"
+          validation: true
+        - percentage: 25
+          duration: "10m"
+          validation: true
+        - percentage: 50
+          duration: "15m"
+          validation: true
+        - percentage: 75
+          duration: "10m"
+          validation: true
+        - percentage: 100
+          duration: "5m"
+          validation: true
+    
+    # 回滚配置
+    rollback:
+      conditions:
+        - metric: "error_rate"
+          threshold: 5
+          comparison: "greater_than"
+          window: "5m"
+        - metric: "response_time"
+          threshold: 5000
+          comparison: "greater_than"
+          window: "5m"
+      action:
+        switch_back_to: "blue"
+
+# 滚动升级配置
+rolling_upgrade:
+  # 升级策略
+  strategy:
+    type: "RollingUpdate"
+    maxUnavailable: 1
+    maxSurge: 1
+  
+  # 组件升级顺序
+  upgrade_order:
+    - component: "triggerer"
+      replicas: 2
+      wait_time: "30s"
+    - component: "scheduler"
+      replicas: 2
+      wait_time: "1m"
+    - component: "worker"
+      replicas: 5
+      wait_time: "2m"
+    - component: "webserver"
+      replicas: 3
+      wait_time: "1m"
+  
+  # 健康检查配置
+  health_checks:
+    webserver:
+      readinessProbe:
+        httpGet:
+          path: "/health"
+          port: 8080
+        initialDelaySeconds: 30
+        periodSeconds: 10
+        timeoutSeconds: 5
+        failureThreshold: 3
+      livenessProbe:
+        httpGet:
+          path: "/health"
+          port: 8080
+        initialDelaySeconds: 300
+        periodSeconds: 30
+        timeoutSeconds: 10
+        failureThreshold: 5
+    
+    scheduler:
+      readinessProbe:
+        exec:
+          command:
+            - "airflow"
+            - "checks"
+            - "check-migrations"
+        initialDelaySeconds: 30
+        periodSeconds: 30
+        timeoutSeconds: 10
+        failureThreshold: 3
+      livenessProbe:
+        exec:
+          command:
+            - "airflow"
+            - "checks"
+            - "check-process"
+        initialDelaySeconds: 300
+        periodSeconds: 60
+        timeoutSeconds: 10
+        failureThreshold: 3
+    
+    worker:
+      readinessProbe:
+        tcpSocket:
+          port: 8793
+        initialDelaySeconds: 30
+        periodSeconds: 30
+        timeoutSeconds: 5
+        failureThreshold: 3
+      livenessProbe:
+        tcpSocket:
+          port: 8793
+        initialDelaySeconds: 300
+        periodSeconds: 60
+        timeoutSeconds: 10
+        failureThreshold: 3
+  
+  # 升级前检查
+  pre_upgrade_checks:
+    - name: "database_backup"
+      type: "script"
+      script: "/scripts/backup-database.sh"
+    - name: "dag_validation"
+      type: "command"
+      command: "airflow dags list-import-errors"
+    - name: "resource_availability"
+      type: "resource"
+      cpu_required: "4"
+      memory_required: "8Gi"
+    - name: "network_connectivity"
+      type: "network"
+      endpoints:
+        - "airflow-postgresql:5432"
+        - "airflow-redis-master:6379"
+  
+  # 升级后验证
+  post_upgrade_validation:
+    - name: "version_check"
+      type: "http"
+      url: "http://airflow-webserver:8080/api/v1/version"
+      expected_version: "2.7.0"
+    - name: "dag_execution"
+      type: "dag"
+      dag_id: "test_dag"
+      timeout: "10m"
+    - name: "api_functionality"
+      type: "api"
+      endpoints:
+        - "/api/v1/dags"
+        - "/api/v1/dags/{dag_id}/dagRuns"
+        - "/api/v1/dags/{dag_id}/dagRuns/{dag_run_id}/taskInstances"
+
+# 金丝雀发布配置
+canary_release:
+  # 金丝雀部署配置
+  canary_deployment:
+    name: "airflow-canary"
+    namespace: "airflow"
+    version: "2.7.0-canary"
+    replicas:
+      webserver: 1
+      scheduler: 1
+      worker: 2
+      triggerer: 1
+    
+    # 流量分配
+    traffic_distribution:
+      canary_percentage: 5
+      stable_percentage: 95
+    
+    # 监控指标
+    monitoring_metrics:
+      - name: "error_rate"
+        query: "rate(http_requests_total{status=~'5..'}[5m])"
+        threshold: 1
+      - name: "response_time"
+        query: "histogram_quantile(0.95, http_request_duration_seconds_bucket)"
+        threshold: 2
+      - name: "cpu_usage"
+        query: "rate(container_cpu_usage_seconds_total[5m])"
+        threshold: 0.8
+      - name: "memory_usage"
+        query: "container_memory_usage_bytes"
+        threshold: 0.8
+  
+  # 逐步推广配置
+  progressive_rollout:
+    stages:
+      - percentage: 10
+        duration: "30m"
+        validation_metrics:
+          error_rate: "< 1%"
+          response_time: "< 2s"
+          success_rate: "> 99%"
+      - percentage: 25
+        duration: "1h"
+        validation_metrics:
+          error_rate: "< 1%"
+          response_time: "< 2s"
+          success_rate: "> 99%"
+      - percentage: 50
+        duration: "2h"
+        validation_metrics:
+          error_rate: "< 1%"
+          response_time: "< 2s"
+          success_rate: "> 99%"
+      - percentage: 75
+        duration: "1h"
+        validation_metrics:
+          error_rate: "< 1%"
+          response_time: "< 2s"
+          success_rate: "> 99%"
+      - percentage: 100
+        duration: "30m"
+        validation_metrics:
+          error_rate: "< 1%"
+          response_time: "< 2s"
+          success_rate: "> 99%"
+  
+  # 自动回滚配置
+  auto_rollback:
+    enabled: true
+    conditions:
+      - metric: "error_rate"
+        threshold: 2
+        comparison: "greater_than"
+        window: "5m"
+      - metric: "response_time"
+        threshold: 5
+        comparison: "greater_than"
+        window: "5m"
+      - metric: "cpu_usage"
+        threshold: 0.9
+        comparison: "greater_than"
+        window: "5m"
+    action:
+      rollback_to_previous: true
+      notify_on_rollback: true
+
+# 数据库迁移配置
+database_migration:
+  # 迁移前准备
+  pre_migration:
+    backup:
+      enabled: true
+      type: "full"
+      destination: "s3://airflow-backups/database"
+      retention: "30d"
+    
+    validation:
+      checks:
+        - "check_connections"
+        - "validate_schema"
+        - "verify_data_integrity"
+  
+  # 迁移策略
+  migration_strategy:
+    type: "online"
+    downtime_window: "5m"
+    parallel_migration: true
+    
+    steps:
+      - name: "backup_current_schema"
+        command: "pg_dump --schema-only airflow > schema_backup.sql"
+      - name: "apply_migrations"
+        command: "airflow db migrate"
+      - name: "validate_new_schema"
+        command: "alembic check"
+      - name: "verify_data_consistency"
+        command: "python /scripts/verify_data.py"
+  
+  # 迁移后验证
+  post_migration:
+    validation:
+      checks:
+        - "verify_migrations"
+        - "test_queries"
+        - "check_performance"
+    
+    rollback_plan:
+      steps:
+        - "restore_database_from_backup"
+        - "rollback_migrations"
+        - "validate_restored_state"
+
+# 配置同步配置
+config_sync:
+  # 配置备份
+  backup:
+    enabled: true
+    schedule: "0 2 * * *"  # 每天凌晨2点
+    retention: "7d"
+    destinations:
+      - "s3://airflow-configs/backups"
+      - "/backup/configs"
+  
+  # 配置验证
+  validation:
+    enabled: true
+    checks:
+      - "syntax_validation"
+      - "schema_validation"
+      - "dependency_check"
+  
+  # 配置回滚
+  rollback:
+    enabled: true
+    retention: "30d"
+    trigger_conditions:
+      - "deployment_failure"
+      - "config_validation_failure"
+      - "manual_trigger"
+
+# 监控和告警配置
+monitoring_alerting:
+  # 升级期间监控
+  upgrade_monitoring:
+    metrics:
+      - name: "deployment_status"
+        query: "kube_deployment_status_replicas_ready"
+      - name: "pod_status"
+        query: "kube_pod_status_ready"
+      - name: "error_rate"
+        query: "rate(http_requests_total{status=~'5..'}[5m])"
+      - name: "response_time"
+        query: "histogram_quantile(0.95, http_request_duration_seconds_bucket)"
+    
+    alerts:
+      - name: "upgrade_failure"
+        condition: "deployment_status < expected_replicas"
+        severity: "critical"
+        notify:
+          - "slack"
+          - "email"
+      - name: "high_error_rate"
+        condition: "error_rate > 5"
+        severity: "warning"
+        notify:
+          - "slack"
+      - name: "slow_response"
+        condition: "response_time > 5"
+        severity: "warning"
+        notify:
+          - "slack"
+
+# 回滚策略
+rollback_strategy:
+  # 自动回滚条件
+  auto_rollback_conditions:
+    - metric: "error_rate"
+      threshold: 5
+      comparison: "greater_than"
+      window: "5m"
+    - metric: "unavailable_pods"
+      threshold: 30
+      comparison: "greater_than"
+      window: "5m"
+    - metric: "response_time"
+      threshold: 10
+      comparison: "greater_than"
+      window: "5m"
+  
+  # 手动回滚步骤
+  manual_rollback_steps:
+    1. "暂停新流量"
+    2. "验证回滚条件"
+    3. "执行回滚操作"
+    4. "验证回滚结果"
+    5. "恢复流量"
+  
+  # 回滚验证
+  rollback_validation:
+    checks:
+      - "service_availability"
+      - "data_consistency"
+      - "performance_metrics"
+      - "user_functionality"

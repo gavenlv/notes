@@ -1,0 +1,54 @@
+# Apache Airflow Core
+apache-airflow==2.6.3
+
+# Database backends
+apache-airflow-providers-postgres==5.4.0
+apache-airflow-providers-mysql==3.4.0
+apache-airflow-providers-sqlite==3.4.0
+
+# Executors
+apache-airflow-providers-celery==3.4.0
+apache-airflow-providers-dask==3.4.0
+
+# Cloud providers (optional, uncomment as needed)
+# apache-airflow-providers-amazon==8.0.0
+# apache-airflow-providers-google==10.0.0
+# apache-airflow-providers-microsoft-azure==6.0.0
+
+# Common integrations
+apache-airflow-providers-http==4.4.0
+apache-airflow-providers-ftp==3.4.0
+apache-airflow-providers-imap==3.4.0
+apache-airflow-providers-smtp==3.4.0
+
+# Development and testing
+pytest==7.3.1
+pytest-cov==4.1.0
+pytest-mock==3.10.0
+pytest-xdist==3.3.1
+
+# Code quality
+flake8==6.0.0
+black==23.3.0
+isort==5.12.0
+mypy==1.3.0
+
+# Documentation
+sphinx==6.2.1
+sphinx-rtd-theme==1.2.0
+
+# Utilities
+python-dotenv==1.0.0
+psutil==5.9.5
+requests==2.31.0
+
+# Jupyter for examples
+jupyter==1.0.0
+matplotlib==3.7.1
+pandas==2.0.2
+numpy==1.24.3
+
+# Additional providers for examples
+apache-airflow-providers-docker==3.4.0
+apache-airflow-providers-slack==7.3.0
+apache-airflow-providers-ssh==3.4.0

@@ -1,0 +1,226 @@
+# 生产环境Airflow部署配置示例
+# 使用Helm Chart部署到Kubernetes集群
+
+# values-production.yaml
+airflow:
+  image:
+    repository: apache/airflow
+    tag: 2.7.0-python3.9
+    pullPolicy: IfNotPresent
+
+  # 启用高可用模式
+  executor: CeleryExecutor
+  
+  # 配置安全参数
+  securityContext:
+    runAsUser: 50000
+    fsGroup: 0
+    runAsGroup: 0
+
+  # 环境变量配置
+  config:
+    AIRFLOW__CORE__EXECUTOR: CeleryExecutor
+    AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql://airflow:{{ .Values.postgresql.auth.password }}@{{ .Release.Name }}-postgresql:5432/airflow
+    AIRFLOW__CELERY__RESULT_BACKEND: db+postgresql://airflow:{{ .Values.postgresql.auth.password }}@{{ .Release.Name }}-postgresql:5432/airflow
+    AIRFLOW__CELERY__BROKER_URL: redis://:{{ .Values.redis.auth.password }}@{{ .Release.Name }}-redis-master:6379/0
+    AIRFLOW__CORE__FERNET_KEY: "{{ .Values.airflow.config.AIRFLOW__CORE__FERNET_KEY }}"
+    AIRFLOW__WEBSERVER__SECRET_KEY: "{{ .Values.airflow.config.AIRFLOW__WEBSERVER__SECRET_KEY }}"
+    AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: "True"
+    AIRFLOW__API__AUTH_BACKENDS: "airflow.api.auth.backend.basic_auth"
+    AIRFLOW__WEBSERVER__EXPOSE_CONFIG: "False"
+    AIRFLOW__CORE__LOAD_EXAMPLES: "False"
+
+  # Webserver配置
+  webserver:
+    replicas: 3
+    resources:
+      limits:
+        cpu: 1
+        memory: 2Gi
+      requests:
+        cpu: 500m
+        memory: 1Gi
+    service:
+      type: ClusterIP
+      port: 8080
+    livenessProbe:
+      enabled: true
+      initialDelaySeconds: 300
+      periodSeconds: 30
+      timeoutSeconds: 10
+      failureThreshold: 6
+    readinessProbe:
+      enabled: true
+      initialDelaySeconds: 60
+      periodSeconds: 10
+      timeoutSeconds: 5
+      failureThreshold: 6
+
+  # Scheduler配置
+  scheduler:
+    replicas: 2
+    resources:
+      limits:
+        cpu: 500m
+        memory: 1Gi
+      requests:
+        cpu: 250m
+        memory: 512Mi
+    livenessProbe:
+      enabled: true
+      initialDelaySeconds: 300
+      periodSeconds: 30
+      timeoutSeconds: 10
+      failureThreshold: 6
+
+  # Worker配置
+  workers:
+    replicas: 3
+    resources:
+      limits:
+        cpu: 1
+        memory: 2Gi
+      requests:
+        cpu: 500m
+        memory: 1Gi
+    terminationGracePeriodSeconds: 600
+
+  # Flower配置（Celery监控）
+  flower:
+    enabled: true
+    resources:
+      limits:
+        cpu: 200m
+        memory: 256Mi
+      requests:
+        cpu: 100m
+        memory: 128Mi
+    service:
+      type: ClusterIP
+      port: 5555
+
+  # 触发器配置
+  triggerer:
+    enabled: true
+    replicas: 1
+    resources:
+      limits:
+        cpu: 200m
+        memory: 256Mi
+      requests:
+        cpu: 100m
+        memory: 128Mi
+
+  # DAGs持久化配置
+  dags:
+    persistence:
+      enabled: true
+      existingClaim: airflow-dags-pvc
+      mountPath: /opt/airflow/dags
+    gitSync:
+      enabled: true
+      repo: https://github.com/your-org/airflow-dags.git
+      branch: main
+      rev: HEAD
+      depth: 1
+      maxFailures: 0
+      subPath: ""
+      sshKeySecret: airflow-git-secret
+      knownHosts: ""
+      syncWait: 60
+
+  # 日志持久化配置
+  logs:
+    persistence:
+      enabled: true
+      existingClaim: airflow-logs-pvc
+      mountPath: /opt/airflow/logs
+
+# PostgreSQL配置
+postgresql:
+  enabled: true
+  auth:
+    username: airflow
+    password: "secure-password-here"
+    database: airflow
+  primary:
+    resources:
+      limits:
+        cpu: 500m
+        memory: 512Mi
+      requests:
+        cpu: 250m
+        memory: 256Mi
+    persistence:
+      enabled: true
+      existingClaim: postgresql-data-pvc
+      size: 20Gi
+
+# Redis配置
+redis:
+  enabled: true
+  auth:
+    enabled: true
+    password: "secure-redis-password"
+  master:
+    resources:
+      limits:
+        cpu: 200m
+        memory: 256Mi
+      requests:
+        cpu: 100m
+        memory: 128Mi
+    persistence:
+      enabled: true
+      existingClaim: redis-data-pvc
+      size: 8Gi
+
+# 持久化卷声明
+persistence:
+  enabled: true
+  size: 20Gi
+
+# 网络策略
+networkPolicies:
+  enabled: true
+
+# RBAC配置
+rbac:
+  create: true
+  enabled: true
+
+serviceAccount:
+  create: true
+  name: airflow
+
+# Ingress配置
+ingress:
+  web:
+    enabled: true
+    hosts:
+      - name: airflow.example.com
+        path: "/"
+    tls:
+      - secretName: airflow-tls
+        hosts:
+          - airflow.example.com
+    annotations:
+      kubernetes.io/ingress.class: nginx
+      nginx.ingress.kubernetes.io/ssl-redirect: "true"
+      cert-manager.io/cluster-issuer: "letsencrypt-prod"
+
+# 资源配额
+resources:
+  limits:
+    cpu: 4
+    memory: 8Gi
+  requests:
+    cpu: 2
+    memory: 4Gi
+
+# 监控配置
+metrics:
+  enabled: true
+  serviceMonitor:
+    enabled: true
+    namespace: monitoring

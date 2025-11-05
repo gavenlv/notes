@@ -1,0 +1,779 @@
+# Airflow高可用架构配置示例
+
+# Kubernetes多区域部署配置
+# airflow-ha-values.yaml
+
+# 全局配置
+global:
+  airflowHome: /opt/airflow
+  images:
+    airflow:
+      repository: apache/airflow
+      tag: 2.7.0-python3.9
+    pullPolicy: IfNotPresent
+
+# Airflow核心配置
+airflow:
+  # 启用高可用模式
+  executor: CeleryExecutor
+  
+  # 安全上下文
+  securityContext:
+    runAsUser: 50000
+    fsGroup: 0
+    runAsGroup: 0
+
+  # 环境变量配置
+  config:
+    AIRFLOW__CORE__EXECUTOR: CeleryExecutor
+    AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql://airflow:${POSTGRES_PASSWORD}@postgresql-ha-postgresql:5432/airflow
+    AIRFLOW__CELERY__RESULT_BACKEND: db+postgresql://airflow:${POSTGRES_PASSWORD}@postgresql-ha-postgresql:5432/airflow
+    AIRFLOW__CELERY__BROKER_URL: redis://:${REDIS_PASSWORD}@redis-ha-server-0.redis-ha-headless:6379/0,redis://:${REDIS_PASSWORD}@redis-ha-server-1.redis-ha-headless:6379/0,redis://:${REDIS_PASSWORD}@redis-ha-server-2.redis-ha-headless:6379/0
+    AIRFLOW__CORE__FERNET_KEY: ${FERNET_KEY}
+    AIRFLOW__WEBSERVER__SECRET_KEY: ${SECRET_KEY}
+    AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: "True"
+    AIRFLOW__API__AUTH_BACKENDS: "airflow.api.auth.backend.basic_auth"
+    AIRFLOW__WEBSERVER__EXPOSE_CONFIG: "False"
+    AIRFLOW__CORE__LOAD_EXAMPLES: "False"
+
+  # Webserver高可用配置
+  webserver:
+    # 多副本部署
+    replicas: 3
+    
+    # 资源限制
+    resources:
+      limits:
+        cpu: 1
+        memory: 2Gi
+      requests:
+        cpu: 500m
+        memory: 1Gi
+    
+    # 服务配置
+    service:
+      type: ClusterIP
+      port: 8080
+      annotations: {}
+      
+    # 健康检查
+    livenessProbe:
+      enabled: true
+      initialDelaySeconds: 300
+      periodSeconds: 30
+      timeoutSeconds: 10
+      failureThreshold: 6
+      
+    readinessProbe:
+      enabled: true
+      initialDelaySeconds: 60
+      periodSeconds: 10
+      timeoutSeconds: 5
+      failureThreshold: 6
+      
+    # 自动扩缩容配置
+    autoscaling:
+      enabled: true
+      minReplicas: 3
+      maxReplicas: 10
+      targetCPUUtilizationPercentage: 80
+
+  # Scheduler高可用配置
+  scheduler:
+    # 多副本部署
+    replicas: 3
+    
+    # 资源限制
+    resources:
+      limits:
+        cpu: 500m
+        memory: 1Gi
+      requests:
+        cpu: 250m
+        memory: 512Mi
+        
+    # 健康检查
+    livenessProbe:
+      enabled: true
+      initialDelaySeconds: 300
+      periodSeconds: 30
+      timeoutSeconds: 10
+      failureThreshold: 6
+      
+    # 自动扩缩容配置
+    autoscaling:
+      enabled: true
+      minReplicas: 2
+      maxReplicas: 5
+      targetCPUUtilizationPercentage: 70
+
+  # Worker高可用配置
+  workers:
+    # 多副本部署
+    replicas: 5
+    
+    # 资源限制
+    resources:
+      limits:
+        cpu: 1
+        memory: 2Gi
+      requests:
+        cpu: 500m
+        memory: 1Gi
+        
+    # 优雅终止时间
+    terminationGracePeriodSeconds: 600
+    
+    # 自动扩缩容配置
+    autoscaling:
+      enabled: true
+      minReplicas: 3
+      maxReplicas: 20
+      targetCPUUtilizationPercentage: 75
+
+  # Flower监控高可用配置
+  flower:
+    enabled: true
+    replicas: 2
+    resources:
+      limits:
+        cpu: 200m
+        memory: 256Mi
+      requests:
+        cpu: 100m
+        memory: 128Mi
+    service:
+      type: ClusterIP
+      port: 5555
+
+  # Triggerer高可用配置
+  triggerer:
+    enabled: true
+    replicas: 2
+    resources:
+      limits:
+        cpu: 200m
+        memory: 256Mi
+      requests:
+        cpu: 100m
+        memory: 128Mi
+
+  # DAGs持久化配置
+  dags:
+    persistence:
+      enabled: true
+      existingClaim: airflow-dags-pvc
+      mountPath: /opt/airflow/dags
+    gitSync:
+      enabled: true
+      repo: https://github.com/your-org/airflow-dags.git
+      branch: main
+      rev: HEAD
+      depth: 1
+      maxFailures: 0
+      subPath: ""
+      sshKeySecret: airflow-git-secret
+      knownHosts: ""
+      syncWait: 60
+
+  # 日志持久化配置
+  logs:
+    persistence:
+      enabled: true
+      existingClaim: airflow-logs-pvc
+      mountPath: /opt/airflow/logs
+
+# PostgreSQL高可用配置（使用Bitnami PostgreSQL HA Helm Chart）
+postgresql-ha:
+  enabled: true
+  
+  # 全局配置
+  global:
+    postgresql:
+      username: airflow
+      password: "secure-password-here"
+      database: airflow
+      repmgrUsername: repmgr
+      repmgrPassword: "repmgr-password"
+      repmgrDatabase: repmgr
+      
+  # PostgreSQL配置
+  postgresql:
+    image:
+      registry: docker.io
+      repository: bitnami/postgresql-repmgr
+      tag: 14.5.0-debian-11-r20
+      
+    resources:
+      limits:
+        cpu: 1
+        memory: 1Gi
+      requests:
+        cpu: 500m
+        memory: 512Mi
+        
+    # 持久化存储
+    persistence:
+      enabled: true
+      existingClaim: postgresql-data-pvc
+      size: 50Gi
+      
+    # 主节点配置
+    primary:
+      extendedConfiguration: |-
+        shared_buffers = 256MB
+        effective_cache_size = 1GB
+        maintenance_work_mem = 64MB
+        checkpoint_completion_target = 0.9
+        wal_buffers = 16MB
+        default_statistics_target = 100
+        random_page_cost = 1.1
+        effective_io_concurrency = 200
+        work_mem = 32MB
+        min_wal_size = 1GB
+        max_wal_size = 4GB
+        
+    # 备节点配置
+    standby:
+      extendedConfiguration: |-
+        shared_buffers = 256MB
+        effective_cache_size = 1GB
+        maintenance_work_mem = 64MB
+        checkpoint_completion_target = 0.9
+        wal_buffers = 16MB
+        default_statistics_target = 100
+        random_page_cost = 1.1
+        effective_io_concurrency = 200
+        work_mem = 32MB
+        min_wal_size = 1GB
+        max_wal_size = 4GB
+
+# Redis高可用配置（使用Redis HA Helm Chart）
+redis-ha:
+  enabled: true
+  
+  # 镜像配置
+  image:
+    repository: redis
+    tag: 6.2.7-alpine
+    
+  # Redis配置
+  redis:
+    masterGroupName: airflowsentinel
+    config:
+      save: "900 1 300 10"
+      tcp-keepalive: "60"
+      notify-keyspace-events: "Exe"
+      
+  # 持久化配置
+  persistentVolume:
+    enabled: true
+    size: 10Gi
+    
+  # 资源配置
+  resources:
+    server:
+      limits:
+        cpu: 500m
+        memory: 512Mi
+      requests:
+        cpu: 250m
+        memory: 256Mi
+        
+  # 哨兵配置
+  sentinel:
+    config:
+      down-after-milliseconds: "5000"
+      failover-timeout: "10000"
+      
+  # 网络配置
+  networkPolicy:
+    enabled: true
+
+# 持久化卷声明
+persistence:
+  enabled: true
+  size: 50Gi
+
+# 网络策略
+networkPolicies:
+  enabled: true
+
+# RBAC配置
+rbac:
+  create: true
+  enabled: true
+
+serviceAccount:
+  create: true
+  name: airflow
+
+# Ingress高可用配置
+ingress:
+  web:
+    enabled: true
+    hosts:
+      - name: airflow.primary.example.com
+        path: "/"
+      - name: airflow.secondary.example.com
+        path: "/"
+    tls:
+      - secretName: airflow-primary-tls
+        hosts:
+          - airflow.primary.example.com
+      - secretName: airflow-secondary-tls
+        hosts:
+          - airflow.secondary.example.com
+    annotations:
+      kubernetes.io/ingress.class: nginx
+      nginx.ingress.kubernetes.io/ssl-redirect: "true"
+      cert-manager.io/cluster-issuer: "letsencrypt-prod"
+
+# 多区域部署配置
+affinity:
+  nodeAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: topology.kubernetes.io/region
+              operator: In
+              values:
+                - us-west-1
+                - us-east-1
+                
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 100
+        podAffinityTerm:
+          labelSelector:
+            matchExpressions:
+              - key: app
+                operator: In
+                values:
+                  - airflow-webserver
+          topologyKey: kubernetes.io/hostname
+
+# 负载均衡器配置
+service:
+  type: LoadBalancer
+  loadBalancerIP: ""
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
+    service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: "true"
+    service.beta.kubernetes.io/aws-load-balancer-internal: "false"
+
+# 资源配额
+resources:
+  limits:
+    cpu: 8
+    memory: 16Gi
+  requests:
+    cpu: 4
+    memory: 8Gi
+
+# 监控配置
+metrics:
+  enabled: true
+  serviceMonitor:
+    enabled: true
+    namespace: monitoring
+
+# 备份配置
+backup:
+  enabled: true
+  cronjob:
+    schedule: "0 2 * * *"
+    successfulJobsHistoryLimit: 3
+    failedJobsHistoryLimit: 3
+  storage:
+    size: 100Gi
+    className: ""
+  retention:
+    days: 30
+
+# 灾难恢复配置
+disasterRecovery:
+  enabled: true
+  replication:
+    enabled: true
+    destination:
+      region: us-east-2
+      bucket: airflow-backups-us-east-2
+  failover:
+    enabled: true
+    trigger:
+      type: manual
+    notification:
+      email: dr-team@example.com
+
+# 多环境配置示例
+# production-values.yaml
+environment: production
+replicaCount:
+  webserver: 5
+  scheduler: 3
+  worker: 10
+---
+# staging-values.yaml
+environment: staging
+replicaCount:
+  webserver: 2
+  scheduler: 2
+  worker: 5
+
+# Docker Compose高可用配置示例
+# docker-compose.ha.yml
+version: '3.8'
+
+services:
+  # PostgreSQL主节点
+  postgres-primary:
+    image: postgres:14
+    environment:
+      POSTGRES_USER: airflow
+      POSTGRES_PASSWORD: airflow
+      POSTGRES_DB: airflow
+    volumes:
+      - postgres_primary_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "airflow"]
+      interval: 10s
+      retries: 5
+      start_period: 30s
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      resources:
+        limits:
+          cpus: '1'
+          memory: 1G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+
+  # PostgreSQL备节点
+  postgres-standby:
+    image: postgres:14
+    environment:
+      POSTGRES_USER: airflow
+      POSTGRES_PASSWORD: airflow
+      POSTGRES_DB: airflow
+      PG_REPLICATION_MODE: standby
+      PG_REPLICATION_USER: replicator
+      PG_REPLICATION_PASSWORD: replicator_password
+      PG_MASTER_HOST: postgres-primary
+      PG_MASTER_PORT_NUMBER: 5432
+    volumes:
+      - postgres_standby_data:/var/lib/postgresql/data
+    depends_on:
+      postgres-primary:
+        condition: service_healthy
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == worker
+      resources:
+        limits:
+          cpus: '1'
+          memory: 1G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+
+  # Redis Sentinel模式
+  redis-sentinel-1:
+    image: bitnami/redis-sentinel:6.2
+    environment:
+      REDIS_SENTINEL_QUORUM: 2
+      REDIS_SENTINEL_DOWN_AFTER_MILLISECONDS: 5000
+      REDIS_SENTINEL_FAILOVER_TIMEOUT: 10000
+      REDIS_MASTER_HOST: redis-master
+      REDIS_MASTER_PORT_NUMBER: 6379
+      REDIS_MASTER_SET: airflowsentinel
+      REDIS_SENTINEL_PORT_NUMBER: 26379
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.hostname == node1
+      resources:
+        limits:
+          cpus: '0.2'
+          memory: 128M
+        reservations:
+          cpus: '0.1'
+          memory: 64M
+
+  redis-sentinel-2:
+    image: bitnami/redis-sentinel:6.2
+    environment:
+      REDIS_SENTINEL_QUORUM: 2
+      REDIS_SENTINEL_DOWN_AFTER_MILLISECONDS: 5000
+      REDIS_SENTINEL_FAILOVER_TIMEOUT: 10000
+      REDIS_MASTER_HOST: redis-master
+      REDIS_MASTER_PORT_NUMBER: 6379
+      REDIS_MASTER_SET: airflowsentinel
+      REDIS_SENTINEL_PORT_NUMBER: 26379
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.hostname == node2
+      resources:
+        limits:
+          cpus: '0.2'
+          memory: 128M
+        reservations:
+          cpus: '0.1'
+          memory: 64M
+
+  redis-sentinel-3:
+    image: bitnami/redis-sentinel:6.2
+    environment:
+      REDIS_SENTINEL_QUORUM: 2
+      REDIS_SENTINEL_DOWN_AFTER_MILLISECONDS: 5000
+      REDIS_SENTINEL_FAILOVER_TIMEOUT: 10000
+      REDIS_MASTER_HOST: redis-master
+      REDIS_MASTER_PORT_NUMBER: 6379
+      REDIS_MASTER_SET: airflowsentinel
+      REDIS_SENTINEL_PORT_NUMBER: 26379
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.hostname == node3
+      resources:
+        limits:
+          cpus: '0.2'
+          memory: 128M
+        reservations:
+          cpus: '0.1'
+          memory: 64M
+
+  # Redis主节点
+  redis-master:
+    image: bitnami/redis:6.2
+    environment:
+      ALLOW_EMPTY_PASSWORD: "yes"
+      REDIS_REPLICATION_MODE: master
+      REDIS_SENTINEL_HOST: redis-sentinel-1
+      REDIS_SENTINEL_PORT_NUMBER: 26379
+    volumes:
+      - redis_master_data:/bitnami/redis/data
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+        reservations:
+          cpus: '0.25'
+          memory: 128M
+
+  # Redis从节点
+  redis-slave:
+    image: bitnami/redis:6.2
+    environment:
+      ALLOW_EMPTY_PASSWORD: "yes"
+      REDIS_REPLICATION_MODE: slave
+      REDIS_MASTER_HOST: redis-master
+      REDIS_MASTER_PORT_NUMBER: 6379
+    volumes:
+      - redis_slave_data:/bitnami/redis/data
+    depends_on:
+      - redis-master
+    deploy:
+      replicas: 2
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+        reservations:
+          cpus: '0.25'
+          memory: 128M
+
+  # Airflow Webserver（多实例）
+  airflow-webserver-1:
+    image: apache/airflow:2.7.0
+    depends_on:
+      postgres-primary:
+        condition: service_healthy
+      redis-master:
+        condition: service_started
+    environment:
+      &airflow_environment
+      AIRFLOW__CORE__EXECUTOR: CeleryExecutor
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql://airflow:airflow@postgres-primary/airflow
+      AIRFLOW__CELERY__RESULT_BACKEND: db+postgresql://airflow:airflow@postgres-primary/airflow
+      AIRFLOW__CELERY__BROKER_URL: redis://redis-master:6379/0
+      AIRFLOW__CORE__FERNET_KEY: ''
+      AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: 'true'
+      AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
+      AIRFLOW__API__AUTH_BACKENDS: 'airflow.api.auth.backend.basic_auth'
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./logs:/opt/airflow/logs
+    ports:
+      - "8080:8080"
+    command: webserver
+    deploy:
+      replicas: 2
+      resources:
+        limits:
+          cpus: '1'
+          memory: 2G
+        reservations:
+          cpus: '0.5'
+          memory: 1G
+
+  airflow-webserver-2:
+    image: apache/airflow:2.7.0
+    depends_on:
+      postgres-primary:
+        condition: service_healthy
+      redis-master:
+        condition: service_started
+    environment:
+      <<: *airflow_environment
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./logs:/opt/airflow/logs
+    ports:
+      - "8081:8080"
+    command: webserver
+    deploy:
+      replicas: 2
+      resources:
+        limits:
+          cpus: '1'
+          memory: 2G
+        reservations:
+          cpus: '0.5'
+          memory: 1G
+
+  # Airflow Scheduler（多实例）
+  airflow-scheduler-1:
+    image: apache/airflow:2.7.0
+    depends_on:
+      postgres-primary:
+        condition: service_healthy
+      redis-master:
+        condition: service_started
+    environment:
+      <<: *airflow_environment
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./logs:/opt/airflow/logs
+    command: scheduler
+    deploy:
+      replicas: 2
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 1G
+        reservations:
+          cpus: '0.25'
+          memory: 512M
+
+  airflow-scheduler-2:
+    image: apache/airflow:2.7.0
+    depends_on:
+      postgres-primary:
+        condition: service_healthy
+      redis-master:
+        condition: service_started
+    environment:
+      <<: *airflow_environment
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./logs:/opt/airflow/logs
+    command: scheduler
+    deploy:
+      replicas: 2
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 1G
+        reservations:
+          cpus: '0.25'
+          memory: 512M
+
+  # Airflow Worker（多实例）
+  airflow-worker-1:
+    image: apache/airflow:2.7.0
+    depends_on:
+      postgres-primary:
+        condition: service_healthy
+      redis-master:
+        condition: service_started
+    environment:
+      <<: *airflow_environment
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./logs:/opt/airflow/logs
+    command: celery worker
+    deploy:
+      replicas: 3
+      resources:
+        limits:
+          cpus: '1'
+          memory: 2G
+        reservations:
+          cpus: '0.5'
+          memory: 1G
+
+  airflow-worker-2:
+    image: apache/airflow:2.7.0
+    depends_on:
+      postgres-primary:
+        condition: service_healthy
+      redis-master:
+        condition: service_started
+    environment:
+      <<: *airflow_environment
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./logs:/opt/airflow/logs
+    command: celery worker
+    deploy:
+      replicas: 3
+      resources:
+        limits:
+          cpus: '1'
+          memory: 2G
+        reservations:
+          cpus: '0.5'
+          memory: 1G
+
+  # 负载均衡器
+  load-balancer:
+    image: nginx:alpine
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - airflow-webserver-1
+      - airflow-webserver-2
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      resources:
+        limits:
+          cpus: '0.2'
+          memory: 128M
+        reservations:
+          cpus: '0.1'
+          memory: 64M
+
+volumes:
+  postgres_primary_data:
+  postgres_standby_data:
+  redis_master_data:
+  redis_slave_data:

@@ -1,0 +1,381 @@
+# Airflow安全配置示例
+
+# airflow.cfg - 安全相关配置
+[core]
+# Fernet密钥用于加密连接密码等敏感信息
+fernet_key = your_fernet_key_here
+
+# 是否隐藏敏感变量字段
+hide_sensitive_variable_fields = True
+
+# 敏感字段模式（正则表达式）
+sensitive_var_names = '^.*(password|secret|token|key).*$'
+
+[webserver]
+# Web服务器密钥（用于会话加密）
+secret_key = your_secret_key_here
+
+# 是否暴露配置信息
+expose_config = False
+
+# 默认的登录视图
+authenticate = True
+
+# RBAC（基于角色的访问控制）
+rbac = True
+
+# 允许的主机（防止HTTP Host头攻击）
+allowed_hosts = ['airflow.example.com', '.example.com']
+
+# CSRF保护
+WTF_CSRF_ENABLED = True
+WTF_CSRF_TIME_LIMIT = None
+
+[api]
+# API认证后端
+auth_backends = airflow.api.auth.backend.basic_auth,airflow.api.auth.backend.session
+
+# CORS配置
+access_control_allow_headers = origin, content-type, accept, authorization
+access_control_allow_methods = GET, POST, PUT, DELETE, OPTIONS
+access_control_allow_origins = https://airflow.example.com
+
+[ldap]
+# LDAP配置（如果使用LDAP认证）
+uri = ldap://ldap.example.com:389
+user_filter = objectClass=*
+user_name_attr = uid
+group_member_attr = memberUid
+superuser_filter = memberOf=cn=airflow-admins,ou=groups,dc=example,dc=com
+data_profiler_filter = memberOf=cn=airflow-users,ou=groups,dc=example,dc=com
+bind_user = cn=Manager,dc=example,dc=com
+bind_password = ldap_bind_password
+basedn = dc=example,dc=com
+cacert = /etc/ssl/certs/ldap.crt
+search_scope = SUBTREE
+
+[oauth]
+# OAuth配置（如果使用OAuth认证）
+google_client_id = your_google_client_id
+google_client_secret = your_google_client_secret
+
+github_client_id = your_github_client_id
+github_client_secret = your_github_client_secret
+
+[openid]
+# OpenID配置（如果使用OpenID认证）
+openid_discovery_endpoint = https://openid.example.com/.well-known/openid-configuration
+
+[kerberos]
+# Kerberos配置（如果使用Kerberos认证）
+ccache = /tmp/airflow_krb5_ccache
+principal = airflow/_HOST@EXAMPLE.COM
+reinit_frequency = 3600
+kinit_path = kinit
+keytab = airflow.keytab
+
+[github_enterprise]
+# GitHub Enterprise配置
+api_rev = v3
+
+[celery]
+# Celery安全配置
+broker_use_ssl = {
+  'keyfile': '/path/to/key.pem',
+  'certfile': '/path/to/cert.pem',
+  'ca_certs': '/path/to/ca.pem',
+  'cert_reqs': ssl.CERT_REQUIRED
+}
+
+[database]
+# 数据库连接字符串（应使用环境变量或密钥管理）
+sql_alchemy_conn = postgresql://airflow:encrypted_password@postgres:5432/airflow
+
+# 连接池预ping（检测死连接）
+sql_alchemy_pool_pre_ping = True
+
+# SSL配置（如果需要）
+sql_alchemy_connect_args = {
+  'sslmode': 'require',
+  'sslcert': '/path/to/client-cert.pem',
+  'sslkey': '/path/to/client-key.pem',
+  'sslrootcert': '/path/to/root-cert.pem'
+}
+
+# Kubernetes安全配置示例
+
+# rbac.yaml
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: airflow
+  namespace: airflow
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: airflow
+  name: airflow-role
+rules:
+- apiGroups: [""]
+  resources: ["pods", "pods/log"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+- apiGroups: [""]
+  resources: ["persistentvolumeclaims"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: airflow-rolebinding
+  namespace: airflow
+subjects:
+- kind: ServiceAccount
+  name: airflow
+  namespace: airflow
+roleRef:
+  kind: Role
+  name: airflow-role
+  apiGroup: rbac.authorization.k8s.io
+
+# network-policy.yaml
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: airflow-network-policy
+  namespace: airflow
+spec:
+  podSelector:
+    matchLabels:
+      app: airflow
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: monitoring
+    ports:
+    - protocol: TCP
+      port: 8080
+  egress:
+  - to:
+    - namespaceSelector: {}
+    ports:
+    - protocol: TCP
+      port: 5432  # PostgreSQL
+    - protocol: TCP
+      port: 6379  # Redis
+
+# secrets.yaml (示例 - 实际使用时应通过外部密钥管理)
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: airflow-secrets
+  namespace: airflow
+type: Opaque
+data:
+  fernet-key: base64_encoded_fernet_key
+  secret-key: base64_encoded_secret_key
+  postgres-password: base64_encoded_postgres_password
+  redis-password: base64_encoded_redis_password
+
+# ingress.yaml (TLS配置)
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: airflow-ingress
+  namespace: airflow
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/proxy-body-size: "100m"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+spec:
+  tls:
+  - hosts:
+    - airflow.example.com
+    secretName: airflow-tls
+  rules:
+  - host: airflow.example.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: airflow-webserver
+            port:
+              number: 8080
+
+# Docker配置示例（用于容器化部署）
+
+# docker-compose.yml (安全增强版)
+version: '3.8'
+services:
+  postgres:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: airflow
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
+      POSTGRES_DB: airflow
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    secrets:
+      - postgres_password
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "airflow"]
+      interval: 10s
+      retries: 5
+      start_period: 30s
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /var/run/postgresql
+
+  redis:
+    image: redis:6
+    command: >
+      bash -c "
+        redis-server
+        --appendonly yes
+        --requirepass \"$$(cat /run/secrets/redis_password)\"
+      "
+    volumes:
+      - redis_data:/data
+    secrets:
+      - redis_password
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "$$(cat /run/secrets/redis_password)", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
+    tmpfs:
+      - /tmp
+
+  airflow-webserver:
+    image: apache/airflow:2.7.0
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      &airflow_environment
+      AIRFLOW__CORE__EXECUTOR: CeleryExecutor
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql://airflow:$$(cat /run/secrets/postgres_password)@postgres/airflow
+      AIRFLOW__CELERY__RESULT_BACKEND: db+postgresql://airflow:$$(cat /run/secrets/postgres_password)@postgres/airflow
+      AIRFLOW__CELERY__BROKER_URL: redis://:$$(cat /run/secrets/redis_password)@redis:6379/0
+      AIRFLOW__CORE__FERNET_KEY_FILE: /run/secrets/fernet_key
+      AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: 'true'
+      AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
+      AIRFLOW__API__AUTH_BACKENDS: 'airflow.api.auth.backend.basic_auth'
+      AIRFLOW__WEBSERVER__SECRET_KEY_FILE: /run/secrets/webserver_secret_key
+      AIRFLOW__WEBSERVER__EXPOSE_CONFIG: 'false'
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./logs:/opt/airflow/logs
+    ports:
+      - "8080:8080"
+    secrets:
+      - postgres_password
+      - redis_password
+      - fernet_key
+      - webserver_secret_key
+    command: webserver
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    user: "50000:0"
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
+    tmpfs:
+      - /tmp
+
+  airflow-scheduler:
+    image: apache/airflow:2.7.0
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      <<: *airflow_environment
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./logs:/opt/airflow/logs
+    secrets:
+      - postgres_password
+      - redis_password
+      - fernet_key
+      - webserver_secret_key
+    command: scheduler
+    healthcheck:
+      test: ["CMD-SHELL", 'airflow jobs check --job-type SchedulerJob --hostname "$${HOSTNAME}"']
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    user: "50000:0"
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
+    tmpfs:
+      - /tmp
+
+  airflow-worker:
+    image: apache/airflow:2.7.0
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      <<: *airflow_environment
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./logs:/opt/airflow/logs
+    secrets:
+      - postgres_password
+      - redis_password
+      - fernet_key
+      - webserver_secret_key
+    command: celery worker
+    healthcheck:
+      test: ["CMD-SHELL", 'celery --app airflow.providers.celery.executors.celery_executor.app inspect ping -d "celery@$${HOSTNAME}" || exit 1']
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    user: "50000:0"
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
+    tmpfs:
+      - /tmp
+
+secrets:
+  postgres_password:
+    file: ./secrets/postgres_password.txt
+  redis_password:
+    file: ./secrets/redis_password.txt
+  fernet_key:
+    file: ./secrets/fernet_key.txt
+  webserver_secret_key:
+    file: ./secrets/webserver_secret_key.txt
+
+volumes:
+  postgres_data:
+  redis_data:

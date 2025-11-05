@@ -1,0 +1,366 @@
+# Apache Airflow 多云部署配置示例
+# 展示在AWS、Azure和GCP上的部署配置
+
+# AWS部署配置
+aws_deployment:
+  # 部署名称
+  name: airflow-aws
+  # 区域
+  region: us-west-2
+  # EKS集群配置
+  eks_cluster:
+    name: airflow-eks
+    version: "1.21"
+    node_groups:
+      - name: airflow-workers
+        instance_type: m5.xlarge
+        desired_capacity: 3
+        min_size: 1
+        max_size: 10
+        
+      - name: airflow-control-plane
+        instance_type: m5.large
+        desired_capacity: 3
+        min_size: 3
+        max_size: 5
+  
+  # RDS数据库配置
+  rds_database:
+    engine: postgres
+    engine_version: "13.4"
+    instance_class: db.t3.medium
+    allocated_storage: 100
+    multi_az: true
+    backup_retention_period: 30
+  
+  # ElastiCache配置
+  elasticache:
+    engine: redis
+    node_type: cache.m5.large
+    num_cache_nodes: 3
+    replication_group_id: airflow-redis
+  
+  # S3存储配置
+  s3_storage:
+    bucket_name: airflow-logs-aws
+    region: us-west-2
+  
+  # IAM角色配置
+  iam_roles:
+    - name: airflow-eks-role
+      policies:
+        - arn:aws:iam::aws:policy/AmazonEKSClusterPolicy
+        - arn:aws:iam::aws:policy/AmazonEKSServicePolicy
+    - name: airflow-s3-role
+      policies:
+        - arn:aws:iam::aws:policy/AmazonS3FullAccess
+
+# Azure部署配置
+azure_deployment:
+  # 部署名称
+  name: airflow-azure
+  # 区域
+  region: East US
+  # AKS集群配置
+  aks_cluster:
+    name: airflow-aks
+    kubernetes_version: "1.21.2"
+    agent_pool_profiles:
+      - name: workerpool
+        vm_size: Standard_D4s_v3
+        count: 3
+        min_count: 1
+        max_count: 10
+        enable_auto_scaling: true
+      - name: controlpool
+        vm_size: Standard_D2s_v3
+        count: 3
+        min_count: 3
+        max_count: 5
+  
+  # PostgreSQL数据库配置
+  postgresql_database:
+    sku:
+      name: GP_Gen5_2
+      tier: GeneralPurpose
+      family: Gen5
+      capacity: 2
+    storage_profile:
+      storage_mb: 51200
+      backup_retention_days: 30
+      geo_redundant_backup: Enabled
+    
+  # Redis缓存配置
+  redis_cache:
+    sku:
+      name: Premium
+      family: P
+      capacity: 1
+    shard_count: 3
+    enable_non_ssl_port: false
+  
+  # Storage Account配置
+  storage_account:
+    name: airflowlogsazure
+    sku:
+      name: Standard_LRS
+    
+  # 角色分配配置
+  role_assignments:
+    - role_definition_id: Contributor
+      principal_id: airflow-service-principal
+    - role_definition_id: Storage Blob Data Contributor
+      principal_id: airflow-service-principal
+
+# GCP部署配置
+gcp_deployment:
+  # 部署名称
+  name: airflow-gcp
+  # 区域
+  region: us-central1
+  # GKE集群配置
+  gke_cluster:
+    name: airflow-gke
+    initial_node_count: 3
+    node_pools:
+      - name: worker-pool
+        initial_node_count: 3
+        node_config:
+          machine_type: n1-standard-4
+          disk_size_gb: 100
+        autoscaling:
+          enabled: true
+          min_node_count: 1
+          max_node_count: 10
+      - name: control-pool
+        initial_node_count: 3
+        node_config:
+          machine_type: n1-standard-2
+          disk_size_gb: 50
+        
+  # Cloud SQL数据库配置
+  cloud_sql:
+    database_version: POSTGRES_13
+    settings:
+      tier: db-n1-standard-2
+      backup_configuration:
+        enabled: true
+        start_time: "02:00"
+        point_in_time_recovery_enabled: true
+      ip_configuration:
+        authorized_networks:
+          - value: 0.0.0.0/0
+            name: public
+      availability_type: REGIONAL
+    
+  # Memorystore配置
+  memorystore:
+    tier: STANDARD_HA
+    memory_size_gb: 10
+    redis_version: REDIS_6_X
+    
+  # Cloud Storage配置
+  cloud_storage:
+    bucket_name: airflow-logs-gcp
+    location: US
+    storage_class: STANDARD
+    
+  # IAM角色配置
+  iam_roles:
+    - role: roles/container.admin
+      members:
+        - serviceAccount: airflow-gcp@project-id.iam.gserviceaccount.com
+    - role: roles/storage.admin
+      members:
+        - serviceAccount: airflow-gcp@project-id.iam.gserviceaccount.com
+
+# 跨云负载均衡配置
+cross_cloud_load_balancing:
+  # 启用跨云负载均衡
+  enabled: true
+  # 全局负载均衡器配置
+  global_load_balancer:
+    name: airflow-global-lb
+    # DNS配置
+    dns:
+      domain: airflow.example.com
+      ttl: 300
+    # 健康检查配置
+    health_checks:
+      - protocol: HTTP
+        port: 8080
+        path: /health
+        check_interval_sec: 30
+        timeout_sec: 10
+        healthy_threshold: 1
+        unhealthy_threshold: 3
+    
+    # 后端服务配置
+    backend_services:
+      - name: airflow-aws-backend
+        backends:
+          - group: aws-target-group
+            balancing_mode: UTILIZATION
+            capacity_scaler: 1.0
+      - name: airflow-azure-backend
+        backends:
+          - group: azure-load-balancer
+            balancing_mode: UTILIZATION
+            capacity_scaler: 1.0
+      - name: airflow-gcp-backend
+        backends:
+          - group: gcp-target-proxy
+            balancing_mode: UTILIZATION
+            capacity_scaler: 1.0
+    
+    # 路由规则配置
+    routing_rules:
+      - priority: 1
+        match:
+          prefix_match: /
+        route_action:
+          weighted_backend_services:
+            - backend_service: airflow-aws-backend
+              weight: 30
+            - backend_service: airflow-azure-backend
+              weight: 30
+            - backend_service: airflow-gcp-backend
+              weight: 40
+
+# 多云监控配置
+multi_cloud_monitoring:
+  # Prometheus配置
+  prometheus:
+    # AWS Prometheus工作区
+    aws_workspace:
+      name: airflow-aws-workspace
+      alias: aws-prometheus
+    
+    # Azure Monitor
+    azure_monitor:
+      workspace_name: airflow-azure-workspace
+      resource_group: monitoring-rg
+    
+    # GCP Monitoring
+    gcp_monitoring:
+      project_id: your-gcp-project-id
+      
+    # 联邦配置
+    federation:
+      enabled: true
+      endpoints:
+        - url: https://aps-workspaces.us-west-2.amazonaws.com/workspaces/ws-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/api/v1/query
+          auth_type: sigv4
+        - url: https://airflow-azure-workspace.monitoring.azure.com/api/v1/query
+          auth_type: azure_ad
+        - url: https://monitoring.googleapis.com/v3/projects/your-gcp-project-id/location/global/prometheus/api/v1/query
+          auth_type: google_auth
+  
+  # Grafana配置
+  grafana:
+    # 多数据源配置
+    datasources:
+      - name: AWS Prometheus
+        type: prometheus
+        url: https://aps-workspaces.us-west-2.amazonaws.com/workspaces/ws-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+        access: proxy
+        is_default: false
+      - name: Azure Monitor
+        type: azure-monitor
+        url: https://api.loganalytics.io
+        access: proxy
+        is_default: false
+      - name: GCP Monitoring
+        type: stackdriver
+        url: https://monitoring.googleapis.com/
+        access: proxy
+        is_default: false
+    
+    # 仪表板配置
+    dashboards:
+      - name: Cross-Cloud Airflow Overview
+        folder: Multi-Cloud
+        tags: [multi-cloud, airflow]
+        
+# 多云安全配置
+multi_cloud_security:
+  # 统一身份认证
+  unified_identity:
+    provider: Auth0
+    domain: airflow-example.auth0.com
+    client_id: your-auth0-client-id
+    
+  # 密钥管理
+  secret_management:
+    # AWS Secrets Manager
+    aws_secrets_manager:
+      region: us-west-2
+      
+    # Azure Key Vault
+    azure_key_vault:
+      vault_name: airflow-keyvault
+      resource_group: security-rg
+      
+    # GCP Secret Manager
+    gcp_secret_manager:
+      project_id: your-gcp-project-id
+      
+    # 同步策略
+    sync_policy:
+      interval_minutes: 60
+      encryption_key: your-master-key
+  
+  # 网络安全
+  network_security:
+    # 统一防火墙规则
+    unified_firewall:
+      allowed_ips:
+        - 0.0.0.0/0
+      allowed_ports:
+        - 8080
+        - 5432
+        - 6379
+      
+    # VPN连接
+    vpn_connections:
+      - name: aws-to-azure-vpn
+        aws_vpn_gateway_id: vgw-xxxxxxxx
+        azure_vpn_gateway_id: /subscriptions/xxxxxxxx/resourceGroups/network-rg/providers/Microsoft.Network/virtualNetworkGateways/azure-vpngw
+      - name: aws-to-gcp-vpn
+        aws_vpn_gateway_id: vgw-yyyyyyyy
+        gcp_vpn_gateway_id: projects/your-gcp-project-id/regions/us-central1/vpnGateways/gcp-vpngw
+      
+# 多云灾备配置
+multi_cloud_disaster_recovery:
+  # 主要部署区域
+  primary_region: aws-us-west-2
+  
+  # 灾备区域
+  disaster_recovery_regions:
+    - azure-east-us
+    - gcp-us-central1
+  
+  # 故障转移策略
+  failover_policy:
+    # 自动故障转移
+    auto_failover:
+      enabled: true
+      # 故障检测阈值
+      failure_detection_threshold:
+        consecutive_failures: 3
+        time_window_seconds: 300
+      
+    # 故障转移顺序
+    failover_order:
+      - azure-east-us
+      - gcp-us-central1
+    
+    # 故障恢复
+    failback:
+      # 自动故障恢复
+      auto_failback:
+      enabled: true
+      # 恢复检测阈值
+      recovery_detection_threshold:
+        health_check_success_count: 5
+        time_window_seconds: 600

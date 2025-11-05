@@ -1,0 +1,238 @@
+# Airflow 配置文件示例
+# 这是一个基本的 Airflow 配置文件示例，包含常用的配置选项
+# 在实际使用中，您可以根据需要修改这些配置
+
+[core]
+# Airflow 主目录，默认为 ~/airflow
+# airflow_home = /path/to/your/airflow/home
+
+# 执行器类型，可选值: SequentialExecutor, LocalExecutor, CeleryExecutor, KubernetesExecutor, LocalKubernetesExecutor
+# 对于开发和测试环境，可以使用 LocalExecutor
+# 对于生产环境，推荐使用 CeleryExecutor 或 KubernetesExecutor
+executor = LocalExecutor
+
+# 并行任务实例数量
+# 对于 LocalExecutor，这是可以并行运行的任务数
+# 对于 CeleryExecutor，这是 Celery worker 的数量
+parallelism = 32
+
+# DAG 可以同时运行的活跃任务实例数量
+dag_concurrency = 16
+
+# 单个 DAG 可以同时运行的任务实例数量
+max_active_tasks_per_dag = 16
+
+# 是否加载示例 DAG
+load_examples = True
+
+# 是否加载默认连接
+load_default_connections = True
+
+# 插件文件夹路径
+plugins_folder = /path/to/your/plugins/folder
+
+# 时区设置
+# 默认为 UTC，可以设置为您的本地时区，例如: Asia/Shanghai
+default_timezone = UTC
+
+[cli]
+# CLI 命令的输出格式
+# 可选值: table, json, yaml
+output_format = table
+
+[api]
+# REST API 是否启用认证
+auth_backend = airflow.api.auth.backend.default
+
+[operators]
+# 默认操作符
+default_owner = airflow
+
+[webserver]
+# Web 服务器的基础 URL
+base_url = http://localhost:8080
+
+# Web 服务器的主机
+web_server_host = 0.0.0.0
+
+# Web 服务器的端口
+web_server_port = 8080
+
+# 访问日志是否启用
+access_logfile = /path/to/your/access.log
+
+# 错误日志是否启用
+error_logfile = /path/to/your/error.log
+
+# 是否启用安全模式
+# 在生产环境中应设置为 True
+secure_mode = False
+
+# 是否启用 RBAC (基于角色的访问控制)
+rbac = True
+
+# 是否启用实验性 API
+enable_experimental_api = True
+
+# 是否显示示例 DAG
+hide_sensitive_var_fields = True
+
+[database]
+# 数据库连接 URL
+# 默认使用 SQLite，仅适用于开发和测试
+# 生产环境应使用 PostgreSQL 或 MySQL
+sql_alchemy_conn = sqlite:////path/to/your/airflow/airflow.db
+
+# PostgreSQL 示例:
+# sql_alchemy_conn = postgresql+psycopg2://user:password@localhost:5432/airflow
+
+# MySQL 示例:
+# sql_alchemy_conn = mysql://user:password@localhost:3306/airflow
+
+# 数据库引擎参数
+sql_alchemy_pool_enabled = True
+sql_alchemy_pool_size = 5
+sql_alchemy_max_overflow = 10
+
+[logging]
+# 基础日志文件夹
+base_log_folder = /path/to/your/logs/folder
+
+# 日志文件名模板
+log_filename_template = {{ ti.dag_id }}/{{ ti.task_id }}/{{ ts }}/{{ try_number }}.log
+
+# 日志处理程序
+log_processor_class = airflow.utils.log.processing.LogFileProcessor
+
+# 是否启用任务实例日志
+log_task_instance_to_stdout = False
+
+# 日志格式
+log_format = [%%(asctime)s] {%%(filename)s:%%(lineno)d} %%(levelname)s - %%(message)s
+simple_log_format = %%(levelname)s - %%(message)s
+
+# 日志级别
+log_level = INFO
+
+[scheduler]
+# 调度器运行频率（秒）
+scheduler_heartbeat_sec = 5
+
+# 调度器检查新 DAG 的频率（秒）
+min_file_process_interval = 30
+
+# DAG 目录扫描间隔（秒）
+dag_dir_list_interval = 300
+
+# 捕获过去的任务实例
+catchup_by_default = True
+
+# 调度器最多可以安排的 DAG 数量
+max_dagruns_per_loop_to_schedule = 10
+
+# 是否使用 Celery
+use_job_schedule = True
+
+[celery]
+# Celery 结果后端
+# 如果使用 CeleryExecutor，需要设置此项
+# result_backend = db+postgresql://user:password@localhost:5432/airflow
+
+# Celery 代理 URL
+# 如果使用 CeleryExecutor，需要设置此项
+# broker_url = redis://localhost:6379/0
+
+# Celery worker 并发数
+worker_concurrency = 16
+
+# Celery 任务超时时间（秒）
+task_soft_time_limit = 1800
+task_time_limit = 3600
+
+[mesos]
+# Mesos master 地址
+# 如果使用 MesosExecutor，需要设置此项
+# master = localhost:5050
+
+# Mesos 框架名称
+framework_name = Airflow
+
+# 任务 CPU 资源
+task_cpu = 1
+
+# 任务内存资源 (MB)
+task_memory = 256
+
+[kubernetes]
+# Kubernetes 命名空间
+# 如果使用 KubernetesExecutor，需要设置此项
+# namespace = default
+
+# 工作节点镜像
+worker_container_repository = apache/airflow
+worker_container_tag = latest
+
+# 工作节点服务账户名称
+worker_service_account_name = airflow
+
+# 工作节点挂载的 DAG 文件夹
+dags_volume_claim = airflow-dags
+
+# 工作节点挂载的日志文件夹
+logs_volume_claim = airflow-logs
+
+[elasticsearch]
+# Elasticsearch 主机
+# 如果使用 Elasticsearch 日志记录，需要设置此项
+# host = localhost:9200
+
+# Elasticsearch 日志 ID 模板
+log_id_template = {{ dag_id }}-{{ task_id }}-{{ execution_date }}-{{ try_number }}
+
+# 写入索引的前缀
+frontend = elasticsearch
+
+[elasticsearch_configs]
+# Elasticsearch 配置
+# use_ssl = False
+# use_ssl_as_verify = False
+
+[smtp]
+# SMTP 配置，用于发送邮件通知
+# smtp_host = localhost
+# smtp_starttls = True
+# smtp_ssl = False
+# smtp_port = 25
+# smtp_mail_from = airflow@example.com
+# smtp_user = airflow
+# smtp_password = airflow
+
+[secret_key]
+# 用于加密浏览器会话的密钥
+# 在生产环境中应该设置一个强密钥
+# secret_key = temporary_key
+
+[oauth]
+# OAuth 提供商配置
+# [oauth_google]
+# client_id = your_client_id
+# client_secret = your_client_secret
+# redirect_uri = http://localhost:8080/oauth-authorized/google
+
+[github_enterprise]
+# GitHub Enterprise 配置
+# api_rev = v3
+# endpoint_url = https://api.github.com
+
+[admin]
+# 是否隐藏敏感变量字段
+hide_sensitive_var_fields = True
+
+[debug]
+# 是否启用调试模式
+# 在生产环境中应设置为 False
+debug = False
+
+[connections]
+# 是否显示敏感连接字段
+hide_sensitive_headers_conn_fields = True

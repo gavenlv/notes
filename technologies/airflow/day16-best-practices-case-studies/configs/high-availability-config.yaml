@@ -1,0 +1,163 @@
+# Airflow 高可用架构配置
+
+# Kubernetes 部署配置
+kubernetes:
+  # 命名空间
+  namespace: airflow-prod
+  
+  # Webserver 配置
+  webserver:
+    replicas: 3
+    resources:
+      requests:
+        memory: "1Gi"
+        cpu: "500m"
+      limits:
+        memory: "2Gi"
+        cpu: "1"
+    service:
+      type: LoadBalancer
+      port: 8080
+    
+  # Scheduler 配置
+  scheduler:
+    replicas: 2
+    resources:
+      requests:
+        memory: "1Gi"
+        cpu: "500m"
+      limits:
+        memory: "2Gi"
+        cpu: "1"
+    
+  # Worker 配置 (CeleryExecutor)
+  worker:
+    replicas: 3
+    autoscaling:
+      minReplicas: 3
+      maxReplicas: 10
+      targetCPUUtilizationPercentage: 80
+    resources:
+      requests:
+        memory: "1Gi"
+        cpu: "500m"
+      limits:
+        memory: "2Gi"
+        cpu: "1"
+    
+  # 数据库配置
+  database:
+    postgresql:
+      enabled: false
+      externalDatabase:
+        host: postgresql-cluster.prod.svc.cluster.local
+        port: 5432
+        database: airflow
+        username: airflow_user
+        passwordSecret: "postgresql-password"
+        passwordSecretKey: "password"
+    
+  # Redis 配置
+  redis:
+    enabled: true
+    redisPassword: "redis_password"
+    cluster:
+      enabled: true
+      slaveCount: 2
+    master:
+      persistence:
+        enabled: true
+        size: 8Gi
+    slave:
+      persistence:
+        enabled: true
+        size: 8Gi
+    
+  # 存储配置
+  persistence:
+    enabled: true
+    existingClaim: ""
+    subPath: ""
+    accessMode: ReadWriteOnce
+    size: 10Gi
+    
+  # 网络策略
+  networkPolicy:
+    enabled: true
+    
+  # RBAC 配置
+  rbac:
+    create: true
+    
+  # Ingress 配置
+  ingress:
+    enabled: true
+    hosts:
+      - airflow.prod.example.com
+    tls:
+      - secretName: airflow-tls
+        hosts:
+          - airflow.prod.example.com
+
+# Airflow 配置
+airflow:
+  image:
+    repository: apache/airflow
+    tag: 2.7.0
+    pullPolicy: IfNotPresent
+  
+  # 安全上下文
+  securityContext:
+    runAsUser: 50000
+    fsGroup: 0
+    
+  # 环境变量
+  env:
+    - name: AIRFLOW__CORE__EXECUTOR
+      value: CeleryExecutor
+    - name: AIRFLOW__CORE__FERNET_KEY
+      valueFrom:
+        secretKeyRef:
+          name: airflow-secrets
+          key: fernet-key
+    - name: AIRFLOW__CORE__SQL_ALCHEMY_CONN
+      valueFrom:
+        secretKeyRef:
+          name: airflow-secrets
+          key: connection
+    - name: AIRFLOW__CELERY__BROKER_URL
+      valueFrom:
+        secretKeyRef:
+          name: airflow-secrets
+          key: redis-url
+    - name: AIRFLOW__CELERY__RESULT_BACKEND
+      valueFrom:
+        secretKeyRef:
+          name: airflow-secrets
+          key: redis-url
+    
+  # DAG 配置
+  dags:
+    persistence:
+      enabled: true
+      existingClaim: "airflow-dags-pvc"
+      subPath: ""
+      accessMode: ReadOnlyMany
+      size: 2Gi
+    
+  # 日志配置
+  logs:
+    persistence:
+      enabled: true
+      existingClaim: "airflow-logs-pvc"
+      subPath: ""
+      accessMode: ReadWriteMany
+      size: 5Gi
+    
+  # 配置文件
+  config:
+    AIRFLOW__CORE__LOAD_EXAMPLES: "False"
+    AIRFLOW__SCHEDULER__CATCHUP_BY_DEFAULT: "False"
+    AIRFLOW__API__AUTH_BACKENDS: "airflow.api.auth.backend.basic_auth"
+    AIRFLOW__WEBSERVER__EXPOSE_CONFIG: "False"
+    AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: "True"

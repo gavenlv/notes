@@ -1,0 +1,601 @@
+# Apache Airflow 边缘计算部署配置示例
+# 展示如何在边缘节点部署Airflow组件以处理本地数据
+
+# 边缘节点配置
+edge_nodes:
+  # 工厂A边缘节点
+  factory_a_edge:
+    # 节点标识
+    node_id: edge-factory-a
+    location: Factory-A, Detroit, MI
+    
+    # 硬件配置
+    hardware:
+      cpu_cores: 4
+      memory_gb: 16
+      storage_gb: 500
+      network_interfaces:
+        - name: eth0
+          ip: 192.168.10.10
+          gateway: 192.168.10.1
+          subnet_mask: 255.255.255.0
+    
+    # 操作系统
+    os:
+      distribution: Ubuntu
+      version: "20.04 LTS"
+      
+    # Docker配置
+    docker:
+      version: "20.10.7"
+      daemon_config:
+        log-driver: json-file
+        log-opts:
+          max-size: 100m
+          max-file: "3"
+      
+    # Kubernetes配置 (轻量级)
+    k3s:
+      enabled: true
+      version: "v1.21.5+k3s2"
+      server_args: "--disable traefik --disable servicelb"
+      agent_args: ""
+      
+    # 存储配置
+    storage:
+      local_dags:
+        path: /opt/airflow/dags
+        size_gb: 10
+      local_logs:
+        path: /opt/airflow/logs
+        size_gb: 20
+      shared_data:
+        path: /data/shared
+        size_gb: 100
+      
+    # 网络配置
+    networking:
+      internal_dns: 192.168.10.1
+      external_dns: 8.8.8.8
+      firewall_rules:
+        - direction: ingress
+          protocol: tcp
+          port: 8080
+          source: 192.168.0.0/16
+        - direction: egress
+          protocol: tcp
+          port: 443
+          destination: 0.0.0.0/0
+    
+    # 安全配置
+    security:
+      ssh:
+        enabled: true
+        port: 22
+        allowed_sources:
+          - 192.168.0.0/16
+      certificates:
+        ca_trust_store: /etc/ssl/certs/ca-certificates.crt
+      
+  # 仓库B边缘节点
+  warehouse_b_edge:
+    # 节点标识
+    node_id: edge-warehouse-b
+    location: Warehouse-B, Chicago, IL
+    
+    # 硬件配置
+    hardware:
+      cpu_cores: 2
+      memory_gb: 8
+      storage_gb: 250
+      network_interfaces:
+        - name: eth0
+          ip: 192.168.20.20
+          gateway: 192.168.20.1
+          subnet_mask: 255.255.255.0
+    
+    # 操作系统
+    os:
+      distribution: CentOS
+      version: "8.4"
+      
+    # Docker配置
+    docker:
+      version: "20.10.7"
+      daemon_config:
+        log-driver: json-file
+        log-opts:
+          max-size: 50m
+          max-file: "2"
+      
+    # Kubernetes配置 (轻量级)
+    k3s:
+      enabled: true
+      version: "v1.21.5+k3s2"
+      server_args: "--disable traefik --disable servicelb"
+      agent_args: ""
+      
+    # 存储配置
+    storage:
+      local_dags:
+        path: /opt/airflow/dags
+        size_gb: 5
+      local_logs:
+        path: /opt/airflow/logs
+        size_gb: 10
+      shared_data:
+        path: /data/shared
+        size_gb: 50
+      
+    # 网络配置
+    networking:
+      internal_dns: 192.168.20.1
+      external_dns: 8.8.8.8
+      firewall_rules:
+        - direction: ingress
+          protocol: tcp
+          port: 8080
+          source: 192.168.0.0/16
+        - direction: egress
+          protocol: tcp
+          port: 443
+          destination: 0.0.0.0/0
+    
+    # 安全配置
+    security:
+      ssh:
+        enabled: true
+        port: 22
+        allowed_sources:
+          - 192.168.0.0/16
+      certificates:
+        ca_trust_store: /etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem
+
+# 边缘Airflow部署配置
+edge_airflow_deployments:
+  # 工厂A的边缘部署
+  factory_a_deployment:
+    # 部署名称
+    name: airflow-edge-factory-a
+    
+    # 部署节点
+    target_node: edge-factory-a
+    
+    # Airflow版本
+    airflow_version: "2.2.3"
+    
+    # 核心组件配置
+    core_components:
+      # Webserver配置
+      webserver:
+        enabled: true
+        replicas: 1
+        resources:
+          requests:
+            cpu: 500m
+            memory: 1Gi
+          limits:
+            cpu: 1
+            memory: 2Gi
+        service_port: 8080
+        
+      # Scheduler配置
+      scheduler:
+        enabled: true
+        replicas: 1
+        resources:
+          requests:
+            cpu: 500m
+            memory: 1Gi
+          limits:
+            cpu: 1
+            memory: 2Gi
+        
+      # Worker配置
+      worker:
+        enabled: true
+        replicas: 2
+        resources:
+          requests:
+            cpu: 250m
+            memory: 512Mi
+          limits:
+            cpu: 500m
+            memory: 1Gi
+        
+    # 数据库配置
+    database:
+      type: sqlite
+      path: /opt/airflow/airflow.db
+      
+    # Redis配置 (用于CeleryExecutor)
+    redis:
+      enabled: true
+      image: redis:6.2-alpine
+      resources:
+        requests:
+          cpu: 100m
+          memory: 128Mi
+        limits:
+          cpu: 250m
+          memory: 256Mi
+      
+    # DAG配置
+    dags:
+      # 本地DAG存储
+      local_storage:
+        enabled: true
+        path: /opt/airflow/dags
+        
+      # 远程DAG同步
+      remote_sync:
+        enabled: true
+        source: s3://airflow-central-dags/factory-a/
+        sync_schedule: "*/10 * * * *"
+        sync_method: git-sync
+        git_repo: https://github.com/example/airflow-dags-factory-a.git
+        git_branch: main
+        
+    # 日志配置
+    logs:
+      # 本地日志存储
+      local_storage:
+        enabled: true
+        path: /opt/airflow/logs
+        
+      # 远程日志同步
+      remote_sync:
+        enabled: true
+        destination: s3://airflow-logs/factory-a/
+        sync_schedule: "0 */1 * * *"
+        compression: gzip
+        
+    # 插件配置
+    plugins:
+      local_plugins:
+        enabled: true
+        path: /opt/airflow/plugins
+        
+    # 配置文件
+    config:
+      core:
+        executor: CeleryExecutor
+        load_examples: false
+        
+      logging:
+        remote_logging: true
+        remote_base_log_folder: s3://airflow-logs/factory-a/
+        remote_log_conn_id: aws_s3_logs
+        
+      celery:
+        broker_url: redis://edge-factory-a-redis:6379/0
+        result_backend: db+sqlite:////opt/airflow/airflow.db
+        
+  # 仓库B的边缘部署
+  warehouse_b_deployment:
+    # 部署名称
+    name: airflow-edge-warehouse-b
+    
+    # 部署节点
+    target_node: edge-warehouse-b
+    
+    # Airflow版本
+    airflow_version: "2.2.3"
+    
+    # 核心组件配置
+    core_components:
+      # Webserver配置
+      webserver:
+        enabled: false
+        
+      # Scheduler配置
+      scheduler:
+        enabled: true
+        replicas: 1
+        resources:
+          requests:
+            cpu: 250m
+            memory: 512Mi
+          limits:
+            cpu: 500m
+            memory: 1Gi
+        
+      # Worker配置
+      worker:
+        enabled: true
+        replicas: 1
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+          limits:
+            cpu: 250m
+            memory: 512Mi
+        
+    # 数据库配置
+    database:
+      type: sqlite
+      path: /opt/airflow/airflow.db
+      
+    # Redis配置 (用于CeleryExecutor)
+    redis:
+      enabled: true
+      image: redis:6.2-alpine
+      resources:
+        requests:
+          cpu: 50m
+          memory: 64Mi
+        limits:
+          cpu: 100m
+          memory: 128Mi
+      
+    # DAG配置
+    dags:
+      # 本地DAG存储
+      local_storage:
+        enabled: true
+        path: /opt/airflow/dags
+        
+      # 远程DAG同步
+      remote_sync:
+        enabled: true
+        source: s3://airflow-central-dags/warehouse-b/
+        sync_schedule: "*/15 * * * *"
+        sync_method: git-sync
+        git_repo: https://github.com/example/airflow-dags-warehouse-b.git
+        git_branch: main
+        
+    # 日志配置
+    logs:
+      # 本地日志存储
+      local_storage:
+        enabled: true
+        path: /opt/airflow/logs
+        
+      # 远程日志同步
+      remote_sync:
+        enabled: true
+        destination: s3://airflow-logs/warehouse-b/
+        sync_schedule: "0 */2 * * *"
+        compression: gzip
+        
+    # 插件配置
+    plugins:
+      local_plugins:
+        enabled: true
+        path: /opt/airflow/plugins
+        
+    # 配置文件
+    config:
+      core:
+        executor: CeleryExecutor
+        load_examples: false
+        
+      logging:
+        remote_logging: true
+        remote_base_log_folder: s3://airflow-logs/warehouse-b/
+        remote_log_conn_id: aws_s3_logs
+        
+      celery:
+        broker_url: redis://edge-warehouse-b-redis:6379/0
+        result_backend: db+sqlite:////opt/airflow/airflow.db
+
+# 中心化管理配置
+centralized_management:
+  # 中心控制器
+  central_controller:
+    # 控制器地址
+    address: https://airflow-central-controller.example.com
+    
+    # 认证配置
+    authentication:
+      method: token
+      token_secret: airflow-central-token
+      
+    # 同步配置
+    synchronization:
+      # DAG同步
+      dag_sync:
+        enabled: true
+        schedule: "*/5 * * * *"
+        sync_method: git
+        repositories:
+          - name: factory-a-dags
+            url: https://github.com/example/airflow-dags-factory-a.git
+            branch: main
+            target: s3://airflow-central-dags/factory-a/
+          - name: warehouse-b-dags
+            url: https://github.com/example/airflow-dags-warehouse-b.git
+            branch: main
+            target: s3://airflow-central-dags/warehouse-b/
+      
+      # 配置同步
+      config_sync:
+        enabled: true
+        schedule: "0 */1 * * *"
+        source: git://airflow-configs.git
+        target: s3://airflow-central-configs/
+      
+      # 日志聚合
+      log_aggregation:
+        enabled: true
+        schedule: "*/30 * * * *"
+        sources:
+          - s3://airflow-logs/factory-a/
+          - s3://airflow-logs/warehouse-b/
+        target: s3://airflow-central-logs/
+        
+  # 监控配置
+  monitoring:
+    # Prometheus配置
+    prometheus:
+      enabled: true
+      endpoint: https://prometheus-central.example.com
+      scrape_interval: 30s
+      
+      # 边缘节点监控
+      edge_scraping:
+        enabled: true
+        targets:
+          - edge-factory-a:9100
+          - edge-warehouse-b:9100
+        
+    # Grafana配置
+    grafana:
+      enabled: true
+      dashboard_url: https://grafana.example.com/d/edge-airflow-dashboard
+      
+    # 告警配置
+    alerting:
+      enabled: true
+      channels:
+        - name: slack-edge-alerts
+          type: slack
+          webhook_url: https://hooks.slack.com/services/YOUR/SLACK/WEBHOOK
+        - name: email-edge-alerts
+          type: email
+          recipients:
+            - admin@example.com
+            - ops@example.com
+      
+      # 告警规则
+      rules:
+        - name: edge_node_unreachable
+          condition: up == 0
+          duration: 5m
+          severity: critical
+        - name: edge_cpu_high
+          condition: cpu_usage > 80
+          duration: 10m
+          severity: warning
+        - name: edge_memory_high
+          condition: memory_usage > 85
+          duration: 10m
+          severity: warning
+
+# 数据流配置
+data_flow:
+  # 从边缘到中心的数据传输
+  edge_to_central:
+    # 生产数据同步
+    production_data_sync:
+      enabled: true
+      schedule: "*/30 * * * *"
+      source_paths:
+        - /data/shared/production/
+      target_bucket: s3://company-production-data/
+      compression: gzip
+      encryption: aes256
+      
+    # 分析数据同步
+    analytics_data_sync:
+      enabled: true
+      schedule: "0 1 * * *"
+      source_paths:
+        - /data/shared/analytics/
+      target_bucket: s3://company-analytics-data/
+      compression: gzip
+      encryption: aes256
+      
+  # 从中心到边缘的配置分发
+  central_to_edge:
+    # DAG分发
+    dag_distribution:
+      enabled: true
+      schedule: "*/10 * * * *"
+      source_bucket: s3://airflow-central-dags/
+      target_paths:
+        factory-a: /opt/airflow/dags/factory-a/
+        warehouse-b: /opt/airflow/dags/warehouse-b/
+      
+    # 配置分发
+    config_distribution:
+      enabled: true
+      schedule: "0 */1 * * *"
+      source_bucket: s3://airflow-central-configs/
+      target_paths:
+        factory-a: /opt/airflow/config/
+        warehouse-b: /opt/airflow/config/
+
+# 安全配置
+edge_security:
+  # 证书管理
+  certificate_management:
+    # 中心CA
+    central_ca:
+      url: https://ca.example.com
+      
+    # 边缘证书签发
+    edge_certificates:
+      validity_days: 365
+      renewal_threshold_days: 30
+      
+  # 网络安全
+  network_security:
+    # VPN连接
+    vpn:
+      enabled: true
+      type: wireguard
+      central_endpoint: vpn.example.com:51820
+      
+    # 防火墙规则
+    firewall:
+      default_policy: drop
+      rules:
+        - direction: ingress
+          protocol: tcp
+          port: 22
+          source: 192.168.0.0/16
+        - direction: ingress
+          protocol: tcp
+          port: 8080
+          source: 192.168.0.0/16
+        
+  # SSH密钥管理
+  ssh_key_management:
+    # 中心密钥库
+    central_key_store:
+      url: https://key-store.example.com
+      
+    # 边缘节点密钥
+    edge_keys:
+      rotation_interval_days: 90
+      minimum_rsa_bits: 2048
+      
+      # 允许的密钥类型
+      allowed_key_types:
+        - rsa
+        - ed25519
+      
+  # 访问控制
+  access_control:
+    # 用户角色
+    roles:
+      admin:
+        permissions:
+          - manage_nodes
+          - deploy_airflow
+          - view_logs
+          - configure_network
+      operator:
+        permissions:
+          - deploy_airflow
+          - view_logs
+      viewer:
+        permissions:
+          - view_logs
+    
+    # 身份提供商
+    identity_provider:
+      type: ldap
+      server: ldap.example.com
+      base_dn: dc=example,dc=com
+      bind_dn: cn=admin,dc=example,dc=com
+      
+    # 多因素认证
+    mfa:
+      enabled: true
+      methods:
+        - totp
+        - sms
+        - email

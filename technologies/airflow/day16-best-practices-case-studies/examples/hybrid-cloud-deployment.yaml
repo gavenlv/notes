@@ -1,0 +1,412 @@
+# Apache Airflow 混合云部署配置示例
+# 展示如何结合私有云和公有云进行部署
+
+# 私有云部署配置
+on_premises_deployment:
+  # 部署名称
+  name: airflow-on-premises
+  # 数据中心位置
+  datacenter: dc1
+  
+  # Kubernetes集群配置
+  kubernetes_cluster:
+    name: airflow-onprem-k8s
+    version: "1.21.5"
+    master_nodes:
+      - hostname: k8s-master-1
+        ip: 192.168.1.101
+      - hostname: k8s-master-2
+        ip: 192.168.1.102
+      - hostname: k8s-master-3
+        ip: 192.168.1.103
+    worker_nodes:
+      - hostname: k8s-worker-1
+        ip: 192.168.1.111
+        labels:
+          role: worker
+          zone: zone-a
+      - hostname: k8s-worker-2
+        ip: 192.168.1.112
+        labels:
+          role: worker
+          zone: zone-b
+      - hostname: k8s-worker-3
+        ip: 192.168.1.113
+        labels:
+          role: worker
+          zone: zone-c
+    
+    # 网络配置
+    networking:
+      pod_cidr: 10.244.0.0/16
+      service_cidr: 10.96.0.0/12
+      dns_domain: cluster.local
+    
+    # 存储配置
+    storage:
+      provisioner: nfs
+      server: 192.168.1.200
+      path: /exports/airflow
+  
+  # 数据库配置
+  database:
+    type: postgresql
+    host: 192.168.1.150
+    port: 5432
+    database: airflow
+    username: airflow
+    password_secret: airflow-db-password
+    ssl_enabled: true
+    
+  # Redis配置
+  redis:
+    host: 192.168.1.160
+    port: 6379
+    password_secret: airflow-redis-password
+    
+  # 存储配置
+  storage:
+    logs:
+      type: nfs
+      server: 192.168.1.200
+      path: /exports/airflow/logs
+    dags:
+      type: nfs
+      server: 192.168.1.200
+      path: /exports/airflow/dags
+    
+  # 安全配置
+  security:
+    authentication:
+      type: ldap
+      server: ldap://192.168.1.50
+      bind_dn: cn=admin,dc=example,dc=com
+    authorization:
+      rbac_enabled: true
+    
+# 公有云部署配置 (AWS)
+public_cloud_deployment:
+  # 部署名称
+  name: airflow-aws-public
+  # 区域
+  region: us-west-2
+  
+  # EKS集群配置
+  eks_cluster:
+    name: airflow-eks-public
+    version: "1.21"
+    node_groups:
+      - name: burst-workers
+        instance_type: m5.xlarge
+        desired_capacity: 2
+        min_size: 0
+        max_size: 20
+        spot_instances: true
+      
+  # RDS数据库配置
+  rds_database:
+    engine: postgres
+    engine_version: "13.4"
+    instance_class: db.t3.medium
+    allocated_storage: 50
+    multi_az: false
+    backup_retention_period: 7
+  
+  # ElastiCache配置
+  elasticache:
+    engine: redis
+    node_type: cache.m5.large
+    num_cache_nodes: 1
+    
+  # S3存储配置
+  s3_storage:
+    bucket_name: airflow-burst-logs
+    region: us-west-2
+
+# 混合云架构配置
+hybrid_cloud_architecture:
+  # 主要工作负载位置
+  primary_workload_location: on_premises
+  
+  # 突发工作负载配置
+  burst_workload:
+    # 启用条件
+    trigger_conditions:
+      - metric: queue_length
+        threshold: 100
+        comparison: greater_than
+      - metric: cpu_utilization
+        threshold: 80
+        comparison: greater_than
+      - metric: memory_utilization
+        threshold: 85
+        comparison: greater_than
+    
+    # 突发目标
+    burst_target: aws_public_cloud
+    
+    # 扩展策略
+    scaling_policies:
+      - name: queue_based_scaling
+        metric: queue_length
+        target_value: 50
+        scale_factor: 2
+      - name: resource_based_scaling
+        metrics:
+          - cpu_utilization
+          - memory_utilization
+        target_values:
+          cpu_utilization: 60
+          memory_utilization: 70
+        scale_factor: 1.5
+    
+    # 缩减策略
+    scaling_down_policies:
+      - name: cooldown_scaling
+        cooldown_period: 300
+        scale_down_factor: 0.5
+      
+  # 数据同步配置
+  data_synchronization:
+    # DAG同步
+    dag_sync:
+      enabled: true
+      sync_method: rsync
+      schedule: "*/5 * * * *"
+      source: /exports/airflow/dags
+      target: s3://airflow-burst-dags
+      
+    # 日志同步
+    log_sync:
+      enabled: true
+      sync_method: fluentd
+      filters:
+        - level: INFO
+        - level: WARN
+        - level: ERROR
+      targets:
+        - elasticsearch://192.168.1.180:9200
+        - s3://airflow-burst-logs
+      
+    # 配置同步
+    config_sync:
+      enabled: true
+      sync_method: git
+      repository: https://github.com/example/airflow-configs.git
+      branch: main
+      sync_interval: 300
+
+# 网络连接配置
+network_connectivity:
+  # VPN连接
+  vpn_connection:
+    enabled: true
+    type: ipsec
+    local_gateway: 192.168.1.1
+    remote_gateway: 54.123.45.67
+    pre_shared_key: your-pre-shared-key
+    
+  # 专线连接
+  direct_connect:
+    enabled: false
+    location: aws-direct-connect-location
+    bandwidth: 1Gbps
+    
+  # 网络策略
+  network_policies:
+    allow_internal_traffic: true
+    allow_public_cloud_traffic: true
+    firewall_rules:
+      - direction: egress
+        protocol: tcp
+        port: 5432
+        destination: aws-rds-endpoint
+      - direction: egress
+        protocol: tcp
+        port: 6379
+        destination: aws-elasticache-endpoint
+      - direction: egress
+        protocol: tcp
+        port: 443
+        destination: 0.0.0.0/0
+
+# 安全配置
+hybrid_security:
+  # 统一身份认证
+  unified_authentication:
+    provider: Active Directory
+    domain: example.com
+    servers:
+      - 192.168.1.50
+      - 192.168.1.51
+    
+  # 密钥管理
+  secret_management:
+    # HashiCorp Vault配置
+    hashicorp_vault:
+      address: https://vault.example.com
+      auth_method: kubernetes
+      kubernetes_role: airflow
+      
+    # AWS Secrets Manager
+    aws_secrets_manager:
+      region: us-west-2
+      
+    # 同步策略
+    sync_policy:
+      interval_minutes: 30
+      encryption_key: hybrid-master-key
+  
+  # 证书管理
+  certificate_management:
+    # 私有CA
+    private_ca:
+      url: https://ca.example.com
+      
+    # 公有CA
+    public_ca:
+      provider: letsencrypt
+      
+    # 证书同步
+    cert_sync:
+      schedule: "0 2 * * *"
+      
+# 监控和告警配置
+hybrid_monitoring:
+  # Prometheus配置
+  prometheus:
+    # 本地Prometheus
+    on_premises_prometheus:
+      url: http://prometheus.onprem:9090
+      
+    # AWS Prometheus
+    aws_prometheus:
+      workspace_id: ws-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+      region: us-west-2
+      
+    # 联邦配置
+    federation:
+      enabled: true
+      endpoints:
+        - url: http://prometheus.onprem:9090/federate
+          match: '{job=~"airflow.*"}'
+        - url: https://aps-workspaces.us-west-2.amazonaws.com/workspaces/ws-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/api/v1/query
+          match: '{job=~"airflow.*"}'
+          auth_type: sigv4
+  
+  # Grafana配置
+  grafana:
+    # 数据源配置
+    datasources:
+      - name: On-Premises Prometheus
+        type: prometheus
+        url: http://prometheus.onprem:9090
+        access: proxy
+        is_default: true
+      - name: AWS Prometheus
+        type: prometheus
+        url: https://aps-workspaces.us-west-2.amazonaws.com/workspaces/ws-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+        access: proxy
+        is_default: false
+    
+    # 仪表板配置
+    dashboards:
+      - name: Hybrid Airflow Overview
+        folder: Hybrid-Cloud
+        tags: [hybrid-cloud, airflow]
+        
+# 成本优化配置
+cost_optimization:
+  # 资源调度策略
+  resource_scheduling:
+    # 工作负载分类
+    workload_classification:
+      - name: critical_workloads
+        priority: high
+        location: on_premises
+        sla: 99.9%
+      - name: batch_workloads
+        priority: low
+        location: aws_public_cloud
+        sla: 99%
+      - name: burst_workloads
+        priority: medium
+        location: aws_public_cloud
+        sla: 99.5%
+    
+    # 调度策略
+    scheduling_policies:
+      - name: time_based_scheduling
+        schedule: "0 0 * * 1-5"
+        target_location: on_premises
+      - name: cost_based_scheduling
+        cost_threshold: 0.5
+        target_location: aws_public_cloud
+        
+  # 实例优化
+  instance_optimization:
+    # Spot实例使用
+    spot_instances:
+      enabled: true
+      max_price_multiplier: 1.5
+      fallback_instance_types:
+        - m5.large
+        - m5.xlarge
+        - c5.xlarge
+      
+    # 预留实例
+    reserved_instances:
+      enabled: false
+      instance_families:
+        - m5
+        - c5
+      
+# 灾备配置
+disaster_recovery:
+  # 备份策略
+  backup_strategy:
+    # 本地备份
+    on_premises_backup:
+      enabled: true
+      schedule: "0 2 * * *"
+      retention: 30d
+      destination: /backup/airflow
+      
+    # 云端备份
+    cloud_backup:
+      enabled: true
+      schedule: "0 3 * * *"
+      retention: 90d
+      destination: s3://airflow-dr-backup
+      
+  # 故障转移配置
+  failover_configuration:
+    # 自动故障转移
+    auto_failover:
+      enabled: true
+      trigger_conditions:
+        - metric: health_score
+          threshold: 50
+          comparison: less_than
+        - metric: unavailable_components
+          threshold: 3
+          comparison: greater_than
+      
+    # 故障转移目标
+    failover_targets:
+      - name: aws_dr_site
+        region: us-east-1
+        priority: 1
+        
+  # 故障恢复
+  failback:
+    # 自动故障恢复
+    auto_failback:
+      enabled: true
+      recovery_conditions:
+        - metric: health_score
+          threshold: 90
+          comparison: greater_than
+        - metric: component_availability
+          threshold: 95
+          comparison: greater_than
