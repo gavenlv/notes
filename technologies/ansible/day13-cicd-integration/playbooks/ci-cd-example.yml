@@ -1,7 +1,7 @@
 ---
 - name: CI/CD Integration Example
   hosts: all
-  become: yes
+  #become: yes
   vars:
     # 应用配置
     app_name: "myapp"
