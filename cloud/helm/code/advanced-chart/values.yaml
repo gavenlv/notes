@@ -1,0 +1,198 @@
+# 全局配置
+global:
+  # 应用名称，用于标签和命名
+  appName: "advanced-webapp"
+  
+  # 环境配置
+  environment: "development"
+  
+  # 域名配置
+  domain: "example.com"
+
+# 主应用配置
+app:
+  # 镜像配置
+  image:
+    repository: "nginx"
+    tag: "1.21"
+    pullPolicy: "IfNotPresent"
+    
+  # 副本配置
+  replicaCount: 2
+  
+  # 资源限制
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "128Mi"
+    limits:
+      cpu: "500m"
+      memory: "512Mi"
+      
+  # 健康检查
+  livenessProbe:
+    httpGet:
+      path: /
+      port: http
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    
+  readinessProbe:
+    httpGet:
+      path: /
+      port: http
+    initialDelaySeconds: 5
+    periodSeconds: 5
+
+# 服务配置
+service:
+  # 主服务
+  main:
+    type: ClusterIP
+    port: 80
+    targetPort: 80
+    
+  # 监控服务（可选）
+  metrics:
+    enabled: false
+    port: 9113
+    targetPort: 9113
+
+# 自动扩缩容配置
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 80
+
+# Ingress配置
+ingress:
+  enabled: false
+  className: "nginx"
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+  hosts:
+    - host: chart-example.local
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
+
+# ConfigMap配置
+configMaps:
+  # 应用配置
+  app-config:
+    enabled: true
+    data:
+      APP_ENV: "{{ .Values.global.environment }}"
+      APP_NAME: "{{ .Values.global.appName }}"
+      LOG_LEVEL: "info"
+      
+  # 数据库配置
+  db-config:
+    enabled: true
+    data:
+      DB_HOST: "{{ .Release.Name }}-postgresql"
+      DB_PORT: "5432"
+
+# Secret配置
+secrets:
+  # 数据库密码
+  db-secret:
+    enabled: true
+    data:
+      DB_PASSWORD: "{{ .Values.postgresql.auth.password }}"
+      
+  # API密钥
+  api-keys:
+    enabled: false
+    data:
+      API_KEY: ""
+
+# 持久化存储配置
+persistence:
+  enabled: false
+  storageClass: ""
+  accessMode: ReadWriteOnce
+  size: 8Gi
+
+# Redis配置（依赖）
+redis:
+  enabled: true
+  architecture: standalone
+  auth:
+    enabled: false
+  master:
+    persistence:
+      enabled: false
+
+# PostgreSQL配置（依赖）
+postgresql:
+  enabled: true
+  auth:
+    postgresPassword: "postgres"
+    database: "mydb"
+    username: "myuser"
+    password: "mypassword"
+  persistence:
+    enabled: false
+
+# 网络策略
+networkPolicy:
+  enabled: false
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: {{ .Chart.Name }}
+
+# Pod安全上下文
+podSecurityContext:
+  fsGroup: 1000
+  runAsUser: 1000
+  runAsNonRoot: true
+
+# 容器安全上下文
+securityContext:
+  allowPrivilegeEscalation: false
+  runAsNonRoot: true
+  runAsUser: 1000
+  capabilities:
+    drop:
+      - ALL
+
+# 节点亲和性配置
+nodeAffinity: {}
+
+# Pod亲和性配置
+podAffinity: {}
+
+# Pod反亲和性配置
+podAntiAffinity:
+  preferredDuringSchedulingIgnoredDuringExecution:
+    - weight: 100
+      podAffinityTerm:
+        labelSelector:
+          matchExpressions:
+            - key: app.kubernetes.io/name
+              operator: In
+              values:
+                - {{ .Chart.Name }}
+        topologyKey: kubernetes.io/hostname
+
+# 容忍度配置
+tolerations: []
+
+# 镜像拉取密钥
+imagePullSecrets: []
+
+# 服务账户配置
+serviceAccount:
+  create: true
+  name: ""
+  annotations: {}
+
+# RBAC配置
+rbac:
+  create: false
+  rules: []

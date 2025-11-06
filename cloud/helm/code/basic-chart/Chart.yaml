@@ -1,0 +1,38 @@
+apiVersion: v2
+name: basic-webapp
+description: A basic Helm chart for a simple web application
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
+
+# 维护者信息
+maintainers:
+  - name: Helm Learner
+    email: learner@example.com
+
+# 应用描述
+description: |
+  This is a basic Helm chart example for learning purposes.
+  It demonstrates the fundamental structure of a Helm chart.
+
+# 应用图标（可选）
+icon: https://example.com/icon.png
+
+# 关键字（用于搜索）
+keywords:
+  - web
+  - application
+  - nginx
+  - learning
+
+# 源文件链接（可选）
+sources:
+  - https://github.com/example/basic-webapp
+
+# 依赖关系（本示例无依赖）
+dependencies: []
+
+# 注释信息
+annotations:
+  category: Web Application
+  learning-level: Beginner

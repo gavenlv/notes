@@ -1,0 +1,117 @@
+# Default values for basic-webapp.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+# 副本数量
+replicaCount: 1
+
+# 镜像配置
+image:
+  repository: nginx
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: ""
+
+# 镜像拉取密钥（可选）
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+# 服务账户配置
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+# Pod安全上下文
+podSecurityContext: {}
+  # fsGroup: 2000
+
+# 容器安全上下文  
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+# 服务配置
+service:
+  type: ClusterIP
+  port: 80
+
+# 资源限制
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+# 自动扩缩容配置
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+# 节点选择器
+nodeSelector: {}
+
+# 容忍度配置
+tolerations: []
+
+# 亲和性配置
+affinity: {}
+
+# 环境变量配置
+env:
+  - name: APP_ENV
+    value: "production"
+  - name: DEBUG
+    value: "false"
+
+# 配置文件（可选）
+configMap:
+  enabled: false
+  data: {}
+
+# 密钥配置（可选）
+secret:
+  enabled: false
+  data: {}
+
+# 持久化存储（可选）
+persistence:
+  enabled: false
+  accessMode: ReadWriteOnce
+  size: 1Gi
+  storageClass: ""
+
+# 入口配置（可选）
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  hosts:
+    - host: chart-example.local
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local

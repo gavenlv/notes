@@ -1,0 +1,29 @@
+apiVersion: v2
+name: advanced-webapp
+description: A Helm chart for Kubernetes with advanced features
+
+type: application
+
+# Chart版本号，遵循语义化版本控制
+version: 1.0.0
+
+# 应用版本，对应镜像标签
+appVersion: "1.0.0"
+
+# 依赖管理
+dependencies:
+  - name: redis
+    version: "17.0.0"
+    repository: "https://charts.bitnami.com/bitnami"
+    condition: redis.enabled
+    
+  - name: postgresql
+    version: "12.0.0"
+    repository: "https://charts.bitnami.com/bitnami"
+    condition: postgresql.enabled
+
+# 维护者信息
+maintainers:
+  - name: Helm Learning Team
+    email: helm-learning@example.com
+    url: https://example.com
