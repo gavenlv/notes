@@ -1,0 +1,50 @@
+{
+  "name": "高级特性演示",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+  
+  // 自定义构建
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+  
+  // 功能特性
+  "features": {
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "18"
+    },
+    "ghcr.io/devcontainers/features/python:1": {
+      "version": "3.11"
+    },
+    "ghcr.io/devcontainers/features/git:1": {},
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {}
+  },
+  
+  // 容器启动后运行的命令
+  "postCreateCommand": "bash .devcontainer/setup.sh",
+  
+  // 自定义设置
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "terminal.integrated.shell.linux": "/bin/bash"
+      },
+      "extensions": [
+        "ms-vscode.vscode-typescript-next",
+        "ms-python.python",
+        "ms-azuretools.vscode-docker"
+      ]
+    }
+  },
+  
+  // 端口转发
+  "forwardPorts": [8080, 3000, 5000],
+  
+  // 其他配置
+  "remoteUser": "vscode",
+  "mounts": [
+    "type=bind,source=/var/run/docker.sock,target=/var/run/docker.sock"
+  ],
+  "runArgs": [
+    "--privileged"
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "name": "Node.js开发环境",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:18",
+  
+  // 容器启动后运行的命令
+  "postCreateCommand": "npm install",
+  
+  // 自定义设置
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "editor.formatOnSave": true,
+        "editor.codeActionsOnSave": {
+          "source.fixAll.eslint": true
+        }
+      },
+      "extensions": [
+        "esbenp.prettier-vscode",
+        "dbaeumer.vscode-eslint",
+        "ms-vscode.vscode-typescript-next"
+      ]
+    }
+  },
+  
+  // 端口转发
+  "forwardPorts": [3000, 8080],
+  
+  // 其他配置
+  "remoteUser": "node",
+  "features": {
+    "ghcr.io/devcontainers/features/node:1": {}
+  }
+}

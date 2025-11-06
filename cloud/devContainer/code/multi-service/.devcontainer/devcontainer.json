@@ -1,0 +1,55 @@
+{
+  "name": "多服务微服务架构",
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "gateway",
+  "workspaceFolder": "/workspace",
+  
+  // 容器启动后运行的命令
+  "postCreateCommand": "npm install && cd services/auth && npm install && cd ../api && npm install && cd ../gateway && npm install",
+  
+  // 自定义设置
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "editor.formatOnSave": true,
+        "typescript.preferences.includePackageJsonAutoImports": "auto"
+      },
+      "extensions": [
+        "ms-vscode.vscode-typescript-next",
+        "esbenp.prettier-vscode",
+        "dbaeumer.vscode-eslint"
+      ]
+    }
+  },
+  
+  // 端口转发
+  "forwardPorts": [3000, 3001, 3002, 5432, 6379],
+  "portsAttributes": {
+    "3000": {
+      "label": "网关服务",
+      "onAutoForward": "notify"
+    },
+    "3001": {
+      "label": "认证服务",
+      "onAutoForward": "silent"
+    },
+    "3002": {
+      "label": "API服务",
+      "onAutoForward": "silent"
+    },
+    "5432": {
+      "label": "PostgreSQL",
+      "onAutoForward": "silent"
+    },
+    "6379": {
+      "label": "Redis",
+      "onAutoForward": "silent"
+    }
+  },
+  
+  // 其他配置
+  "remoteUser": "node",
+  "features": {
+    "ghcr.io/devcontainers/features/node:1": {}
+  }
+}

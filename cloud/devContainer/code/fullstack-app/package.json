@@ -1,0 +1,29 @@
+{
+  "name": "fullstack-app-devcontainer",
+  "version": "1.0.0",
+  "description": "全栈应用开发环境示例",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "dev": "nodemon server.js",
+    "start": "node server.js",
+    "db:init": "node scripts/init-db.js",
+    "test": "jest"
+  },
+  "keywords": ["devcontainer", "fullstack", "nodejs"],
+  "author": "DevContainer教程",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.0",
+    "cors": "^2.8.5",
+    "pg": "^8.11.0",
+    "bcryptjs": "^2.4.3",
+    "jsonwebtoken": "^9.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.0",
+    "jest": "^29.0.0",
+    "eslint": "^8.0.0",
+    "prettier": "^3.0.0"
+  }
+}

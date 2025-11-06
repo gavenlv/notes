@@ -1,0 +1,82 @@
+version: '3.8'
+
+services:
+  # 网关服务
+  gateway:
+    build:
+      context: ../services/gateway
+      dockerfile: Dockerfile
+    volumes:
+      - ../services/gateway:/workspace:cached
+      - /workspace/node_modules
+    working_dir: /workspace
+    command: npm run dev
+    environment:
+      - AUTH_SERVICE_URL=http://auth:3001
+      - API_SERVICE_URL=http://api:3002
+    ports:
+      - "3000:3000"
+    depends_on:
+      - auth
+      - api
+
+  # 认证服务
+  auth:
+    build:
+      context: ../services/auth
+      dockerfile: Dockerfile
+    volumes:
+      - ../services/auth:/workspace:cached
+      - /workspace/node_modules
+    working_dir: /workspace
+    command: npm run dev
+    environment:
+      - DATABASE_URL=postgresql://user:password@db:5432/auth_db
+      - REDIS_URL=redis://redis:6379
+      - JWT_SECRET=devcontainer-secret
+    ports:
+      - "3001:3001"
+    depends_on:
+      - db
+      - redis
+
+  # API服务
+  api:
+    build:
+      context: ../services/api
+      dockerfile: Dockerfile
+    volumes:
+      - ../services/api:/workspace:cached
+      - /workspace/node_modules
+    working_dir: /workspace
+    command: npm run dev
+    environment:
+      - DATABASE_URL=postgresql://user:password@db:5432/api_db
+      - REDIS_URL=redis://redis:6379
+    ports:
+      - "3002:3002"
+    depends_on:
+      - db
+      - redis
+
+  # 数据库
+  db:
+    image: postgres:15
+    environment:
+      - POSTGRES_MULTIPLE_DATABASES=auth_db,api_db
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-db.sh:/docker-entrypoint-initdb.d/init-db.sh
+    ports:
+      - "5432:5432"
+
+  # Redis缓存
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+volumes:
+  postgres_data:

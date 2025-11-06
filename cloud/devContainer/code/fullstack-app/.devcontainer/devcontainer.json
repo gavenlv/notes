@@ -1,0 +1,52 @@
+{
+  "name": "全栈应用开发环境",
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "app",
+  "workspaceFolder": "/workspace",
+  
+  // 容器启动后运行的命令
+  "postCreateCommand": "npm install && cd client && npm install",
+  
+  // 自定义设置
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "editor.formatOnSave": true,
+        "typescript.preferences.includePackageJsonAutoImports": "auto",
+        "eslint.validate": ["javascript", "typescript", "javascriptreact", "typescriptreact"]
+      },
+      "extensions": [
+        "ms-vscode.vscode-typescript-next",
+        "bradlc.vscode-tailwindcss",
+        "esbenp.prettier-vscode",
+        "dbaeumer.vscode-eslint",
+        "ms-vscode.vscode-json"
+      ]
+    }
+  },
+  
+  // 端口转发
+  "forwardPorts": [3000, 5000, 5432],
+  "portsAttributes": {
+    "3000": {
+      "label": "前端应用",
+      "onAutoForward": "notify"
+    },
+    "5000": {
+      "label": "后端API",
+      "onAutoForward": "notify"
+    },
+    "5432": {
+      "label": "数据库",
+      "onAutoForward": "silent"
+    }
+  },
+  
+  // 其他配置
+  "remoteUser": "node",
+  "features": {
+    "ghcr.io/devcontainers/features/node:1": {
+      "nodeGypDependencies": true
+    }
+  }
+}

@@ -1,0 +1,54 @@
+{
+  "name": "Python数据科学环境",
+  "image": "mcr.microsoft.com/devcontainers/python:3.11",
+  
+  // 自定义Dockerfile
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+  
+  // 功能特性
+  "features": {
+    "ghcr.io/devcontainers/features/python:1": {
+      "version": "3.11"
+    },
+    "ghcr.io/devcontainers/features/git:1": {},
+    "ghcr.io/devcontainers/features/github-cli:1": {}
+  },
+  
+  // 容器启动后运行的命令
+  "postCreateCommand": "pip install -r requirements.txt && jupyter notebook --generate-config",
+  
+  // 自定义设置
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "python.defaultInterpreterPath": "/usr/local/bin/python",
+        "python.linting.enabled": true,
+        "python.formatting.provider": "black"
+      },
+      "extensions": [
+        "ms-python.python",
+        "ms-python.vscode-pylance",
+        "ms-toolsai.jupyter",
+        "ms-toolsai.jupyter-keymap",
+        "ms-toolsai.jupyter-renderers"
+      ]
+    }
+  },
+  
+  // 端口转发
+  "forwardPorts": [8888, 5000],
+  "portsAttributes": {
+    "8888": {
+      "label": "Jupyter Notebook",
+      "onAutoForward": "notify"
+    }
+  },
+  
+  // 其他配置
+  "remoteUser": "vscode",
+  "mounts": [
+    "source=${localWorkspaceFolder}/data,target=/workspace/data,type=bind,consistency=cached"
+  ]
+}
