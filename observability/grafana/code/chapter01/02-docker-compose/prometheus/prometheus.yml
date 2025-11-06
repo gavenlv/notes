@@ -1,0 +1,35 @@
+# Prometheus Configuration
+global:
+  # How frequently to scrape targets
+  scrape_interval: 15s
+  
+  # How frequently to evaluate rules
+  evaluation_interval: 15s
+  
+  # Attach these labels to any time series or alerts
+  external_labels:
+    cluster: 'docker-compose'
+    environment: 'development'
+
+# Scrape configurations
+scrape_configs:
+  # Prometheus itself
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+        labels:
+          instance: 'prometheus'
+
+  # Node Exporter - System metrics
+  - job_name: 'node-exporter'
+    static_configs:
+      - targets: ['node-exporter:9100']
+        labels:
+          instance: 'docker-host'
+
+  # Grafana metrics
+  - job_name: 'grafana'
+    static_configs:
+      - targets: ['grafana:3000']
+        labels:
+          instance: 'grafana'
