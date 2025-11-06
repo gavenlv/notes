@@ -1,0 +1,51 @@
+# Database Configuration
+database:
+  host: localhost
+  port: 9000
+  database: default
+  user: default
+  password: ""
+  secure: false
+  verify: false
+
+# Migration Settings
+migration:
+  table_name: schema_migrations
+  version_format: "V{version}__{description}"
+  rollback_enabled: true
+  parallel_execution: false
+  dry_run: false
+
+# Environment Settings
+environments:
+  development:
+    database: dev_db
+    user: dev_user
+  staging:
+    database: staging_db
+    user: staging_user
+  production:
+    database: prod_db
+    user: prod_user
+    rollback_enabled: false  # Disable rollback in production
+
+# Validation Settings
+validation:
+  check_syntax: true
+  check_dependencies: true
+  check_rollback: true
+  max_migration_size: 1048576  # 1MB
+
+# Logging
+logging:
+  level: INFO
+  file: migration.log
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+
+# Security
+security:
+  use_ssl: false
+  verify_cert: false
+  service_account: migration_service
+  audit_logging: true
+  backup_before_migration: true

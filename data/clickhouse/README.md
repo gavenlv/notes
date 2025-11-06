@@ -48,6 +48,20 @@
 - [x] **Day 16**: [迁移框架 (Migration Framework)](day16-migration-framework/) ✅
   - 自动化迁移工具、数据校验框架、回滚机制
 
+### 深度专题 (Ongoing)
+- [x] **数据管理 (Data Management)**: [data-management/](data-management/) ✅
+  - 数据建模、ETL流程、数据质量保障
+- [x] **集群运维 (Cluster Operations)**: [cluster-ops/](cluster-ops/) ✅
+  - 集群监控、故障排查、自动化运维
+- [x] **性能调优 (Performance Tuning)**: [performance-tuning/](performance-tuning/) ✅
+  - 查询优化、资源配置、基准测试
+- [x] **安全访问控制 (Security Access Control)**: [security-access-control/](security-access-control/) ✅
+  - 权限管理、数据加密、审计日志
+- [x] **迁移框架 (Migration Framework)**: [migration-framework/](migration-framework/) ✅
+  - 自动化迁移工具、数据校验框架、回滚机制
+- [x] **实际应用场景 (Real World Scenarios)**: [real-world-scenarios/](real-world-scenarios/) ✅
+  - 电商分析、日志处理、实时监控
+
 ### 高级管理 (Day 17)
 - [x] **Day 17**: [多租户配额管理 (Multi-Tenant Quotas)](day17-multi-tenant-quotas/) ✅
   - 资源配额配置、多租户隔离、系统稳定性保障
@@ -176,11 +190,48 @@ clickhouse/
 │   ├── project-demo.sql                # 完整SQL示例
 │   ├── project-config.xml              # 生产配置
 │   └── project-manager.ps1             # 项目管理脚本
-└── day15-data-migration/               # Day 15: 数据迁移实战
-    ├── data-migration.md               # 学习笔记
-    ├── examples/                       # 迁移演示SQL
-    ├── configs/                        # 集群配置文件
-    └── scripts/                        # 迁移管理脚本
+├── day15-data-migration/               # Day 15: 数据迁移实战
+│   ├── data-migration.md               # 学习笔记
+│   ├── examples/                       # 迁移演示SQL
+│   ├── configs/                        # 集群配置文件
+│   └── scripts/                        # 迁移管理脚本
+├── day16-migration-framework/          # Day 16: 迁移框架
+│   ├── migration-framework.md          # 学习笔记
+│   ├── examples/                       # 迁移示例
+│   ├── configs/                        # 配置文件
+│   └── scripts/                        # 迁移脚本
+├── day17-multi-tenant-quotas/          # Day 17: 多租户配额管理
+│   ├── multi-tenant-quotas.md          # 学习笔记
+│   ├── examples/                       # 配置示例
+│   ├── configs/                        # 配置文件
+│   └── scripts/                        # 管理脚本
+├── data-management/                    # 数据管理
+│   ├── data-modeling/                  # 数据建模
+│   ├── etl-pipelines/                  # ETL流程
+│   └── data-quality/                   # 数据质量
+├── cluster-ops/                        # 集群运维
+│   ├── monitoring/                     # 集群监控
+│   ├── troubleshooting/                # 故障排查
+│   └── automation/                     # 自动化运维
+├── performance-tuning/                 # 性能调优
+│   ├── query-optimization/             # 查询优化
+│   ├── resource-allocation/            # 资源配置
+│   └── benchmarking/                   # 基准测试
+├── security-access-control/            # 安全访问控制
+│   ├── permissions/                    # 权限管理
+│   ├── encryption/                     # 数据加密
+│   └── audit-logs/                     # 审计日志
+├── migration-framework/                # 迁移框架
+│   ├── core/                           # 核心模块
+│   ├── templates/                      # 模板文件
+│   ├── migrations/                     # 迁移文件
+│   ├── configs/                        # 配置文件
+│   ├── scripts/                        # 脚本工具
+│   └── examples/                       # 示例文件
+└── real-world-scenarios/               # 实际应用场景
+    ├── e-commerce-analytics/           # 电商分析
+    ├── log-processing/                 # 日志处理
+    └── real-time-monitoring/           # 实时监控
 ```
 
 ## 🛠️ 主要技术栈
