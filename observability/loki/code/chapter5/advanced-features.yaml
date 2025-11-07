@@ -1,0 +1,192 @@
+version: "3.8"
+
+services:
+  # Gateway - 统一入口
+  nginx:
+    image: nginx:alpine
+    container_name: loki-gateway
+    ports:
+      - "3100:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - distributor
+      - query-frontend
+    restart: unless-stopped
+    networks:
+      - loki
+
+  # Distributor - 日志分发器
+  distributor:
+    image: grafana/loki:2.9.0
+    container_name: loki-distributor
+    command: -config.file=/etc/loki/local-config.yaml -target=distributor
+    volumes:
+      - ./loki-config.yaml:/etc/loki/local-config.yaml:ro
+    depends_on:
+      - consul
+    restart: unless-stopped
+    networks:
+      - loki
+    deploy:
+      replicas: 2
+
+  # Ingester - 日志接收器
+  ingester:
+    image: grafana/loki:2.9.0
+    container_name: loki-ingester
+    command: -config.file=/etc/loki/local-config.yaml -target=ingester
+    volumes:
+      - ./loki-config.yaml:/etc/loki/local-config.yaml:ro
+      - ingester-data:/loki
+    depends_on:
+      - consul
+    restart: unless-stopped
+    networks:
+      - loki
+    deploy:
+      replicas: 2
+
+  # Querier - 查询器
+  querier:
+    image: grafana/loki:2.9.0
+    container_name: loki-querier
+    command: -config.file=/etc/loki/local-config.yaml -target=querier
+    volumes:
+      - ./loki-config.yaml:/etc/loki/local-config.yaml:ro
+    depends_on:
+      - consul
+    restart: unless-stopped
+    networks:
+      - loki
+    deploy:
+      replicas: 2
+
+  # Query Frontend - 查询前端
+  query-frontend:
+    image: grafana/loki:2.9.0
+    container_name: loki-query-frontend
+    command: -config.file=/etc/loki/local-config.yaml -target=query-frontend
+    volumes:
+      - ./loki-config.yaml:/etc/loki/local-config.yaml:ro
+    depends_on:
+      - consul
+    restart: unless-stopped
+    networks:
+      - loki
+    deploy:
+      replicas: 2
+
+  # Compactor - 压缩器
+  compactor:
+    image: grafana/loki:2.9.0
+    container_name: loki-compactor
+    command: -config.file=/etc/loki/local-config.yaml -target=compactor
+    volumes:
+      - ./loki-config.yaml:/etc/loki/local-config.yaml:ro
+      - compactor-data:/loki
+    depends_on:
+      - consul
+    restart: unless-stopped
+    networks:
+      - loki
+
+  # Ruler - 告警规则
+  ruler:
+    image: grafana/loki:2.9.0
+    container_name: loki-ruler
+    command: -config.file=/etc/loki/local-config.yaml -target=ruler
+    volumes:
+      - ./loki-config.yaml:/etc/loki/local-config.yaml:ro
+      - ./rules:/etc/loki/rules:ro
+    depends_on:
+      - consul
+    restart: unless-stopped
+    networks:
+      - loki
+
+  # Consul - 服务发现和配置存储
+  consul:
+    image: consul:1.14
+    container_name: loki-consul
+    ports:
+      - "8500:8500"
+    command: agent -server -bootstrap-expect=1 -client=0.0.0.0
+    volumes:
+      - consul-data:/consul/data
+    restart: unless-stopped
+    networks:
+      - loki
+
+  # MinIO - 对象存储（模拟S3）
+  minio:
+    image: minio/minio:latest
+    container_name: loki-minio
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    command: server /data --console-address ":9001"
+    environment:
+      - MINIO_ACCESS_KEY=loki
+      - MINIO_SECRET_KEY=loki-secret
+    volumes:
+      - minio-data:/data
+    restart: unless-stopped
+    networks:
+      - loki
+
+  # Redis - 缓存
+  redis:
+    image: redis:7-alpine
+    container_name: loki-redis
+    ports:
+      - "6379:6379"
+    command: redis-server --requirepass redis-secret
+    volumes:
+      - redis-data:/data
+    restart: unless-stopped
+    networks:
+      - loki
+
+  # Grafana - 可视化和查询界面
+  grafana:
+    image: grafana/grafana:latest
+    container_name: loki-grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_INSTALL_PLUGINS=grafana-piechart-panel
+      - GF_SECURITY_ALLOW_EMBEDDING=true
+    volumes:
+      - grafana-storage:/var/lib/grafana
+      - ./grafana-provisioning:/etc/grafana/provisioning:ro
+    restart: unless-stopped
+    networks:
+      - loki
+
+  # 认证服务（可选）
+  auth-service:
+    image: ghcr.io/grafana/grafana-gateway:latest
+    container_name: loki-auth
+    ports:
+      - "8080:8080"
+    environment:
+      - JWT_SECRET=my-secret-key
+      - JWT_ISSUER=loki-auth
+      - JWT_AUDIENCE=loki
+    restart: unless-stopped
+    networks:
+      - loki
+
+volumes:
+  ingester-data:
+  compactor-data:
+  consul-data:
+  minio-data:
+  redis-data:
+  grafana-storage:
+
+networks:
+  loki:
+    driver: bridge
