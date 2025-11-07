@@ -1,0 +1,151 @@
+version: '3.8'
+
+services:
+  # Grafana 负载均衡
+  nginx:
+    image: nginx:alpine
+    container_name: grafana-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - grafana-1
+      - grafana-2
+      - grafana-3
+    restart: unless-stopped
+    networks:
+      - grafana-net
+
+  # Grafana 实例 1
+  grafana-1:
+    image: grafana/grafana:enterprise:9.5.0
+    container_name: grafana-1
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=${ADMIN_PASSWORD}
+      - GF_DATABASE_TYPE=postgres
+      - GF_DATABASE_HOST=postgres:5432
+      - GF_DATABASE_NAME=grafana
+      - GF_DATABASE_USER=grafana
+      - GF_DATABASE_PASSWORD=${DB_PASSWORD}
+      - GF_INSTALL_PLUGINS=grafana-piechart-panel,grafana-worldmap-panel
+      - GF_AUTH_SAML_ENABLED=true
+      - GF_AUTH_SAML_CERT_FILE=/etc/grafana/saml/cert.pem
+      - GF_AUTH_SAML_PRIVATE_KEY_FILE=/etc/grafana/saml/key.pem
+    volumes:
+      - grafana-storage-1:/var/lib/grafana
+      - grafana-config-1:/etc/grafana
+      - ./saml:/etc/grafana/saml:ro
+    restart: unless-stopped
+    networks:
+      - grafana-net
+
+  # Grafana 实例 2
+  grafana-2:
+    image: grafana/grafana:enterprise:9.5.0
+    container_name: grafana-2
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=${ADMIN_PASSWORD}
+      - GF_DATABASE_TYPE=postgres
+      - GF_DATABASE_HOST=postgres:5432
+      - GF_DATABASE_NAME=grafana
+      - GF_DATABASE_USER=grafana
+      - GF_DATABASE_PASSWORD=${DB_PASSWORD}
+      - GF_INSTALL_PLUGINS=grafana-piechart-panel,grafana-worldmap-panel
+      - GF_AUTH_SAML_ENABLED=true
+      - GF_AUTH_SAML_CERT_FILE=/etc/grafana/saml/cert.pem
+      - GF_AUTH_SAML_PRIVATE_KEY_FILE=/etc/grafana/saml/key.pem
+    volumes:
+      - grafana-storage-2:/var/lib/grafana
+      - grafana-config-2:/etc/grafana
+      - ./saml:/etc/grafana/saml:ro
+    restart: unless-stopped
+    networks:
+      - grafana-net
+
+  # Grafana 实例 3
+  grafana-3:
+    image: grafana/grafana:enterprise:9.5.0
+    container_name: grafana-3
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=${ADMIN_PASSWORD}
+      - GF_DATABASE_TYPE=postgres
+      - GF_DATABASE_HOST=postgres:5432
+      - GF_DATABASE_NAME=grafana
+      - GF_DATABASE_USER=grafana
+      - GF_DATABASE_PASSWORD=${DB_PASSWORD}
+      - GF_INSTALL_PLUGINS=grafana-piechart-panel,grafana-worldmap-panel
+      - GF_AUTH_SAML_ENABLED=true
+      - GF_AUTH_SAML_CERT_FILE=/etc/grafana/saml/cert.pem
+      - GF_AUTH_SAML_PRIVATE_KEY_FILE=/etc/grafana/saml/key.pem
+    volumes:
+      - grafana-storage-3:/var/lib/grafana
+      - grafana-config-3:/etc/grafana
+      - ./saml:/etc/grafana/saml:ro
+    restart: unless-stopped
+    networks:
+      - grafana-net
+
+  # PostgreSQL 数据库
+  postgres:
+    image: postgres:14
+    container_name: grafana-postgres
+    environment:
+      - POSTGRES_DB=grafana
+      - POSTGRES_USER=grafana
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql:ro
+    restart: unless-stopped
+    networks:
+      - grafana-net
+
+  # Redis 缓存
+  redis:
+    image: redis:7-alpine
+    container_name: grafana-redis
+    command: redis-server --requirepass ${REDIS_PASSWORD}
+    volumes:
+      - redis-data:/data
+    restart: unless-stopped
+    networks:
+      - grafana-net
+
+  # Prometheus 数据源
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: grafana-prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=200h'
+      - '--web.enable-lifecycle'
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    restart: unless-stopped
+    networks:
+      - grafana-net
+
+volumes:
+  grafana-storage-1:
+  grafana-storage-2:
+  grafana-storage-3:
+  grafana-config-1:
+  grafana-config-2:
+  grafana-config-3:
+  postgres-data:
+  redis-data:
+  prometheus-data:
+
+networks:
+  grafana-net:
+    driver: bridge

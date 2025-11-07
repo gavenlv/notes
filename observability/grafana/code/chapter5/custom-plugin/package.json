@@ -1,0 +1,37 @@
+{
+  "name": "simple-stat-panel",
+  "version": "1.0.0",
+  "description": "一个简单的统计面板插件示例",
+  "scripts": {
+    "build": "webpack -c webpack.config.js",
+    "dev": "webpack -w -c webpack.config.js",
+    "test": "jest",
+    "typecheck": "tsc --noEmit"
+  },
+  "author": "Your Name",
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "@grafana/data": "^9.5.0",
+    "@grafana/runtime": "^9.5.0",
+    "@grafana/ui": "^9.5.0",
+    "@types/lodash": "^4.14.178",
+    "copy-webpack-plugin": "^11.0.0",
+    "css-loader": "^6.7.3",
+    "fork-ts-checker-webpack-plugin": "^7.2.13",
+    "jest": "^27.5.1",
+    "replace-in-file-webpack-plugin": "^1.0.6",
+    "sass": "^1.49.9",
+    "sass-loader": "^13.2.0",
+    "style-loader": "^3.3.2",
+    "ts-loader": "^9.4.2",
+    "typescript": "^4.9.5",
+    "webpack": "^5.76.0",
+    "webpack-cli": "^5.0.1",
+    "webpack-livereload-plugin": "^3.0.2"
+  },
+  "dependencies": {
+    "lodash": "^4.17.21",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2"
+  }
+}

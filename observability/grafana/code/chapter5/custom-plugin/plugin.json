@@ -1,0 +1,32 @@
+{
+  "type": "panel",
+  "name": "简单统计面板",
+  "id": "simple-stat-panel",
+  "info": {
+    "description": "一个简单的统计面板插件示例",
+    "author": {
+      "name": "Your Name",
+      "url": "https://yourwebsite.com"
+    },
+    "keywords": ["panel", "stat", "simple"],
+    "logos": {
+      "small": "img/logo.svg",
+      "large": "img/logo.svg"
+    },
+    "links": [
+      {
+        "name": "GitHub",
+        "url": "https://github.com/yourname/simple-stat-panel"
+      }
+    ],
+    "screenshots": [],
+    "version": "1.0.0",
+    "updated": "2023-05-01"
+  },
+  "includes": [
+    {
+      "type": "panel",
+      "name": "简单统计面板"
+    }
+  ]
+}
