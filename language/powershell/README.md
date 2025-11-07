@@ -183,7 +183,7 @@ A: PowerShell管道是一种将命令输出作为另一个命令输入的机制�
 
 ### 基本语法
 
-```powershell
+``powershell
 # 注释
 # 这是单行注释
 <#
@@ -237,7 +237,7 @@ $person.Remove("City")  # 删除元素
 
 ### 运算符
 
-```powershell
+``powershell
 # 算术运算符
 $a = 10
 $b = 3
@@ -291,7 +291,7 @@ $split = "a,b,c" -split ","             # 分割运算符: "a", "b", "c"
 
 ### 流程控制
 
-```powershell
+``powershell
 # If-Else语句
 $age = 25
 
@@ -382,7 +382,7 @@ for ($i = 1; $i -le 10; $i++) {
 
 ### 函数
 
-```powershell
+``powershell
 # 基本函数
 function Say-Hello {
     Write-Host "Hello, World!"
@@ -527,7 +527,7 @@ Get-AdvancedProcess -Name "powershell" -Status "Running" -IncludeMemory -Verbose
 
 ### 文件和文件夹操作
 
-```powershell
+``powershell
 # 获取当前目录
 $currentDir = Get-Location
 Write-Host "当前目录: $currentDir"
@@ -612,7 +612,7 @@ Expand-Archive -Path "C:\Temp\NewFolder.zip" -DestinationPath "C:\Temp\Extracted
 
 ### 注册表操作
 
-```powershell
+``powershell
 # 列出注册表项
 Get-ChildItem -Path "HKLM:\SOFTWARE"
 Get-ChildItem -Path "HKCU:\Software"
@@ -677,7 +677,7 @@ Invoke-Command -ComputerName $remoteComputer -ScriptBlock {
 
 ### WMI和CIM操作
 
-```powershell
+``powershell
 # 使用WMI获取系统信息
 $osInfo = Get-WmiObject -Class Win32_OperatingSystem
 Write-Host "操作系统: $($osInfo.Caption)"
@@ -767,7 +767,7 @@ Remove-CimSession -CimSession $cimSession
 
 ### Active Directory管理
 
-```powershell
+``powershell
 # 导入Active Directory模块
 Import-Module ActiveDirectory
 
@@ -895,7 +895,7 @@ foreach ($user in $users) {
 
 ### 错误处理
 
-```powershell
+``powershell
 # 使用Try-Catch处理错误
 try {
     # 可能出错的代码
@@ -1087,3 +1087,325 @@ catch {
 ---
 
 *最后更新: 2023年*
+```
+
+## PowerShell从0到专家完整教程
+
+> **🎯 零基础友好** | **📚 深入浅出** | **💡 实战导向** | **🚀 专家进阶**
+
+欢迎来到PowerShell完整学习之旅！本教程专为零基础学习者设计，通过12个章节带你从入门到精通PowerShell自动化脚本和系统管理。
+
+---
+
+## 📖 课程简介
+
+**PowerShell**是微软开发的任务自动化和配置管理框架，基于.NET框架构建。它不仅是一个命令行外壳，更是一个强大的脚本语言，被广泛应用于：
+
+- 🖥️ **Windows系统管理**: 用户、进程、服务管理
+- ☁️ **云服务管理**: Azure、AWS、Office 365
+- 🔧 **自动化运维**: 批量操作、定时任务
+- 📊 **数据处理**: 日志分析、报表生成
+- 🌐 **网络管理**: 配置、监控、故障排查
+
+---
+
+## 🎓 课程特色
+
+### ✨ 零基础友好
+- 从最基础的概念开始讲解
+- 每个知识点都有详细说明
+- 不假设任何编程经验
+
+### 📊 深入全面
+- 每章平均700-900行内容
+- 涵盖从基础到高级的所有知识点
+- 系统化的学习路径
+
+### 💡 实例丰富
+- 每个概念都配有代码示例
+- 通过实验验证所有知识点
+- 提供大量实战练习
+
+### 🚀 实战导向
+- 配套code目录存放所有代码
+- 可直接运行的完整脚本
+- 真实场景的项目案例
+
+---
+
+## 📚 完整章节目录
+
+### 🔰 入门阶段 (第1-3章)
+
+| 章节 | 标题 | 学时 | 难度 | 说明 |
+|------|------|------|------|------|
+| [第1章](./1-PowerShell环境安装与配置.md) | PowerShell环境安装与配置 | 3-4h | ⭐ | PowerShell简介、版本选择、环境配置、基础命令 |
+| [第2章](./2-PowerShell基础语法.md) | PowerShell基础语法 | 4-5h | ⭐⭐ | 命令结构、帮助系统、别名、格式化输出 |
+| [第3章](./3-变量与数据类型.md) | 变量与数据类型 | 5-6h | ⭐⭐⭐ | 变量定义、数据类型、类型转换、数组哈希表 |
+
+### 📈 进阶阶段 (第4-7章)
+
+| 章节 | 标题 | 学时 | 难度 | 说明 |
+|------|------|------|------|------|
+| [第4章](./4-运算符与表达式.md) | 运算符与表达式 | 4-5h | ⭐⭐⭐ | 算术、比较、逻辑、位运算符 |
+| [第5章](./5-控制流程.md) | 控制流程 | 5-6h | ⭐⭐⭐ | 条件语句、循环、流程控制 |
+| [第6章](./6-函数与脚本.md) | 函数与脚本 | 6-7h | ⭐⭐⭐⭐ | 函数定义、参数、作用域、脚本开发 |
+| [第7章](./7-对象与管道.md) | 对象与管道 | 7-8h | ⭐⭐⭐⭐⭐ | 对象模型、管道机制、数据处理 |
+
+### 🚀 高级阶段 (第8-11章)
+
+| 章节 | 标题 | 学时 | 难度 | 说明 |
+|------|------|------|------|------|
+| [第8章](./8-文件系统操作.md) | 文件系统操作 | 5-6h | ⭐⭐⭐⭐ | 文件读写、目录管理、权限操作 |
+| [第9章](./9-错误处理与调试.md) | 错误处理与调试 | 5-6h | ⭐⭐⭐⭐ | Try-Catch、错误处理、调试技巧 |
+| [第10章](./10-模块与包管理.md) | 模块与包管理 | 6-7h | ⭐⭐⭐⭐ | 模块导入、PSGallery、包管理 |
+| [第11章](./11-远程管理与自动化.md) | 远程管理与自动化 | 8-10h | ⭐⭐⭐⭐⭐ | PowerShell Remoting、任务调度、自动化 |
+
+### 🎯 实战阶段 (第12章)
+
+| 章节 | 标题 | 学时 | 难度 | 说明 |
+|------|------|------|------|------|
+| [第12章](./12-实战项目.md) | 实战项目 | 15-20h | ⭐⭐⭐⭐⭐ | 系统监控、日志分析、自动化部署、批量管理 |
+
+**总学时**: 约 **80-100小时**
+
+---
+
+## 🎯 学习路径
+
+```
+开始学习
+    ↓
+第1-2章: PowerShell入门
+├─ 环境配置
+├─ 基础命令
+└─ 基本语法
+    ↓
+第3-5章: 核心基础
+├─ 变量与类型
+├─ 运算符
+└─ 控制流程
+    ↓
+第6-7章: 进阶技能
+├─ 函数与脚本
+└─ 对象与管道 ⭐重要
+    ↓
+第8-9章: 实用技能
+├─ 文件操作
+└─ 错误处理
+    ↓
+第10-11章: 高级应用
+├─ 模块管理
+└─ 远程自动化
+    ↓
+第12章: 实战项目
+├─ 系统监控工具
+├─ 日志分析器
+├─ 自动化部署
+└─ 批量管理系统
+    ↓
+成为PowerShell专家 🎉
+```
+
+---
+
+## 🚀 快速开始
+
+### 1. 检查PowerShell版本
+
+```powershell
+# 查看PowerShell版本
+$PSVersionTable
+
+# 输出示例
+Name                           Value
+----                           -----
+PSVersion                      7.4.0
+PSEdition                      Core
+GitCommitId                    7.4.0
+OS                             Microsoft Windows 10.0.22631
+Platform                       Win32NT
+```
+
+### 2. 推荐配置
+
+- **Windows 10/11**: 自带Windows PowerShell 5.1
+- **推荐安装**: PowerShell 7+ (跨平台版本)
+- **编辑器**: VS Code + PowerShell扩展
+- **终端**: Windows Terminal
+
+### 3. 第一个PowerShell命令
+
+``powershell
+# 显示"Hello, PowerShell!"
+Write-Host "Hello, PowerShell!" -ForegroundColor Green
+
+# 获取当前目录
+Get-Location
+
+# 列出文件
+Get-ChildItem
+```
+
+---
+
+## 📁 项目结构
+
+```
+language/powershell/
+├── README.md                              # 本文件 - 课程总览
+├── 1-PowerShell环境安装与配置.md           # 第1章
+├── 2-PowerShell基础语法.md                 # 第2章
+├── 3-变量与数据类型.md                     # 第3章
+├── 4-运算符与表达式.md                     # 第4章
+├── 5-控制流程.md                           # 第5章
+├── 6-函数与脚本.md                         # 第6章
+├── 7-对象与管道.md                         # 第7章
+├── 8-文件系统操作.md                       # 第8章
+├── 9-错误处理与调试.md                     # 第9章
+├── 10-模块与包管理.md                      # 第10章
+├── 11-远程管理与自动化.md                  # 第11章
+├── 12-实战项目.md                          # 第12章
+└── code/                                  # 代码目录
+    ├── chapter01/                         # 第1章代码
+    ├── chapter02/                         # 第2章代码
+    ├── ...
+    └── chapter12/                         # 第12章代码
+```
+
+---
+
+## 💻 代码使用说明
+
+### 文档中的代码
+
+每章文档中都包含大量代码示例，可以直接复制到PowerShell中运行：
+
+``powershell
+# 示例代码
+Get-Process | Where-Object {$_.CPU -gt 100} | Select-Object Name, CPU
+```
+
+### code目录中的脚本
+
+独立的`.ps1`脚本文件，可以直接运行：
+
+```powershell
+# 运行脚本
+.\code\chapter01\01-hello-world.ps1
+
+# 或者使用点操作符在当前会话中运行
+. .\code\chapter01\01-hello-world.ps1
+```
+
+### 执行策略
+
+首次运行脚本可能需要设置执行策略：
+
+```powershell
+# 查看当前执行策略
+Get-ExecutionPolicy
+
+# 设置为RemoteSigned (推荐)
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+
+# 临时绕过执行策略
+powershell -ExecutionPolicy Bypass -File script.ps1
+```
+
+---
+
+## 🎓 学习建议
+
+### 初学者
+
+1. **按顺序学习**: 从第1章开始，不要跳章
+2. **动手实践**: 每个示例都要亲自运行
+3. **完成练习**: 每章末尾的练习题很重要
+4. **记录笔记**: 记下遇到的问题和解决方法
+
+### 有基础的学习者
+
+1. **快速浏览**: 前3章可以快速浏览
+2. **重点章节**: 第7章(对象与管道)是重中之重
+3. **实战为主**: 多做第12章的实战项目
+4. **深入研究**: 研究PowerShell的底层机制
+
+### 学习资源
+
+- 📖 **官方文档**: [Microsoft PowerShell Docs](https://docs.microsoft.com/powershell/)
+- 💻 **在线练习**: [PowerShell Gallery](https://www.powershellgallery.com/)
+- 📺 **视频教程**: Microsoft Learn
+- 📚 **推荐书籍**: 
+  - "Learn PowerShell in a Month of Lunches"
+  - "PowerShell for Sysadmins"
+
+---
+
+## ⚙️ 系统要求
+
+### Windows
+- **操作系统**: Windows 10/11, Windows Server 2016+
+- **PowerShell**: 5.1+ (内置) 或 PowerShell 7+
+- **内存**: 最低2GB，推荐4GB+
+- **磁盘**: 500MB可用空间
+
+### Linux/macOS
+- **PowerShell**: PowerShell 7+
+- **安装方式**: 
+  ```bash
+  # Ubuntu/Debian
+  sudo apt-get install -y powershell
+  
+  # macOS
+  brew install --cask powershell
+  ```
+
+---
+
+## 📊 学习进度追踪
+
+建议创建一个学习日志，记录你的进度：
+
+```
+□ 第1章 - PowerShell环境安装与配置
+□ 第2章 - PowerShell基础语法
+□ 第3章 - 变量与数据类型
+□ 第4章 - 运算符与表达式
+□ 第5章 - 控制流程
+□ 第6章 - 函数与脚本
+□ 第7章 - 对象与管道
+□ 第8章 - 文件系统操作
+□ 第9章 - 错误处理与调试
+□ 第10章 - 模块与包管理
+□ 第11章 - 远程管理与自动化
+□ 第12章 - 实战项目
+```
+
+---
+
+## 🤝 贡献与反馈
+
+如果你发现任何错误或有改进建议，欢迎提出！
+
+---
+
+## 📜 版权说明
+
+本教程仅供学习使用，所有代码示例均可自由使用和修改。
+
+---
+
+## 🎯 开始学习
+
+准备好了吗？让我们从[第1章：PowerShell环境安装与配置](./1-PowerShell环境安装与配置.md)开始你的PowerShell学习之旅！
+
+**记住**: 
+- ✨ 编程是实践的艺术，多动手！
+- 📚 遇到问题不要怕，查文档、搜索、实验
+- 🚀 循序渐进，每天进步一点点
+- 💪 坚持学习，你一定能成为PowerShell专家！
+
+---
+
+**Happy Scripting! 🎉**
