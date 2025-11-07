@@ -1,0 +1,114 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dolphinscheduler-postgresql
+  namespace: dolphinscheduler
+  labels:
+    app: dolphinscheduler-postgresql
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dolphinscheduler-postgresql
+  template:
+    metadata:
+      labels:
+        app: dolphinscheduler-postgresql
+    spec:
+      containers:
+      - name: postgresql
+        image: postgres:12-alpine
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: POSTGRES_USER
+          value: "dolphinscheduler"
+        - name: POSTGRES_PASSWORD
+          value: "dolphinscheduler"
+        - name: POSTGRES_DB
+          value: "dolphinscheduler"
+        ports:
+        - containerPort: 5432
+        volumeMounts:
+        - name: postgres-storage
+          mountPath: /var/lib/postgresql/data
+        - name: init-sql
+          mountPath: /docker-entrypoint-initdb.d
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+          limits:
+            memory: "1Gi"
+            cpu: "500m"
+        livenessProbe:
+          exec:
+            command:
+            - pg_isready
+            - -U
+            - dolphinscheduler
+            - -d
+            - dolphinscheduler
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          exec:
+            command:
+            - pg_isready
+            - -U
+            - dolphinscheduler
+            - -d
+            - dolphinscheduler
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+      volumes:
+      - name: postgres-storage
+        persistentVolumeClaim:
+          claimName: postgres-pvc
+      - name: init-sql
+        configMap:
+          name: dolphinscheduler-postgresql-init
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dolphinscheduler-postgresql
+  namespace: dolphinscheduler
+  labels:
+    app: dolphinscheduler-postgresql
+spec:
+  ports:
+  - port: 5432
+    targetPort: 5432
+    name: postgresql
+  selector:
+    app: dolphinscheduler-postgresql
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-pvc
+  namespace: dolphinscheduler
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 20Gi
+  storageClassName: standard
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: dolphinscheduler-postgresql-init
+  namespace: dolphinscheduler
+data:
+  init.sql: |
+    CREATE DATABASE dolphinscheduler;
+    -- Create user for dolphinscheduler
+    CREATE USER dolphinscheduler WITH PASSWORD 'dolphinscheduler';
+    GRANT ALL PRIVILEGES ON DATABASE dolphinscheduler TO dolphinscheduler;

@@ -1,0 +1,142 @@
+version: '3.8'
+
+services:
+  dolphinscheduler-postgresql:
+    image: postgres:12-alpine
+    container_name: dolphinscheduler-postgresql
+    environment:
+      POSTGRES_USER: dolphinscheduler
+      POSTGRES_PASSWORD: dolphinscheduler
+      POSTGRES_DB: dolphinscheduler
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./sql/dolphinscheduler_postgresql.sql:/docker-entrypoint-initdb.d/dolphinscheduler_postgresql.sql
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dolphinscheduler"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - dolphinscheduler
+
+  dolphinscheduler-zookeeper:
+    image: zookeeper:3.4.14
+    container_name: dolphinscheduler-zookeeper
+    environment:
+      ZOO_MY_ID: 1
+      ZOO_SERVERS: server.1=dolphinscheduler-zookeeper:2888:3888
+    ports:
+      - "2181:2181"
+    networks:
+      - dolphinscheduler
+
+  dolphinscheduler-master:
+    image: apache/dolphinscheduler:latest
+    container_name: dolphinscheduler-master
+    depends_on:
+      dolphinscheduler-postgresql:
+        condition: service_healthy
+      dolphinscheduler-zookeeper:
+        condition: service_started
+    command: ["master-server"]
+    ports:
+      - "5678:5678"
+    environment:
+      DATABASE_TYPE: postgresql
+      DATABASE_DRIVER: org.postgresql.Driver
+      DATABASE_HOST: dolphinscheduler-postgresql
+      DATABASE_PORT: 5432
+      DATABASE_USERNAME: dolphinscheduler
+      DATABASE_PASSWORD: dolphinscheduler
+      DATABASE_DATABASE: dolphinscheduler
+      REGISTRY_ZOOKEEPER_CONNECT_STRING: dolphinscheduler-zookeeper:2181
+    volumes:
+      - ./logs:/opt/dolphinscheduler/logs
+      - ./data:/opt/dolphinscheduler/data
+    networks:
+      - dolphinscheduler
+
+  dolphinscheduler-worker:
+    image: apache/dolphinscheduler:latest
+    container_name: dolphinscheduler-worker
+    depends_on:
+      dolphinscheduler-postgresql:
+        condition: service_healthy
+      dolphinscheduler-zookeeper:
+        condition: service_started
+    command: ["worker-server"]
+    ports:
+      - "1234:1234"
+    environment:
+      DATABASE_TYPE: postgresql
+      DATABASE_DRIVER: org.postgresql.Driver
+      DATABASE_HOST: dolphinscheduler-postgresql
+      DATABASE_PORT: 5432
+      DATABASE_USERNAME: dolphinscheduler
+      DATABASE_PASSWORD: dolphinscheduler
+      DATABASE_DATABASE: dolphinscheduler
+      REGISTRY_ZOOKEEPER_CONNECT_STRING: dolphinscheduler-zookeeper:2181
+    volumes:
+      - ./logs:/opt/dolphinscheduler/logs
+      - ./data:/opt/dolphinscheduler/data
+    networks:
+      - dolphinscheduler
+
+  dolphinscheduler-api:
+    image: apache/dolphinscheduler:latest
+    container_name: dolphinscheduler-api
+    depends_on:
+      dolphinscheduler-postgresql:
+        condition: service_healthy
+      dolphinscheduler-zookeeper:
+        condition: service_started
+    command: ["api-server"]
+    ports:
+      - "12345:12345"
+    environment:
+      DATABASE_TYPE: postgresql
+      DATABASE_DRIVER: org.postgresql.Driver
+      DATABASE_HOST: dolphinscheduler-postgresql
+      DATABASE_PORT: 5432
+      DATABASE_USERNAME: dolphinscheduler
+      DATABASE_PASSWORD: dolphinscheduler
+      DATABASE_DATABASE: dolphinscheduler
+      REGISTRY_ZOOKEEPER_CONNECT_STRING: dolphinscheduler-zookeeper:2181
+    volumes:
+      - ./logs:/opt/dolphinscheduler/logs
+    networks:
+      - dolphinscheduler
+
+  dolphinscheduler-alert:
+    image: apache/dolphinscheduler:latest
+    container_name: dolphinscheduler-alert
+    depends_on:
+      dolphinscheduler-postgresql:
+        condition: service_healthy
+      dolphinscheduler-zookeeper:
+        condition: service_started
+    command: ["alert-server"]
+    ports:
+      - "50052:50052"
+    environment:
+      DATABASE_TYPE: postgresql
+      DATABASE_DRIVER: org.postgresql.Driver
+      DATABASE_HOST: dolphinscheduler-postgresql
+      DATABASE_PORT: 5432
+      DATABASE_USERNAME: dolphinscheduler
+      DATABASE_PASSWORD: dolphinscheduler
+      DATABASE_DATABASE: dolphinscheduler
+      REGISTRY_ZOOKEEPER_CONNECT_STRING: dolphinscheduler-zookeeper:2181
+    volumes:
+      - ./logs:/opt/dolphinscheduler/logs
+    networks:
+      - dolphinscheduler
+
+volumes:
+  postgres_data:
+
+networks:
+  dolphinscheduler:
+    driver: bridge
