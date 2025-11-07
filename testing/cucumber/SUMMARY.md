@@ -83,6 +83,17 @@
 - [8.7 持续维护和演进](chapter8/8.7-continuous-maintenance-evolution.md)
 - [8.8 本章实验](chapter8/8.8-chapter-exercises.md)
 
+## 第9章：Cucumber最佳实践与总结
+
+- [9.1 最佳实践概述](chapter9/9.1-best-practices-overview.md)
+- [9.2 常见陷阱与解决方案](chapter9/9.2-common-pitfalls-solutions.md)
+- [9.3 性能优化](chapter9/9.3-performance-optimization.md)
+- [9.4 团队协作](chapter9/9.4-team-collaboration.md)
+- [9.5 工具与生态系统](chapter9/9.5-tools-ecosystem.md)
+- [9.6 高级主题](chapter9/9.6-advanced-topics.md)
+- [9.7 社区与资源](chapter9/9.7-community-resources.md)
+- [9.8 总结与展望](chapter9/9.8-conclusion.md)
+
 ## 附录
 
 - [附录A：Cucumber命令参考](appendix/a-cucumber-command-reference.md)

@@ -1,0 +1,77 @@
+-- Tableau计算字段示例
+-- 包含各种常用计算字段的公式
+
+-- 1. 基本计算字段
+-- 利润率
+[Profit Ratio] = SUM([Profit]) / SUM([Sales])
+
+-- 平均订单价值
+[Average Order Value] = SUM([Sales]) / COUNTD([Order ID])
+
+-- 2. 日期计算字段
+-- 年份
+[Year] = YEAR([Order Date])
+
+-- 季度
+[Quarter] = "Q" + STR(DATEPART('quarter', [Order Date]))
+
+-- 月份名称
+[Month Name] = DATENAME('month', [Order Date])
+
+-- 3. 条件计算字段
+-- 销售类别
+[Sales Category] = 
+  IF [Sales] > 10000 THEN "高"
+  ELSEIF [Sales] > 5000 THEN "中"
+  ELSE "低"
+  END
+
+-- 4. LOD表达式
+-- 客户总销售额
+[Customer Total Sales] = {FIXED [Customer ID]: SUM([Sales])}
+
+-- 产品平均利润（包含所有产品）
+[Product Average Profit (All Products)] = {INCLUDE [Product ID]: AVG([Profit])}
+
+-- 5. 表计算
+-- 移动平均
+[3-Month Moving Avg] = WINDOW_AVG(SUM([Sales]), -2, 0)
+
+-- 同比增长
+[YoY Growth] = 
+  (SUM([Sales]) - LOOKUP(SUM([Sales]), -12)) / LOOKUP(SUM([Sales]), -12)
+
+-- 6. 字符串函数
+-- 客户全名
+[Customer Full Name] = [Customer First Name] + " " + [Customer Last Name]
+
+-- 产品代码提取
+[Product Code] = LEFT([Product Name], 5)
+
+-- 7. 高级计算
+-- 客户细分
+[Customer Segment] = 
+  IF {FIXED [Customer ID]: COUNTD([Order ID])} >= 10 AND 
+     {FIXED [Customer ID]: SUM([Sales])} >= 5000 THEN "高价值客户"
+  ELSEIF {FIXED [Customer ID]: COUNTD([Order ID])} >= 5 THEN "常规客户"
+  ELSE "新客户"
+  END
+
+-- 8. 集合计算
+-- 是否为东部地区
+[Is East Region] = IF [Region] = "East" THEN 1 ELSE 0 END
+
+-- 9. 逻辑计算
+-- 是否为畅销产品
+[Is Bestseller] = 
+  IF RANK(SUM([Sales]), 'desc') <= 10 THEN "畅销产品"
+  ELSE "普通产品"
+  END
+
+-- 10. 数学函数
+-- 订单大小分级
+[Order Size Tier] = 
+  IF [Quantity] < 10 THEN "小订单"
+  ELSEIF [Quantity] < 50 THEN "中订单"
+  ELSE "大订单"
+  END

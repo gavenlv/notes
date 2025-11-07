@@ -1,0 +1,30 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    cluster: 'promql-learning'
+    environment: 'demo'
+
+scrape_configs:
+  # Prometheus自身监控
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+        labels:
+          service: 'prometheus'
+
+  # Node Exporter - 系统指标
+  - job_name: 'node-exporter'
+    static_configs:
+      - targets: ['node-exporter:9100']
+        labels:
+          service: 'node-exporter'
+          instance_type: 'linux-server'
+
+  # Demo App - HTTP请求指标
+  - job_name: 'demo-app'
+    static_configs:
+      - targets: ['demo-app:8000']
+        labels:
+          service: 'demo-app'
+          environment: 'demo'

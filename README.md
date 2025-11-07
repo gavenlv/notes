@@ -1,113 +1,126 @@
-# 技术学习笔记
+# 学习笔记
 
-这是一个综合性的技术学习项目，包含多种技术栈的系统性学习路径。
+本仓库包含各种技术学习笔记和文档，涵盖面试、数据工程、云原生、开发运维等多个领域。
 
-## 📚 学习内容
+## 目录结构
 
-### ClickHouse 数据库
-- **学习路径**: [ClickHouse 14天学习计划](clickhouse/)
-- **完成状态**: ✅ 已完成 (14/14 天)
-- **学习成果**: 掌握了从基础安装到企业级项目实战的完整技能
+### 面试相关 (Interview)
+- [base](Interview/base/docker_k8s.md) - 基础面试题
+- [bi](Interview/bi/) - 商业智能面试题 (待完成)
+- [clickhouse](Interview/clickhouse/) - ClickHouse数据库面试题 (待完成)
+- [frontend](Interview/frontend/react.md) - 前端面试题
+- [frontend-interview](Interview/frontend-interview/) - 前端面试题扩展 (待完成)
+- [java](Interview/java/java_advance.md) - Java面试题
+- [python](Interview/python/python.md) - Python面试题
+- [softskill](Interview/softskill/) - 软技能面试题 (待完成)
 
-### 其他技术栈
-- **Apache Airflow**: 工作流调度平台 (规划中)
-- **Docker**: 容器化技术 (规划中)
-- **Apache Doris**: 实时分析数据库 (规划中)
-- **Apache Flink**: 流处理框架 (规划中)
-- **Kubernetes**: 容器编排平台 (规划中)
+### 商业智能 (BI)
+- [birt](bi/birt/) - BIRT报表工具 (待完成)
+- [jasper](bi/jasper/) - JasperReports报表工具 (待完成)
+- [metabase](bi/metabase/) - Metabase数据分析工具 (待完成)
+- [qlik_sense](bi/qlik_sense/) - Qlik Sense商业智能平台 (待完成)
+- [superset](bi/superset/README.md) - Apache Superset数据可视化平台
+- [superset_zh](bi/superset_zh/README.md) - Apache Superset中文文档
+- [tableau](bi/tableau/README.md) - Tableau数据可视化工具
 
-## 🎯 学习目标
+### 博客文章 (blogs)
+- [clickhouse-tiering-storage.md](blogs/clickhouse-tiering-storage.md) - ClickHouse分层存储方案
 
-通过系统性的学习，掌握现代数据技术栈：
+### 云原生技术 (cloud)
+- [bigquery](cloud/bigquery/README.md) - Google BigQuery数据仓库
+- [devContainer](cloud/devContainer/README.md) - 开发容器环境
+- [docker](cloud/docker/README.md) - Docker容器技术
+- [gcp](cloud/gcp/) - Google Cloud Platform (待完成)
+- [helm](cloud/helm/README.md) - Kubernetes包管理工具
+- [k8s](cloud/k8s/README.md) - Kubernetes容器编排平台
 
-1. **数据存储**: ClickHouse、Doris 等高性能数据库
-2. **数据处理**: Flink 流处理、Airflow 工作流
-3. **容器化**: Docker、Kubernetes 容器技术
-4. **项目实战**: 构建完整的数据分析平台
+### 数据工程 (data)
+- [airflow](data/airflow/README.md) - Apache Airflow工作流管理
+- [clickhouse](data/clickhouse/README.md) - ClickHouse列式数据库
+- [data-quality](data/data-quality/README.md) - 数据质量管理
+- [dolphinscheduler](data/dolphinscheduler/) - Apache DolphinScheduler工作流调度 (待完成)
+- [doris](data/doris/) - Apache Doris分析型数据库 (待完成)
+- [flink](data/flink/README.md) - Apache Flink流处理框架
+- [kafka](data/kafka/) - Apache Kafka消息队列 (待完成)
+- [mongodb](data/mongodb/) - MongoDB文档数据库 (待完成)
+- [mysql](data/mysql/) - MySQL关系型数据库 (待完成)
+- [postgresql](data/postgresql/) - PostgreSQL关系型数据库 (待完成)
+- [python-data-quality](data/python-data-quality/) - Python数据质量工具 (待完成)
+- [rabbitmq](data/rabbitmq/) - RabbitMQ消息代理 (待完成)
+- [redis](data/redis/) - Redis内存数据库 (待完成)
+- [soda-data-quality](data/soda-data-quality/) - Soda数据质量工具 (待完成)
 
-## 📊 整体进度
+### 开发运维 (devops)
+- [ansible](devops/ansible/README.md) - Ansible自动化配置工具
+- [jenkins](devops/jenkins/) - Jenkins持续集成工具 (待完成)
+- [terraform](devops/terraform/README.md) - Terraform基础设施即代码
 
-- **ClickHouse**: 🎉 **已完成** (100%)
-- **其他技术**: 📝 **规划中**
+### 指令说明 (instructions)
+- [copilot-instructions-java.md](instructions/copilot-instructions-java.md) - GitHub Copilot Java指令说明
 
-## 🚀 快速开始
+### 编程语言 (language)
+- [css](language/css/) - CSS样式表语言 (待完成)
+- [es6](language/es6/) - ES6+ JavaScript特性 (待完成)
+- [java](language/java/) - Java编程语言 (待完成)
+- [javascript](language/javascript/) - JavaScript编程语言 (待完成)
+- [powershell](language/powershell/) - PowerShell脚本语言 (待完成)
+- [python](language/python/) - Python编程语言 (待完成)
+- [shell](language/shell/) - Shell脚本语言 (待完成)
+- [sql](language/sql/) - SQL查询语言 (待完成)
 
-### ClickHouse 学习
-```bash
-# 进入 ClickHouse 学习目录
-cd clickhouse
+### 本地笔记 (local_notes)
+- [local_docker_notes.md](local_notes/local_docker_notes.md) - Docker本地笔记
 
-# 查看学习计划
-cat README.md
+### 可观测性 (observability)
+- [grafana](observability/grafana/README.md) - Grafana可视化平台
+- [loki](observability/loki/README.md) - Grafana Loki日志聚合系统
+- [open telemetry](observability/open telemetry/) - 开放遥测标准 (待完成)
+- [prometheus](observability/prometheus/) - Prometheus监控系统 (待完成)
 
-# 从 Day 1 开始学习
-cd day1-installation
-```
+### 测试 (testing)
+- [cucumber](testing/cucumber/README.md) - Cucumber BDD测试框架
+- [unit_test](testing/unit_test/) - 单元测试 (待完成)
 
-### 项目实战
-```bash
-# 进入项目实战目录
-cd clickhouse/day14-project-implementation
+## 目录状态说明
 
-# 部署实时数据分析平台
-powershell -File project-manager.ps1 -Action deploy
-```
+以下目录标记为"待完成"，表示目录已创建但内容尚未填充：
 
-## 📁 项目结构
+- Interview/bi (待完成)
+- Interview/clickhouse (待完成)
+- Interview/frontend-interview (待完成)
+- Interview/softskill (待完成)
+- bi/birt (待完成)
+- bi/jasper (待完成)
+- bi/metabase (待完成)
+- bi/qlik_sense (待完成)
+- cloud/gcp (待完成)
+- data/dolphinscheduler (待完成)
+- data/doris (待完成)
+- data/kafka (待完成)
+- data/mongodb (待完成)
+- data/mysql (待完成)
+- data/postgresql (待完成)
+- data/python-data-quality (待完成)
+- data/rabbitmq (待完成)
+- data/redis (待完成)
+- data/soda-data-quality (待完成)
+- devops/jenkins (待完成)
+- language/css (待完成)
+- language/es6 (待完成)
+- language/java (待完成)
+- language/javascript (待完成)
+- language/powershell (待完成)
+- language/python (待完成)
+- language/shell (待完成)
+- language/sql (待完成)
+- observability/open telemetry (待完成)
+- observability/prometheus (待完成)
+- testing/unit_test (待完成)
 
-```
-notes/
-├── README.md                    # 本文件
-├── clickhouse/                  # ClickHouse 学习目录
-│   ├── README.md               # ClickHouse 学习计划
-│   ├── day1-installation/      # Day 1: 安装部署
-│   ├── day2-introduction/      # Day 2: 基础介绍
-│   ├── day3-cloud-deployment/  # Day 3: 云端部署
-│   ├── ...                     # Day 4-13: 核心功能学习
-│   └── day14-project-implementation/ # Day 14: 项目实战
-├── technologies/               # 其他技术学习目录
-│   ├── airflow/               # Apache Airflow
-│   ├── docker/                # Docker 容器技术
-│   ├── doris/                 # Apache Doris
-│   ├── flink/                 # Apache Flink
-│   └── k8s/                   # Kubernetes
-└── test-all-files.ps1         # 测试脚本
-```
+## 贡献指南
 
-## 🛠️ 主要技术栈
+欢迎提交PR来完善这些学习笔记。如果您发现错误或有改进建议，请提交Issue或PR。
 
-### 已掌握
-- **ClickHouse**: 高性能列式数据库
-- **Docker**: 容器化部署
-- **Kafka**: 实时数据流处理
-- **Prometheus**: 监控和告警
-- **Grafana**: 数据可视化
+## 许可证
 
-### 学习计划
-- **Apache Airflow**: 数据工作流调度
-- **Apache Doris**: MPP 分析数据库
-- **Apache Flink**: 流批一体处理
-- **Kubernetes**: 容器编排管理
-
-## 📈 学习成果
-
-### ClickHouse 专精
-完成 14 天系统学习，具备：
-- 🏗️ **架构设计**: 企业级集群规划和部署
-- ⚡ **性能优化**: 查询调优和系统调优
-- 🔧 **运维管理**: 监控、备份、故障排查
-- 🚀 **项目实战**: 完整的实时分析平台构建
-
-## 🤝 贡献
-
-欢迎提交 Issue 和 Pull Request 来完善这个学习项目！
-
-## 📄 许可证
-
-MIT License
-
----
-
-**持续学习，持续进步！** 🎓
-
-> 💡 **提示**: 每个技术栈都有详细的学习路径和实战项目，建议根据个人兴趣和职业规划选择学习顺序。
+本仓库内容仅供学习参考，不涉及商业用途。

@@ -1,0 +1,372 @@
+# Tableau Server企业级Kubernetes部署配置
+# 适用于Kubernetes环境的企业级部署
+
+# Tableau Server命名空间
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: tableau-server
+  labels:
+    name: tableau-server
+
+---
+# Tableau Server ConfigMap
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: tableau-server-config
+  namespace: tableau-server
+data:
+  # Tableau Server配置参数
+  TSM_CONFIG: |
+    # 服务器配置
+    wgserver.authentication.enabled: "true"
+    wgserver.session.idle.timeout: "240"
+    backgrounder.querylimit: "25"
+    vizqlserver.querylimit: "1000"
+    dataserver.limit.extractsrefreshconcurrent: "10"
+    
+    # 高可用配置
+    service.count: "3"
+    vizqlserver.count: "4"
+    backgrounder.count: "2"
+    dataserver.count: "2"
+    
+    # 性能优化配置
+    java.heap.size: "8g"
+    vizqlserver.cache.enabled: "true"
+    vizqlserver.cache.size: "2g"
+    
+    # 日志配置
+    logger.level: "info"
+    logger.logfile.rotation.enabled: "true"
+    logger.logfile.rotation.maxsize: "100MB"
+    logger.logfile.rotation.maxfiles: "10"
+
+---
+# PostgreSQL数据库持久化存储
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-data-pvc
+  namespace: tableau-server
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: fast-ssd
+  resources:
+    requests:
+      storage: 200Gi
+
+---
+# Tableau数据持久化存储
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: tableau-data-pvc
+  namespace: tableau-server
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: fast-ssd
+  resources:
+    requests:
+      storage: 500Gi
+
+---
+# PostgreSQL数据库部署
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: postgresql
+  namespace: tableau-server
+spec:
+  serviceName: postgresql
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgresql
+  template:
+    metadata:
+      labels:
+        app: postgresql
+    spec:
+      containers:
+      - name: postgresql
+        image: postgres:13
+        env:
+        - name: POSTGRES_DB
+          value: tableau
+        - name: POSTGRES_USER
+          value: tableau
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret
+              key: password
+        - name: PGDATA
+          value: /var/lib/postgresql/data/pgdata
+        ports:
+        - containerPort: 5432
+        volumeMounts:
+        - name: postgres-data
+          mountPath: /var/lib/postgresql/data
+        resources:
+          requests:
+            memory: "2Gi"
+            cpu: "1000m"
+          limits:
+            memory: "4Gi"
+            cpu: "2000m"
+      volumes:
+      - name: postgres-data
+        persistentVolumeClaim:
+          claimName: postgres-data-pvc
+
+---
+# PostgreSQL服务
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgresql
+  namespace: tableau-server
+spec:
+  selector:
+    app: postgresql
+  ports:
+  - port: 5432
+    targetPort: 5432
+  type: ClusterIP
+
+---
+# Tableau Server部署
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tableau-server
+  namespace: tableau-server
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: tableau-server
+  template:
+    metadata:
+      labels:
+        app: tableau-server
+    spec:
+      containers:
+      - name: tableau-server
+        image: tableau/tableau-server:2023.1
+        env:
+        - name: LICENSE_KEY
+          valueFrom:
+            secretKeyRef:
+              name: tableau-secrets
+              key: license-key
+        - name: ADMIN_USER
+          valueFrom:
+            secretKeyRef:
+              name: tableau-secrets
+              key: admin-user
+        - name: ADMIN_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: tableau-secrets
+              key: admin-password
+        ports:
+        - containerPort: 80
+        - containerPort: 443
+        - containerPort: 8850
+        volumeMounts:
+        - name: tableau-data
+          mountPath: /var/opt/tableau
+        - name: tableau-config
+          mountPath: /etc/tableau
+        resources:
+          requests:
+            memory: "8Gi"
+            cpu: "4000m"
+          limits:
+            memory: "16Gi"
+            cpu: "8000m"
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 300
+          periodSeconds: 30
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 60
+          periodSeconds: 10
+      volumes:
+      - name: tableau-data
+        persistentVolumeClaim:
+          claimName: tableau-data-pvc
+      - name: tableau-config
+        configMap:
+          name: tableau-server-config
+
+---
+# Tableau Server负载均衡服务
+apiVersion: v1
+kind: Service
+metadata:
+  name: tableau-server-service
+  namespace: tableau-server
+  annotations:
+    service.beta.kubernetes.io/azure-load-balancer-internal: "true"
+    # 如果使用AWS，取消注释下面一行
+    # service.beta.kubernetes.io/aws-load-balancer-internal: "0.0.0.0/0"
+spec:
+  selector:
+    app: tableau-server
+  ports:
+  - name: http
+    port: 80
+    targetPort: 80
+  - name: https
+    port: 443
+    targetPort: 443
+  - name: gateway
+    port: 8850
+    targetPort: 8850
+  type: LoadBalancer
+
+---
+# Tableau Server Ingress（如果使用Ingress控制器）
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: tableau-server-ingress
+  namespace: tableau-server
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/proxy-body-size: "0"
+spec:
+  tls:
+  - hosts:
+    - tableau.example.com
+    secretName: tableau-tls
+  rules:
+  - host: tableau.example.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: tableau-server-service
+            port:
+              number: 443
+
+---
+# 水平Pod自动扩缩放(HPA)
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: tableau-server-hpa
+  namespace: tableau-server
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: tableau-server
+  minReplicas: 3
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80
+
+---
+# Pod中断预算(确保高可用)
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: tableau-server-pdb
+  namespace: tableau-server
+spec:
+  minAvailable: 2
+  selector:
+    matchLabels:
+      app: tableau-server
+
+---
+# Tableau Server初始化任务
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: tableau-init
+  namespace: tableau-server
+spec:
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+      - name: tableau-init
+        image: tableau/tableau-server:2023.1
+        env:
+        - name: LICENSE_KEY
+          valueFrom:
+            secretKeyRef:
+              name: tableau-secrets
+              key: license-key
+        - name: ADMIN_USER
+          valueFrom:
+            secretKeyRef:
+              name: tableau-secrets
+              key: admin-user
+        - name: ADMIN_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: tableau-secrets
+              key: admin-password
+        command: ["/bin/bash", "-c"]
+        args:
+        - |
+          # 等待Tableau Server服务启动
+          until curl -f http://tableau-server-service:80; do
+            echo "等待Tableau Server服务启动..."
+            sleep 10
+          done
+          
+          # 激活许可证
+          tsm licenses activate -k $LICENSE_KEY
+          
+          # 初始化服务器
+          tsm initialize --start --accept-eula --no-prompt
+          
+          # 设置管理员账户
+          tabcmd initialuser --server localhost:80 --username $ADMIN_USER --password $ADMIN_PASSWORD --complete
+          
+          # 配置服务器
+          tsm pending-changes apply
+          
+          echo "Tableau Server初始化完成"
+      volumeMounts:
+      - name: tableau-data
+        mountPath: /var/opt/tableau
+      - name: tableau-config
+        mountPath: /etc/tableau
+      volumes:
+      - name: tableau-data
+        persistentVolumeClaim:
+          claimName: tableau-data-pvc
+      - name: tableau-config
+        configMap:
+          name: tableau-server-config
