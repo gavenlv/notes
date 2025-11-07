@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JSON简介 - 实例演示</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        h1, h2, h3 {
+            color: #2c3e50;
+        }
+        h1 {
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        code {
+            background-color: #f8f9fa;
+            padding: 2px 5px;
+            border-radius: 4px;
+            font-family: 'Courier New', Courier, monospace;
+        }
+        pre {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            border-left: 4px solid #3498db;
+        }
+        .json-container {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .json-box {
+            flex: 1;
+            min-width: 300px;
+        }
+        .tabs {
+            margin-top: 20px;
+        }
+        .tab-buttons {
+            display: flex;
+            background-color: #f1f1f1;
+            border-radius: 5px 5px 0 0;
+            overflow: hidden;
+        }
+        .tab-button {
+            background-color: inherit;
+            border: none;
+            outline: none;
+            cursor: pointer;
+            padding: 10px 15px;
+            transition: 0.3s;
+            font-weight: 500;
+        }
+        .tab-button:hover {
+            background-color: #ddd;
+        }
+        .tab-button.active {
+            background-color: #3498db;
+            color: white;
+        }
+        .tab-content {
+            display: none;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-top: none;
+            background-color: white;
+            border-radius: 0 0 5px 5px;
+        }
+        .interactive {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        textarea {
+            width: 100%;
+            height: 150px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: 'Courier New', Courier, monospace;
+            margin-bottom: 10px;
+        }
+        .output {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 10px;
+            white-space: pre-wrap;
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .highlight {
+            background-color: #fff9c4;
+            padding: 2px 4px;
+        }
+        .error {
+            color: #e74c3c;
+        }
+        .success {
+            color: #27ae60;
+        }
+        .comparison {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .comparison-item {
+            flex: 1;
+            min-width: 300px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>JSON简介 - 实例演示</h1>
+        <p>JSON (JavaScript Object Notation) 是一种轻量级的数据交换格式，易于人阅读和编写，也易于机器解析和生成。</p>
+        
+        <h2>基本JSON结构</h2>
+        <div class="json-container">
+            <div class="json-box">
+                <h3>JSON对象</h3>
+                <pre>{
+  "name": "张三",
+  "age": 30,
+  "isStudent": false,
+  "courses": ["数学", "物理", "化学"],
+  "address": {
+    "street": "人民路123号",
+    "city": "北京",
+    "zipCode": "100010"
+  }
+}</pre>
+            </div>
+            <div class="json-box">
+                <h3>JSON数组</h3>
+                <pre>[
+  {
+    "id": 1,
+    "title": "学习JSON",
+    "completed": true
+  },
+  {
+    "id": 2,
+    "title": "练习JSON",
+    "completed": false
+  }
+]</pre>
+            </div>
+        </div>
+
+        <div class="tabs">
+            <div class="tab-buttons">
+                <button class="tab-button active" onclick="openTab(event, 'basics')">基本概念</button>
+                <button class="tab-button" onclick="openTab(event, 'comparison')">JSON vs XML</button>
+                <button class="tab-button" onclick="openTab(event, 'advantages')">JSON优势</button>
+                <button class="tab-button" onclick="openTab(event, 'interactive')">交互体验</button>
+            </div>
+            
+            <div id="basics" class="tab-content" style="display: block;">
+                <h3>JSON数据类型</h3>
+                <ul>
+                    <li><strong>字符串 (string)</strong>: 用双引号括起来的文本，如 "Hello, JSON!"</li>
+                    <li><strong>数字 (number)</strong>: 整数或浮点数，如 42 或 3.14</li>
+                    <li><strong>布尔值 (boolean)</strong>: true 或 false</li>
+                    <li><strong>数组 (array)</strong>: 用方括号括起来的有序值列表</li>
+                    <li><strong>对象 (object)</strong>: 用花括号括起来的无序键值对集合</li>
+                    <li><strong>null</strong>: 空值</li>
+                </ul>
+                
+                <h3>JSON语法规则</h3>
+                <ul>
+                    <li>数据使用键值对表示</li>
+                    <li>数据由逗号分隔</li>
+                    <li>花括号保存对象</li>
+                    <li>方括号保存数组</li>
+                </ul>
+            </div>
+            
+            <div id="comparison" class="tab-content">
+                <h3>JSON与XML比较</h3>
+                <div class="comparison">
+                    <div class="comparison-item">
+                        <h4>JSON示例</h4>
+                        <pre>{
+  "user": {
+    "name": "张三",
+    "age": 30,
+    "email": "zhangsan@example.com"
+  }
+}</pre>
+                        <p>更简洁，易于阅读，解析速度快</p>
+                    </div>
+                    <div class="comparison-item">
+                        <h4>XML示例</h4>
+                        <pre>&lt;user&gt;
+  &lt;name&gt;张三&lt;/name&gt;
+  &lt;age&gt;30&lt;/age&gt;
+  &lt;email&gt;zhangsan@example.com&lt;/email&gt;
+&lt;/user&gt;</pre>
+                        <p>更冗长，但支持命名空间和属性</p>
+                    </div>
+                </div>
+                
+                <h3>主要区别</h3>
+                <table border="1" style="width:100%; border-collapse: collapse; margin-top: 15px;">
+                    <tr>
+                        <th style="padding: 10px; text-align: left;">特性</th>
+                        <th style="padding: 10px; text-align: left;">JSON</th>
+                        <th style="padding: 10px; text-align: left;">XML</th>
+                    </tr>
+                    <tr>
+                        <td style="padding: 10px;">可读性</td>
+                        <td style="padding: 10px;">高</td>
+                        <td style="padding: 10px;">中等</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 10px;">解析速度</td>
+                        <td style="padding: 10px;">快</td>
+                        <td style="padding: 10px;">较慢</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 10px;">数据大小</td>
+                        <td style="padding: 10px;">较小</td>
+                        <td style="padding: 10px;">较大</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 10px;">命名空间</td>
+                        <td style="padding: 10px;">不支持</td>
+                        <td style="padding: 10px;">支持</td>
+                    </tr>
+                </table>
+            </div>
+            
+            <div id="advantages" class="tab-content">
+                <h3>JSON的主要优势</h3>
+                <ul>
+                    <li><strong>轻量级</strong>: 相比XML更简洁，数据量更小</li>
+                    <li><strong>易读性</strong>: 语法简单，人眼容易理解</li>
+                    <li><strong>易于解析</strong>: JavaScript原生支持，解析速度快</li>
+                    <li><strong>语言无关</strong>: 虽源自JavaScript，但几乎被所有编程语言支持</li>
+                    <li><strong>结构化数据</strong>: 支持复杂的数据结构，如嵌套对象和数组</li>
+                    <li><strong>Web应用友好</strong>: 与现代Web技术栈无缝集成</li>
+                </ul>
+                
+                <h3>应用场景</h3>
+                <ul>
+                    <li><strong>API通信</strong>: RESTful API标准数据格式</li>
+                    <li><strong>配置文件</strong>: 应用配置、设置存储</li>
+                    <li><strong>数据存储</strong>: NoSQL数据库(如MongoDB)文档格式</li>
+                    <li><strong>前后端数据交换</strong>: Web应用前后端通信</li>
+                </ul>
+            </div>
+            
+            <div id="interactive" class="tab-content">
+                <div class="interactive">
+                    <h3>交互式JSON编辑器</h3>
+                    <p>在下面的文本框中输入JSON内容，然后点击验证按钮检查语法是否正确：</p>
+                    
+                    <textarea id="jsonInput" placeholder='在这里输入JSON内容，例如:
+{
+  "name": "李四",
+  "age": 25,
+  "skills": ["JavaScript", "Python"],
+  "isActive": true
+}'></textarea>
+                    
+                    <div>
+                        <button onclick="validateJSON()">验证JSON</button>
+                        <button onclick="formatJSON()">格式化JSON</button>
+                        <button onclick="minifyJSON()">压缩JSON</button>
+                        <button onclick="loadExample()">加载示例</button>
+                    </div>
+                    
+                    <div id="output" class="output"></div>
+                </div>
+                
+                <div class="interactive" style="margin-top: 20px;">
+                    <h3>JSON路径测试</h3>
+                    <p>使用JSONPath查询特定数据：</p>
+                    
+                    <textarea id="jsonPathInput" placeholder='在这里输入JSON内容'>
+{
+  "store": {
+    "book": [
+      {
+        "category": "reference",
+        "author": "Nigel Rees",
+        "title": "Sayings of the Century",
+        "price": 8.95
+      },
+      {
+        "category": "fiction",
+        "author": "Evelyn Waugh",
+        "title": "Sword of Honour",
+        "price": 12.99
+      }
+    ],
+    "bicycle": {
+      "color": "red",
+      "price": 19.95
+    }
+  }
+}</textarea>
+                    
+                    <div>
+                        <input type="text" id="pathExpression" placeholder="输入JSONPath表达式，如: $.store.book[0].title" style="width: 70%; padding: 8px; margin-right: 10px;">
+                        <button onclick="queryJSONPath()">查询</button>
+                    </div>
+                    
+                    <div id="pathOutput" class="output"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openTab(evt, tabName) {
+            const tabContents = document.getElementsByClassName("tab-content");
+            for (let i = 0; i < tabContents.length; i++) {
+                tabContents[i].style.display = "none";
+            }
+            
+            const tabButtons = document.getElementsByClassName("tab-button");
+            for (let i = 0; i < tabButtons.length; i++) {
+                tabButtons[i].classList.remove("active");
+            }
+            
+            document.getElementById(tabName).style.display = "block";
+            evt.currentTarget.classList.add("active");
+        }
+        
+        function validateJSON() {
+            const jsonInput = document.getElementById('jsonInput').value;
+            const output = document.getElementById('output');
+            
+            try {
+                JSON.parse(jsonInput);
+                output.innerHTML = '<div class="success">✓ JSON格式有效!</div>';
+            } catch (e) {
+                output.innerHTML = `<div class="error">✗ JSON格式错误: ${e.message}</div>`;
+            }
+        }
+        
+        function formatJSON() {
+            const jsonInput = document.getElementById('jsonInput').value;
+            const output = document.getElementById('output');
+            
+            try {
+                const parsed = JSON.parse(jsonInput);
+                const formatted = JSON.stringify(parsed, null, 2);
+                document.getElementById('jsonInput').value = formatted;
+                output.innerHTML = '<div class="success">✓ JSON已格式化!</div>';
+            } catch (e) {
+                output.innerHTML = `<div class="error">✗ JSON格式错误，无法格式化: ${e.message}</div>`;
+            }
+        }
+        
+        function minifyJSON() {
+            const jsonInput = document.getElementById('jsonInput').value;
+            const output = document.getElementById('output');
+            
+            try {
+                const parsed = JSON.parse(jsonInput);
+                const minified = JSON.stringify(parsed);
+                document.getElementById('jsonInput').value = minified;
+                output.innerHTML = '<div class="success">✓ JSON已压缩!</div>';
+            } catch (e) {
+                output.innerHTML = `<div class="error">✗ JSON格式错误，无法压缩: ${e.message}</div>`;
+            }
+        }
+        
+        function loadExample() {
+            const exampleJSON = {
+                "employees": [
+                    {
+                        "id": 1,
+                        "name": "张三",
+                        "position": "前端开发",
+                        "skills": ["HTML", "CSS", "JavaScript"],
+                        "isActive": true
+                    },
+                    {
+                        "id": 2,
+                        "name": "李四",
+                        "position": "后端开发",
+                        "skills": ["Python", "Django", "MySQL"],
+                        "isActive": true
+                    },
+                    {
+                        "id": 3,
+                        "name": "王五",
+                        "position": "产品经理",
+                        "skills": ["需求分析", "原型设计"],
+                        "isActive": false
+                    }
+                ],
+                "company": {
+                    "name": "科技有限公司",
+                    "founded": 2015,
+                    "location": "北京"
+                }
+            };
+            
+            document.getElementById('jsonInput').value = JSON.stringify(exampleJSON, null, 2);
+            document.getElementById('output').innerHTML = '<div class="success">✓ 示例JSON已加载!</div>';
+        }
+        
+        function queryJSONPath() {
+            const jsonInput = document.getElementById('jsonPathInput').value;
+            const pathExpression = document.getElementById('pathExpression').value;
+            const output = document.getElementById('pathOutput');
+            
+            try {
+                const jsonObj = JSON.parse(jsonInput);
+                
+                // 简单的JSONPath实现，仅支持基本路径查询
+                const pathParts = pathExpression.replace(/^\$\.?/, '').split('.');
+                let result = jsonObj;
+                
+                for (const part of pathParts) {
+                    if (part === '') continue;
+                    
+                    // 处理数组索引
+                    if (part.includes('[') && part.includes(']')) {
+                        const [prop, indexStr] = part.split('[');
+                        const index = parseInt(indexStr.replace(']', ''));
+                        
+                        if (prop && result[prop]) {
+                            result = result[prop][index];
+                        } else {
+                            result = result[index];
+                        }
+                    } else {
+                        result = result[part];
+                    }
+                    
+                    if (result === undefined) {
+                        throw new Error(`路径中的属性 "${part}" 不存在`);
+                    }
+                }
+                
+                output.innerHTML = `<div class="success">查询结果: ${JSON.stringify(result, null, 2)}</div>`;
+            } catch (e) {
+                output.innerHTML = `<div class="error">查询错误: ${e.message}</div>`;
+            }
+        }
+        
+        // 初始加载示例
+        window.onload = function() {
+            loadExample();
+        };
+    </script>
+</body>
+</html>

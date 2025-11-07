@@ -1,0 +1,504 @@
+# JSON扩展与生态系统示例
+# 此文件展示了JSON的各种扩展格式和生态系统工具
+
+# ==================== JSON5 ====================
+# JSON5 是 JSON 的超集，旨在更易于人类编写和阅读
+{
+  // JSON5 允许注释
+  "unquotedKey": "JSON5 允许未引用的键",
+  'singleQuotes': "JSON5 允许单引号",
+  "trailingComma": "JSON5 允许尾随逗号",  # 也支持井号注释
+  "hexadecimal": 0x1f,     # 十六进制数
+  "octal": 0755,           # 八进制数
+  "multiline": """
+    多行字符串
+    在 JSON5 中是有效的
+  """,
+  "leadingDecimalPoint": .5,
+  "trailingDecimalPoint": 5.,
+  "positiveSign": +1,
+  "Infinity": Infinity,
+  "NaN": NaN,
+  "array": [
+    1,
+    2,
+    3,  # 尾随逗号
+  ]
+}
+
+# ==================== JSONC ====================
+# JSONC (JSON with Comments) 是带有注释的 JSON
+{
+  "name": "JSONC 示例",  /* 这是块注释 */
+  "description": "带有注释的 JSON 格式",
+  "features": [
+    "单行注释 // 像这样",
+    "块注释 /* 像这样 */",
+    "注释可以出现在任何位置"
+  ],
+  "nested": {
+    "comment": "嵌套对象中也可以有注释" /* 块注释 */
+  }
+}
+
+# ==================== HOCON ====================
+# HOCON (Human-Optimized Config Object Notation) 是一种人类友好的配置格式
+{
+  // 基本键值对
+  name = "示例应用"
+  version = "1.0.0"
+  
+  // 引用其他键
+  fullName = ${name} v${version}
+  
+  // 数组语法
+  features = [
+    "特性A"
+    "特性B"  // 不需要逗号
+    "特性C"
+  ]
+  
+  // 嵌套对象
+  database {
+    host = "localhost"
+    port = 5432
+    name = "mydb"
+  }
+  
+  // 环境变量引用
+  apiUrl = "https://${API_HOST}/api/v1"
+  
+  // 合并对象
+  production = ${development} {
+    logLevel = "ERROR"
+  }
+  
+  // 包含其他文件
+  include "common-config.conf"
+}
+
+# ==================== TOML ====================
+# TOML (Tom's Obvious, Minimal Language) 是一种最小化配置文件格式
+[application]
+name = "示例应用"
+version = "1.0.0"
+debug = true
+
+[database]
+server = "localhost"
+port = 5432
+connection_max = 5000
+enabled = true
+
+[servers]
+
+[servers.alpha]
+ip = "10.0.0.1"
+dc = "eqdc10"
+
+[servers.beta]
+ip = "10.0.0.2"
+dc = "eqdc10"
+
+[clients]
+data = [["gamma", "delta"], [1, 2]]
+
+# 连接多行的键值对
+hosts = [
+  "alpha",
+  "omega"
+]
+
+# ==================== YAML ====================
+# YAML 是一种人类友好的数据序列化语言
+name: "示例应用"
+version: "1.0.0"
+description: |
+  这是一个多行描述
+  可以包含换行和格式
+  用于展示 YAML 的多行字符串功能
+
+# 列表
+features:
+  - "特性A"
+  - "特性B"
+  - "特性C"
+
+# 嵌套对象
+database:
+  host: "localhost"
+  port: 5432
+  name: "mydb"
+  credentials:
+    username: "user"
+    password: "pass"
+
+# 多文档
+---
+document: 1
+---
+document: 2
+
+# 引用和锚点
+defaults: &defaults
+  adapter: postgres
+  encoding: unicode
+
+development:
+  database: mydb_development
+  <<: *defaults
+
+test:
+  database: mydb_test
+  <<: *defaults
+
+# ==================== JSON-LD ====================
+# JSON-LD (JSON for Linking Data) 是用于链接数据的 JSON 格式
+{
+  "@context": {
+    "name": "http://schema.org/name",
+    "homepage": {
+      "@id": "http://schema.org/url",
+      "@type": "@id"
+    },
+    "image": {
+      "@id": "http://schema.org/image",
+      "@type": "@id"
+    }
+  },
+  "name": "示例组织",
+  "homepage": "https://example.com/",
+  "image": "https://example.com/logo.png"
+}
+
+# ==================== JSON Schema ====================
+# JSON Schema 是一个用于验证 JSON 数据结构的词汇表
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "产品",
+  "description": "产品表示",
+  "type": "object",
+  "required": [
+    "id",
+    "name",
+    "price"
+  ],
+  "properties": {
+    "id": {
+      "description": "产品的唯一标识符",
+      "type": "integer"
+    },
+    "name": {
+      "description": "产品名称",
+      "type": "string"
+    },
+    "price": {
+      "type": "number",
+      "minimum": 0
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "uniqueItems": true
+    }
+  }
+}
+
+# ==================== Jupyter Notebook JSON ====================
+# Jupyter Notebook 是一个基于 JSON 的文档格式
+{
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "# 示例 Jupyter Notebook\n",
+        "这是一个 Markdown 单元格"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {},
+      "outputs": [],
+      "source": [
+        "# 这是一个代码单元格\n",
+        "print('Hello, JSON Extensions!')"
+      ]
+    }
+  ],
+  "metadata": {
+    "kernelspec": {
+      "display_name": "Python 3",
+      "language": "python",
+      "name": "python3"
+    },
+    "language_info": {
+      "codemirror_mode": {
+        "name": "ipython",
+        "version": 3
+      },
+      "file_extension": ".py",
+      "mimetype": "text/x-python",
+      "name": "python",
+      "nbconvert_exporter": "python",
+      "pygments_lexer": "ipython3",
+      "version": "3.8.5"
+    }
+  },
+  "nbformat": 4,
+  "nbformat_minor": 4
+}
+
+# ==================== JSON API (JSON:API) ====================
+# JSON:API 是用于构建 API 的规范
+{
+  "data": [
+    {
+      "type": "articles",
+      "id": "1",
+      "attributes": {
+        "title": "JSON 扩展介绍",
+        "content": "本文介绍了 JSON 的各种扩展格式。"
+      },
+      "relationships": {
+        "author": {
+          "data": { "type": "people", "id": "9" }
+        },
+        "comments": {
+          "data": [
+            { "type": "comments", "id": "5" },
+            { "type": "comments", "id": "12" }
+          ]
+        }
+      },
+      "links": {
+        "self": "http://example.com/articles/1"
+      }
+    }
+  ],
+  "included": [
+    {
+      "type": "people",
+      "id": "9",
+      "attributes": {
+        "name": "张三",
+        "twitter": "zhang_san"
+      },
+      "links": {
+        "self": "http://example.com/people/9"
+      }
+    },
+    {
+      "type": "comments",
+      "id": "5",
+      "attributes": {
+        "body": "很好的文章！"
+      },
+      "links": {
+        "self": "http://example.com/comments/5"
+      }
+    },
+    {
+      "type": "comments",
+      "id": "12",
+      "attributes": {
+        "body": "学到了很多，谢谢分享。"
+      },
+      "links": {
+        "self": "http://example.com/comments/12"
+      }
+    }
+  ],
+  "links": {
+    "self": "http://example.com/articles",
+    "next": "http://example.com/articles?page[offset]=2",
+    "last": "http://example.com/articles?page[offset]=10"
+  }
+}
+
+# ==================== JSON Merge Patch ====================
+# JSON Merge Patch 是一种用于描述对 JSON 文档修改的格式
+{
+  "title": "新的标题",
+  "author": {
+    "name": "新作者"
+  },
+  "tags": [
+    "JSON",
+    "API"
+  ],
+  "phoneNumber": null  # 删除字段
+}
+
+# ==================== JSON Patch ====================
+# JSON Patch 是一种描述对 JSON 文档修改操作的格式
+[
+  { "op": "replace", "path": "/title", "value": "新的标题" },
+  { "op": "replace", "path": "/author/name", "value": "新作者" },
+  { "op": "add", "path": "/tags/-", "value": "JSON" },
+  { "op": "add", "path": "/tags/-", "value": "API" },
+  { "op": "remove", "path": "/phoneNumber" }
+]
+
+# ==================== HAL (Hypertext Application Language) ====================
+# HAL 是一种简单的格式，为 API 提供了一种一致且简洁的方式来表示超链接
+{
+  "_links": {
+    "self": { "href": "/orders/523" },
+    "warehouse": { "href": "/warehouse/35" },
+    "invoice": { "href": "/invoices/487" }
+  },
+  "currency": "USD",
+  "status": "shipped",
+  "total": 10.57,
+  "_embedded": {
+    "customer": {
+      "_links": {
+        "self": { "href": "/customers/123" }
+      },
+      "name": "张三",
+      "address": "北京市朝阳区某某街道123号"
+    }
+  }
+}
+
+# ==================== JSON Web Token (JWT) ====================
+# JWT 是一种开放标准（RFC 7519），用于在各方之间安全地传输信息作为 JSON 对象
+# Header 部分
+{
+  "alg": "HS256",
+  "typ": "JWT"
+}
+
+# Payload 部分
+{
+  "sub": "1234567890",
+  "name": "张三",
+  "iat": 1516239022,
+  "exp": 1516242622,
+  "roles": ["user", "admin"]
+}
+
+# ==================== JSend ====================
+# JSend 是一种应用程序级别的响应格式规范
+{
+  "status": "success",
+  "data": {
+    "id": 1,
+    "title": "示例文章",
+    "content": "文章内容..."
+  }
+}
+
+{
+  "status": "fail",
+  "data": {
+    "title": "标题不能为空",
+    "content": "内容不能为空"
+  }
+}
+
+{
+  "status": "error",
+  "message": "数据库连接错误",
+  "code": 500
+}
+
+# ==================== Sereal ====================
+# Sereal 是 Perl 的二进制序列化格式，也可以表示 JSON 结构
+# 这里只展示 JSON 表示，实际使用时会编码为二进制
+{
+  "perl_version": "5.032000",
+  "sereal_version": "4.024",
+  "data": {
+    "hello": "world",
+    "number": 42,
+    "array": [1, 2, 3],
+    "hash": {
+      "key": "value"
+    }
+  }
+}
+
+# ==================== BSON ====================
+# BSON (Binary JSON) 是一种二进制格式的 JSON 表示
+{
+  "_id": { "$oid": "607f1f77e8c8f72f8e8e8e8" },
+  "name": "张三",
+  "age": 30,
+  "registered": { "$date": "2021-04-19T16:07:19.690Z" },
+  "skills": ["JavaScript", "Python", "MongoDB"],
+  "address": {
+    "street": "北京市朝阳区某某街道123号",
+    "city": "北京",
+    "zipCode": "100010"
+  },
+  "active": true,
+  "score": 95.5
+}
+
+# ==================== MessagePack ====================
+# MessagePack 是一种高效的二进制序列化格式
+# 这里只展示 JSON 表示，实际使用时会编码为二进制
+{
+  "compact": true,
+  "binary": true,
+  "features": [
+    "高效编码",
+    "类型丰富",
+    "跨语言支持"
+  ],
+  "metadata": {
+    "created": "2023-04-22T14:30:45Z",
+    "version": "1.0.0"
+  }
+}
+
+# ==================== CBOR ====================
+# CBOR (Concise Binary Object Representation) 是一种二进制数据格式
+# 这里只展示 JSON 表示，实际使用时会编码为二进制
+{
+  "format": "CBOR",
+  "rfc": "7049",
+  "data_types": [
+    "整数",
+    "字节数组",
+    "字符串",
+    "数组",
+    "映射",
+    "标签",
+    "简单值和浮点数"
+  ],
+  "advantages": [
+    "紧凑表示",
+    "高效解析",
+    "类型扩展",
+    "自描述"
+  ]
+}
+
+# ==================== UBJSON ====================
+# UBJSON (Universal Binary JSON) 旨在提供 JSON 的二进制表示
+# 这里只展示 JSON 表示，实际使用时会编码为二进制
+{
+  "format": "UBJSON",
+  "goals": [
+    "完全兼容 JSON",
+    "易于实现",
+    "快速解析",
+    "类型信息明确"
+  ],
+  "types": {
+    "null": "Z",
+    "no-op": "N",
+    "boolean": "T/F",
+    "numeric": "i/I/U/d/D",
+    "string": "S/s",
+    "array": "[/ #/$",
+    "object": "{/ $$/}"
+  }
+}

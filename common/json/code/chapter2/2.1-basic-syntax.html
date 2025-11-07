@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JSON语法规则 - 交互式演示</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        h1, h2, h3 {
+            color: #2c3e50;
+        }
+        h1 {
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        code {
+            background-color: #f8f9fa;
+            padding: 2px 5px;
+            border-radius: 4px;
+            font-family: 'Courier New', Courier, monospace;
+        }
+        pre {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            border-left: 4px solid #3498db;
+            margin: 15px 0;
+        }
+        .tabs {
+            margin-top: 20px;
+        }
+        .tab-buttons {
+            display: flex;
+            background-color: #f1f1f1;
+            border-radius: 5px 5px 0 0;
+            overflow: hidden;
+        }
+        .tab-button {
+            background-color: inherit;
+            border: none;
+            outline: none;
+            cursor: pointer;
+            padding: 10px 15px;
+            transition: 0.3s;
+            font-weight: 500;
+        }
+        .tab-button:hover {
+            background-color: #ddd;
+        }
+        .tab-button.active {
+            background-color: #3498db;
+            color: white;
+        }
+        .tab-content {
+            display: none;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-top: none;
+            background-color: white;
+            border-radius: 0 0 5px 5px;
+        }
+        .interactive {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        textarea {
+            width: 100%;
+            height: 200px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: 'Courier New', Courier, monospace;
+            margin-bottom: 10px;
+            box-sizing: border-box;
+        }
+        .output {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 10px;
+            white-space: pre-wrap;
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .error {
+            color: #e74c3c;
+        }
+        .success {
+            color: #27ae60;
+        }
+        .warning {
+            color: #f39c12;
+        }
+        .highlight {
+            background-color: #fff9c4;
+            padding: 2px 4px;
+        }
+        .rules-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .rule-card {
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            padding: 15px;
+            border-left: 4px solid #3498db;
+        }
+        .rule-card.invalid {
+            border-left-color: #e74c3c;
+        }
+        .rule-card.valid {
+            border-left-color: #27ae60;
+        }
+        .examples {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+        .example {
+            flex: 1;
+            min-width: 300px;
+        }
+        .invalid-example {
+            background-color: #fff5f5;
+            border: 1px solid #fed7d7;
+            border-radius: 5px;
+            padding: 10px;
+        }
+        .valid-example {
+            background-color: #f0fff4;
+            border: 1px solid #c6f6d5;
+            border-radius: 5px;
+            padding: 10px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>JSON语法规则 - 交互式演示</h1>
+        <p>JSON(JavaScript Object Notation)语法简单明了，但它有一些严格的规则必须遵守。下面通过交互式示例详细解析JSON的语法规则。</p>
+        
+        <div class="tabs">
+            <div class="tab-buttons">
+                <button class="tab-button active" onclick="openTab(event, 'basic-rules')">基本规则</button>
+                <button class="tab-button" onclick="openTab(event, 'data-types')">数据类型</button>
+                <button class="tab-button" onclick="openTab(event, 'common-errors')">常见错误</button>
+                <button class="tab-button" onclick="openTab(event, 'interactive-test')">交互测试</button>
+            </div>
+            
+            <div id="basic-rules" class="tab-content" style="display: block;">
+                <h3>JSON基本语法规则</h3>
+                
+                <div class="rules-grid">
+                    <div class="rule-card valid">
+                        <h4>1. 数据使用键值对</h4>
+                        <p>JSON中的数据以键值对形式存在，键必须是字符串，值可以是任意JSON数据类型。</p>
+                        <pre>"key": "value"</pre>
+                    </div>
+                    
+                    <div class="rule-card valid">
+                        <h4>2. 键必须使用双引号</h4>
+                        <p>JSON中的键必须用双引号括起来，不能使用单引号或不使用引号。</p>
+                        <pre>"name": "张三"  // 正确
+'name': "张三"  // 错误</pre>
+                    </div>
+                    
+                    <div class="rule-card valid">
+                        <h4>3. 字符串值使用双引号</h4>
+                        <p>字符串类型的值必须使用双引号，不能使用单引号。</p>
+                        <pre>"message": "Hello, JSON!"  // 正确
+"message": 'Hello, JSON!'  // 错误</pre>
+                    </div>
+                    
+                    <div class="rule-card valid">
+                        <h4>4. 数据由逗号分隔</h4>
+                        <p>JSON中的多个数据项（对象中的键值对或数组中的元素）之间必须使用逗号分隔。</p>
+                        <pre>{
+  "name": "张三",
+  "age": 30,
+  "isStudent": false
+}</pre>
+                    </div>
+                    
+                    <div class="rule-card valid">
+                        <h4>5. 对象使用花括号</h4>
+                        <p>JSON对象使用花括号{}包围，包含一组键值对。</p>
+                        <pre>{
+  "key1": "value1",
+  "key2": "value2"
+}</pre>
+                    </div>
+                    
+                    <div class="rule-card valid">
+                        <h4>6. 数组使用方括号</h4>
+                        <p>JSON数组使用方括号[]包围，包含一组有序的值。</p>
+                        <pre>["item1", "item2", "item3"]</pre>
+                    </div>
+                    
+                    <div class="rule-card valid">
+                        <h4>7. 不允许尾随逗号</h4>
+                        <p>JSON对象或数组的最后一个元素后不能有逗号。</p>
+                        <pre>{
+  "name": "张三",
+  "age": 30
+}  // 正确
+
+{
+  "name": "张三",
+  "age": 30,  // 错误，尾随逗号
+}</pre>
+                    </div>
+                    
+                    <div class="rule-card valid">
+                        <h4>8. 不允许注释</h4>
+                        <p>标准JSON格式不支持注释，不能使用//或/* */注释。</p>
+                        <pre>{
+  "name": "张三"
+  // , "age": 30  // 错误，不支持注释
+}</pre>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="data-types" class="tab-content">
+                <h3>JSON数据类型</h3>
+                
+                <table>
+                    <tr>
+                        <th>数据类型</th>
+                        <th>说明</th>
+                        <th>示例</th>
+                    </tr>
+                    <tr>
+                        <td>字符串(string)</td>
+                        <td>用双引号括起来的Unicode字符序列</td>
+                        <td>"Hello, JSON!"</td>
+                    </tr>
+                    <tr>
+                        <td>数字(number)</td>
+                        <td>整数或浮点数</td>
+                        <td>42, 3.14, -10.5</td>
+                    </tr>
+                    <tr>
+                        <td>布尔值(boolean)</td>
+                        <td>true或false</td>
+                        <td>true, false</td>
+                    </tr>
+                    <tr>
+                        <td>数组(array)</td>
+                        <td>有序的值列表，用方括号括起来</td>
+                        <td>["apple", "banana", "orange"]</td>
+                    </tr>
+                    <tr>
+                        <td>对象(object)</td>
+                        <td>无序的键值对集合，用花括号括起来</td>
+                        <td>{"name": "张三", "age": 30}</td>
+                    </tr>
+                    <tr>
+                        <td>null</td>
+                        <td>表示空值</td>
+                        <td>null</td>
+                    </tr>
+                </table>
+                
+                <h3>字符串转义字符</h3>
+                <table>
+                    <tr>
+                        <th>转义字符</th>
+                        <th>含义</th>
+                        <th>Unicode表示</th>
+                    </tr>
+                    <tr>
+                        <td>\"</td>
+                        <td>双引号</td>
+                        <td>\u0022</td>
+                    </tr>
+                    <tr>
+                        <td>\\</td>
+                        <td>反斜杠</td>
+                        <td>\u005C</td>
+                    </tr>
+                    <tr>
+                        <td>\/</td>
+                        <td>正斜杠</td>
+                        <td>\u002F</td>
+                    </tr>
+                    <tr>
+                        <td>\b</td>
+                        <td>退格</td>
+                        <td>\u0008</td>
+                    </tr>
+                    <tr>
+                        <td>\f</td>
+                        <td>换页</td>
+                        <td>\u000C</td>
+                    </tr>
+                    <tr>
+                        <td>\n</td>
+                        <td>换行</td>
+                        <td>\u000A</td>
+                    </tr>
+                    <tr>
+                        <td>\r</td>
+                        <td>回车</td>
+                        <td>\u000D</td>
+                    </tr>
+                    <tr>
+                        <td>\t</td>
+                        <td>制表符</td>
+                        <td>\u0009</td>
+                    </tr>
+                    <tr>
+                        <td>\uXXXX</td>
+                        <td>Unicode字符</td>
+                        <td>如 \u4F60 表示"你"</td>
+                    </tr>
+                </table>
+                
+                <div class="examples">
+                    <div class="example">
+                        <h4>有效的JSON示例</h4>
+                        <div class="valid-example">
+                            <pre>{
+  "name": "张三",
+  "age": 30,
+  "isStudent": false,
+  "courses": ["数学", "物理"],
+  "address": null,
+  "bio": "他是一位\"好学生\"！\n爱好：数学，物理。"
+}</pre>
+                        </div>
+                    </div>
+                    <div class="example">
+                        <h4>无效的JSON示例</h4>
+                        <div class="invalid-example">
+                            <pre>{
+  name: "张三",             // 错误：键未使用引号
+  'age': 30,                // 错误：键使用单引号
+  "isStudent": false,
+  "courses": ['数学', '物理'], // 错误：数组元素使用单引号
+  "address":,                // 错误：缺少值
+}</pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="common-errors" class="tab-content">
+                <h3>常见JSON语法错误</h3>
+                
+                <div class="rules-grid">
+                    <div class="rule-card invalid">
+                        <h4>1. 键未使用引号或使用单引号</h4>
+                        <div class="examples">
+                            <div class="invalid-example">
+                                <pre>{
+  name: "张三",     // 错误
+  'age': 30         // 错误
+}</pre>
+                            </div>
+                            <div class="valid-example">
+                                <pre>{
+  "name": "张三",   // 正确
+  "age": 30         // 正确
+}</pre>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="rule-card invalid">
+                        <h4>2. 值使用单引号</h4>
+                        <div class="examples">
+                            <div class="invalid-example">
+                                <pre>{
+  "name": '张三',    // 错误
+  "message": 'Hello'  // 错误
+}</pre>
+                            </div>
+                            <div class="valid-example">
+                                <pre>{
+  "name": "张三",   // 正确
+  "message": "Hello"  // 正确
+}</pre>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="rule-card invalid">
+                        <h4>3. 尾随逗号</h4>
+                        <div class="examples">
+                            <div class="invalid-example">
+                                <pre>{
+  "name": "张三",
+  "age": 30,         // 错误：对象最后一个键值对后有逗号
+}
+
+[
+  "apple",
+  "banana",          // 错误：数组最后一个元素后有逗号
+]</pre>
+                            </div>
+                            <div class="valid-example">
+                                <pre>{
+  "name": "张三",
+  "age": 30          // 正确：无尾随逗号
+}
+
+[
+  "apple",
+  "banana"           // 正确：无尾随逗号
+]</pre>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="rule-card invalid">
+                        <h4>4. 未引号的布尔值和null</h4>
+                        <div class="examples">
+                            <div class="invalid-example">
+                                <pre>{
+  "isActive": "true",  // 错误：布尔值不需要引号
+  "isNull": "null"     // 错误：null不需要引号
+}</pre>
+                            </div>
+                            <div class="valid-example">
+                                <pre>{
+  "isActive": true,   // 正确：布尔值不使用引号
+  "isNull": null       // 正确：null不使用引号
+}</pre>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="rule-card invalid">
+                        <h4>5. 无效的数字格式</h4>
+                        <div class="examples">
+                            <div class="invalid-example">
+                                <pre>{
+  "price": +10.5,      // 错误：不允许使用加号
+  "hex": 0x10,         // 错误：不允许十六进制
+  "octal": 010        // 错误：不允许八进制
+}</pre>
+                            </div>
+                            <div class="valid-example">
+                                <pre>{
+  "price": 10.5,       // 正确：十进制浮点数
+  "hex": 16,           // 正确：十进制整数
+  "negative": -5       // 正确：负数
+}</pre>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="rule-card invalid">
+                        <h4>6. 注释</h4>
+                        <div class="examples">
+                            <div class="invalid-example">
+                                <pre>{
+  "name": "张三",     // 错误：不支持注释
+  /* 年龄字段 */
+  "age": 30
+}</pre>
+                            </div>
+                            <div class="valid-example">
+                                <pre>{
+  "name": "张三",     // 正确：无注释
+  "age": 30
+}</pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="interactive-test" class="tab-content">
+                <div class="interactive">
+                    <h3>JSON语法交互测试</h3>
+                    <p>在下面的文本框中输入JSON内容，系统会实时检查语法错误并给出提示：</p>
+                    
+                    <textarea id="jsonInput" placeholder='在这里输入JSON内容，系统会实时验证语法...'>{
+  "name": "张三",
+  "age": 30,
+  "isStudent": false,
+  "courses": ["数学", "物理"],
+  "address": {
+    "street": "人民路123号",
+    "city": "北京",
+    "zipCode": "100010"
+  }
+}</textarea>
+                    
+                    <div>
+                        <button onclick="validateJSON()">验证JSON</button>
+                        <button onclick="formatJSON()">格式化JSON</button>
+                        <button onclick="findErrors()">查找常见错误</button>
+                        <button onclick="loadValidExample()">加载有效示例</button>
+                        <button onclick="loadInvalidExample()">加载无效示例</button>
+                    </div>
+                    
+                    <div id="output" class="output"></div>
+                </div>
+                
+                <div class="interactive" style="margin-top: 20px;">
+                    <h3>常见错误修复练习</h3>
+                    <p>下面的JSON包含多个语法错误，尝试修复它们：</p>
+                    
+                    <textarea id="brokenJson" placeholder='修复这里的JSON...'>{
+  name: '张三',           // 错误1：键未使用双引号，值使用单引号
+  "age": 30,             // 正确
+  'isStudent': false,    // 错误2：键使用单引号
+  "courses": ['数学', '物理'],  // 错误3：数组元素使用单引号
+  "address": {           // 正确
+    street: "人民路123号", // 错误4：键未使用双引号
+    "city": "北京",       // 正确
+    "zipCode": "100010",  // 正确
+  },                     // 错误5：对象最后有尾随逗号
+  "phone": null          // 正确
+}</textarea>
+                    
+                    <div>
+                        <button onclick="checkFixedJSON()">检查修复结果</button>
+                        <button onclick="showSolution()">显示解决方案</button>
+                    </div>
+                    
+                    <div id="fixOutput" class="output"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openTab(evt, tabName) {
+            const tabContents = document.getElementsByClassName("tab-content");
+            for (let i = 0; i < tabContents.length; i++) {
+                tabContents[i].style.display = "none";
+            }
+            
+            const tabButtons = document.getElementsByClassName("tab-button");
+            for (let i = 0; i < tabButtons.length; i++) {
+                tabButtons[i].classList.remove("active");
+            }
+            
+            document.getElementById(tabName).style.display = "block";
+            evt.currentTarget.classList.add("active");
+        }
+        
+        function validateJSON() {
+            const jsonInput = document.getElementById('jsonInput').value;
+            const output = document.getElementById('output');
+            
+            try {
+                JSON.parse(jsonInput);
+                output.innerHTML = '<div class="success">✓ JSON格式有效!</div>';
+            } catch (e) {
+                const errorMessage = e.message;
+                const lineMatch = errorMessage.match(/line (\d+)/i);
+                const columnMatch = errorMessage.match(/column (\d+)/i);
+                
+                let positionInfo = '';
+                if (lineMatch && columnMatch) {
+                    positionInfo = `<br>错误位置：第${lineMatch[1]}行，第${columnMatch[1]}列`;
+                }
+                
+                output.innerHTML = `<div class="error">✗ JSON格式错误: ${errorMessage}${positionInfo}</div>`;
+            }
+        }
+        
+        function formatJSON() {
+            const jsonInput = document.getElementById('jsonInput').value;
+            const output = document.getElementById('output');
+            
+            try {
+                const parsed = JSON.parse(jsonInput);
+                const formatted = JSON.stringify(parsed, null, 2);
+                document.getElementById('jsonInput').value = formatted;
+                output.innerHTML = '<div class="success">✓ JSON已格式化!</div>';
+            } catch (e) {
+                output.innerHTML = `<div class="error">✗ JSON格式错误，无法格式化: ${e.message}</div>`;
+            }
+        }
+        
+        function findErrors() {
+            const jsonInput = document.getElementById('jsonInput').value;
+            const output = document.getElementById('output');
+            
+            const errors = [];
+            const lines = jsonInput.split('\n');
+            
+            // 检查常见错误
+            lines.forEach((line, index) => {
+                const lineNum = index + 1;
+                
+                // 检查未引用的键
+                const unquotedKeys = line.match(/(?:^|\s+)([^"\s]+):/g);
+                if (unquotedKeys) {
+                    unquotedKeys.forEach(key => {
+                        const keyName = key.trim().slice(0, -1);
+                        if (!['true', 'false', 'null'].includes(keyName)) {
+                            errors.push({
+                                line: lineNum,
+                                message: `未引用的键: "${keyName}" 应该使用双引号`
+                            });
+                        }
+                    });
+                }
+                
+                // 检查单引号
+                if (line.includes("'")) {
+                    errors.push({
+                        line: lineNum,
+                        message: '使用单引号，应该使用双引号'
+                    });
+                }
+                
+                // 检查尾随逗号
+                const trimmed = line.trim();
+                if (trimmed.endsWith(',')) {
+                    errors.push({
+                        line: lineNum,
+                        message: '尾随逗号，JSON不允许在对象或数组的最后一个元素后使用逗号'
+                    });
+                }
+            });
+            
+            if (errors.length === 0) {
+                try {
+                    JSON.parse(jsonInput);
+                    output.innerHTML = '<div class="success">✓ 未发现常见语法错误!</div>';
+                } catch (e) {
+                    output.innerHTML = `<div class="error">✗ JSON格式错误: ${e.message}</div>`;
+                }
+            } else {
+                let errorsHtml = '<div class="error">发现以下潜在错误:</div><ul>';
+                errors.forEach(error => {
+                    errorsHtml += `<li>第${error.line}行: ${error.message}</li>`;
+                });
+                errorsHtml += '</ul>';
+                output.innerHTML = errorsHtml;
+            }
+        }
+        
+        function loadValidExample() {
+            const validJSON = {
+                "user": {
+                    "id": 123,
+                    "name": "张三",
+                    "email": "zhangsan@example.com",
+                    "isActive": true,
+                    "roles": ["user", "editor"],
+                    "profile": {
+                        "age": 30,
+                        "city": "北京",
+                        "bio": "这是一个简介，包含\"引号\"和\n换行符"
+                    },
+                    "lastLogin": null
+                },
+                "settings": {
+                    "theme": "dark",
+                    "notifications": true,
+                    "autoSave": false
+                }
+            };
+            
+            document.getElementById('jsonInput').value = JSON.stringify(validJSON, null, 2);
+            document.getElementById('output').innerHTML = '<div class="success">✓ 有效示例已加载!</div>';
+        }
+        
+        function loadInvalidExample() {
+            const invalidJSON = `{
+  name: '张三',           // 错误：键未使用双引号，值使用单引号
+  "age": 30,             // 正确
+  'isStudent': false,    // 错误：键使用单引号
+  "courses": ['数学', '物理'],  // 错误：数组元素使用单引号
+  "address": {           // 正确
+    street: "人民路123号", // 错误：键未使用双引号
+    "city": "北京",       // 正确
+    "zipCode": "100010",  // 正确
+  },                     // 错误：对象最后有尾随逗号
+  "phone": null          // 正确
+}`;
+            
+            document.getElementById('jsonInput').value = invalidJSON;
+            document.getElementById('output').innerHTML = '<div class="warning">⚠ 包含语法错误的示例已加载，尝试修复它们!</div>';
+        }
+        
+        function checkFixedJSON() {
+            const brokenJson = document.getElementById('brokenJson').value;
+            const output = document.getElementById('fixOutput');
+            
+            try {
+                JSON.parse(brokenJson);
+                output.innerHTML = '<div class="success">✓ 恭喜！JSON已修复，语法有效!</div>';
+            } catch (e) {
+                output.innerHTML = `<div class="error">✗ 仍有错误需要修复: ${e.message}</div>`;
+            }
+        }
+        
+        function showSolution() {
+            const fixedJSON = `{
+  "name": "张三",
+  "age": 30,
+  "isStudent": false,
+  "courses": ["数学", "物理"],
+  "address": {
+    "street": "人民路123号",
+    "city": "北京",
+    "zipCode": "100010"
+  },
+  "phone": null
+}`;
+            
+            document.getElementById('brokenJson').value = fixedJSON;
+            document.getElementById('fixOutput').innerHTML = '<div class="success">✓ 已显示修复后的JSON!</div>';
+        }
+        
+        // 初始加载
+        window.onload = function() {
+            // 默认显示第一个标签
+            validateJSON();
+        };
+    </script>
+</body>
+</html>

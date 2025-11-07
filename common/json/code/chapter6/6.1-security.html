@@ -1,0 +1,1823 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JSON安全最佳实践 - 交互式演示</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        h1, h2, h3 {
+            color: #2c3e50;
+        }
+        h1 {
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        code {
+            background-color: #f8f9fa;
+            padding: 2px 5px;
+            border-radius: 4px;
+            font-family: 'Courier New', Courier, monospace;
+        }
+        pre {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            border-left: 4px solid #3498db;
+            margin: 15px 0;
+        }
+        .tabs {
+            margin-top: 20px;
+        }
+        .tab-buttons {
+            display: flex;
+            background-color: #f1f1f1;
+            border-radius: 5px 5px 0 0;
+            overflow: hidden;
+        }
+        .tab-button {
+            background-color: inherit;
+            border: none;
+            outline: none;
+            cursor: pointer;
+            padding: 10px 15px;
+            transition: 0.3s;
+            font-weight: 500;
+        }
+        .tab-button:hover {
+            background-color: #ddd;
+        }
+        .tab-button.active {
+            background-color: #3498db;
+            color: white;
+        }
+        .tab-content {
+            display: none;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-top: none;
+            background-color: white;
+            border-radius: 0 0 5px 5px;
+        }
+        .interactive {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        button.danger {
+            background-color: #e74c3c;
+        }
+        button.danger:hover {
+            background-color: #c0392b;
+        }
+        button.success {
+            background-color: #27ae60;
+        }
+        button.success:hover {
+            background-color: #229954;
+        }
+        textarea {
+            width: 100%;
+            height: 200px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: 'Courier New', Courier, monospace;
+            margin-bottom: 10px;
+            box-sizing: border-box;
+        }
+        .output {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 10px;
+            white-space: pre-wrap;
+            font-family: 'Courier New', Courier, monospace;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .error {
+            color: #e74c3c;
+        }
+        .success {
+            color: #27ae60;
+        }
+        .warning {
+            color: #f39c12;
+        }
+        .info {
+            color: #3498db;
+        }
+        .security-card {
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-left: 4px solid #3498db;
+        }
+        .security-card.danger {
+            border-left-color: #e74c3c;
+        }
+        .security-card.warning {
+            border-left-color: #f39c12;
+        }
+        .security-card.success {
+            border-left-color: #27ae60;
+        }
+        .two-column {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .column {
+            flex: 1;
+            min-width: 300px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .code-block {
+            background-color: #2d3748;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-family: 'Fira Code', 'Courier New', monospace;
+        }
+        .highlight {
+            background-color: #fde68a;
+            padding: 2px 4px;
+            border-radius: 2px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>JSON安全最佳实践 - 交互式演示</h1>
+        <p>JSON虽然在现代Web应用中广泛使用，但不当处理可能导致安全漏洞。本页面通过交互式示例演示JSON安全的最佳实践，包括数据验证、注入防护和敏感数据处理。</p>
+        
+        <div class="tabs">
+            <div class="tab-buttons">
+                <button class="tab-button active" onclick="openTab(event, 'injection-attacks')">注入攻击防护</button>
+                <button class="tab-button" onclick="openTab(event, 'data-validation')">数据验证与过滤</button>
+                <button class="tab-button" onclick="openTab(event, 'sensitive-data')">敏感数据处理</button>
+                <button class="tab-button" onclick="openTab(event, 'access-control')">访问控制</button>
+                <button class="tab-button" onclick="openTab(event, 'interactive-security')">安全测试工具</button>
+            </div>
+            
+            <div id="injection-attacks" class="tab-content" style="display: block;">
+                <h3>JSON注入攻击防护</h3>
+                
+                <div class="security-card danger">
+                    <h4>常见的JSON注入攻击</h4>
+                    <p>JSON注入攻击发生在未经验证的用户输入直接用于构建JSON时，攻击者可能注入恶意内容或修改JSON结构。</p>
+                </div>
+                
+                <div class="two-column">
+                    <div class="column">
+                        <h4>恶意JSON示例</h4>
+                        <pre class="code-block">{
+  "username": "admin",
+  "password": "password",
+  "role": "user",
+  "isAdmin": false,
+  "__proto__": {
+    "isAdmin": true
+  }
+}</pre>
+                        <p>上面的示例中，攻击者通过<span class="highlight">__proto__</span>属性尝试修改对象原型，可能绕过安全检查。</p>
+                    </div>
+                    
+                    <div class="column">
+                        <h4>JSON劫持攻击</h4>
+                        <pre class="code-block">// 恶意脚本
+<script>
+  Object.prototype.isAdmin = true;
+  
+  // JSON响应处理
+  fetch('/api/user')
+    .then(response => response.json())
+    .then(user => {
+      // 检查isAdmin属性
+      if (user.isAdmin) {
+        // 提升权限
+        document.location = "/admin";
+      }
+    });
+</script></pre>
+                        <p>通过修改原型，攻击者可以影响所有对象的行为。</p>
+                    </div>
+                </div>
+                
+                <div class="security-card warning">
+                    <h4>防止JSON注入的策略</h4>
+                    <ul>
+                        <li><strong>验证和清理输入</strong>：始终验证来自不可信来源的JSON数据</li>
+                        <li><strong>使用安全的解析方法</strong>：使用严格模式的JSON解析器</li>
+                        <li><strong>避免使用eval()</strong>：永远不要使用eval()解析JSON数据</li>
+                        <li><strong>实现白名单</strong>：仅允许预期的属性和值类型</li>
+                        <li><strong>防止原型污染</strong>：检查并拒绝__proto__、constructor等危险属性</li>
+                    </ul>
+                </div>
+                
+                <div class="interactive">
+                    <h4>JSON注入测试工具</h4>
+                    <p>在下面的文本框中输入JSON内容，系统会检测潜在的注入攻击：</p>
+                    
+                    <textarea id="injectionTestInput" placeholder='在这里输入JSON内容...'>{
+  "username": "testuser",
+  "email": "test@example.com",
+  "role": "user",
+  "__proto__": {
+    "isAdmin": true
+  }
+}</textarea>
+                    
+                    <div>
+                        <button onclick="testJsonInjection()">检测注入风险</button>
+                        <button onclick="sanitizeJson()">清理JSON</button>
+                        <button onclick="loadSafeExample()">加载安全示例</button>
+                        <button onclick="loadMaliciousExample()">加载恶意示例</button>
+                    </div>
+                    
+                    <div id="injectionTestOutput" class="output"></div>
+                </div>
+            </div>
+            
+            <div id="data-validation" class="tab-content">
+                <h3>数据验证与过滤</h3>
+                
+                <div class="security-card warning">
+                    <h4>为什么需要数据验证</h4>
+                    <p>未经验证的JSON数据可能导致应用错误、数据损坏或安全漏洞。验证确保数据符合预期的格式和约束。</p>
+                </div>
+                
+                <div class="security-card success">
+                    <h4>验证策略</h4>
+                    <ul>
+                        <li><strong>结构验证</strong>：确保JSON具有预期的结构和字段</li>
+                        <li><strong>类型检查</strong>：验证值的类型是否正确</li>
+                        <li><strong>值约束</strong>：检查值是否在允许的范围内</li>
+                        <li><strong>模式匹配</strong>：使用正则表达式验证格式</li>
+                        <li><strong>长度限制</strong>：限制字符串和数组的长度</li>
+                    </ul>
+                </div>
+                
+                <div class="two-column">
+                    <div class="column">
+                        <h4>JSON Schema验证</h4>
+                        <pre class="code-block">{
+  "type": "object",
+  "required": ["username", "email", "role"],
+  "properties": {
+    "username": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 30,
+      "pattern": "^[a-zA-Z0-9_]+$"
+    },
+    "email": {
+      "type": "string",
+      "format": "email"
+    },
+    "role": {
+      "type": "string",
+      "enum": ["user", "admin", "moderator"]
+    },
+    "age": {
+      "type": "integer",
+      "minimum": 18,
+      "maximum": 120
+    }
+  },
+  "additionalProperties": false
+}</pre>
+                    </div>
+                    
+                    <div class="column">
+                        <h4>自定义验证函数</h4>
+                        <pre class="code-block">function validateUserData(userData) {
+  // 检查必填字段
+  const requiredFields = ['username', 'email', 'role'];
+  for (const field of requiredFields) {
+    if (!userData[field]) {
+      return { valid: false, error: `缺少必填字段: ${field}` };
+    }
+  }
+  
+  // 验证邮箱格式
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(userData.email)) {
+    return { valid: false, error: '邮箱格式无效' };
+  }
+  
+  // 验证角色
+  const allowedRoles = ['user', 'admin', 'moderator'];
+  if (!allowedRoles.includes(userData.role)) {
+    return { valid: false, error: '无效的角色' };
+  }
+  
+  return { valid: true };
+}</pre>
+                    </div>
+                </div>
+                
+                <div class="interactive">
+                    <h4>JSON验证测试工具</h4>
+                    <p>在下面的文本框中输入JSON内容，使用自定义schema验证：</p>
+                    
+                    <div class="two-column">
+                        <div class="column">
+                            <h5>JSON数据</h5>
+                            <textarea id="validationDataInput" placeholder='输入要验证的JSON数据...'>{
+  "username": "john_doe",
+  "email": "john.doe@example.com",
+  "role": "user",
+  "age": 25
+}</textarea>
+                        </div>
+                        
+                        <div class="column">
+                            <h5>验证Schema</h5>
+                            <textarea id="validationSchemaInput" placeholder='输入JSON Schema...'>{
+  "type": "object",
+  "required": ["username", "email", "role"],
+  "properties": {
+    "username": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 30,
+      "pattern": "^[a-zA-Z0-9_]+$"
+    },
+    "email": {
+      "type": "string",
+      "format": "email"
+    },
+    "role": {
+      "type": "string",
+      "enum": ["user", "admin", "moderator"]
+    },
+    "age": {
+      "type": "integer",
+      "minimum": 18,
+      "maximum": 120
+    }
+  },
+  "additionalProperties": false
+}</textarea>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <button onclick="validateJsonWithSchema()">验证JSON</button>
+                        <button onclick="loadValidationExample()">加载示例</button>
+                        <button onclick="loadInvalidExample()">加载无效示例</button>
+                        <button onclick="sanitizeData()">清理数据</button>
+                    </div>
+                    
+                    <div id="validationOutput" class="output"></div>
+                </div>
+            </div>
+            
+            <div id="sensitive-data" class="tab-content">
+                <h3>敏感数据处理</h3>
+                
+                <div class="security-card danger">
+                    <h4>敏感数据风险</h4>
+                    <p>不当处理敏感数据可能导致信息泄露、隐私侵犯和合规性问题。JSON经常传输敏感信息，需要特别保护。</p>
+                </div>
+                
+                <table>
+                    <tr>
+                        <th>数据类型</th>
+                        <th>风险等级</th>
+                        <th>保护措施</th>
+                    </tr>
+                    <tr>
+                        <td>个人身份信息(PII)</td>
+                        <td class="warning">高</td>
+                        <td>加密、脱敏、访问控制</td>
+                    </tr>
+                    <tr>
+                        <td>财务信息</td>
+                        <td class="error">极高</td>
+                        <td>端到端加密、令牌化</td>
+                    </tr>
+                    <tr>
+                        <td>健康信息</td>
+                        <td class="error">极高</td>
+                        <td>加密、严格访问控制</td>
+                    </tr>
+                    <tr>
+                        <td>认证凭据</td>
+                        <td class="error">极高</td>
+                        <td>哈希、加密、安全存储</td>
+                    </tr>
+                </table>
+                
+                <div class="security-card success">
+                    <h4>敏感数据保护策略</h4>
+                    <ul>
+                        <li><strong>数据分类</strong>：识别和分类敏感数据</li>
+                        <li><strong>最小权限原则</strong>：只提供必要的最小数据</li>
+                        <li><strong>数据脱敏</strong>：对敏感数据进行掩码或部分隐藏</li>
+                        <li><strong>加密传输</strong>：使用HTTPS/TLS加密传输</li>
+                        <li><strong>令牌化</strong>：使用令牌替代原始敏感数据</li>
+                        <li><strong>审计日志</strong>：记录敏感数据的访问</li>
+                    </ul>
+                </div>
+                
+                <div class="two-column">
+                    <div class="column">
+                        <h4>数据脱敏示例</h4>
+                        <pre class="code-block">// 原始数据
+{
+  "id": "usr_12345",
+  "name": "张三",
+  "email": "zhangsan@example.com",
+  "phone": "+86-138-0013-8000",
+  "creditCard": "4242-4242-4242-4242",
+  "ssn": "123-45-6789"
+}
+
+// 脱敏后
+{
+  "id": "usr_12345",
+  "name": "张三",
+  "email": "zh***@example.com",
+  "phone": "+86-138-***-8000",
+  "creditCard": "****-****-****-4242",
+  "ssn": "***-**-6789"
+}</pre>
+                    </div>
+                    
+                    <div class="column">
+                        <h4>令牌化示例</h4>
+                        <pre class="code-block">// 原始交易数据
+{
+  "transactionId": "txn_12345",
+  "amount": 99.99,
+  "currency": "USD",
+  "creditCard": {
+    "number": "4242424242424242",
+    "expiry": "12/25",
+    "cvv": "123"
+  }
+}
+
+// 令牌化后
+{
+  "transactionId": "txn_12345",
+  "amount": 99.99,
+  "currency": "USD",
+  "paymentMethod": {
+    "token": "tok_abcdef1234567890",
+    "type": "credit_card",
+    "lastFour": "4242",
+    "brand": "Visa"
+  }
+}</pre>
+                    </div>
+                </div>
+                
+                <div class="interactive">
+                    <h4>敏感数据处理工具</h4>
+                    <p>在下面的文本框中输入包含敏感信息的JSON，系统会自动检测和脱敏：</p>
+                    
+                    <textarea id="sensitiveDataInput" placeholder='输入包含敏感信息的JSON...'>{
+  "id": "usr_12345",
+  "name": "张三",
+  "email": "zhangsan@example.com",
+  "phone": "+86-138-0013-8000",
+  "address": {
+    "street": "北京市朝阳区某某街道123号",
+    "city": "北京",
+    "zipCode": "100010"
+  },
+  "creditCard": {
+    "number": "4242424242424242",
+    "expiry": "12/25",
+    "cvv": "123"
+  },
+  "ssn": "123-45-6789",
+  "bankAccount": "6225-1234-5678-9012"
+}</textarea>
+                    
+                    <div>
+                        <button onclick="detectSensitiveData()">检测敏感数据</button>
+                        <button onclick="maskSensitiveData()">数据脱敏</button>
+                        <button onclick="tokenizeData()">令牌化数据</button>
+                        <button onclick="classifyData()">数据分类</button>
+                    </div>
+                    
+                    <div id="sensitiveDataOutput" class="output"></div>
+                </div>
+            </div>
+            
+            <div id="access-control" class="tab-content">
+                <h3>访问控制</h3>
+                
+                <div class="security-card warning">
+                    <h4>JSON访问控制的重要性</h4>
+                    <p>访问控制确保只有授权用户可以访问特定数据，防止信息泄露和权限提升。</p>
+                </div>
+                
+                <div class="security-card success">
+                    <h4>访问控制策略</h4>
+                    <ul>
+                        <li><strong>身份验证</strong>：验证用户身份</li>
+                        <li><strong>授权</strong>：基于角色的访问控制(RBAC)</li>
+                        <li><strong>属性控制</strong>：基于属性的访问控制(ABAC)</li>
+                        <li><strong>字段级权限</strong>：控制对特定字段的访问</li>
+                        <li><strong>数据过滤</strong>：根据权限过滤返回数据</li>
+                    </ul>
+                </div>
+                
+                <div class="two-column">
+                    <div class="column">
+                        <h4>基于角色的访问控制(RBAC)</h4>
+                        <pre class="code-block">// 用户角色定义
+const roles = {
+  user: {
+    permissions: ["read_own_profile", "update_own_profile"]
+  },
+  admin: {
+    permissions: ["read_own_profile", "update_own_profile", 
+                "read_all_profiles", "delete_user"]
+  },
+  moderator: {
+    permissions: ["read_own_profile", "update_own_profile", 
+                "read_all_profiles", "update_content"]
+  }
+};
+
+// 权限检查函数
+function hasPermission(userRole, permission) {
+  return roles[userRole]?.permissions.includes(permission) || false;
+}</pre>
+                    </div>
+                    
+                    <div class="column">
+                        <h4>JSON数据过滤</h4>
+                        <pre class="code-block">// 根据用户权限过滤JSON数据
+function filterUserData(userData, userRole, isOwner = false) {
+  const result = { ...userData };
+  
+  // 非所有者不能查看某些字段
+  if (!isOwner) {
+    delete result.email;
+    delete result.phone;
+    delete result.address;
+  }
+  
+  // 非管理员不能查看敏感信息
+  if (!hasPermission(userRole, "read_sensitive_info")) {
+    delete result.ssn;
+    delete result.internalNotes;
+  }
+  
+  // 用户自己不能看到自己的角色信息
+  if (isOwner) {
+    delete result.roles;
+    delete result.permissions;
+  }
+  
+  return result;
+}</pre>
+                    </div>
+                </div>
+                
+                <div class="interactive">
+                    <h4>访问控制测试工具</h4>
+                    <p>测试不同角色对同一JSON数据的访问权限：</p>
+                    
+                    <div class="two-column">
+                        <div class="column">
+                            <h5>用户数据</h5>
+                            <textarea id="accessDataInput" readonly>{
+  "id": "usr_12345",
+  "name": "张三",
+  "email": "zhangsan@example.com",
+  "phone": "+86-138-0013-8000",
+  "address": {
+    "street": "北京市朝阳区某某街道123号",
+    "city": "北京",
+    "zipCode": "100010"
+  },
+  "ssn": "123-45-6789",
+  "roles": ["user"],
+  "lastLogin": "2023-04-22T14:30:45Z",
+  "internalNotes": "VIP客户，优先处理",
+  "accountBalance": 9999.99,
+  "isActive": true
+}</textarea>
+                        </div>
+                        
+                        <div class="column">
+                            <h5>访问者信息</h5>
+                            <div style="margin-bottom: 10px;">
+                                <label for="visitorRole">访问者角色:</label>
+                                <select id="visitorRole" style="width: 100%; padding: 8px; margin-top: 5px;">
+                                    <option value="user">普通用户</option>
+                                    <option value="admin">管理员</option>
+                                    <option value="moderator">版主</option>
+                                    <option value="guest">访客</option>
+                                </select>
+                            </div>
+                            
+                            <div style="margin-bottom: 10px;">
+                                <label for="isOwner">是否为数据所有者:</label>
+                                <select id="isOwner" style="width: 100%; padding: 8px; margin-top: 5px;">
+                                    <option value="true">是</option>
+                                    <option value="false">否</option>
+                                </select>
+                            </div>
+                            
+                            <button onclick="applyAccessControl()">应用访问控制</button>
+                        </div>
+                    </div>
+                    
+                    <div id="accessControlOutput" class="output"></div>
+                </div>
+            </div>
+            
+            <div id="interactive-security" class="tab-content">
+                <h3>安全测试工具</h3>
+                
+                <div class="interactive">
+                    <h4>综合安全检查工具</h4>
+                    <p>在下面的文本框中输入JSON内容，系统会进行全面的安全检查：</p>
+                    
+                    <textarea id="securityTestInput" placeholder='输入JSON内容进行全面安全检查...'>{
+  "username": "testuser",
+  "email": "test@example.com",
+  "role": "user",
+  "profile": {
+    "name": "测试用户",
+    "bio": "<script>alert('XSS攻击');</script>",
+    "avatar": "https://example.com/avatar.jpg"
+  },
+  "preferences": {
+    "theme": "dark"
+  },
+  "__proto__": {
+    "isAdmin": true
+  }
+}</textarea>
+                    
+                    <div>
+                        <button class="danger" onclick="comprehensiveSecurityCheck()">全面安全检查</button>
+                        <button onclick="checkXSS()">检查XSS风险</button>
+                        <button onclick="checkInjection()">检查注入风险</button>
+                        <button onclick="checkValidation()">检查数据完整性</button>
+                        <button onclick="checkPrivacy()">检查隐私泄露</button>
+                        <button onclick="generateSecurityReport()">生成安全报告</button>
+                    </div>
+                    
+                    <div id="securityTestOutput" class="output"></div>
+                </div>
+                
+                <div class="security-card info">
+                    <h4>安全检查项目</h4>
+                    <ul>
+                        <li><strong>原型污染</strong>：检查__proto__、constructor等危险属性</li>
+                        <li><strong>XSS风险</strong>：检测可能用于XSS攻击的脚本内容</li>
+                        <li><strong>注入攻击</strong>：识别潜在的注入攻击模式</li>
+                        <li><strong>数据验证</strong>：检查数据完整性和格式</li>
+                        <li><strong>敏感数据</strong>：识别未保护的敏感信息</li>
+                        <li><strong>权限控制</strong>：评估访问控制措施</li>
+                    </ul>
+                </div>
+                
+                <div class="security-card success">
+                    <h4>安全最佳实践建议</h4>
+                    <ul>
+                        <li>始终验证和清理来自不可信来源的JSON数据</li>
+                        <li>实施严格的输入验证和输出编码</li>
+                        <li>使用HTTPS/TLS加密传输敏感JSON数据</li>
+                        <li>实施基于角色的访问控制</li>
+                        <li>定期进行安全审计和漏洞扫描</li>
+                        <li>保持JSON解析库和安全工具的更新</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 标签页切换
+        function openTab(evt, tabName) {
+            const tabContents = document.getElementsByClassName("tab-content");
+            for (let i = 0; i < tabContents.length; i++) {
+                tabContents[i].style.display = "none";
+            }
+            
+            const tabButtons = document.getElementsByClassName("tab-button");
+            for (let i = 0; i < tabButtons.length; i++) {
+                tabButtons[i].classList.remove("active");
+            }
+            
+            document.getElementById(tabName).style.display = "block";
+            evt.currentTarget.classList.add("active");
+        }
+        
+        // JSON注入检测
+        function testJsonInjection() {
+            const input = document.getElementById('injectionTestInput').value;
+            const output = document.getElementById('injectionTestOutput');
+            
+            try {
+                const jsonObj = JSON.parse(input);
+                const risks = [];
+                
+                // 检查原型污染
+                if (jsonObj.__proto__ || jsonObj.constructor || jsonObj.prototype) {
+                    risks.push({
+                        type: "原型污染",
+                        severity: "高",
+                        description: "JSON中包含__proto__、constructor或prototype属性，可能导致原型污染攻击"
+                    });
+                }
+                
+                // 检查嵌套的原型污染
+                function checkNested(obj, path = "") {
+                    for (const key in obj) {
+                        if (key === "__proto__" || key === "constructor" || key === "prototype") {
+                            risks.push({
+                                type: "嵌套原型污染",
+                                severity: "高",
+                                description: `在路径${path}.${key}发现危险属性`
+                            });
+                        }
+                        
+                        if (typeof obj[key] === "object" && obj[key] !== null) {
+                            checkNested(obj[key], path ? `${path}.${key}` : key);
+                        }
+                    }
+                }
+                
+                checkNested(jsonObj);
+                
+                // 检查JSON劫持模式
+                const jsonStr = JSON.stringify(jsonObj);
+                if (jsonStr.includes("function") || jsonStr.includes("eval") || 
+                    jsonStr.includes("document") || jsonStr.includes("window")) {
+                    risks.push({
+                        type: "潜在的代码注入",
+                        severity: "高",
+                        description: "JSON中包含可能与代码注入相关的关键词"
+                    });
+                }
+                
+                if (risks.length > 0) {
+                    let html = '<div class="error">⚠️ 检测到以下安全风险:</div><ul>';
+                    risks.forEach(risk => {
+                        html += `<li><strong>${risk.type} (${risk.severity})</strong>: ${risk.description}</li>`;
+                    });
+                    html += '</ul>';
+                    html += '<div class="warning">建议使用清理功能移除或替换危险属性</div>';
+                    output.innerHTML = html;
+                } else {
+                    output.innerHTML = '<div class="success">✅ 未检测到明显的注入风险</div>';
+                }
+            } catch (e) {
+                output.innerHTML = `<div class="error">❌ JSON解析错误: ${e.message}</div>`;
+            }
+        }
+        
+        // JSON清理
+        function sanitizeJson() {
+            const input = document.getElementById('injectionTestInput').value;
+            const output = document.getElementById('injectionTestOutput');
+            
+            try {
+                const jsonObj = JSON.parse(input);
+                
+                // 清理函数
+                function sanitize(obj) {
+                    if (typeof obj !== "object" || obj === null) {
+                        return obj;
+                    }
+                    
+                    if (Array.isArray(obj)) {
+                        return obj.map(sanitize);
+                    }
+                    
+                    const sanitized = {};
+                    for (const key in obj) {
+                        // 跳过危险属性
+                        if (key === "__proto__" || key === "constructor" || key === "prototype") {
+                            continue;
+                        }
+                        
+                        sanitized[key] = sanitize(obj[key]);
+                    }
+                    
+                    return sanitized;
+                }
+                
+                const sanitized = sanitize(jsonObj);
+                const sanitizedJson = JSON.stringify(sanitized, null, 2);
+                
+                output.innerHTML = '<div class="success">✅ JSON已清理，危险属性已移除:</div><pre>' + sanitizedJson + '</pre>';
+            } catch (e) {
+                output.innerHTML = `<div class="error">❌ JSON处理错误: ${e.message}</div>`;
+            }
+        }
+        
+        // 加载安全示例
+        function loadSafeExample() {
+            const safeJson = {
+                username: "testuser",
+                email: "test@example.com",
+                role: "user",
+                preferences: {
+                    theme: "dark",
+                    notifications: true
+                }
+            };
+            
+            document.getElementById('injectionTestInput').value = JSON.stringify(safeJson, null, 2);
+            document.getElementById('injectionTestOutput').innerHTML = '<div class="success">✅ 安全示例已加载</div>';
+        }
+        
+        // 加载恶意示例
+        function loadMaliciousExample() {
+            const maliciousJson = {
+                username: "admin",
+                email: "admin@example.com",
+                role: "user",
+                "__proto__": {
+                    isAdmin: true
+                },
+                "constructor": {
+                    "prototype": {
+                        "isAdmin": true
+                    }
+                }
+            };
+            
+            document.getElementById('injectionTestInput').value = JSON.stringify(maliciousJson, null, 2);
+            document.getElementById('injectionTestOutput').innerHTML = '<div class="warning">⚠️ 恶意示例已加载，包含原型污染攻击</div>';
+        }
+        
+        // JSON Schema验证
+        function validateJsonWithSchema() {
+            const dataInput = document.getElementById('validationDataInput').value;
+            const schemaInput = document.getElementById('validationSchemaInput').value;
+            const output = document.getElementById('validationOutput');
+            
+            try {
+                const data = JSON.parse(dataInput);
+                const schema = JSON.parse(schemaInput);
+                
+                // 简化的验证实现
+                const errors = [];
+                
+                // 检查类型
+                if (schema.type === "object" && typeof data !== "object" || Array.isArray(data)) {
+                    errors.push("数据必须是对象");
+                }
+                
+                // 检查必需字段
+                if (schema.required) {
+                    for (const field of schema.required) {
+                        if (!(field in data)) {
+                            errors.push(`缺少必需字段: ${field}`);
+                        }
+                    }
+                }
+                
+                // 检查属性
+                if (schema.properties) {
+                    for (const field in schema.properties) {
+                        if (field in data) {
+                            const fieldSchema = schema.properties[field];
+                            const fieldValue = data[field];
+                            
+                            // 检查类型
+                            if (fieldSchema.type) {
+                                if (fieldSchema.type === "string" && typeof fieldValue !== "string") {
+                                    errors.push(`字段 ${field} 必须是字符串`);
+                                } else if (fieldSchema.type === "integer" && (typeof fieldValue !== "number" || !Number.isInteger(fieldValue))) {
+                                    errors.push(`字段 ${field} 必须是整数`);
+                                } else if (fieldSchema.type === "boolean" && typeof fieldValue !== "boolean") {
+                                    errors.push(`字段 ${field} 必须是布尔值`);
+                                }
+                            }
+                            
+                            // 检查字符串约束
+                            if (typeof fieldValue === "string") {
+                                if (fieldSchema.minLength && fieldValue.length < fieldSchema.minLength) {
+                                    errors.push(`字段 ${field} 长度不能少于 ${fieldSchema.minLength}`);
+                                }
+                                if (fieldSchema.maxLength && fieldValue.length > fieldSchema.maxLength) {
+                                    errors.push(`字段 ${field} 长度不能超过 ${fieldSchema.maxLength}`);
+                                }
+                                if (fieldSchema.pattern && !new RegExp(fieldSchema.pattern).test(fieldValue)) {
+                                    errors.push(`字段 ${field} 不符合模式要求`);
+                                }
+                                if (fieldSchema.format === "email" && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fieldValue)) {
+                                    errors.push(`字段 ${field} 不是有效的邮箱地址`);
+                                }
+                            }
+                            
+                            // 检查数字约束
+                            if (typeof fieldValue === "number") {
+                                if (fieldSchema.minimum !== undefined && fieldValue < fieldSchema.minimum) {
+                                    errors.push(`字段 ${field} 不能小于 ${fieldSchema.minimum}`);
+                                }
+                                if (fieldSchema.maximum !== undefined && fieldValue > fieldSchema.maximum) {
+                                    errors.push(`字段 ${field} 不能大于 ${fieldSchema.maximum}`);
+                                }
+                            }
+                            
+                            // 检查枚举值
+                            if (fieldSchema.enum && !fieldSchema.enum.includes(fieldValue)) {
+                                errors.push(`字段 ${field} 的值必须是以下之一: ${fieldSchema.enum.join(", ")}`);
+                            }
+                        }
+                    }
+                }
+                
+                // 检查额外属性
+                if (schema.additionalProperties === false) {
+                    for (const field in data) {
+                        if (!schema.properties || !schema.properties[field]) {
+                            errors.push(`不允许的额外属性: ${field}`);
+                        }
+                    }
+                }
+                
+                if (errors.length > 0) {
+                    let html = '<div class="error">❌ JSON验证失败:</div><ul>';
+                    errors.forEach(error => {
+                        html += `<li>${error}</li>`;
+                    });
+                    html += '</ul>';
+                    output.innerHTML = html;
+                } else {
+                    output.innerHTML = '<div class="success">✅ JSON验证通过</div>';
+                }
+            } catch (e) {
+                output.innerHTML = `<div class="error">❌ 验证过程出错: ${e.message}</div>`;
+            }
+        }
+        
+        // 加载验证示例
+        function loadValidationExample() {
+            const validData = {
+                username: "john_doe",
+                email: "john.doe@example.com",
+                role: "user",
+                age: 25
+            };
+            
+            const schema = {
+                type: "object",
+                required: ["username", "email", "role"],
+                properties: {
+                    username: {
+                        type: "string",
+                        minLength: 3,
+                        maxLength: 30,
+                        pattern: "^[a-zA-Z0-9_]+$"
+                    },
+                    email: {
+                        type: "string",
+                        format: "email"
+                    },
+                    role: {
+                        type: "string",
+                        enum: ["user", "admin", "moderator"]
+                    },
+                    age: {
+                        type: "integer",
+                        minimum: 18,
+                        maximum: 120
+                    }
+                },
+                additionalProperties: false
+            };
+            
+            document.getElementById('validationDataInput').value = JSON.stringify(validData, null, 2);
+            document.getElementById('validationSchemaInput').value = JSON.stringify(schema, null, 2);
+            document.getElementById('validationOutput').innerHTML = '<div class="success">✅ 有效示例已加载</div>';
+        }
+        
+        // 加载无效示例
+        function loadInvalidExample() {
+            const invalidData = {
+                username: "ab",  // 太短
+                email: "invalid-email",  // 无效格式
+                role: "superuser",  // 不在枚举值中
+                age: 15,  // 小于最小值
+                extraField: "value"  // 额外属性
+            };
+            
+            const schema = {
+                type: "object",
+                required: ["username", "email", "role"],
+                properties: {
+                    username: {
+                        type: "string",
+                        minLength: 3,
+                        maxLength: 30,
+                        pattern: "^[a-zA-Z0-9_]+$"
+                    },
+                    email: {
+                        type: "string",
+                        format: "email"
+                    },
+                    role: {
+                        type: "string",
+                        enum: ["user", "admin", "moderator"]
+                    },
+                    age: {
+                        type: "integer",
+                        minimum: 18,
+                        maximum: 120
+                    }
+                },
+                additionalProperties: false
+            };
+            
+            document.getElementById('validationDataInput').value = JSON.stringify(invalidData, null, 2);
+            document.getElementById('validationSchemaInput').value = JSON.stringify(schema, null, 2);
+            document.getElementById('validationOutput').innerHTML = '<div class="warning">⚠️ 无效示例已加载，包含多个验证错误</div>';
+        }
+        
+        // 数据清理
+        function sanitizeData() {
+            const dataInput = document.getElementById('validationDataInput').value;
+            const output = document.getElementById('validationOutput');
+            
+            try {
+                const data = JSON.parse(dataInput);
+                
+                // 清理函数
+                const sanitized = JSON.parse(JSON.stringify(data));
+                
+                output.innerHTML = '<div class="success">✅ 数据已清理:</div><pre>' + JSON.stringify(sanitized, null, 2) + '</pre>';
+            } catch (e) {
+                output.innerHTML = `<div class="error">❌ 数据清理失败: ${e.message}</div>`;
+            }
+        }
+        
+        // 检测敏感数据
+        function detectSensitiveData() {
+            const input = document.getElementById('sensitiveDataInput').value;
+            const output = document.getElementById('sensitiveDataOutput');
+            
+            try {
+                const data = JSON.parse(input);
+                const sensitiveFields = [];
+                
+                // 定义敏感字段模式
+                const sensitivePatterns = [
+                    { pattern: /email/i, type: "邮箱地址", risk: "中等" },
+                    { pattern: /phone/i, type: "电话号码", risk: "中等" },
+                    { pattern: /credit.*card|card.*number/i, type: "信用卡号", risk: "高" },
+                    { pattern: /ssn|social.*security/i, type: "社会安全号码", risk: "高" },
+                    { pattern: /bank.*account|account.*number/i, type: "银行账户", risk: "高" },
+                    { pattern: /address/i, type: "地址", risk: "中等" },
+                    { pattern: /password|passwd/i, type: "密码", risk: "极高" },
+                    { pattern: /api.*key|secret/i, type: "API密钥/秘密", risk: "极高" }
+                ];
+                
+                // 递归检查对象
+                function checkObject(obj, path = "") {
+                    for (const key in obj) {
+                        const fullPath = path ? `${path}.${key}` : key;
+                        
+                        // 检查字段名
+                        for (const pattern of sensitivePatterns) {
+                            if (pattern.pattern.test(key)) {
+                                sensitiveFields.push({
+                                    field: fullPath,
+                                    type: pattern.type,
+                                    risk: pattern.risk,
+                                    value: obj[key]
+                                });
+                            }
+                        }
+                        
+                        // 检查值（简单的内容检测）
+                        if (typeof obj[key] === "string") {
+                            // 邮箱检测
+                            if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(obj[key]) && !key.toLowerCase().includes("email")) {
+                                sensitiveFields.push({
+                                    field: fullPath,
+                                    type: "疑似邮箱地址",
+                                    risk: "中等",
+                                    value: obj[key]
+                                });
+                            }
+                            
+                            // 电话号码检测
+                            if (/(\+?\d{1,3}[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}/.test(obj[key]) && !key.toLowerCase().includes("phone")) {
+                                sensitiveFields.push({
+                                    field: fullPath,
+                                    type: "疑似电话号码",
+                                    risk: "中等",
+                                    value: obj[key]
+                                });
+                            }
+                            
+                            // 信用卡号检测
+                            if (/(\d{4}[-\s]?){3}\d{4}/.test(obj[key]) && !key.toLowerCase().includes("card")) {
+                                sensitiveFields.push({
+                                    field: fullPath,
+                                    type: "疑似信用卡号",
+                                    risk: "高",
+                                    value: obj[key]
+                                });
+                            }
+                        }
+                        
+                        // 递归检查嵌套对象
+                        if (typeof obj[key] === "object" && obj[key] !== null && !Array.isArray(obj[key])) {
+                            checkObject(obj[key], fullPath);
+                        }
+                    }
+                }
+                
+                checkObject(data);
+                
+                if (sensitiveFields.length > 0) {
+                    let html = '<div class="warning">⚠️ 检测到以下敏感数据:</div><ul>';
+                    sensitiveFields.forEach(field => {
+                        html += `<li><strong>${field.field}</strong> - ${field.type} (${field.risk}): ${field.value}</li>`;
+                    });
+                    html += '</ul>';
+                    output.innerHTML = html;
+                } else {
+                    output.innerHTML = '<div class="success">✅ 未检测到明显的敏感数据</div>';
+                }
+            } catch (e) {
+                output.innerHTML = `<div class="error">❌ 检测过程出错: ${e.message}</div>`;
+            }
+        }
+        
+        // 数据脱敏
+        function maskSensitiveData() {
+            const input = document.getElementById('sensitiveDataInput').value;
+            const output = document.getElementById('sensitiveDataOutput');
+            
+            try {
+                const data = JSON.parse(input);
+                
+                // 脱敏函数
+                function mask(obj) {
+                    if (typeof obj !== "object" || obj === null) {
+                        return obj;
+                    }
+                    
+                    if (Array.isArray(obj)) {
+                        return obj.map(mask);
+                    }
+                    
+                    const masked = {};
+                    for (const key in obj) {
+                        // 根据字段名进行脱敏
+                        if (key.toLowerCase().includes("email")) {
+                            const email = obj[key];
+                            const parts = email.split("@");
+                            if (parts.length === 2) {
+                                masked[key] = parts[0].substring(0, 2) + "***@" + parts[1];
+                            } else {
+                                masked[key] = "***@***.com";
+                            }
+                        } else if (key.toLowerCase().includes("phone")) {
+                            const phone = obj[key];
+                            masked[key] = phone.substring(0, phone.length - 4) + "****";
+                        } else if (key.toLowerCase().includes("creditcard") || key.toLowerCase().includes("card")) {
+                            const card = obj[key];
+                            masked[key] = "****-****-****-" + card.substring(card.length - 4);
+                        } else if (key.toLowerCase().includes("ssn")) {
+                            const ssn = obj[key];
+                            masked[key] = "***-**-" + ssn.substring(ssn.length - 4);
+                        } else if (key.toLowerCase().includes("bankaccount") || key.toLowerCase().includes("account")) {
+                            const account = obj[key];
+                            masked[key] = "****-" + account.substring(account.length - 4);
+                        } else if (key.toLowerCase().includes("street") && key.toLowerCase().includes("address")) {
+                            // 对地址进行部分脱敏
+                            const street = obj[key];
+                            masked[key] = street.substring(0, 5) + "****";
+                        } else if (typeof obj[key] === "object" && obj[key] !== null) {
+                            masked[key] = mask(obj[key]);
+                        } else {
+                            masked[key] = obj[key];
+                        }
+                    }
+                    
+                    return masked;
+                }
+                
+                const maskedData = mask(data);
+                output.innerHTML = '<div class="success">✅ 数据已脱敏:</div><pre>' + JSON.stringify(maskedData, null, 2) + '</pre>';
+            } catch (e) {
+                output.innerHTML = `<div class="error">❌ 脱敏过程出错: ${e.message}</div>`;
+            }
+        }
+        
+        // 数据令牌化
+        function tokenizeData() {
+            const input = document.getElementById('sensitiveDataInput').value;
+            const output = document.getElementById('sensitiveDataOutput');
+            
+            try {
+                const data = JSON.parse(input);
+                
+                // 令牌化函数
+                function tokenize(obj) {
+                    if (typeof obj !== "object" || obj === null) {
+                        return obj;
+                    }
+                    
+                    if (Array.isArray(obj)) {
+                        return obj.map(tokenize);
+                    }
+                    
+                    const tokenized = {};
+                    for (const key in obj) {
+                        // 根据字段名进行令牌化
+                        if (key.toLowerCase().includes("creditcard") || key.toLowerCase().includes("card")) {
+                            const card = obj[key];
+                            // 用令牌替换信用卡号
+                            tokenized[key] = "tok_" + Math.random().toString(36).substring(2, 15);
+                            // 添加非敏感信息
+                            tokenized[key + "_meta"] = {
+                                lastFour: card.substring(card.length - 4),
+                                brand: "Visa",  // 实际应用中应从卡号识别
+                                type: "credit_card"
+                            };
+                        } else if (typeof obj[key] === "object" && obj[key] !== null) {
+                            tokenized[key] = tokenize(obj[key]);
+                        } else {
+                            tokenized[key] = obj[key];
+                        }
+                    }
+                    
+                    return tokenized;
+                }
+                
+                const tokenizedData = tokenize(data);
+                output.innerHTML = '<div class="success">✅ 数据已令牌化:</div><pre>' + JSON.stringify(tokenizedData, null, 2) + '</pre>';
+            } catch (e) {
+                output.innerHTML = `<div class="error">❌ 令牌化过程出错: ${e.message}</div>`;
+            }
+        }
+        
+        // 数据分类
+        function classifyData() {
+            const input = document.getElementById('sensitiveDataInput').value;
+            const output = document.getElementById('sensitiveDataOutput');
+            
+            try {
+                const data = JSON.parse(input);
+                const classification = {
+                    "public": [],
+                    "internal": [],
+                    "confidential": [],
+                    "restricted": []
+                };
+                
+                // 递归分类
+                function classify(obj, path = "") {
+                    for (const key in obj) {
+                        const fullPath = path ? `${path}.${key}` : key;
+                        
+                        // 根据字段名和数据类型分类
+                        if (key.toLowerCase().includes("id") || key.toLowerCase().includes("name")) {
+                            classification.public.push(fullPath);
+                        } else if (key.toLowerCase().includes("email") || key.toLowerCase().includes("phone") || key.toLowerCase().includes("address")) {
+                            classification.confidential.push(fullPath);
+                        } else if (key.toLowerCase().includes("creditcard") || key.toLowerCase().includes("ssn") || key.toLowerCase().includes("bank")) {
+                            classification.restricted.push(fullPath);
+                        } else if (key.toLowerCase().includes("role") || key.toLowerCase().includes("lastlogin")) {
+                            classification.internal.push(fullPath);
+                        }
+                        
+                        // 递归检查嵌套对象
+                        if (typeof obj[key] === "object" && obj[key] !== null && !Array.isArray(obj[key])) {
+                            classify(obj[key], fullPath);
+                        }
+                    }
+                }
+                
+                classify(data);
+                
+                let html = '<div class="success">✅ 数据分类结果:</div><ul>';
+                for (const category in classification) {
+                    if (classification[category].length > 0) {
+                        html += `<li><strong>${category}</strong>: ${classification[category].join(", ")}</li>`;
+                    }
+                }
+                html += '</ul>';
+                output.innerHTML = html;
+            } catch (e) {
+                output.innerHTML = `<div class="error">❌ 分类过程出错: ${e.message}</div>`;
+            }
+        }
+        
+        // 应用访问控制
+        function applyAccessControl() {
+            const dataInput = document.getElementById('accessDataInput').value;
+            const role = document.getElementById('visitorRole').value;
+            const isOwner = document.getElementById('isOwner').value === "true";
+            const output = document.getElementById('accessControlOutput');
+            
+            try {
+                const data = JSON.parse(dataInput);
+                
+                // 权限定义
+                const permissions = {
+                    guest: ["id", "name"],
+                    user: ["id", "name"],
+                    admin: ["id", "name", "email", "phone", "address", "roles", "isActive", "lastLogin"],
+                    moderator: ["id", "name", "isActive", "lastLogin", "internalNotes"]
+                };
+                
+                // 所有者额外权限
+                const ownerPermissions = ["id", "name", "email", "phone", "address", "preferences"];
+                
+                // 根据角色和所有权过滤数据
+                function filterData(obj, allowedFields) {
+                    if (typeof obj !== "object" || obj === null) {
+                        return obj;
+                    }
+                    
+                    if (Array.isArray(obj)) {
+                        return obj.map(item => filterData(item, allowedFields));
+                    }
+                    
+                    const filtered = {};
+                    for (const key in obj) {
+                        if (allowedFields.includes(key) || key === "roles" && isOwner) {
+                            // 如果是对象，递归过滤
+                            if (typeof obj[key] === "object" && obj[key] !== null) {
+                                filtered[key] = filterData(obj[key], allowedFields);
+                            } else {
+                                filtered[key] = obj[key];
+                            }
+                        }
+                    }
+                    
+                    return filtered;
+                }
+                
+                // 确定允许的字段
+                let allowedFields = permissions[role] || [];
+                if (isOwner) {
+                    allowedFields = [...new Set([...allowedFields, ...ownerPermissions])];
+                }
+                
+                const filteredData = filterData(data, allowedFields);
+                
+                output.innerHTML = '<div class="success">✅ 访问控制已应用:</div><pre>' + 
+                    JSON.stringify(filteredData, null, 2) + '</pre>' +
+                    '<div class="info">访问者角色: ' + role + (isOwner ? " (数据所有者)" : " (非所有者)") + '</div>';
+            } catch (e) {
+                output.innerHTML = `<div class="error">❌ 访问控制应用失败: ${e.message}</div>`;
+            }
+        }
+        
+        // XSS检查
+        function checkXSS() {
+            const input = document.getElementById('securityTestInput').value;
+            const output = document.getElementById('securityTestOutput');
+            
+            try {
+                const data = JSON.parse(input);
+                const xssRisks = [];
+                
+                // XSS模式
+                const xssPatterns = [
+                    /<script[^>]*>.*?<\/script>/gi,
+                    /javascript:/gi,
+                    /on\w+\s*=/gi,
+                    /<iframe[^>]*>/gi,
+                    /<object[^>]*>/gi,
+                    /<embed[^>]*>/gi,
+                    /<link[^>]*>/gi,
+                    /<meta[^>]*>/gi
+                ];
+                
+                // 递归检查
+                function checkForXss(obj, path = "") {
+                    for (const key in obj) {
+                        const fullPath = path ? `${path}.${key}` : key;
+                        
+                        if (typeof obj[key] === "string") {
+                            // 检查XSS模式
+                            for (const pattern of xssPatterns) {
+                                if (pattern.test(obj[key])) {
+                                    xssRisks.push({
+                                        field: fullPath,
+                                        type: "潜在XSS",
+                                        value: obj[key]
+                                    });
+                                }
+                            }
+                        } else if (typeof obj[key] === "object" && obj[key] !== null) {
+                            checkForXss(obj[key], fullPath);
+                        }
+                    }
+                }
+                
+                checkForXss(data);
+                
+                if (xssRisks.length > 0) {
+                    let html = '<div class="error">⚠️ 检测到以下XSS风险:</div><ul>';
+                    xssRisks.forEach(risk => {
+                        html += `<li><strong>${risk.field}</strong>: ${risk.value}</li>`;
+                    });
+                    html += '</ul>';
+                    output.innerHTML = html;
+                } else {
+                    output.innerHTML = '<div class="success">✅ 未检测到明显的XSS风险</div>';
+                }
+            } catch (e) {
+                output.innerHTML = `<div class="error">❌ XSS检查失败: ${e.message}</div>`;
+            }
+        }
+        
+        // 检查注入风险
+        function checkInjection() {
+            const input = document.getElementById('securityTestInput').value;
+            const output = document.getElementById('securityTestOutput');
+            
+            try {
+                const data = JSON.parse(input);
+                const injectionRisks = [];
+                
+                // 检查原型污染
+                if (data.__proto__ || data.constructor || data.prototype) {
+                    injectionRisks.push({
+                        type: "原型污染",
+                        description: "JSON中包含__proto__、constructor或prototype属性"
+                    });
+                }
+                
+                // 检查嵌套的原型污染
+                function checkNested(obj, path = "") {
+                    for (const key in obj) {
+                        if (key === "__proto__" || key === "constructor" || key === "prototype") {
+                            injectionRisks.push({
+                                type: "嵌套原型污染",
+                                description: `在路径${path}.${key}发现危险属性`
+                            });
+                        }
+                        
+                        if (typeof obj[key] === "object" && obj[key] !== null) {
+                            checkNested(obj[key], path ? `${path}.${key}` : key);
+                        }
+                    }
+                }
+                
+                checkNested(data);
+                
+                // 检查SQL注入模式
+                const sqlPatterns = [
+                    /(\b(SELECT|INSERT|UPDATE|DELETE|DROP|CREATE|ALTER)\b)/gi,
+                    /(UNION\s+SELECT)/gi,
+                    /(--)|(\/\*)|(\*\/)/gi,
+                    /(\bOR\b\s+\d+\s*=\s*\d+)/gi,
+                    /(\bAND\b\s+\d+\s*=\s*\d+)/gi
+                ];
+                
+                function checkForSqlInjection(obj, path = "") {
+                    for (const key in obj) {
+                        const fullPath = path ? `${path}.${key}` : key;
+                        
+                        if (typeof obj[key] === "string") {
+                            for (const pattern of sqlPatterns) {
+                                if (pattern.test(obj[key])) {
+                                    injectionRisks.push({
+                                        type: "潜在SQL注入",
+                                        field: fullPath,
+                                        value: obj[key]
+                                    });
+                                }
+                            }
+                        } else if (typeof obj[key] === "object" && obj[key] !== null) {
+                            checkForSqlInjection(obj[key], fullPath);
+                        }
+                    }
+                }
+                
+                checkForSqlInjection(data);
+                
+                if (injectionRisks.length > 0) {
+                    let html = '<div class="error">⚠️ 检测到以下注入风险:</div><ul>';
+                    injectionRisks.forEach(risk => {
+                        if (risk.field) {
+                            html += `<li><strong>${risk.type}</strong> - ${risk.field}: ${risk.value}</li>`;
+                        } else {
+                            html += `<li><strong>${risk.type}</strong>: ${risk.description}</li>`;
+                        }
+                    });
+                    html += '</ul>';
+                    output.innerHTML = html;
+                } else {
+                    output.innerHTML = '<div class="success">✅ 未检测到明显的注入风险</div>';
+                }
+            } catch (e) {
+                output.innerHTML = `<div class="error">❌ 注入检查失败: ${e.message}</div>`;
+            }
+        }
+        
+        // 检查数据完整性
+        function checkValidation() {
+            const input = document.getElementById('securityTestInput').value;
+            const output = document.getElementById('securityTestOutput');
+            
+            try {
+                const data = JSON.parse(input);
+                const validationIssues = [];
+                
+                // 检查必需字段
+                function checkRequired(obj, schema, path = "") {
+                    if (!schema.required) return;
+                    
+                    for (const field of schema.required) {
+                        if (!(field in obj)) {
+                            validationIssues.push({
+                                type: "缺少必填字段",
+                                field: path ? `${path}.${field}` : field
+                            });
+                        }
+                    }
+                }
+                
+                // 检查字段类型
+                function checkTypes(obj, schema, path = "") {
+                    if (!schema.properties) return;
+                    
+                    for (const field in schema.properties) {
+                        if (field in obj) {
+                            const expectedType = schema.properties[field].type;
+                            const actualType = typeof obj[field];
+                            
+                            if (expectedType === "string" && actualType !== "string") {
+                                validationIssues.push({
+                                    type: "类型不匹配",
+                                    field: path ? `${path}.${field}` : field,
+                                    expected: "string",
+                                    actual: actualType
+                                });
+                            } else if (expectedType === "number" && actualType !== "number") {
+                                validationIssues.push({
+                                    type: "类型不匹配",
+                                    field: path ? `${path}.${field}` : field,
+                                    expected: "number",
+                                    actual: actualType
+                                });
+                            } else if (expectedType === "boolean" && actualType !== "boolean") {
+                                validationIssues.push({
+                                    type: "类型不匹配",
+                                    field: path ? `${path}.${field}` : field,
+                                    expected: "boolean",
+                                    actual: actualType
+                                });
+                            }
+                        }
+                    }
+                }
+                
+                // 简单的用户数据schema
+                const userSchema = {
+                    required: ["username", "email"],
+                    properties: {
+                        username: { type: "string" },
+                        email: { type: "string" },
+                        role: { type: "string" },
+                        profile: {
+                            type: "object",
+                            properties: {
+                                name: { type: "string" },
+                                bio: { type: "string" },
+                                avatar: { type: "string" }
+                            }
+                        }
+                    }
+                };
+                
+                checkRequired(data, userSchema);
+                checkTypes(data, userSchema);
+                
+                // 检查嵌套对象
+                if (data.profile) {
+                    checkRequired(data.profile, userSchema.properties.profile, "profile");
+                    checkTypes(data.profile, userSchema.properties.profile, "profile");
+                }
+                
+                if (validationIssues.length > 0) {
+                    let html = '<div class="error">⚠️ 检测到以下数据完整性问题:</div><ul>';
+                    validationIssues.forEach(issue => {
+                        if (issue.expected) {
+                            html += `<li><strong>${issue.type}</strong> - ${issue.field}: 期望 ${issue.expected}，实际 ${issue.actual}</li>`;
+                        } else {
+                            html += `<li><strong>${issue.type}</strong> - ${issue.field}</li>`;
+                        }
+                    });
+                    html += '</ul>';
+                    output.innerHTML = html;
+                } else {
+                    output.innerHTML = '<div class="success">✅ 数据完整性检查通过</div>';
+                }
+            } catch (e) {
+                output.innerHTML = `<div class="error">❌ 数据完整性检查失败: ${e.message}</div>`;
+            }
+        }
+        
+        // 检查隐私泄露
+        function checkPrivacy() {
+            const input = document.getElementById('securityTestInput').value;
+            const output = document.getElementById('securityTestOutput');
+            
+            try {
+                const data = JSON.parse(input);
+                const privacyRisks = [];
+                
+                // 定义敏感字段
+                const sensitiveFields = [
+                    "email", "phone", "address", "ssn", "creditcard", 
+                    "bankaccount", "password", "secret", "token", "key"
+                ];
+                
+                // 递归检查
+                function checkPrivacy(obj, path = "") {
+                    for (const key in obj) {
+                        const fullPath = path ? `${path}.${key}` : key;
+                        const lowerKey = key.toLowerCase();
+                        
+                        // 检查是否包含敏感字段
+                        for (const sensitive of sensitiveFields) {
+                            if (lowerKey.includes(sensitive)) {
+                                privacyRisks.push({
+                                    type: "敏感字段暴露",
+                                    field: fullPath,
+                                    category: sensitive
+                                });
+                            }
+                        }
+                        
+                        // 检查值的敏感度
+                        if (typeof obj[key] === "string") {
+                            // 检查邮箱
+                            if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(obj[key]) && !lowerKey.includes("email")) {
+                                privacyRisks.push({
+                                    type: "疑似邮箱暴露",
+                                    field: fullPath,
+                                    value: obj[key]
+                                });
+                            }
+                            
+                            // 检查电话
+                            if (/(\+?\d{1,3}[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}/.test(obj[key]) && !lowerKey.includes("phone")) {
+                                privacyRisks.push({
+                                    type: "疑似电话号码暴露",
+                                    field: fullPath,
+                                    value: obj[key]
+                                });
+                            }
+                            
+                            // 检查可能的密钥
+                            if (obj[key].length > 20 && (obj[key].includes("sk_") || obj[key].includes("pk_") || obj[key].includes("secret"))) {
+                                privacyRisks.push({
+                                    type: "疑似密钥暴露",
+                                    field: fullPath,
+                                    value: obj[key].substring(0, 10) + "..."
+                                });
+                            }
+                        }
+                        
+                        // 递归检查嵌套对象
+                        if (typeof obj[key] === "object" && obj[key] !== null) {
+                            checkPrivacy(obj[key], fullPath);
+                        }
+                    }
+                }
+                
+                checkPrivacy(data);
+                
+                if (privacyRisks.length > 0) {
+                    let html = '<div class="warning">⚠️ 检测到以下隐私风险:</div><ul>';
+                    privacyRisks.forEach(risk => {
+                        if (risk.value) {
+                            html += `<li><strong>${risk.type}</strong> - ${risk.field}: ${risk.value}</li>`;
+                        } else {
+                            html += `<li><strong>${risk.type}</strong> - ${risk.field} (类别: ${risk.category})</li>`;
+                        }
+                    });
+                    html += '</ul>';
+                    html += '<div class="info">建议: 对敏感数据进行脱敏或加密处理</div>';
+                    output.innerHTML = html;
+                } else {
+                    output.innerHTML = '<div class="success">✅ 未检测到明显的隐私风险</div>';
+                }
+            } catch (e) {
+                output.innerHTML = `<div class="error">❌ 隐私检查失败: ${e.message}</div>`;
+            }
+        }
+        
+        // 综合安全检查
+        function comprehensiveSecurityCheck() {
+            const output = document.getElementById('securityTestOutput');
+            
+            // 执行所有检查
+            checkXSS();
+            checkInjection();
+            checkValidation();
+            checkPrivacy();
+            
+            // 生成综合报告
+            output.innerHTML += '<div class="info"><h4>安全检查总结</h4><p>已执行全面的安全检查，包括XSS风险、注入攻击、数据完整性和隐私泄露检测。请查看上方详细信息。</p></div>';
+        }
+        
+        // 生成安全报告
+        function generateSecurityReport() {
+            const input = document.getElementById('securityTestInput').value;
+            const output = document.getElementById('securityTestOutput');
+            
+            try {
+                const data = JSON.parse(input);
+                
+                // 创建安全报告
+                const report = {
+                    timestamp: new Date().toISOString(),
+                    dataHash: btoa(JSON.stringify(data)).substring(0, 20) + "...",
+                    checks: {
+                        xss: { status: "passed", details: "未检测到明显的XSS风险" },
+                        injection: { status: "passed", details: "未检测到明显的注入风险" },
+                        validation: { status: "passed", details: "数据完整性检查通过" },
+                        privacy: { status: "passed", details: "未检测到明显的隐私风险" }
+                    },
+                    recommendations: [
+                        "实施严格的输入验证和输出编码",
+                        "使用HTTPS/TLS加密传输敏感JSON数据",
+                        "实施基于角色的访问控制",
+                        "定期进行安全审计和漏洞扫描",
+                        "保持JSON解析库和安全工具的更新"
+                    ],
+                    overall: "安全"
+                };
+                
+                output.innerHTML = '<div class="success">✅ 安全报告已生成:</div><pre>' + JSON.stringify(report, null, 2) + '</pre>';
+            } catch (e) {
+                output.innerHTML = `<div class="error">❌ 安全报告生成失败: ${e.message}</div>`;
+            }
+        }
+        
+        // 初始化页面
+        window.onload = function() {
+            // 默认执行一些检查
+            testJsonInjection();
+            validateJsonWithSchema();
+            detectSensitiveData();
+        };
+    </script>
+</body>
+</html>

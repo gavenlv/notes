@@ -1,0 +1,491 @@
+{
+  "enterpriseIntegration": {
+    "title": "JSON企业级集成示例",
+    "version": "1.0.0",
+    "lastUpdated": "2023-04-22T14:30:45Z",
+    
+    "apiGateway": {
+      "config": {
+        "version": "v2",
+        "baseURL": "https://api.enterprise.com",
+        "timeout": 30000,
+        "retries": 3,
+        "rateLimiting": {
+          "enabled": true,
+          "requests": 1000,
+          "window": "1m"
+        }
+      },
+      "endpoints": [
+        {
+          "name": "用户服务",
+          "path": "/users",
+          "methods": ["GET", "POST", "PUT", "DELETE"],
+          "authentication": "JWT",
+          "rateLimit": {
+            "requests": 100,
+            "window": "1m"
+          }
+        },
+        {
+          "name": "产品服务",
+          "path": "/products",
+          "methods": ["GET", "POST", "PUT", "DELETE"],
+          "authentication": "OAuth2",
+          "rateLimit": {
+            "requests": 200,
+            "window": "1m"
+          }
+        },
+        {
+          "name": "订单服务",
+          "path": "/orders",
+          "methods": ["GET", "POST", "PUT"],
+          "authentication": "APIKey",
+          "rateLimit": {
+            "requests": 150,
+            "window": "1m"
+          }
+        }
+      ]
+    },
+    
+    "serviceMesh": {
+      "technology": "Istio",
+      "config": {
+        "version": "1.15.0",
+        "namespace": "enterprise",
+        "mTLS": {
+          "enabled": true,
+          "mode": "STRICT"
+        },
+        "trafficManagement": {
+          "virtualServices": [
+            {
+              "name": "user-service",
+              "hosts": ["user-service.enterprise.svc.cluster.local"],
+              "http": [
+                {
+                  "match": [
+                    {"uri": {"prefix": "/api/v1/users"}}
+                  ],
+                  "route": [
+                    {"destination": {"host": "user-service", "subset": "v1"}}
+                  ],
+                  "timeout": "30s"
+                }
+              ]
+            }
+          ],
+          "destinationRules": [
+            {
+              "name": "user-service",
+              "host": "user-service",
+              "trafficPolicy": {
+                "loadBalancer": {
+                  "simple": "ROUND_ROBIN"
+                },
+                "connectionPool": {
+                  "tcp": {
+                    "maxConnections": 100
+                  }
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    
+    "dataPipeline": {
+      "sourceSystems": [
+        {
+          "name": "CRM系统",
+          "type": "Salesforce",
+          "connector": "salesforce-connector-v2",
+          "config": {
+            "apiVersion": "52.0",
+            "authentication": "OAuth2",
+            "batchSize": 2000
+          },
+          "extraction": {
+            "frequency": "0 2 * * *",
+            "incremental": true,
+            "keyField": "LastModifiedDate"
+          }
+        },
+        {
+          "name": "ERP系统",
+          "type": "SAP",
+          "connector": "sap-connector-v1",
+          "config": {
+            "system": "PROD",
+            "client": "100",
+            "language": "ZH"
+          },
+          "extraction": {
+            "frequency": "0 3 * * *",
+            "incremental": true,
+            "keyField": "CHANGED_ON"
+          }
+        },
+        {
+          "name": "应用日志",
+          "type": "ELK Stack",
+          "connector": "elasticsearch-connector-v3",
+          "config": {
+            "hosts": ["es1.enterprise.local", "es2.enterprise.local"],
+            "port": 9200,
+            "indexPattern": "app-logs-*"
+          },
+          "extraction": {
+            "frequency": "*/5 * * * *",
+            "incremental": true,
+            "keyField": "@timestamp"
+          }
+        }
+      ],
+      "transformations": [
+        {
+          "name": "客户数据标准化",
+          "source": "CRM系统",
+          "target": "数据仓库",
+          "operations": [
+            {
+              "type": "映射",
+              "sourceField": "CustomerNumber__c",
+              "targetField": "customer_id"
+            },
+            {
+              "type": "映射",
+              "sourceField": "Name",
+              "targetField": "customer_name"
+            },
+            {
+              "type": "解析",
+              "sourceField": "BillingAddress",
+              "targetFields": ["billing_street", "billing_city", "billing_state", "billing_postal"],
+              "format": "structured"
+            },
+            {
+              "type": "验证",
+              "field": "email",
+              "rules": ["required", "email"]
+            },
+            {
+              "type": "脱敏",
+              "field": "phone",
+              "method": "mask_last_four"
+            }
+          ]
+        },
+        {
+          "name": "订单数据聚合",
+          "source": "ERP系统",
+          "target": "数据仓库",
+          "operations": [
+            {
+              "type": "聚合",
+              "groupBy": ["customer_id", "product_id", "date"],
+              "aggregations": [
+                {"field": "amount", "function": "sum", "output": "total_amount"},
+                {"field": "quantity", "function": "sum", "output": "total_quantity"}
+              ]
+            }
+          ]
+        }
+      ],
+      "destinations": [
+        {
+          "name": "数据仓库",
+          "type": "Snowflake",
+          "config": {
+            "account": "enterprise.west-us-2",
+            "warehouse": "ENTERPRISE_WH",
+            "database": "ENTERPRISE_DB",
+            "schema": "PRODUCTION"
+          },
+          "tables": [
+            {
+              "name": "CUSTOMERS",
+              "columns": [
+                {"name": "CUSTOMER_ID", "type": "VARCHAR", "primaryKey": true},
+                {"name": "CUSTOMER_NAME", "type": "VARCHAR"},
+                {"name": "EMAIL", "type": "VARCHAR"},
+                {"name": "PHONE", "type": "VARCHAR"},
+                {"name": "BILLING_STREET", "type": "VARCHAR"},
+                {"name": "BILLING_CITY", "type": "VARCHAR"},
+                {"name": "BILLING_STATE", "type": "VARCHAR"},
+                {"name": "BILLING_POSTAL", "type": "VARCHAR"},
+                {"name": "CREATED_AT", "type": "TIMESTAMP"},
+                {"name": "UPDATED_AT", "type": "TIMESTAMP"}
+              ]
+            },
+            {
+              "name": "ORDERS",
+              "columns": [
+                {"name": "ORDER_ID", "type": "VARCHAR", "primaryKey": true},
+                {"name": "CUSTOMER_ID", "type": "VARCHAR"},
+                {"name": "ORDER_DATE", "type": "DATE"},
+                {"name": "STATUS", "type": "VARCHAR"},
+                {"name": "TOTAL_AMOUNT", "type": "DECIMAL"},
+                {"name": "CREATED_AT", "type": "TIMESTAMP"},
+                {"name": "UPDATED_AT", "type": "TIMESTAMP"}
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    
+    "messageBus": {
+      "technology": "Kafka",
+      "clusters": [
+        {
+          "name": "primary-cluster",
+          "brokers": [
+            "kafka1.enterprise.local:9092",
+            "kafka2.enterprise.local:9092",
+            "kafka3.enterprise.local:9092"
+          ],
+          "topics": [
+            {
+              "name": "customer-events",
+              "partitions": 6,
+              "replicationFactor": 3,
+              "retention": "7d",
+              "schema": {
+                "key": {
+                  "type": "string",
+                  "name": "customer_id"
+                },
+                "value": {
+                  "type": "record",
+                  "name": "CustomerEvent",
+                  "fields": [
+                    {"name": "event_type", "type": "string"},
+                    {"name": "customer_id", "type": "string"},
+                    {"name": "customer_data", "type": "record", "fields": [
+                      {"name": "name", "type": "string"},
+                      {"name": "email", "type": "string"},
+                      {"name": "phone", "type": "string", "nullable": true}
+                    ]},
+                    {"name": "timestamp", "type": "long", "logicalType": "timestamp-millis"}
+                  ]
+                }
+              }
+            },
+            {
+              "name": "order-events",
+              "partitions": 12,
+              "replicationFactor": 3,
+              "retention": "30d",
+              "schema": {
+                "key": {
+                  "type": "string",
+                  "name": "order_id"
+                },
+                "value": {
+                  "type": "record",
+                  "name": "OrderEvent",
+                  "fields": [
+                    {"name": "event_type", "type": "string"},
+                    {"name": "order_id", "type": "string"},
+                    {"name": "customer_id", "type": "string"},
+                    {"name": "order_data", "type": "record", "fields": [
+                      {"name": "order_date", "type": "string"},
+                      {"name": "status", "type": "string"},
+                      {"name": "total_amount", "type": "double"}
+                    ]},
+                    {"name": "timestamp", "type": "long", "logicalType": "timestamp-millis"}
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      ],
+      "consumers": [
+        {
+          "name": "data-warehouse-ingestion",
+          "topic": "customer-events",
+          "groupId": "dw-ingestion-group",
+          "config": {
+            "autoOffsetReset": "earliest",
+            "enableAutoCommit": false
+          },
+          "processing": {
+            "batchSize": 100,
+            "timeout": 30
+          }
+        }
+      ]
+    },
+    
+    "caching": {
+      "layers": [
+        {
+          "name": "应用缓存",
+          "technology": "Redis",
+          "config": {
+            "cluster": {
+              "nodes": [
+                {"host": "redis1.enterprise.local", "port": 6379},
+                {"host": "redis2.enterprise.local", "port": 6379},
+                {"host": "redis3.enterprise.local", "port": 6379}
+              ]
+            },
+            "tls": {
+              "enabled": true,
+              "certFile": "/etc/redis/tls/redis.crt"
+            },
+            "auth": {
+              "enabled": true,
+              "passwordFile": "/etc/redis/redis.pass"
+            }
+          },
+          "cacheTemplates": [
+            {
+              "name": "用户会话",
+              "keyPrefix": "session:",
+              "ttl": 1800,
+              "maxSize": 100000
+            },
+            {
+              "name": "产品目录",
+              "keyPrefix": "product:",
+              "ttl": 3600,
+              "maxSize": 50000
+            }
+          ]
+        },
+        {
+          "name": "分布式缓存",
+          "technology": "Hazelcast",
+          "config": {
+            "clusterName": "enterprise-cache",
+            "members": [
+              "hz1.enterprise.local:5701",
+              "hz2.enterprise.local:5701",
+              "hz3.enterprise.local:5701"
+            ]
+          },
+          "maps": [
+            {
+              "name": "customer-profiles",
+              "ttl": 1800,
+              "maxSize": 100000,
+              "evictionPolicy": "LRU"
+            },
+            {
+              "name": "order-summaries",
+              "ttl": 3600,
+              "maxSize": 50000,
+              "evictionPolicy": "LFU"
+            }
+          ]
+        }
+      ]
+    },
+    
+    "monitoring": {
+      "metrics": {
+        "system": "Prometheus",
+        "config": {
+          "servers": [
+            "prometheus1.enterprise.local:9090",
+            "prometheus2.enterprise.local:9090"
+          ],
+          "scrapeInterval": "15s"
+        },
+        "keyMetrics": [
+          {
+            "name": "API请求率",
+            "query": "sum(rate(http_requests_total[5m]))",
+            "threshold": 1000,
+            "unit": "requests/sec"
+          },
+          {
+            "name": "API响应时间",
+            "query": "histogram_quantile(0.95, http_request_duration_seconds)",
+            "threshold": 1,
+            "unit": "seconds"
+          },
+          {
+            "name": "错误率",
+            "query": "sum(rate(http_requests_total{status=~\"5..\"}[5m])) / sum(rate(http_requests_total[5m]))",
+            "threshold": 0.01,
+            "unit": "percentage"
+          }
+        ]
+      },
+      "logging": {
+        "system": "ELK Stack",
+        "config": {
+          "elasticsearch": {
+            "hosts": ["es1.enterprise.local:9200", "es2.enterprise.local:9200"],
+            "indexPattern": "logs-%{+YYYY.MM.dd}"
+          },
+          "logstash": {
+            "hosts": ["logstash1.enterprise.local:5044"]
+          },
+          "kibana": {
+            "url": "https://kibana.enterprise.local:5601"
+          }
+        },
+        "logFormats": {
+          "application": {
+            "pattern": "%{TIMESTAMP_ISO8601:timestamp} %{LOGLEVEL:level} [%{DATA:service}] %{DATA:message} %{DATA:userId}",
+            "fields": ["timestamp", "level", "service", "message", "userId"]
+          },
+          "access": {
+            "pattern": "%{DATA:client} - %{DATA:user} [%{DATA:timestamp}] \"%{DATA:method} %{DATA:path} HTTP/%{DATA:http_version}\" %{DATA:status} %{DATA:bytes}",
+            "fields": ["client", "user", "timestamp", "method", "path", "status", "bytes"]
+          }
+        }
+      },
+      "alerting": {
+        "system": "AlertManager",
+        "config": {
+          "url": "https://alertmanager.enterprise.local:9093",
+          "receivers": [
+            {
+              "name": "email-alerts",
+              "emailConfigs": [
+                {
+                  "to": "devops-alerts@enterprise.com",
+                  "from": "alertmanager@enterprise.com",
+                  "smtpHost": "smtp.enterprise.com",
+                  "smtpPort": 587
+                }
+              ]
+            },
+            {
+              "name": "slack-alerts",
+              "slackConfigs": [
+                {
+                  "apiURL": "https://hooks.slack.com/services/T00000000/B00000000/XXXXXXXXXXXXXXXXXXXXXXXX",
+                  "channel": "#alerts"
+                }
+              ]
+            }
+          ]
+        },
+        "rules": [
+          {
+            "name": "高错误率告警",
+            "condition": "error_rate > 0.05",
+            "for": "5m",
+            "severity": "critical"
+          },
+          {
+            "name": "高响应时间告警",
+            "condition": "response_time_p95 > 2",
+            "for": "3m",
+            "severity": "warning"
+          }
+        ]
+      }
+    }
+  }
+}
