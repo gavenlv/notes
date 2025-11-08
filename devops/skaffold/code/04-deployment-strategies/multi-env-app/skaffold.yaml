@@ -1,0 +1,198 @@
+# 多环境部署策略示例 - Skaffold配置文件
+apiVersion: skaffold/v4beta1
+kind: Config
+metadata:
+  name: multi-env-app
+
+# 全局构建配置
+build:
+  artifacts:
+    - image: my-registry/multi-env-app
+      context: .
+      docker:
+        dockerfile: Dockerfile
+        buildArgs:
+          BUILD_ENV: "development"
+  # 本地构建配置
+  local:
+    push: false
+    concurrency: 0
+
+# 默认部署配置（开发环境）
+deploy:
+  kubectl:
+    manifests:
+      - k8s/dev/*.yaml
+    # 开发环境特定配置
+    flags:
+      global:
+        - --server-side
+        - --force-conflicts
+
+# 环境配置
+profiles:
+  # 开发环境
+  - name: dev
+    patches:
+      # 使用开发环境资源文件
+      - op: replace
+        path: /deploy/kubectl/manifests
+        value:
+          - k8s/dev/*.yaml
+      # 开发环境构建参数
+      - op: replace
+        path: /build/artifacts/0/docker/buildArgs/BUILD_ENV
+        value: "development"
+
+  # 预发布环境
+  - name: staging
+    patches:
+      - op: replace
+        path: /deploy/kubectl/manifests
+        value:
+          - k8s/staging/*.yaml
+      - op: replace
+        path: /build/artifacts/0/image
+        value: my-registry/multi-env-app-staging
+      - op: replace
+        path: /build/artifacts/0/docker/buildArgs/BUILD_ENV
+        value: "staging"
+      # 预发布环境推送镜像
+      - op: replace
+        path: /build/local/push
+        value: true
+
+  # 生产环境
+  - name: prod
+    patches:
+      - op: replace
+        path: /deploy/kubectl/manifests
+        value:
+          - k8s/prod/*.yaml
+      - op: replace
+        path: /build/artifacts/0/image
+        value: my-registry/multi-env-app-prod
+      - op: replace
+        path: /build/artifacts/0/docker/buildArgs/BUILD_ENV
+        value: "production"
+      # 生产环境配置
+      - op: replace
+        path: /build/local/push
+        value: true
+      # 生产环境验证
+      - op: add
+        path: /deploy/kubectl/flags
+        value:
+          global:
+            - --validate=true
+            - --dry-run=client
+
+  # kustomize部署策略
+  - name: kustomize-dev
+    deploy:
+      kustomize:
+        paths:
+          - k8s/base
+        buildArgs:
+          - --load-restrictor=LoadRestrictionsNone
+        # 开发环境补丁
+        patches:
+          - path: k8s/dev/patch-deployment.yaml
+            target:
+              kind: Deployment
+              name: multi-env-app
+
+  - name: kustomize-staging
+    deploy:
+      kustomize:
+        paths:
+          - k8s/base
+        buildArgs:
+          - --load-restrictor=LoadRestrictionsNone
+        patches:
+          - path: k8s/staging/patch-deployment.yaml
+            target:
+              kind: Deployment
+              name: multi-env-app
+
+  - name: kustomize-prod
+    deploy:
+      kustomize:
+        paths:
+          - k8s/base
+        buildArgs:
+          - --load-restrictor=LoadRestrictionsNone
+        patches:
+          - path: k8s/prod/patch-deployment.yaml
+            target:
+              kind: Deployment
+              name: multi-env-app
+
+  # Helm部署策略
+  - name: helm-dev
+    deploy:
+      helm:
+        releases:
+          - name: multi-env-app-dev
+            chartPath: charts/my-app
+            namespace: default
+            valuesFiles:
+              - charts/my-app/values/dev.yaml
+            setValues:
+              image.tag: "latest"
+              replicaCount: 1
+            wait: true
+            timeout: 5m
+
+  - name: helm-staging
+    deploy:
+      helm:
+        releases:
+          - name: multi-env-app-staging
+            chartPath: charts/my-app
+            namespace: staging
+            valuesFiles:
+              - charts/my-app/values/staging.yaml
+            setValues:
+              image.tag: "staging"
+              replicaCount: 2
+            wait: true
+            timeout: 10m
+
+  - name: helm-prod
+    deploy:
+      helm:
+        releases:
+          - name: multi-env-app-prod
+            chartPath: charts/my-app
+            namespace: prod
+            valuesFiles:
+              - charts/my-app/values/prod.yaml
+            setValues:
+              image.tag: "prod"
+              replicaCount: 3
+            wait: true
+            timeout: 15m
+
+# 测试配置
+test:
+  # 代码质量检查
+  - name: code-quality
+    commands:
+      - command: go vet ./app/...
+        dir: .
+      - command: gofmt -l .
+        dir: .
+
+  # 镜像验证
+  - name: image-validation
+    image: my-registry/multi-env-app
+    structureTests:
+      - test/image-structure.yaml
+
+# 端口转发配置
+portForward:
+  - resourceType: deployment
+    resourceName: multi-env-app
+    port: 8080
+    localPort: 8080

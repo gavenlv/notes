@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JavaScript 设计模式详解</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+        
+        h1, h2, h3, h4 {
+            color: #2c3e50;
+        }
+        
+        h1 {
+            text-align: center;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+            margin-bottom: 40px;
+        }
+        
+        h2 {
+            border-left: 4px solid #3498db;
+            padding-left: 15px;
+            margin-top: 50px;
+        }
+        
+        h3 {
+            color: #3498db;
+            margin-top: 30px;
+        }
+        
+        .container {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .pattern-section {
+            margin-bottom: 40px;
+            padding: 20px;
+            border: 1px solid #e1e8ed;
+            border-radius: 8px;
+            background-color: #fafafa;
+        }
+        
+        .code-block {
+            background-color: #2c3e50;
+            color: #ecf0f1;
+            padding: 20px;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-family: 'Consolas', 'Monaco', monospace;
+            margin: 20px 0;
+        }
+        
+        .pros-cons {
+            display: flex;
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .pros, .cons {
+            flex: 1;
+            padding: 15px;
+            border-radius: 6px;
+        }
+        
+        .pros {
+            background-color: #e8f5e9;
+            border-left: 4px solid #4caf50;
+        }
+        
+        .cons {
+            background-color: #ffebee;
+            border-left: 4px solid #f44336;
+        }
+        
+        .use-case {
+            background-color: #e3f2fd;
+            padding: 15px;
+            border-radius: 6px;
+            border-left: 4px solid #2196f3;
+            margin: 20px 0;
+        }
+        
+        .demo-section {
+            background-color: #fff3e0;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 40px;
+        }
+        
+        .demo-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: #2980b9;
+        }
+        
+        .result {
+            background-color: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 6px;
+            min-height: 100px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>JavaScript 设计模式详解</h1>
+        
+        <section>
+            <h2>1. 什么是设计模式？</h2>
+            <p>设计模式是一套被反复使用的、多数人知晓的、经过分类的、代码设计经验的总结。使用设计模式是为了重用代码、让代码更容易被他人理解、保证代码可靠性。</p>
+            <p>在 JavaScript 中，设计模式可以帮助我们编写更加模块化、可维护和可扩展的代码。</p>
+        </section>
+        
+        <section class="pattern-section">
+            <h2>2. 创建型设计模式</h2>
+            
+            <h3>2.1 单例模式（Singleton）</h3>
+            <p>单例模式确保一个类只有一个实例，并提供一个全局访问点。</p>
+            
+            <div class="code-block">
+// 单例模式实现
+const Singleton = (function() {
+    let instance;
+    
+    function createInstance() {
+        const object = new Object({ name: 'Singleton' });
+        return object;
+    }
+    
+    return {
+        getInstance: function() {
+            if (!instance) {
+                instance = createInstance();
+            }
+            return instance;
+        }
+    };
+})();
+
+const instance1 = Singleton.getInstance();
+const instance2 = Singleton.getInstance();
+
+console.log(instance1 === instance2); // true
+            </div>
+            
+            <div class="pros-cons">
+                <div class="pros">
+                    <h4>优点</h4>
+                    <ul>
+                        <li>确保只有一个实例，节省内存。</li>
+                        <li>提供全局访问点，方便使用。</li>
+                        <li>避免资源的多重占用。</li>
+                    </ul>
+                </div>
+                <div class="cons">
+                    <h4>缺点</h4>
+                    <ul>
+                        <li>违背单一职责原则。</li>
+                        <li>可能导致内存泄漏。</li>
+                        <li>难以测试。</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="use-case">
+                <h4>应用场景</h4>
+                <ul>
+                    <li>数据库连接池。</li>
+                    <li>全局状态管理。</li>
+                    <li>日志记录器。</li>
+                    <li>配置管理器。</li>
+                </ul>
+            </div>
+        </section>
+        
+        <section class="pattern-section">
+            <h3>2.2 工厂模式（Factory）</h3>
+            <p>工厂模式定义一个用于创建对象的接口，让子类决定实例化哪个类。</p>
+            
+            <div class="code-block">
+// 工厂模式实现
+function VehicleFactory() {}
+
+VehicleFactory.prototype.createVehicle = function(type) {
+    switch(type) {
+        case 'car':
+            return new Car();
+        case 'bike':
+            return new Bike();
+        case 'truck':
+            return new Truck();
+        default:
+            return null;
+    }
+};
+
+function Car() {
+    this.type = 'car';
+    this.wheels = 4;
+}
+
+function Bike() {
+    this.type = 'bike';
+    this.wheels = 2;
+}
+
+function Truck() {
+    this.type = 'truck';
+    this.wheels = 18;
+}
+
+const factory = new VehicleFactory();
+const car = factory.createVehicle('car');
+const bike = factory.createVehicle('bike');
+            </div>
+            
+            <div class="pros-cons">
+                <div class="pros">
+                    <h4>优点</h4>
+                    <ul>
+                        <li>将对象的创建与使用分离。</li>
+                        <li>便于扩展，新增产品只需要添加新的工厂方法。</li>
+                        <li>客户端无需知道具体产品的创建细节。</li>
+                    </ul>
+                </div>
+                <div class="cons">
+                    <h4>缺点</h4>
+                    <ul>
+                        <li>可能导致类的数量过多。</li>
+                        <li>增加系统复杂度。</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="use-case">
+                <h4>应用场景</h4>
+                <ul>
+                    <li>创建复杂对象。</li>
+                    <li>需要根据条件创建不同类型的对象。</li>
+                    <li>对象的创建逻辑较为复杂。</li>
+                </ul>
+            </div>
+        </section>
+        
+        <section class="pattern-section">
+            <h2>3. 结构型设计模式</h2>
+            
+            <h3>3.1 适配器模式（Adapter）</h3>
+            <p>适配器模式将一个类的接口转换成客户端所期望的另一个接口。</p>
+            
+            <div class="code-block">
+// 适配器模式实现
+class ApiV1Client {
+    getUsers() {
+        return [
+            { id: 1, username: 'user1', full_name: 'User One' },
+            { id: 2, username: 'user2', full_name: 'User Two' }
+        ];
+    }
+}
+
+class ApiV2Client {
+    fetchUsers() {
+        return [
+            { user_id: 3, user_name: 'user3', name: { first: 'User', last: 'Three' } },
+            { user_id: 4, user_name: 'user4', name: { first: 'User', last: 'Four' } }
+        ];
+    }
+}
+
+class ApiV2Adapter {
+    constructor(apiV2Client) {
+        this.apiV2Client = apiV2Client;
+    }
+    
+    getUsers() {
+        const v2Users = this.apiV2Client.fetchUsers();
+        return v2Users.map(user => ({
+            id: user.user_id,
+            username: user.user_name,
+            full_name: `${user.name.first} ${user.name.last}`
+        }));
+    }
+}
+            </div>
+            
+            <button onclick="runAdapterDemo()">运行适配器模式演示</button>
+            <div id="adapterResult" class="result">点击按钮查看运行结果...</div>
+            
+            <div class="pros-cons">
+                <div class="pros">
+                    <h4>优点</h4>
+                    <ul>
+                        <li>允许不兼容的接口协同工作。</li>
+                        <li>符合单一职责原则。</li>
+                        <li>符合开闭原则。</li>
+                    </ul>
+                </div>
+                <div class="cons">
+                    <h4>缺点</h4>
+                    <ul>
+                        <li>增加系统复杂度。</li>
+                        <li>可能降低性能。</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="use-case">
+                <h4>应用场景</h4>
+                <ul>
+                    <li>集成不兼容的系统。</li>
+                    <li>使用第三方库。</li>
+                    <li>API版本升级。</li>
+                </ul>
+            </div>
+        </section>
+        
+        <section class="pattern-section">
+            <h3>3.2 装饰器模式（Decorator）</h3>
+            <p>装饰器模式动态地给一个对象添加一些额外的职责，而不修改其原有结构。</p>
+            
+            <div class="code-block">
+// 装饰器模式实现
+class Coffee {
+    getCost() {
+        return 10;
+    }
+    
+    getDescription() {
+        return '普通咖啡';
+    }
+}
+
+class MilkDecorator {
+    constructor(coffee) {
+        this.coffee = coffee;
+    }
+    
+    getCost() {
+        return this.coffee.getCost() + 2;
+    }
+    
+    getDescription() {
+        return this.coffee.getDescription() + ', 加牛奶';
+    }
+}
+
+class SugarDecorator {
+    constructor(coffee) {
+        this.coffee = coffee;
+    }
+    
+    getCost() {
+        return this.coffee.getCost() + 1;
+    }
+    
+    getDescription() {
+        return this.coffee.getDescription() + ', 加糖';
+    }
+}
+
+let coffee = new Coffee();
+coffee = new MilkDecorator(coffee);
+coffee = new SugarDecorator(coffee);
+            </div>
+            
+            <div class="pros-cons">
+                <div class="pros">
+                    <h4>优点</h4>
+                    <ul>
+                        <li>比继承更加灵活。</li>
+                        <li>符合开闭原则。</li>
+                        <li>可以动态地添加功能。</li>
+                    </ul>
+                </div>
+                <div class="cons">
+                    <h4>缺点</h4>
+                    <ul>
+                        <li>可能产生很多小对象。</li>
+                        <li>增加系统复杂度。</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+        
+        <section class="pattern-section">
+            <h2>4. 行为型设计模式</h2>
+            
+            <h3>4.1 观察者模式（Observer）</h3>
+            <p>观察者模式定义了一种一对多的依赖关系，让多个观察者对象同时监听某一个主题对象。</p>
+            
+            <div class="code-block">
+// 观察者模式实现
+class Subject {
+    constructor() {
+        this.observers = [];
+    }
+    
+    addObserver(observer) {
+        this.observers.push(observer);
+    }
+    
+    removeObserver(observer) {
+        this.observers = this.observers.filter(obs => obs !== observer);
+    }
+    
+    notify(data) {
+        this.observers.forEach(observer => observer.update(data));
+    }
+}
+
+class Observer {
+    constructor(name) {
+        this.name = name;
+    }
+    
+    update(data) {
+        console.log(`${this.name} received: ${data}`);
+    }
+}
+
+const subject = new Subject();
+const observer1 = new Observer('Observer 1');
+const observer2 = new Observer('Observer 2');
+            </div>
+            
+            <div class="pros-cons">
+                <div class="pros">
+                    <h4>优点</h4>
+                    <ul>
+                        <li>实现松耦合。</li>
+                        <li>支持广播通信。</li>
+                        <li>符合开闭原则。</li>
+                    </ul>
+                </div>
+                <div class="cons">
+                    <h4>缺点</h4>
+                    <ul>
+                        <li>可能导致内存泄漏。</li>
+                        <li>通知顺序可能不明确。</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+        
+        <section class="pattern-section">
+            <h3>4.2 策略模式（Strategy）</h3>
+            <p>策略模式定义了一系列算法，把它们封装起来，并且使它们可以互相替换。</p>
+            
+            <div class="code-block">
+// 策略模式实现
+const paymentStrategies = {
+    creditCard: function(amount) {
+        return `信用卡支付 ${amount} 元`;
+    },
+    
+    paypal: function(amount) {
+        return `PayPal支付 ${amount} 元`;
+    },
+    
+    bitcoin: function(amount) {
+        return `比特币支付 ${amount} 元`;
+    }
+};
+
+class PaymentContext {
+    constructor(strategy) {
+        this.strategy = strategy;
+    }
+    
+    executeStrategy(amount) {
+        return this.strategy(amount);
+    }
+}
+            </div>
+            
+            <div class="pros-cons">
+                <div class="pros">
+                    <h4>优点</h4>
+                    <ul>
+                        <li>算法可以自由切换。</li>
+                        <li>避免使用多重条件判断。</li>
+                        <li>符合单一职责原则。</li>
+                    </ul>
+                </div>
+                <div class="cons">
+                    <h4>缺点</h4>
+                    <ul>
+                        <li>客户端必须知道所有策略。</li>
+                        <li>可能增加类的数量。</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+        
+        <section class="demo-section">
+            <h3>设计模式演示</h3>
+            <div class="demo-controls">
+                <div>
+                    <button onclick="runSingletonDemo()">运行单例模式演示</button>
+                    <div id="singletonResult" class="result">点击按钮查看运行结果...</div>
+                </div>
+                
+                <div>
+                    <button onclick="runFactoryDemo()">运行工厂模式演示</button>
+                    <div id="factoryResult" class="result">点击按钮查看运行结果...</div>
+                </div>
+                
+                <div>
+                    <button onclick="runObserverDemo()">运行观察者模式演示</button>
+                    <div id="observerResult" class="result">点击按钮查看运行结果...</div>
+                </div>
+                
+                <div>
+                    <button onclick="runStrategyDemo()">运行策略模式演示</button>
+                    <div id="strategyResult" class="result">点击按钮查看运行结果...</div>
+                </div>
+            </div>
+        </section>
+    </div>
+    
+    <script>
+        // 单例模式演示
+        function runSingletonDemo() {
+            const result = document.getElementById('singletonResult');
+            result.textContent = '运行单例模式演示...\n';
+            
+            // 单例模式实现
+            const DatabaseConnection = (function() {
+                let instance;
+                
+                function init() {
+                    result.textContent += '创建数据库连接实例\n';
+                    return { connectionId: Math.random().toString(36).substr(2, 9) };
+                }
+                
+                return {
+                    getInstance: function() {
+                        if (!instance) {
+                            instance = init();
+                        }
+                        return instance;
+                    }
+                };
+            })();
+            
+            // 测试单例
+            const conn1 = DatabaseConnection.getInstance();
+            const conn2 = DatabaseConnection.getInstance();
+            
+            result.textContent += `连接1 ID: ${conn1.connectionId}\n`;
+            result.textContent += `连接2 ID: ${conn2.connectionId}\n`;
+            result.textContent += `是否为同一实例: ${conn1 === conn2}\n`;
+            result.textContent += '单例模式确保只创建一个实例，节省资源。';
+        }
+        
+        // 工厂模式演示
+        function runFactoryDemo() {
+            const result = document.getElementById('factoryResult');
+            result.textContent = '运行工厂模式演示...\n';
+            
+            // 工厂模式实现
+            function PaymentFactory() {
+                this.createPayment = function(type) {
+                    switch(type) {
+                        case 'credit':
+                            return new CreditCardPayment();
+                        case 'paypal':
+                            return new PayPalPayment();
+                        case 'crypto':
+                            return new CryptoPayment();
+                        default:
+                            return null;
+                    }
+                };
+            }
+            
+            function CreditCardPayment() {
+                this.pay = function(amount) {
+                    return `信用卡支付 $${amount}`;
+                };
+            }
+            
+            function PayPalPayment() {
+                this.pay = function(amount) {
+                    return `PayPal支付 $${amount}`;
+                };
+            }
+            
+            function CryptoPayment() {
+                this.pay = function(amount) {
+                    return `加密货币支付 $${amount}`;
+                };
+            }
+            
+            // 测试工厂
+            const factory = new PaymentFactory();
+            const payments = [
+                factory.createPayment('credit'),
+                factory.createPayment('paypal'),
+                factory.createPayment('crypto')
+            ];
+            
+            payments.forEach(payment => {
+                result.textContent += payment.pay(100) + '\n';
+            });
+            result.textContent += '工厂模式使创建逻辑集中管理，便于扩展。';
+        }
+        
+        // 观察者模式演示
+        function runObserverDemo() {
+            const result = document.getElementById('observerResult');
+            result.textContent = '运行观察者模式演示...\n';
+            
+            // 观察者模式实现
+            class Subject {
+                constructor() {
+                    this.observers = [];
+                }
+                
+                addObserver(observer) {
+                    this.observers.push(observer);
+                }
+                
+                removeObserver(observer) {
+                    this.observers = this.observers.filter(obs => obs !== observer);
+                }
+                
+                notify(data) {
+                    this.observers.forEach(observer => observer.update(data));
+                }
+            }
+            
+            class Observer {
+                constructor(name) {
+                    this.name = name;
+                    this.logs = [];
+                }
+                
+                update(data) {
+                    const message = `${this.name} 收到更新: ${data}`;
+                    this.logs.push(message);
+                }
+                
+                getLogs() {
+                    return this.logs.join('\n');
+                }
+            }
+            
+            // 测试观察者
+            const subject = new Subject();
+            const user1 = new Observer('用户1');
+            const user2 = new Observer('用户2');
+            const user3 = new Observer('用户3');
+            
+            subject.addObserver(user1);
+            subject.addObserver(user2);
+            subject.addObserver(user3);
+            
+            result.textContent += '发布第一个通知：产品降价了！\n';
+            subject.notify('产品降价了！');
+            
+            result.textContent += '移除用户2\n';
+            subject.removeObserver(user2);
+            
+            result.textContent += '发布第二个通知：新品上架！\n\n';
+            subject.notify('新品上架！');
+            
+            result.textContent += '各观察者收到的消息：\n';
+            result.textContent += '用户1:\n' + user1.getLogs() + '\n\n';
+            result.textContent += '用户2:\n' + user2.getLogs() + '\n\n';
+            result.textContent += '用户3:\n' + user3.getLogs() + '\n';
+            result.textContent += '观察者模式实现了对象间的一对多依赖关系。';
+        }
+        
+        // 策略模式演示
+        function runStrategyDemo() {
+            const result = document.getElementById('strategyResult');
+            result.textContent = '运行策略模式演示...\n';
+            
+            // 策略模式实现
+            const shippingStrategies = {
+                standard: function(weight) {
+                    return weight * 5;
+                },
+                express: function(weight) {
+                    return weight * 10;
+                },
+                overnight: function(weight) {
+                    return weight * 20 + 50;
+                }
+            };
+            
+            class ShippingCostCalculator {
+                constructor() {
+                    this.strategy = null;
+                }
+                
+                setStrategy(strategy) {
+                    this.strategy = shippingStrategies[strategy];
+                }
+                
+                calculate(weight) {
+                    if (!this.strategy) {
+                        throw new Error('请设置配送策略');
+                    }
+                    return this.strategy(weight);
+                }
+            }
+            
+            // 测试策略
+            const calculator = new ShippingCostCalculator();
+            const weight = 5;
+            
+            result.textContent += `计算5kg包裹的不同配送方式费用：\n`;
+            
+            calculator.setStrategy('standard');
+            result.textContent += `标准配送费用: $${calculator.calculate(weight)}\n`;
+            
+            calculator.setStrategy('express');
+            result.textContent += `快递配送费用: $${calculator.calculate(weight)}\n`;
+            
+            calculator.setStrategy('overnight');
+            result.textContent += `隔夜配送费用: $${calculator.calculate(weight)}\n`;
+            
+            result.textContent += '策略模式允许在运行时动态切换算法。';
+        }
+        
+        // 适配器模式演示
+        function runAdapterDemo() {
+            const result = document.getElementById('adapterResult');
+            result.textContent = '运行适配器模式演示...\n';
+            
+            // 适配器模式实现
+            class ApiV1Client {
+                getUsers() {
+                    return [
+                        { id: 1, username: 'user1', full_name: 'User One' },
+                        { id: 2, username: 'user2', full_name: 'User Two' }
+                    ];
+                }
+            }
+            
+            class ApiV2Client {
+                fetchUsers() {
+                    return [
+                        { user_id: 3, user_name: 'user3', name: { first: 'User', last: 'Three' } },
+                        { user_id: 4, user_name: 'user4', name: { first: 'User', last: 'Four' } }
+                    ];
+                }
+            }
+            
+            class ApiV2Adapter {
+                constructor(apiV2Client) {
+                    this.apiV2Client = apiV2Client;
+                }
+                
+                getUsers() {
+                    const v2Users = this.apiV2Client.fetchUsers();
+                    return v2Users.map(user => ({
+                        id: user.user_id,
+                        username: user.user_name,
+                        full_name: `${user.name.first} ${user.name.last}`
+                    }));
+                }
+            }
+            
+            // 测试适配器
+            const v1Client = new ApiV1Client();
+            const v2Client = new ApiV2Client();
+            const v2Adapter = new ApiV2Adapter(v2Client);
+            
+            result.textContent += 'API V1 格式: ' + JSON.stringify(v1Client.getUsers(), null, 2) + '\n\n';
+            result.textContent += 'API V2 格式: ' + JSON.stringify(v2Client.fetchUsers(), null, 2) + '\n\n';
+            result.textContent += '适配器转换后: ' + JSON.stringify(v2Adapter.getUsers(), null, 2) + '\n';
+            result.textContent += '适配器模式使不兼容的接口可以一起工作。';
+        }
+        
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('设计模式教程页面已加载');
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,1202 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JavaScript 模块化编程详解</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+        
+        h1, h2, h3, h4 {
+            color: #2c3e50;
+        }
+        
+        h1 {
+            text-align: center;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+            margin-bottom: 40px;
+        }
+        
+        h2 {
+            border-left: 4px solid #3498db;
+            padding-left: 15px;
+            margin-top: 50px;
+        }
+        
+        h3 {
+            color: #3498db;
+            margin-top: 30px;
+        }
+        
+        .container {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .code-block {
+            background-color: #282c34;
+            color: #abb2bf;
+            padding: 20px;
+            border-radius: 6px;
+            margin: 15px 0;
+            overflow-x: auto;
+            font-family: 'Courier New', Courier, monospace;
+            white-space: pre-wrap;
+            line-height: 1.5;
+        }
+        
+        .code-line {
+            display: block;
+        }
+        
+        .comment {
+            color: #98c379;
+        }
+        
+        .keyword {
+            color: #c678dd;
+        }
+        
+        .string {
+            color: #e5c07b;
+        }
+        
+        .function {
+            color: #61afef;
+        }
+        
+        .demo-section {
+            margin-bottom: 40px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 6px;
+        }
+        
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: #2980b9;
+        }
+        
+        .result {
+            background-color: #e8f4f8;
+            border: 1px solid #b3e5fc;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 15px 0;
+            font-family: 'Courier New', Courier, monospace;
+        }
+        
+        .comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .comparison-item {
+            padding: 15px;
+            border-radius: 6px;
+            border: 1px solid #ddd;
+        }
+        
+        .before {
+            background-color: #f8d7da;
+            border-left: 4px solid #dc3545;
+        }
+        
+        .after {
+            background-color: #d4edda;
+            border-left: 4px solid #28a745;
+        }
+        
+        .explanation {
+            background-color: #e7f3ff;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 15px 0;
+            border-left: 4px solid #0d6efd;
+        }
+        
+        .pros-cons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin: 15px 0;
+        }
+        
+        .pros {
+            background-color: #d4edda;
+            padding: 15px;
+            border-radius: 6px;
+            border-left: 4px solid #28a745;
+        }
+        
+        .cons {
+            background-color: #f8d7da;
+            padding: 15px;
+            border-radius: 6px;
+            border-left: 4px solid #dc3545;
+        }
+        
+        ul {
+            padding-left: 20px;
+        }
+        
+        li {
+            margin-bottom: 8px;
+        }
+        
+        .diagram {
+            background-color: #f0f0f0;
+            padding: 20px;
+            border-radius: 6px;
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        th {
+            background-color: #f2f2f2;
+        }
+        
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+        
+        .highlight {
+            background-color: #ffeb3b;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+        
+        @media (max-width: 768px) {
+            .comparison,
+            .pros-cons {
+                grid-template-columns: 1fr;
+            }
+            
+            .container {
+                padding: 15px;
+            }
+            
+            body {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>JavaScript 模块化编程详解</h1>
+    
+    <div class="container">
+        <p>本教程详细介绍 JavaScript 中的模块化编程概念、不同模块系统的实现方式以及最佳实践。模块化是现代 JavaScript 开发的核心概念，它帮助开发者组织代码、避免命名冲突、提高代码复用性和可维护性。</p>
+    </div>
+
+    <!-- 1. 模块化编程基础 -->
+    <section class="demo-section">
+        <h2>1. 模块化编程基础</h2>
+        <div class="explanation">
+            <p>模块化编程是一种将代码拆分为独立、可重用单元的编程范式。在 JavaScript 中，模块是一段封装了特定功能的代码，可以导出供其他模块使用，也可以导入其他模块提供的功能。</p>
+            
+            <p>模块化编程的主要优势：</p>
+            <ul>
+                <li><strong>代码组织</strong>：将代码分割成逻辑上独立的模块，便于管理和维护</li>
+                <li><strong>避免命名冲突</strong>：每个模块有自己的作用域，防止全局变量污染</li>
+                <li><strong>代码复用</strong>：模块可以被多个应用或其他模块导入和使用</li>
+                <li><strong>依赖管理</strong>：清晰地定义模块之间的依赖关系</li>
+                <li><strong>按需加载</strong>：支持动态导入，提高应用性能</li>
+            </ul>
+        </div>
+
+        <h3>1.1 JavaScript 模块化的发展历程</h3>
+        <div class="code-block">
+<span class="comment">// JavaScript 模块化的发展经历了以下几个阶段：</span>
+
+<span class="comment">// 1. 全局函数模式（最早期）</span>
+<span class="comment">// 缺点：命名冲突、全局污染、依赖关系不清晰</span>
+function moduleA() {}
+function moduleB() {}
+
+<span class="comment">// 2. 命名空间模式</span>
+<span class="comment">// 减少全局变量，但仍然可能冲突</span>
+var MyApp = {
+    moduleA: function() {},
+    moduleB: function() {}
+};
+
+<span class="comment">// 3. 立即执行函数表达式（IIFE）</span>
+<span class="comment">// 创建私有作用域，避免污染全局命名空间</span>
+var module = (function() {
+    var privateVar = '私有变量';
+    
+    function privateMethod() {
+        return privateVar;
+    }
+    
+    return {
+        publicMethod: function() {
+            return privateMethod();
+        }
+    };
+})();
+
+<span class="comment">// 4. 现代模块系统</span>
+<span class="comment">// CommonJS、AMD、ES Modules 等</span>
+</div>
+    </section>
+
+    <!-- 2. CommonJS 模块系统 -->
+    <section class="demo-section">
+        <h2>2. CommonJS 模块系统</h2>
+        <div class="explanation">
+            <p>CommonJS 是 Node.js 使用的模块系统，它采用同步加载模块的方式。在 CommonJS 中，每个文件都是一个独立的模块，有自己的作用域。</p>
+        </div>
+
+        <h3>2.1 CommonJS 基本语法</h3>
+        <div class="code-block">
+<span class="comment">// 模块导出（module.exports）</span>
+<span class="comment">// 示例：math.js</span>
+function add(a, b) {
+    return a + b;
+}
+
+function subtract(a, b) {
+    return a - b;
+}
+
+<span class="keyword">const</span> PI = 3.14159265359;
+
+<span class="comment">// 导出单个函数</span>
+<span class="keyword">module</span>.exports = add;
+
+<span class="comment">// 或者导出多个函数和变量</span>
+<span class="keyword">module</span>.exports = {
+    add,
+    subtract,
+    PI
+};
+
+<span class="comment">// 或者使用 exports 对象</span>
+exports.add = add;
+exports.subtract = subtract;
+exports.PI = PI;
+
+<span class="comment">// 模块导入（require）</span>
+<span class="comment">// 示例：app.js</span>
+<span class="comment">// 导入整个模块</span>
+<span class="keyword">const</span> math = require('./math.js');
+console.log(math.add(2, 3));  <span class="comment">// 输出: 5</span>
+console.log(math.PI);         <span class="comment">// 输出: 3.14159265359</span>
+
+<span class="comment">// 解构导入</span>
+<span class="keyword">const</span> { add, subtract, PI } = require('./math.js');
+console.log(add(2, 3));       <span class="comment">// 输出: 5</span>
+console.log(subtract(5, 2));  <span class="comment">// 输出: 3</span>
+</div>
+
+        <h3>2.2 CommonJS 模块加载机制</h3>
+        <div class="explanation">
+            <p>CommonJS 模块的加载过程：</p>
+            <ol>
+                <li>当使用 <code>require()</code> 加载模块时，Node.js 会先检查模块是否已经被缓存</li>
+                <li>如果没有缓存，会按照模块路径解析规则查找模块文件</li>
+                <li>读取模块文件内容</li>
+                <li>将模块内容包装在一个函数中执行</li>
+                <li>缓存模块导出的内容</li>
+                <li>返回模块导出的内容</li>
+            </ol>
+            <p>CommonJS 模块是<strong>同步加载</strong>的，这在服务器端环境是可行的，因为文件通常在本地磁盘上，读取速度很快。但在浏览器环境中，同步加载可能导致性能问题。</p>
+        </div>
+
+        <div class="pros-cons">
+            <div class="pros">
+                <h4>优点</h4>
+                <ul>
+                    <li>语法简单直观</li>
+                    <li>适用于服务器端开发（Node.js）</li>
+                    <li>良好的模块缓存机制</li>
+                    <li>广泛的生态系统支持</li>
+                </ul>
+            </div>
+            <div class="cons">
+                <h4>缺点</h4>
+                <ul>
+                    <li>同步加载不适合浏览器环境</li>
+                    <li>不支持静态分析（如 tree-shaking）</li>
+                    <li>无法在编译时确定模块依赖</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3. AMD (Asynchronous Module Definition) -->
+    <section class="demo-section">
+        <h2>3. AMD 异步模块定义</h2>
+        <div class="explanation">
+            <p>AMD（Asynchronous Module Definition）是一种专为浏览器环境设计的异步模块加载规范。RequireJS 是 AMD 规范的主要实现。</p>
+            <p>AMD 解决了浏览器中同步加载模块可能导致的性能问题，允许模块异步加载，避免阻塞页面渲染。</p>
+        </div>
+
+        <h3>3.1 AMD 基本语法</h3>
+        <div class="code-block">
+<span class="comment">// 定义模块（define）</span>
+<span class="comment">// 无依赖模块</span>
+define(function() {
+    <span class="keyword">const</span> PI = 3.14159265359;
+    
+    function calculateArea(radius) {
+        return PI * radius * radius;
+    }
+    
+    function calculateCircumference(radius) {
+        return 2 * PI * radius;
+    }
+    
+    <span class="keyword">return</span> {
+        calculateArea,
+        calculateCircumference,
+        PI
+    };
+});
+
+<span class="comment">// 有依赖模块</span>
+define(['./math'], function(math) {
+    function calculateTotal(a, b) {
+        <span class="keyword">return</span> math.add(a, b);
+    }
+    
+    <span class="keyword">return</span> {
+        calculateTotal
+    };
+});
+
+<span class="comment">// 使用模块（require）</span>
+require(['./circle', './calculator'], function(circle, calculator) {
+    <span class="keyword">const</span> area = circle.calculateArea(5);
+    console.log('圆的面积:', area);
+    
+    <span class="keyword">const</span> total = calculator.calculateTotal(10, 20);
+    console.log('计算结果:', total);
+});
+
+<span class="comment">// RequireJS 配置</span>
+require.config({
+    baseUrl: 'js',  <span class="comment">// 模块基础路径</span>
+    paths: {
+        jquery: 'lib/jquery.min',
+        underscore: 'lib/underscore.min',
+        backbone: 'lib/backbone.min'
+    },
+    shim: {  <span class="comment">// 处理非 AMD 模块</span>
+        backbone: {
+            deps: ['underscore', 'jquery'],
+            exports: 'Backbone'
+        },
+        underscore: {
+            exports: '_'
+        }
+    }
+});
+</div>
+
+        <div class="pros-cons">
+            <div class="pros">
+                <h4>优点</h4>
+                <ul>
+                    <li>异步加载，适合浏览器环境</li>
+                    <li>支持模块的并行加载</li>
+                    <li>可以在模块加载完成后执行回调</li>
+                    <li>支持循环依赖</li>
+                </ul>
+            </div>
+            <div class="cons">
+                <h4>缺点</h4>
+                <ul>
+                    <li>语法相对复杂</li>
+                    <li>目前使用较少，已被 ES Modules 逐渐替代</li>
+                    <li>需要额外的库（如 RequireJS）支持</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- 4. ES Modules -->
+    <section class="demo-section">
+        <h2>4. ES Modules (ESM)</h2>
+        <div class="explanation">
+            <p>ES Modules 是 ECMAScript 2015 (ES6) 引入的官方模块化标准，现在已被所有现代浏览器原生支持，也被 Node.js 支持。ES Modules 结合了 CommonJS 和 AMD 的优点，提供了静态、异步的模块加载机制。</p>
+        </div>
+
+        <h3>4.1 ES Modules 基本语法</h3>
+        <div class="code-block">
+<span class="comment">// 导出（export）</span>
+<span class="comment">// 示例：utils.js</span>
+
+<span class="comment">// 命名导出</span>
+export <span class="keyword">const</span> PI = 3.14159265359;
+
+export function add(a, b) {
+    <span class="keyword">return</span> a + b;
+}
+
+export function subtract(a, b) {
+    <span class="keyword">return</span> a - b;
+}
+
+<span class="comment">// 或者使用导出对象</span>
+<span class="keyword">const</span> multiply = (a, b) => a * b;
+<span class="keyword">const</span> divide = (a, b) => a / b;
+
+export { multiply, divide };
+
+<span class="comment">// 默认导出</span>
+export <span class="keyword">default</span> {
+    add,
+    subtract,
+    multiply,
+    divide,
+    PI
+};
+
+<span class="comment">// 或者导出单个函数作为默认导出</span>
+export <span class="keyword">default</span> function calculate(a, b, operation) {
+    <span class="keyword">switch</span> (operation) {
+        case 'add': <span class="keyword">return</span> add(a, b);
+        case 'subtract': <span class="keyword">return</span> subtract(a, b);
+        case 'multiply': <span class="keyword">return</span> multiply(a, b);
+        case 'divide': <span class="keyword">return</span> divide(a, b);
+        <span class="keyword">default</span>: <span class="keyword">throw</span> <span class="keyword">new</span> Error('未知操作');
+    }
+}
+
+<span class="comment">// 导入（import）</span>
+<span class="comment">// 示例：app.js</span>
+
+<span class="comment">// 导入默认导出</span>
+import calculator <span class="keyword">from</span> './utils.js';
+console.log(calculator.add(2, 3));  <span class="comment">// 输出: 5</span>
+
+<span class="comment">// 导入命名导出</span>
+import { add, subtract, PI } <span class="keyword">from</span> './utils.js';
+console.log(add(2, 3));           <span class="comment">// 输出: 5</span>
+console.log(subtract(5, 2));      <span class="comment">// 输出: 3</span>
+console.log(PI);                  <span class="comment">// 输出: 3.14159265359</span>
+
+<span class="comment">// 重命名导入</span>
+import { add <span class="keyword">as</span> sum } <span class="keyword">from</span> './utils.js';
+console.log(sum(2, 3));           <span class="comment">// 输出: 5</span>
+
+<span class="comment">// 导入所有命名导出</span>
+import * <span class="keyword">as</span> mathUtils <span class="keyword">from</span> './utils.js';
+console.log(mathUtils.add(2, 3)); <span class="comment">// 输出: 5</span>
+
+<span class="comment">// 同时导入默认导出和命名导出</span>
+import calculate, { add, PI } <span class="keyword">from</span> './utils.js';
+</div>
+
+        <h3>4.2 ES Modules 动态导入</h3>
+        <div class="code-block">
+<span class="comment">// 动态导入（返回 Promise）</span>
+<span class="comment">// 可以在运行时根据条件加载模块</span>
+function loadModule(moduleName) {
+    <span class="keyword">return</span> import(`./modules/${moduleName}.js`)
+        .then(module => {
+            console.log(`${moduleName} 模块加载成功`);
+            <span class="keyword">return</span> module;
+        })
+        .catch(error => {
+            console.error(`模块加载失败: ${error}`);
+            <span class="keyword">throw</span> error;
+        });
+}
+
+<span class="comment">// 使用 async/await 语法</span>
+async function useModule(moduleName) {
+    <span class="keyword">try</span> {
+        <span class="keyword">const</span> module = await import(`./modules/${moduleName}.js`);
+        <span class="keyword">return</span> module;
+    } <span class="keyword">catch</span> (error) {
+        console.error('动态导入失败:', error);
+    }
+}
+
+<span class="comment">// 按需加载示例</span>
+document.getElementById('loadButton').addEventListener('click', async () => {
+    <span class="keyword">const</span> heavyModule = await import('./heavy-module.js');
+    heavyModule.doSomething();
+});
+</div>
+
+        <h3>4.3 ES Modules 在浏览器中的使用</h3>
+        <div class="code-block">
+<span class="comment">// HTML 中使用 ES Modules</span>
+<span class="comment">// 需要在 script 标签中添加 type="module" 属性</span>
+
+<span class="comment">// 示例: index.html</span>
+<span class="comment"><!--
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ES Modules Demo</title>
+</head>
+<body>
+    <script type="module">
+        // 直接在 HTML 中使用 ES Modules
+        import { add } from './utils.js';
+        console.log(add(5, 10)); // 输出: 15
+    </script>
+    
+    <script type="module" src="app.js"></script>
+</body>
+</html>
+--></span>
+
+<span class="comment">// 注意事项：</span>
+<span class="comment">// 1. 使用 type="module" 的脚本会被延迟执行（类似于 defer 属性）</span>
+<span class="comment">// 2. 模块内的代码自动运行在严格模式下 ('use strict')</span>
+<span class="comment">// 3. 模块有自己的作用域，变量不会泄露到全局</span>
+<span class="comment">// 4. 模块路径必须是完整的，不能省略 .js 扩展名</span>
+<span class="comment">// 5. 不支持文件协议（file://），必须通过 HTTP/HTTPS 访问</span>
+</div>
+
+        <h3>4.4 ES Modules 在 Node.js 中的使用</h3>
+        <div class="code-block">
+<span class="comment">// Node.js 支持 ES Modules 的几种方式：</span>
+
+<span class="comment">// 1. 使用 .mjs 文件扩展名</span>
+<span class="comment">// example.mjs</span>
+export function hello() {
+    <span class="keyword">return</span> 'Hello from ES Module';
+}
+
+<span class="comment">// 2. 在 package.json 中设置 "type": "module"</span>
+<span class="comment">// package.json</span>
+<span class="comment">// {
+//   "type": "module"
+// }
+// </span>
+
+<span class="comment">// 3. 使用 import/export 语法</span>
+<span class="comment">// app.js (当 package.json 中设置了 "type": "module")</span>
+import { hello } <span class="keyword">from</span> './example.js';
+console.log(hello());
+
+<span class="comment">// 在 CommonJS 中导入 ES Module</span>
+<span class="keyword">const</span> { hello } = await import('./example.js');
+
+<span class="comment">// 在 ES Module 中导入 CommonJS 模块</span>
+import commonJsModule <span class="keyword">from</span> './commonjs-module.js';
+</div>
+
+        <div class="pros-cons">
+            <div class="pros">
+                <h4>优点</h4>
+                <ul>
+                    <li>官方标准，被现代浏览器和 Node.js 原生支持</li>
+                    <li>静态分析支持（有利于 tree-shaking）</li>
+                    <li>支持异步加载和动态导入</li>
+                    <li>语法简洁清晰</li>
+                    <li>更好的运行时优化</li>
+                </ul>
+            </div>
+            <div class="cons">
+                <h4>缺点</h4>
+                <ul>
+                    <li>旧浏览器不支持（需要转译工具）</li>
+                    <li>在 Node.js 中使用需要特殊配置</li>
+                    <li>模块路径必须是完整的，不能省略扩展名</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- 5. 模块系统对比 -->
+    <section class="demo-section">
+        <h2>5. 模块系统对比</h2>
+        
+        <table>
+            <tr>
+                <th>特性</th>
+                <th>CommonJS</th>
+                <th>AMD</th>
+                <th>ES Modules</th>
+            </tr>
+            <tr>
+                <td>加载方式</td>
+                <td>同步</td>
+                <td>异步</td>
+                <td>静态 + 动态异步</td>
+            </tr>
+            <tr>
+                <td>适用环境</td>
+                <td>服务器端 (Node.js)</td>
+                <td>浏览器</td>
+                <td>浏览器和服务器端</td>
+            </tr>
+            <tr>
+                <td>导出语法</td>
+                <td>module.exports / exports</td>
+                <td>return 对象</td>
+                <td>export / export default</td>
+            </tr>
+            <tr>
+                <td>导入语法</td>
+                <td>require()</td>
+                <td>require([], callback)</td>
+                <td>import / import()</td>
+            </tr>
+            <tr>
+                <td>静态分析</td>
+                <td>不支持</td>
+                <td>不支持</td>
+                <td>支持</td>
+            </tr>
+            <tr>
+                <td>Tree-shaking</td>
+                <td>不支持</td>
+                <td>不支持</td>
+                <td>支持</td>
+            </tr>
+            <tr>
+                <td>循环依赖</td>
+                <td>支持</td>
+                <td>支持</td>
+                <td>支持</td>
+            </tr>
+            <tr>
+                <td>原生支持</td>
+                <td>Node.js</td>
+                <td>需要 RequireJS</td>
+                <td>现代浏览器和 Node.js</td>
+            </tr>
+        </table>
+    </section>
+
+    <!-- 6. 模块化最佳实践 -->
+    <section class="demo-section">
+        <h2>6. 模块化最佳实践</h2>
+        
+        <h3>6.1 模块设计原则</h3>
+        <div class="explanation">
+            <ol>
+                <li><strong>单一职责原则</strong>：每个模块应该只负责一个特定的功能</li>
+                <li><strong>最小知识原则</strong>：模块应该只暴露必要的接口，隐藏内部实现</li>
+                <li><strong>高内聚低耦合</strong>：相关功能应该放在同一个模块中，模块之间的依赖关系应该尽量少</li>
+                <li><strong>避免循环依赖</strong>：尽量避免模块之间的相互依赖</li>
+            </ol>
+        </div>
+
+        <h3>6.2 目录结构组织</h3>
+        <div class="code-block">
+<span class="comment">// 推荐的模块目录结构</span>
+project/
+├── src/
+│   ├── assets/         <span class="comment">// 静态资源</span>
+│   ├── components/     <span class="comment">// 可复用组件</span>
+│   │   ├── common/     <span class="comment">// 通用组件</span>
+│   │   └── specific/   <span class="comment">// 特定业务组件</span>
+│   ├── services/       <span class="comment">// API 服务</span>
+│   ├── utils/          <span class="comment">// 工具函数</span>
+│   ├── hooks/          <span class="comment">// 自定义钩子（如果使用 React）</span>
+│   ├── store/          <span class="comment">// 状态管理</span>
+│   ├── config/         <span class="comment">// 配置文件</span>
+│   ├── constants/      <span class="comment">// 常量定义</span>
+│   ├── types/          <span class="comment">// 类型定义（TypeScript）</span>
+│   ├── pages/          <span class="comment">// 页面组件</span>
+│   └── index.js        <span class="comment">// 应用入口</span>
+├── tests/              <span class="comment">// 测试文件</span>
+├── package.json
+└── README.md
+</div>
+
+        <h3>6.3 模块导出最佳实践</h3>
+        <div class="comparison">
+            <div class="comparison-item before">
+                <h4>不推荐的导出方式</h4>
+                <div class="code-block">
+<span class="comment">// 导出过多的小函数</span>
+export function formatDate(date) { /* ... */ }
+export function parseDate(dateString) { /* ... */ }
+export function getCurrentDate() { /* ... */ }
+export function getDayOfWeek(date) { /* ... */ }
+export function isLeapYear(year) { /* ... */ }
+                </div>
+            </div>
+            <div class="comparison-item after">
+                <h4>推荐的导出方式</h4>
+                <div class="code-block">
+<span class="comment">// 使用命名空间导出相关函数</span>
+<span class="keyword">const</span> dateUtils = {
+    formatDate(date) { /* ... */ },
+    parseDate(dateString) { /* ... */ },
+    getCurrentDate() { /* ... */ },
+    getDayOfWeek(date) { /* ... */ },
+    isLeapYear(year) { /* ... */ }
+};
+
+export <span class="keyword">default</span> dateUtils;
+
+<span class="comment">// 或者只导出最常用的函数作为默认导出</span>
+export function formatDate(date) { /* ... */ }
+export <span class="keyword">default</span> formatDate;
+export function parseDate(dateString) { /* ... */ }
+export function getDayOfWeek(date) { /* ... */ }
+                </div>
+            </div>
+        </div>
+
+        <h3>6.4 模块导入最佳实践</h3>
+        <div class="comparison">
+            <div class="comparison-item before">
+                <h4>不推荐的导入方式</h4>
+                <div class="code-block">
+<span class="comment">// 导入整个模块但只使用其中一个功能</span>
+import * <span class="keyword">as</span> utils <span class="keyword">from</span> './utils.js';
+utils.add(1, 2);
+
+<span class="comment">// 混合使用相对路径和模块名称</span>
+import axios <span class="keyword">from</span> 'axios';
+import { formatDate } <span class="keyword">from</span> '../../utils/date';
+import { apiConfig } <span class="keyword">from</span> '../config/api';
+                </div>
+            </div>
+            <div class="comparison-item after">
+                <h4>推荐的导入方式</h4>
+                <div class="code-block">
+<span class="comment">// 只导入需要的功能</span>
+import { add } <span class="keyword">from</span> './utils.js';
+add(1, 2);
+
+<span class="comment">// 使用一致的路径导入策略</span>
+import axios <span class="keyword">from</span> 'axios';
+import { formatDate } <span class="keyword">from</span> '@/utils/date';  <span class="comment">// 使用别名</span>
+import { apiConfig } <span class="keyword">from</span> '@/config/api';
+
+<span class="comment">// 按类型分组导入</span>
+<span class="comment">// 外部依赖</span>
+import React, { useState, useEffect } <span class="keyword">from</span> 'react';
+import axios <span class="keyword">from</span> 'axios';
+
+<span class="comment">// 内部依赖</span>
+import { formatDate } <span class="keyword">from</span> '@/utils/date';
+import { apiConfig } <span class="keyword">from</span> '@/config/api';
+import UserCard <span class="keyword">from</span> '@/components/UserCard';
+                </div>
+            </div>
+        </div>
+
+        <h3>6.5 动态导入最佳实践</h3>
+        <div class="code-block">
+<span class="comment">// 1. 按需加载大型组件</span>
+async function loadChartComponent() {
+    <span class="keyword">const</span> { Chart } = await import('heavy-chart-library');
+    <span class="keyword">return</span> Chart;
+}
+
+<span class="comment">// 2. 根据用户权限动态加载功能模块</span>
+async function loadAdminFeatures() {
+    <span class="keyword">if</span> (user.isAdmin) {
+        <span class="keyword">const</span> adminModule = await import('./admin-features.js');
+        adminModule.initialize();
+    }
+}
+
+<span class="comment">// 3. 条件加载不同实现</span>
+async function getStorageProvider() {
+    <span class="keyword">if</span> (typeof window !== 'undefined' && 'localStorage' in window) {
+        <span class="keyword">return</span> await import('./storage/local-storage.js');
+    } <span class="keyword">else</span> {
+        <span class="keyword">return</span> await import('./storage/memory-storage.js');
+    }
+}
+
+<span class="comment">// 4. 路由懒加载</span>
+<span class="comment">// 以 React Router 为例</span>
+<span class="keyword">const</span> Dashboard = React.lazy(() => import('./pages/Dashboard'));
+<span class="keyword">const</span> Settings = React.lazy(() => import('./pages/Settings'));
+
+<span class="keyword">const</span> routes = [
+    {
+        path: '/dashboard',
+        element: (
+            <React.Suspense fallback={<div>加载中...</div>}>
+                <Dashboard />
+            </React.Suspense>
+        )
+    }
+];
+</div>
+    </section>
+
+    <!-- 7. 模块化构建工具 -->
+    <section class="demo-section">
+        <h2>7. 模块化构建工具</h2>
+        <div class="explanation">
+            <p>在实际项目中，我们通常使用构建工具来处理模块，支持现代 JavaScript 特性，并优化最终输出。以下是一些常用的构建工具：</p>
+        </div>
+
+        <h3>7.1 Webpack</h3>
+        <div class="code-block">
+<span class="comment">// webpack.config.js 基本配置</span>
+<span class="keyword">const</span> path = require('path');
+
+module.exports = {
+    entry: './src/index.js', <span class="comment">// 入口文件</span>
+    output: {
+        path: path.resolve(__dirname, 'dist'), <span class="comment">// 输出目录</span>
+        filename: 'bundle.js', <span class="comment">// 输出文件名</span>
+        clean: true <span class="comment">// 清理旧文件</span>
+    },
+    module: {
+        rules: [
+            {
+                test: /\.js$/, <span class="comment">// 匹配 JavaScript 文件</span>
+                exclude: /node_modules/, <span class="comment">// 排除 node_modules</span>
+                use: 'babel-loader' <span class="comment">// 使用 Babel 转译</span>
+            },
+            {
+                test: /\.css$/, <span class="comment">// 处理 CSS 文件</span>
+                use: ['style-loader', 'css-loader']
+            }
+        ]
+    },
+    resolve: {
+        extensions: ['.js', '.jsx', '.json'], <span class="comment">// 自动解析扩展名</span>
+        alias: {
+            '@': path.resolve(__dirname, 'src') <span class="comment">// 路径别名</span>
+        }
+    },
+    mode: 'production' <span class="comment">// 生产模式</span>
+};
+</div>
+
+        <h3>7.2 Rollup</h3>
+        <div class="code-block">
+<span class="comment">// rollup.config.js 基本配置</span>
+<span class="keyword">export</span> <span class="keyword">default</span> {
+    input: 'src/index.js', <span class="comment">// 入口文件</span>
+    output: [
+        {
+            file: 'dist/bundle.cjs.js', <span class="comment">// CommonJS 格式</span>
+            format: 'cjs'
+        },
+        {
+            file: 'dist/bundle.esm.js', <span class="comment">// ES Module 格式</span>
+            format: 'esm'
+        },
+        {
+            file: 'dist/bundle.umd.js', <span class="comment">// UMD 格式</span>
+            format: 'umd',
+            name: 'MyLibrary'
+        }
+    ],
+    plugins: [
+        <span class="comment">// 可以添加各种插件</span>
+    ],
+    external: ['react', 'lodash'] <span class="comment">// 外部依赖</span>
+};
+</div>
+
+        <h3>7.3 Vite</h3>
+        <div class="code-block">
+<span class="comment">// vite.config.js 基本配置</span>
+<span class="keyword">import</span> { defineConfig } <span class="keyword">from</span> 'vite';
+<span class="keyword">import</span> path from 'path';
+
+<span class="keyword">export</span> <span class="keyword">default</span> defineConfig({
+    root: './src', <span class="comment">// 项目根目录</span>
+    build: {
+        outDir: '../dist', <span class="comment">// 输出目录</span>
+        emptyOutDir: true <span class="comment">// 清空输出目录</span>
+    },
+    resolve: {
+        alias: {
+            '@': path.resolve(__dirname, 'src') <span class="comment">// 路径别名</span>
+        }
+    },
+    server: {
+        port: 3000, <span class="comment">// 开发服务器端口</span>
+        open: true <span class="comment">// 自动打开浏览器</span>
+    }
+});
+</div>
+
+        <h3>7.4 Parcel</h3>
+        <div class="code-block">
+<span class="comment">// Parcel 配置通常不需要配置文件，零配置特性是它的主要卖点</span>
+<span class="comment">// 但也可以通过 package.json 配置一些选项</span>
+
+<span class="comment">// package.json</span>
+<span class="comment">/*
+{
+  "name": "my-project",
+  "version": "1.0.0",
+  "source": "src/index.html",
+  "browserslist": ["> 1%", "last 2 versions"],
+  "scripts": {
+    "dev": "parcel",
+    "build": "parcel build"
+  }
+}
+*/</span>
+</div>
+    </section>
+
+    <!-- 8. 模块化实践演示 -->
+    <section class="demo-section">
+        <h2>8. 模块化实践演示</h2>
+        
+        <h3>8.1 项目模块化示例</h3>
+        <div class="code-block">
+<span class="comment">// 项目结构示例</span>
+<span class="comment">// src/
+// ├── utils/
+// │   ├── math.js
+// │   ├── date.js
+// │   └── http.js
+// ├── services/
+// │   └── api.js
+// ├── components/
+// │   └── UserCard.js
+// └── index.js</span>
+
+<span class="comment">// src/utils/math.js</span>
+export function add(a, b) { <span class="keyword">return</span> a + b; }
+export function subtract(a, b) { <span class="keyword">return</span> a - b; }
+export function multiply(a, b) { <span class="keyword">return</span> a * b; }
+export function divide(a, b) { <span class="keyword">return</span> a / b; }
+
+export <span class="keyword">default</span> {
+    add,
+    subtract,
+    multiply,
+    divide
+};
+
+<span class="comment">// src/utils/date.js</span>
+export function formatDate(date) {
+    <span class="keyword">const</span> d = <span class="keyword">new</span> Date(date);
+    <span class="keyword">const</span> year = d.getFullYear();
+    <span class="keyword">const</span> month = String(d.getMonth() + 1).padStart(2, '0');
+    <span class="keyword">const</span> day = String(d.getDate()).padStart(2, '0');
+    <span class="keyword">return</span> `${year}-${month}-${day}`;
+}
+
+export function getDaysBetween(date1, date2) {
+    <span class="keyword">const</span> oneDay = 24 * 60 * 60 * 1000;
+    <span class="keyword">const</span> d1 = <span class="keyword">new</span> Date(date1);
+    <span class="keyword">const</span> d2 = <span class="keyword">new</span> Date(date2);
+    <span class="keyword">return</span> Math.round(Math.abs((d1 - d2) / oneDay));
+}
+
+<span class="comment">// src/utils/http.js</span>
+<span class="keyword">class</span> HttpClient {
+    constructor(baseURL = '') {
+        this.baseURL = baseURL;
+    }
+    
+    async get(endpoint, params = {}) {
+        <span class="keyword">const</span> queryString = Object.entries(params)
+            .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
+            .join('&');
+        
+        <span class="keyword">const</span> url = `${this.baseURL}${endpoint}${queryString ? `?${queryString}` : ''}`;
+        
+        <span class="keyword">try</span> {
+            <span class="keyword">const</span> response = await fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+            
+            <span class="keyword">if</span> (!response.ok) {
+                <span class="keyword">throw</span> <span class="keyword">new</span> Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            <span class="keyword">return</span> await response.json();
+        } <span class="keyword">catch</span> (error) {
+            console.error('GET request failed:', error);
+            <span class="keyword">throw</span> error;
+        }
+    }
+    
+    async post(endpoint, data = {}) {
+        <span class="keyword">const</span> url = `${this.baseURL}${endpoint}`;
+        
+        <span class="keyword">try</span> {
+            <span class="keyword">const</span> response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
+            
+            <span class="keyword">if</span> (!response.ok) {
+                <span class="keyword">throw</span> <span class="keyword">new</span> Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            <span class="keyword">return</span> await response.json();
+        } <span class="keyword">catch</span> (error) {
+            console.error('POST request failed:', error);
+            <span class="keyword">throw</span> error;
+        }
+    }
+}
+
+export <span class="keyword">default</span> HttpClient;
+
+<span class="comment">// src/services/api.js</span>
+import HttpClient <span class="keyword">from</span> '../utils/http.js';
+
+<span class="keyword">const</span> httpClient = <span class="keyword">new</span> HttpClient('https://api.example.com');
+
+<span class="keyword">export</span> <span class="keyword">const</span> userService = {
+    async getAllUsers() {
+        <span class="keyword">return</span> await httpClient.get('/users');
+    },
+    
+    async getUserById(id) {
+        <span class="keyword">return</span> await httpClient.get(`/users/${id}`);
+    },
+    
+    async createUser(userData) {
+        <span class="keyword">return</span> await httpClient.post('/users', userData);
+    }
+};
+
+<span class="keyword">export</span> <span class="keyword">const</span> productService = {
+    async getAllProducts(filters = {}) {
+        <span class="keyword">return</span> await httpClient.get('/products', filters);
+    },
+    
+    async getProductById(id) {
+        <span class="keyword">return</span> await httpClient.get(`/products/${id}`);
+    }
+};
+
+<span class="comment">// src/index.js - 主应用入口</span>
+import { add, subtract } <span class="keyword">from</span> './utils/math.js';
+import { formatDate } <span class="keyword">from</span> './utils/date.js';
+import { userService } <span class="keyword">from</span> './services/api.js';
+
+<span class="comment">// 使用工具函数</span>console.log('2 + 3 =', add(2, 3));
+console.log('5 - 2 =', subtract(5, 2));
+console.log('今天的日期:', formatDate(new Date()));
+
+<span class="comment">// 加载用户数据</span>
+async function loadUsers() {
+    <span class="keyword">try</span> {
+        <span class="keyword">const</span> users = await userService.getAllUsers();
+        console.log('用户列表:', users);
+        <span class="comment">// 渲染用户列表...</span>
+    } <span class="keyword">catch</span> (error) {
+        console.error('加载用户失败:', error);
+    }
+}
+
+<span class="comment">// 初始化应用</span>
+function initApp() {
+    console.log('应用初始化...');
+    loadUsers();
+    
+    <span class="comment">// 其他初始化代码...</span>
+}
+
+<span class="comment">// 启动应用</span>
+initApp();
+</div>
+
+        <button onclick="runModuleDemo()">运行模块化演示</button>
+        <div id="moduleResult" class="result">点击按钮查看运行结果...</div>
+    </section>
+
+    <!-- JavaScript 代码 -->
+    <script>
+        // 代码高亮辅助函数
+        function highlightCode() {
+            const codeBlocks = document.querySelectorAll('.code-block');
+            codeBlocks.forEach(block => {
+                // 这里可以添加更复杂的代码高亮逻辑
+                block.innerHTML = block.innerHTML
+                    .replace(/\/\/.*$/gm, '<span class="comment">$&</span>')
+                    .replace(/\b(function|const|let|var|return|if|else|for|while|class|extends|import|export|default|async|await|try|catch|throw|new|typeof|instanceof|in|of)\b/gm, '<span class="keyword">$&</span>')
+                    .replace(/('.*?'|\".*?\")/gm, '<span class="string">$&</span>')
+                    .replace(/\b([A-Z][a-zA-Z0-9]+)\b/gm, '<span class="function">$&</span>');
+            });
+        }
+
+        // 模块化演示函数
+        function runModuleDemo() {
+            const resultDiv = document.getElementById('moduleResult');
+            
+            // 模拟模块化运行结果
+            const results = [
+                '模块系统类型比较:',
+                '- CommonJS: 主要用于Node.js, 同步加载',
+                '- AMD: 适用于浏览器, 异步加载',
+                '- ES Modules: 官方标准, 支持静态分析和异步加载',
+                '',
+                '模块化优势:',
+                '- 代码组织: 逻辑清晰, 易于维护',
+                '- 避免命名冲突: 独立作用域',
+                '- 代码复用: 模块可被多处导入使用',
+                '- 依赖管理: 明确模块间关系',
+                '- 按需加载: 提高应用性能',
+                '',
+                'ES Modules 示例:',
+                '// 导出',
+                'export function add(a, b) { return a + b; }',
+                'export default { add, subtract };',
+                '',
+                '// 导入',
+                'import { add } from \'./utils.js\';',
+                'import calculator from \'./utils.js\';'
+            ];
+            
+            resultDiv.textContent = results.join('\n');
+        }
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            highlightCode();
+        });
+    </script>
+</body>
+</html>

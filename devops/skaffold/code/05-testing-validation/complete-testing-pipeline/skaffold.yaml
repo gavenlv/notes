@@ -1,0 +1,234 @@
+# 完整测试流水线示例 - Skaffold配置文件
+apiVersion: skaffold/v4beta1
+kind: Config
+metadata:
+  name: complete-testing-pipeline
+
+# 构建配置
+build:
+  artifacts:
+    - image: my-registry/complete-testing-app
+      context: .
+      docker:
+        dockerfile: Dockerfile
+        buildArgs:
+          BUILD_ENV: "test"
+  local:
+    push: false
+
+# 测试配置 - 完整的测试流水线
+test:
+  # 阶段1：代码质量检查
+  - name: code-quality
+    # 代码静态分析
+    commands:
+      - command: go vet ./app/...
+        dir: .
+        env:
+          - GO111MODULE=on
+      - command: gofmt -l ./app
+        dir: .
+        # 检查代码格式
+      - command: golangci-lint run ./app/...
+        dir: .
+        # 代码规范检查
+        env:
+          - GO111MODULE=on
+      - command: shellcheck scripts/*.sh
+        dir: .
+        # Shell脚本检查
+
+  # 阶段2：单元测试
+  - name: unit-tests
+    commands:
+      - command: go test -race -cover -v ./app/...
+        dir: .
+        env:
+          - GO111MODULE=on
+          - TEST_ENVIRONMENT=unit
+        # 生成测试报告
+        after:
+          - command: go tool cover -html=coverage.out -o coverage.html
+            dir: .
+
+  # 阶段3：集成测试
+  - name: integration-tests
+    # 集成测试依赖
+    dependencies:
+      paths:
+        - ./test-data
+        - ./scripts
+      command: ./scripts/setup-test-env.sh
+    commands:
+      - command: go test -v ./tests/integration/...
+        dir: .
+        env:
+          - GO111MODULE=on
+          - TEST_DATABASE_URL=postgresql://test:test@localhost:5432/test
+          - TEST_API_URL=http://localhost:8080
+
+  # 阶段4：镜像验证
+  - name: image-validation
+    image: my-registry/complete-testing-app
+    # 镜像结构测试
+    structureTests:
+      - ./tests/image/structure-tests.yaml
+    # 自定义镜像测试
+    customTests:
+      - command: ./tests/image/security-scan.sh
+        dir: .
+        env:
+          - IMAGE=my-registry/complete-testing-app:latest
+      - command: ./tests/image/performance-test.sh
+        dir: .
+        # 镜像性能测试
+
+  # 阶段5：部署验证
+  - name: deployment-validation
+    # 部署后验证
+    dependencies:
+      command: ./scripts/deploy-test-app.sh
+    commands:
+      - command: ./tests/deployment/health-check.sh
+        dir: .
+        env:
+          - SERVICE_NAME=complete-testing-app
+          - NAMESPACE=default
+          - TIMEOUT=300s
+      - command: ./tests/deployment/api-test.sh
+        dir: .
+        # API功能测试
+        env:
+          - API_URL=http://complete-testing-app:8080
+      - command: k6 run ./tests/deployment/load-test.js
+        dir: .
+        # 负载测试
+        env:
+          - BASE_URL=http://complete-testing-app:8080
+
+  # 阶段6：端到端测试
+  - name: e2e-tests
+    commands:
+      - command: go test -v ./tests/e2e/...
+        dir: .
+        env:
+          - GO111MODULE=on
+          - BASE_URL=http://complete-testing-app:8080
+          - TEST_TIMEOUT=600s
+
+  # 阶段7：安全测试
+  - name: security-tests
+    commands:
+      - command: trivy image my-registry/complete-testing-app:latest
+        dir: .
+        # 容器安全扫描
+      - command: checkov --directory .
+        dir: .
+        # 基础设施安全扫描
+      - command: grype my-registry/complete-testing-app:latest
+        dir: .
+        # 软件成分分析
+
+  # 阶段8：性能测试
+  - name: performance-tests
+    commands:
+      - command: artillery run ./tests/deployment/stress-test.yaml
+        dir: .
+        # 压力测试
+        env:
+          - TARGET=http://complete-testing-app:8080
+      - command: ./tests/deployment/benchmark.sh
+        dir: .
+        # 基准测试
+
+# 部署配置
+deploy:
+  kubectl:
+    manifests:
+      - k8s/deployment.yaml
+      - k8s/service.yaml
+      - k8s/configmap.yaml
+
+# 环境特定测试配置
+profiles:
+  # 开发环境测试
+  - name: dev
+    test:
+      - name: dev-smoke-tests
+        commands:
+          - command: ./tests/smoke/dev-smoke.sh
+            dir: .
+            env:
+              - ENVIRONMENT=development
+
+  # 预发布环境测试
+  - name: staging
+    test:
+      - name: staging-integration-tests
+        commands:
+          - command: ./tests/integration/staging-integration.sh
+            dir: .
+            env:
+              - ENVIRONMENT=staging
+              - TEST_DATABASE_URL=postgresql://staging:staging@db.staging:5432/staging
+
+  # 生产环境测试
+  - name: prod
+    test:
+      - name: prod-sanity-tests
+        commands:
+          - command: ./tests/sanity/prod-sanity.sh
+            dir: .
+            env:
+              - ENVIRONMENT=production
+              - TEST_DATABASE_URL=postgresql://prod:prod@db.prod:5432/prod
+
+# 测试优化配置
+  - name: optimized-tests
+    test:
+      # 并行测试配置
+      - name: parallel-unit-tests
+        concurrency: 4
+        commands:
+          - command: go test -p 4 -race -cover -v ./app/...
+            dir: .
+            env:
+              - GO111MODULE=on
+
+      # 最小化测试配置
+      - name: minimal-tests
+        commands:
+          - command: go test -short -v ./app/...
+            dir: .
+            env:
+              - GO111MODULE=on
+
+# 测试报告配置
+  - name: test-with-reporting
+    test:
+      - name: test-reporting
+        commands:
+          - command: go test -v -json ./app/... > test-results.json
+            dir: .
+            env:
+              - GO111MODULE=on
+        after:
+          - command: ./scripts/generate-test-report.sh
+            dir: .
+            # 生成测试报告
+
+# 端口转发配置（用于本地测试）
+portForward:
+  - resourceType: deployment
+    resourceName: complete-testing-app
+    port: 8080
+    localPort: 8080
+
+# 资源清理配置
+cleanup:
+  - command: ./scripts/cleanup.sh
+    dir: .
+    # 测试后清理
+
+# 测试超时配置
+testTimeout: 1800s

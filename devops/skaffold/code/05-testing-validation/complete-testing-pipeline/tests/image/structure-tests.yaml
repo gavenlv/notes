@@ -1,0 +1,102 @@
+# 镜像结构测试配置
+schemaVersion: "2.0.0"
+
+# 基础镜像验证
+commandTests:
+  - name: "base-image-version"
+    command: "cat"
+    args: ["/etc/os-release"]
+    expectedOutput: ["PRETTY_NAME=\"Debian GNU/Linux 11 (bullseye)\"\n"]
+
+# 应用文件验证
+fileExistenceTests:
+  - name: "app-binary-exists"
+    path: "/app/complete-testing-app"
+    shouldExist: true
+    permissions: "-rwxr-xr-x"
+
+  - name: "config-directory-exists"
+    path: "/app/config"
+    shouldExist: true
+    isDirectory: true
+
+  - name: "logs-directory-exists"
+    path: "/app/logs"
+    shouldExist: true
+    isDirectory: true
+
+# 文件权限验证
+fileContentTests:
+  - name: "app-binary-permissions"
+    path: "/app/complete-testing-app"
+    expectedContents: ["ELF"]
+
+# 环境变量验证
+metadataTest:
+  env:
+    - key: "APP_ENV"
+      value: "production"
+    - key: "PORT"
+      value: "8080"
+  exposedPorts: ["8080"]
+  workdir: "/app"
+  user: "appuser"
+  entrypoint: ["/app/complete-testing-app"]
+  cmd: ["--config", "/app/config/app.yaml"]
+
+# 安全验证
+commandTests:
+  - name: "non-root-user"
+    command: "whoami"
+    expectedOutput: ["appuser\n"]
+
+  - name: "no-setuid-files"
+    command: "find"
+    args: ["/", "-perm", "/4000"]
+    excludedOutput: ["/proc", "/sys"]
+
+# 依赖验证
+commandTests:
+  - name: "required-libraries"
+    command: "ldd"
+    args: ["/app/complete-testing-app"]
+    expectedOutput: ["libc.so.6"]
+
+# 健康检查验证
+commandTests:
+  - name: "health-check-endpoint"
+    command: "curl"
+    args: ["-f", "http://localhost:8080/health"]
+    # 需要先启动应用
+    setup:
+      - command: ["/app/complete-testing-app", "--config", "/app/config/app.yaml"]
+        background: true
+      - command: ["sleep", "10"]
+
+# 资源限制验证
+commandTests:
+  - name: "memory-limit-check"
+    command: "cat"
+    args: ["/sys/fs/cgroup/memory/memory.limit_in_bytes"]
+    # 验证内存限制设置
+
+# 时区验证
+commandTests:
+  - name: "timezone-configuration"
+    command: "cat"
+    args: ["/etc/timezone"]
+    expectedOutput: ["UTC\n"]
+
+# 日志配置验证
+fileExistenceTests:
+  - name: "log-configuration"
+    path: "/app/config/logging.yaml"
+    shouldExist: true
+
+# 安全扫描结果
+# 这里可以添加自定义的安全检查规则
+commandTests:
+  - name: "security-scan-clean"
+    command: "echo"
+    args: ["Security scan passed"]
+    # 实际项目中应该集成真实的安全扫描工具

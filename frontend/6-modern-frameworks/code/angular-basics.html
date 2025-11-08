@@ -1,0 +1,1329 @@
+\u003c!DOCTYPE html\u003e
+\u003chtml lang="zh-CN"\u003e
+\u003chead\u003e
+    \u003cmeta charset="UTF-8"\u003e
+    \u003cmeta name="viewport" content="width=device-width, initial-scale=1.0"\u003e
+    \u003ctitle\u003eAngular 框架基础详解\u003c/title\u003e
+    \u003cstyle\u003e
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+        
+        h1, h2, h3, h4 {
+            color: #2c3e50;
+        }
+        
+        h1 {
+            text-align: center;
+            border-bottom: 2px solid #dd0031;
+            padding-bottom: 10px;
+            margin-bottom: 40px;
+        }
+        
+        h2 {
+            border-left: 4px solid #dd0031;
+            padding-left: 15px;
+            margin-top: 50px;
+        }
+        
+        h3 {
+            color: #dd0031;
+            margin-top: 30px;
+        }
+        
+        .container {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .code-block {
+            background-color: #282c34;
+            color: #abb2bf;
+            padding: 20px;
+            border-radius: 6px;
+            margin: 15px 0;
+            overflow-x: auto;
+            font-family: 'Courier New', Courier, monospace;
+            white-space: pre-wrap;
+            line-height: 1.5;
+        }
+        
+        .demo-section {
+            margin-bottom: 40px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 6px;
+        }
+        
+        button {
+            background-color: #dd0031;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: #b71c1c;
+        }
+        
+        .result {
+            background-color: #e8f4f8;
+            border: 1px solid #b3e5fc;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 15px 0;
+            font-family: 'Courier New', Courier, monospace;
+        }
+        
+        .concept-box {
+            background-color: #f0f0f0;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 15px 0;
+            border-left: 4px solid #dd0031;
+        }
+        
+        .comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .comparison-item {
+            padding: 15px;
+            border-radius: 6px;
+            border: 1px solid #ddd;
+        }
+    \u003c/style\u003e
+\u003c/head\u003e
+\u003cbody\u003e
+    \u003cdiv class="container"\u003e
+        \u003ch1\u003eAngular 框架基础详解\u003c/h1\u003e
+        
+        \u003cdiv class="demo-section"\u003e
+            \u003ch2\u003e1. Angular 核心概念\u003c/h2\u003e
+            \u003cdiv class="concept-box"\u003e
+                \u003cp\u003eAngular 是一个由 Google 开发的 TypeScript 编写的 Web 应用框架。它具有以下特点：\u003c/p\u003e
+                \u003cul\u003e
+                    \u003cli\u003e完整的框架：提供从路由到表单验证的全套解决方案\u003c/li\u003e
+                    \u003cli\u003e组件化：基于组件的架构设计\u003c/li\u003e
+                    \u003cli\u003eTypeScript：内置类型系统，提供更好的开发体验和代码质量\u003c/li\u003e
+                    \u003cli\u003e依赖注入：强大的依赖注入系统，便于测试和模块化\u003c/li\u003e
+                    \u003cli\u003e响应式编程：基于 RxJS 的异步编程模型\u003c/li\u003e
+                \u003c/ul\u003e
+            \u003c/div\u003e
+            \u003c
+            \u003ch3\u003e1.1 Angular 应用架构\u003c/h3\u003e
+            \u003cdiv class="code-block"\u003e
+// Angular 应用的基本结构
+// 1. 模块（Modules）
+import { NgModule } from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser';
+import { AppComponent } from './app.component';
+import { UserModule } from './user/user.module';
+
+@NgModule({
+  declarations: [    // 声明该模块中的组件、指令和管道
+    AppComponent
+  ],
+  imports: [         // 导入其他模块
+    BrowserModule,
+    UserModule
+  ],
+  providers: [],     // 服务提供者
+  bootstrap: [AppComponent]  // 根组件
+})
+export class AppModule { }
+
+// 2. 组件（Components）
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-root',     // 组件的 HTML 标签名
+  templateUrl: './app.component.html',  // 组件模板
+  styleUrls: ['./app.component.css']    // 组件样式
+})
+export class AppComponent {
+  title = 'my-angular-app';
+}
+
+// 3. 服务（Services）
+import { Injectable } from '@angular/core';
+
+@Injectable({
+  providedIn: 'root'  // 提供到根注入器
+})
+export class UserService {
+  getUserData() {
+    return { name: 'John', age: 30 };
+  }
+}
+
+// 4. 指令（Directives）
+import { Directive, ElementRef } from '@angular/core';
+
+@Directive({
+  selector: '[appHighlight]'
+})
+export class HighlightDirective {
+  constructor(el: ElementRef) {
+    el.nativeElement.style.backgroundColor = 'yellow';
+  }
+}
+
+// 5. 管道（Pipes）
+import { Pipe, PipeTransform } from '@angular/core';
+
+@Pipe({
+  name: 'uppercase'
+})
+export class UppercasePipe implements PipeTransform {
+  transform(value: string): string {
+    return value.toUpperCase();
+  }
+}
+            \u003c/div\u003e
+            \u003c
+            \u003ch3\u003e1.2 Angular CLI 命令行工具\u003c/h3\u003e
+            \u003cdiv class="code-block"\u003e
+# 安装 Angular CLI
+npm install -g @angular/cli
+
+# 创建新的 Angular 项目
+ng new my-angular-app
+
+# 启动开发服务器
+cd my-angular-app
+ng serve
+
+# 生成组件
+ng generate component user-profile
+# 或简写
+ng g c user-profile
+
+# 生成服务
+ng generate service data
+# 或简写
+ng g s data
+
+# 生成模块
+ng generate module admin
+# 或简写
+ng g m admin
+
+# 生成路由模块
+ng generate module app-routing --flat --module=app
+
+# 生成指令
+ng generate directive highlight
+# 或简写
+ng g d highlight
+
+# 生成管道
+ng generate pipe uppercase
+# 或简写
+ng g p uppercase
+
+# 构建生产版本
+ng build --prod
+
+# 运行单元测试
+ng test
+
+# 运行端到端测试
+ng e2e
+            \u003c/div\u003e
+            \u003c
+            \u003cbutton onclick="runArchitectureDemo()"\u003e运行架构演示\u003c/button\u003e
+            \u003cdiv id="architectureResult" class="result"\u003e点击按钮查看 Angular 架构演示结果...\u003c/div\u003e
+        \u003c/div\u003e
+        
+        \u003cdiv class="demo-section"\u003e
+            \u003ch2\u003e2. Angular 组件系统\u003c/h2\u003e
+            \u003c
+            \u003ch3\u003e2.1 组件定义与生命周期\u003c/h3\u003e
+            \u003cdiv class="code-block"\u003e
+import { Component, OnInit, OnChanges, DoCheck, AfterContentInit, AfterContentChecked, AfterViewInit, AfterViewChecked, OnDestroy, Input, Output, EventEmitter, SimpleChanges } from '@angular/core';
+
+@Component({
+  selector: 'app-user',
+  template: `
+    \u003cdiv\u003e
+      \u003ch3\u003e用户信息\u003c/h3\u003e
+      \u003cp\u003e姓名: {{ userName }}\u003c/p\u003e
+      \u003cp\u003e年龄: {{ userAge }}\u003c/p\u003e
+      \u003cbutton (click)="updateUser()"\u003e更新用户信息\u003c/button\u003e
+    \u003c/div\u003e
+  `,
+  styles: [`
+    div { padding: 16px; border: 1px solid #ddd; }
+    button { margin-top: 10px; }
+  `]
+})
+export class UserComponent implements OnInit, OnChanges, DoCheck, AfterContentInit, AfterContentChecked, AfterViewInit, AfterViewChecked, OnDestroy {
+  // 输入属性
+  @Input() userName: string = '默认用户';
+  @Input() userAge: number = 0;
+  
+  // 输出事件
+  @Output() userUpdated = new EventEmitter<{ name: string; age: number }>();
+  
+  // 构造函数
+  constructor() {
+    console.log('1. 构造函数 - Constructor');
+    console.log('userName:', this.userName); // 此时输入属性可能尚未初始化
+  }
+  
+  // 输入属性变化时调用
+  ngOnChanges(changes: SimpleChanges): void {
+    console.log('2. 输入属性变化 - ngOnChanges');
+    console.log('变化:', changes);
+  }
+  
+  // 组件初始化
+  ngOnInit(): void {
+    console.log('3. 组件初始化 - ngOnInit');
+    console.log('userName:', this.userName); // 此时输入属性已初始化
+  }
+  
+  // 自定义变更检测
+  ngDoCheck(): void {
+    console.log('4. 自定义变更检测 - ngDoCheck');
+  }
+  
+  // 内容投影初始化后
+  ngAfterContentInit(): void {
+    console.log('5. 内容初始化 - ngAfterContentInit');
+  }
+  
+  // 内容投影变更检测后
+  ngAfterContentChecked(): void {
+    console.log('6. 内容检测 - ngAfterContentChecked');
+  }
+  
+  // 视图初始化后
+  ngAfterViewInit(): void {
+    console.log('7. 视图初始化 - ngAfterViewInit');
+  }
+  
+  // 视图变更检测后
+  ngAfterViewChecked(): void {
+    console.log('8. 视图检测 - ngAfterViewChecked');
+  }
+  
+  // 组件销毁前
+  ngOnDestroy(): void {
+    console.log('9. 组件销毁 - ngOnDestroy');
+    // 清理资源，如取消订阅
+  }
+  
+  // 组件方法
+  updateUser(): void {
+    this.userUpdated.emit({ name: '更新后的' + this.userName, age: this.userAge + 1 });
+  }
+}
+            \u003c/div\u003e
+            \u003c
+            \u003ch3\u003e2.2 组件交互与通信\u003c/h3\u003e
+            \u003cdiv class="code-block"\u003e
+// 父组件向子组件传递数据 (Input)
+
+// 子组件定义输入属性
+@Component({
+  selector: 'app-child',
+  template: `
+    \u003cdiv\u003e
+      \u003ch3\u003e子组件接收数据\u003c/h3\u003e
+      \u003cp\u003e消息: {{ message }}\u003c/p\u003e
+      \u003cp\u003e计数: {{ count }}\u003c/p\u003e
+    \u003c/div\u003e
+  `
+})
+export class ChildComponent {
+  @Input() message: string = '默认消息';
+  @Input() count: number = 0;
+}
+
+// 父组件使用子组件并传递数据
+@Component({
+  selector: 'app-parent',
+  template: `
+    \u003cdiv\u003e
+      \u003ch3\u003e父组件传递数据\u003c/h3\u003e
+      \u003capp-child [message]="parentMessage" [count]="parentCount" /\u003e
+    \u003c/div\u003e
+  `
+})
+export class ParentComponent {
+  parentMessage = '来自父组件的消息';
+  parentCount = 10;
+}
+
+// 子组件向父组件发送数据 (Output)
+
+@Component({
+  selector: 'app-child-output',
+  template: `
+    \u003cdiv\u003e
+      \u003ch3\u003e子组件发送数据\u003c/h3\u003e
+      \u003cbutton (click)="sendDataToParent()"\u003e发送数据给父组件\u003c/button\u003e
+    \u003c/div\u003e
+  `
+})
+export class ChildOutputComponent {
+  @Output() dataEvent = new EventEmitter<{ id: number; name: string }>();
+  
+  sendDataToParent(): void {
+    this.dataEvent.emit({ id: 1, name: '子组件数据' });
+  }
+}
+
+@Component({
+  selector: 'app-parent-output',
+  template: `
+    \u003cdiv\u003e
+      \u003ch3\u003e父组件接收数据\u003c/h3\u003e
+      \u003cp *ngIf="receivedData"\u003e
+        收到的数据: ID={{ receivedData.id }}, 名称={{ receivedData.name }}
+      \u003c/p\u003e
+      \u003capp-child-output (dataEvent)="handleDataEvent($event)" /\u003e
+    \u003c/div\u003e
+  `
+})
+export class ParentOutputComponent {
+  receivedData: { id: number; name: string } | null = null;
+  
+  handleDataEvent(data: { id: number; name: string }): void {
+    this.receivedData = data;
+  }
+}
+
+// 组件间共享服务（非父子组件通信）
+
+@Injectable({ providedIn: 'root' })
+export class SharedService {
+  // 使用 Subject 或 BehaviorSubject 进行通信
+  private messageSource = new Subject<string>();
+  message$ = this.messageSource.asObservable();
+  
+  sendMessage(message: string): void {
+    this.messageSource.next(message);
+  }
+}
+
+// 发送消息的组件
+@Component({
+  selector: 'app-sender',
+  template: `
+    \u003cdiv\u003e
+      \u003cinput [(ngModel)]="message" placeholder="输入消息"\u003e
+      \u003cbutton (click)="sendMessage()"\u003e发送消息\u003c/button\u003e
+    \u003c/div\u003e
+  `
+})
+export class SenderComponent {
+  message = '';
+  
+  constructor(private sharedService: SharedService) {}
+  
+  sendMessage(): void {
+    this.sharedService.sendMessage(this.message);
+    this.message = '';
+  }
+}
+
+// 接收消息的组件
+@Component({
+  selector: 'app-receiver',
+  template: `
+    \u003cdiv\u003e
+      \u003ch3\u003e收到的消息\u003c/h3\u003e
+      \u003cp *ngFor="let msg of messages"\u003e{{ msg }}\u003c/p\u003e
+    \u003c/div\u003e
+  `
+})
+export class ReceiverComponent {
+  messages: string[] = [];
+  
+  constructor(private sharedService: SharedService) {}
+  
+  ngOnInit(): void {
+    this.sharedService.message$.subscribe(message =\u003e {
+      this.messages.push(message);
+    });
+  }
+  
+  ngOnDestroy(): void {
+    // 注意：在实际应用中需要取消订阅以避免内存泄漏
+    // 这里省略了取消订阅的代码
+  }
+}
+            \u003c/div\u003e
+            \u003c
+            \u003cbutton onclick="runComponentsDemo()"\u003e运行组件演示\u003c/button\u003e
+            \u003cdiv id="componentsResult" class="result"\u003e点击按钮查看组件演示结果...\u003c/div\u003e
+        \u003c/div\u003e
+        
+        \u003cdiv class="demo-section"\u003e
+            \u003ch2\u003e3. Angular 依赖注入系统\u003c/h2\u003e
+            \u003c
+            \u003ch3\u003e3.1 服务创建与注入\u003c/h3\u003e
+            \u003cdiv class="code-block"\u003e
+// 1. 创建服务
+import { Injectable } from '@angular/core';
+
+// 方式1: 提供到根注入器
+@Injectable({
+  providedIn: 'root'
+})
+export class UserService {
+  private users = [
+    { id: 1, name: 'Alice', age: 25 },
+    { id: 2, name: 'Bob', age: 30 },
+    { id: 3, name: 'Charlie', age: 35 }
+  ];
+  
+  getUsers() {
+    return this.users;
+  }
+  
+  getUserById(id: number) {
+    return this.users.find(user =\u003e user.id === id);
+  }
+  
+  addUser(user: { name: string; age: number }) {
+    const newUser = {
+      id: this.users.length + 1,
+      ...user
+    };
+    this.users.push(newUser);
+    return newUser;
+  }
+}
+
+// 方式2: 在模块中提供服务
+@NgModule({
+  declarations: [AppComponent],
+  imports: [BrowserModule],
+  providers: [UserService],  // 在模块中提供服务
+  bootstrap: [AppComponent]
+})
+export class AppModule {}
+
+// 方式3: 在组件中提供服务（每个组件实例会有自己的服务实例）
+@Component({
+  selector: 'app-user-detail',
+  template: `
+    \u003cdiv\u003e用户详情组件\u003c/div\u003e
+  `,
+  providers: [UserService]  // 在组件中提供服务
+})
+export class UserDetailComponent {
+  constructor(private userService: UserService) {}
+}
+
+// 2. 注入服务
+@Component({
+  selector: 'app-user-list',
+  template: `
+    \u003cdiv\u003e
+      \u003ch3\u003e用户列表\u003c/h3\u003e
+      \u003cul\u003e
+        \u003cli *ngFor="let user of users"\u003e
+          {{ user.name }} - {{ user.age }}岁
+        \u003c/li\u003e
+      \u003c/ul\u003e
+    \u003c/div\u003e
+  `
+})
+export class UserListComponent implements OnInit {
+  users: { id: number; name: string; age: number }[] = [];
+  
+  // 在构造函数中注入服务
+  constructor(private userService: UserService) {}
+  
+  ngOnInit(): void {
+    // 使用服务获取数据
+    this.users = this.userService.getUsers();
+  }
+}
+            \u003c/div\u003e
+            \u003c
+            \u003ch3\u003e3.2 依赖注入配置与提供者类型\u003c/h3\u003e
+            \u003cdiv class="code-block"\u003e
+// 1. 使用 useClass 提供者
+@NgModule({
+  providers: [
+    { provide: LoggerService, useClass: AdvancedLoggerService }
+  ]
+})
+export class AppModule {}
+
+// 2. 使用 useValue 提供者（常量值或配置对象）
+const apiConfig = {
+  baseUrl: 'https://api.example.com',
+  timeout: 3000
+};
+
+@NgModule({
+  providers: [
+    { provide: 'API_CONFIG', useValue: apiConfig }
+  ]
+})
+export class AppModule {}
+
+// 使用常量值提供者
+@Component({
+  selector: 'app-data-service',
+  template: ''
+})
+export class DataServiceComponent {
+  constructor(@Inject('API_CONFIG') private config: any) {
+    console.log('API URL:', config.baseUrl);
+  }
+}
+
+// 3. 使用 useFactory 提供者（工厂函数）
+function loggerFactory(isDevMode: boolean) {
+  if (isDevMode) {
+    return new ConsoleLogger();
+  } else {
+    return new FileLogger();
+  }
+}
+
+@NgModule({
+  providers: [
+    { provide: Logger, useFactory: loggerFactory, deps: [DEV_MODE] }
+  ]
+})
+export class AppModule {}
+
+// 4. 使用 useExisting 提供者（别名提供者）
+@NgModule({
+  providers: [
+    AdvancedLoggerService,
+    { provide: LoggerService, useExisting: AdvancedLoggerService }
+  ]
+})
+export class AppModule {}
+
+// 5. 配置注入令牌（InjectionToken）
+import { InjectionToken } from '@angular/core';
+
+// 创建注入令牌
+export const API_URL = new InjectionToken<string>('apiUrl');
+
+@NgModule({
+  providers: [
+    { provide: API_URL, useValue: 'https://api.example.com' }
+  ]
+})
+export class AppModule {}
+
+// 使用注入令牌
+@Injectable()
+export class DataService {
+  constructor(@Inject(API_URL) private apiUrl: string) {}
+  
+  fetchData() {
+    console.log('Fetching from:', this.apiUrl);
+    // 实际的 API 调用逻辑
+  }
+}
+            \u003c/div\u003e
+            \u003c
+            \u003cbutton onclick="runDIADemo()"\u003e运行依赖注入演示\u003c/button\u003e
+            \u003cdiv id="diaResult" class="result"\u003e点击按钮查看依赖注入演示结果...\u003c/div\u003e
+        \u003c/div\u003e
+        
+        \u003cdiv class="demo-section"\u003e
+            \u003ch2\u003e4. Angular 路由系统\u003c/h2\u003e
+            \u003c
+            \u003ch3\u003e4.1 路由配置与导航\u003c/h3\u003e
+            \u003cdiv class="code-block"\u003e
+// 1. 路由模块配置
+import { NgModule } from '@angular/core';
+import { RouterModule, Routes } from '@angular/router';
+import { HomeComponent } from './home/home.component';
+import { UserListComponent } from './user/user-list.component';
+import { UserDetailComponent } from './user/user-detail.component';
+import { NotFoundComponent } from './not-found/not-found.component';
+import { AuthGuard } from './auth/auth.guard';
+
+// 定义路由
+const routes: Routes = [
+  { path: '', redirectTo: '/home', pathMatch: 'full' }, // 默认路由
+  { path: 'home', component: HomeComponent },
+  { 
+    path: 'users', 
+    component: UserListComponent,
+    canActivate: [AuthGuard]  // 路由守卫
+  },
+  { 
+    path: 'users/:id',  // 带参数的路由
+    component: UserDetailComponent,
+    canActivate: [AuthGuard],
+    resolve: {  // 路由解析器
+      user: UserResolver
+    }
+  },
+  { 
+    path: 'admin',
+    loadChildren: () =\u003e import('./admin/admin.module').then(m =\u003e m.AdminModule) // 懒加载模块
+  },
+  { path: '**', component: NotFoundComponent } // 通配符路由，处理404
+];
+
+@NgModule({
+  imports: [RouterModule.forRoot(routes)],
+  exports: [RouterModule]
+})
+export class AppRoutingModule { }
+
+// 2. 在主模块中导入路由模块
+@NgModule({
+  declarations: [/* 组件 */],
+  imports: [
+    BrowserModule,
+    AppRoutingModule  // 导入路由模块
+  ],
+  providers: [],
+  bootstrap: [AppComponent]
+})
+export class AppModule { }
+
+// 3. 在组件模板中使用路由
+/*
+\u003cnav\u003e
+  \u003ca routerLink="/home"\u003e首页\u003c/a\u003e
+  \u003ca routerLink="/users"\u003e用户列表\u003c/a\u003e
+  \u003ca [routerLink]="['/users', 1]"\u003e用户1详情\u003c/a\u003e
+  \u003ca [routerLink]="['/users', 2]" routerLinkActive="active"\u003e用户2详情\u003c/a\u003e
+\u003c/nav\u003e
+
+\u003crouter-outlet\u003e\u003c/router-outlet\u003e
+*/
+
+// 4. 编程式导航
+import { Router, ActivatedRoute } from '@angular/router';
+
+@Component({
+  selector: 'app-user-item',
+  template: `
+    \u003cdiv (click)="navigateToDetail()"\u003e
+      {{ user.name }}
+    \u003c/div\u003e
+  `
+})
+export class UserItemComponent {
+  @Input() user: { id: number; name: string };
+  
+  constructor(private router: Router) {}
+  
+  navigateToDetail(): void {
+    // 编程式导航到用户详情页
+    this.router.navigate(['/users', this.user.id]);
+    
+    // 带查询参数的导航
+    // this.router.navigate(['/users', this.user.id], { queryParams: { tab: 'info' } });
+    
+    // 带片段的导航
+    // this.router.navigate(['/users', this.user.id], { fragment: 'details' });
+  }
+}
+
+// 5. 接收路由参数
+@Component({
+  selector: 'app-user-detail',
+  template: `
+    \u003cdiv\u003e
+      \u003ch3\u003e用户详情 - ID: {{ userId }}\u003c/h3\u003e
+      \u003c!-- 用户详情内容 --\u003e
+    \u003c/div\u003e
+  `
+})
+export class UserDetailComponent implements OnInit {
+  userId: number;
+  
+  constructor(private route: ActivatedRoute) {}
+  
+  ngOnInit(): void {
+    // 快照方式获取参数（适用于参数不会变化的情况）
+    this.userId = +this.route.snapshot.paramMap.get('id');
+    
+    // 订阅方式获取参数（适用于参数可能变化的情况，如从一个用户导航到另一个用户）
+    this.route.paramMap.subscribe(params =\u003e {
+      this.userId = +params.get('id');
+      // 根据新的用户ID加载数据
+      this.loadUserData(this.userId);
+    });
+    
+    // 获取查询参数
+    this.route.queryParamMap.subscribe(queryParams =\u003e {
+      const tab = queryParams.get('tab');
+      console.log('当前标签:', tab);
+    });
+  }
+  
+  loadUserData(id: number): void {
+    // 加载用户数据的逻辑
+    console.log('加载用户ID:', id);
+  }
+}
+            \u003c/div\u003e
+            \u003c
+            \u003ch3\u003e4.2 路由守卫与解析器\u003c/h3\u003e
+            \u003cdiv class="code-block"\u003e
+// 1. CanActivate 守卫（控制是否可以进入路由）
+import { Injectable } from '@angular/core';
+import { CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot, UrlTree, Router } from '@angular/router';
+import { Observable } from 'rxjs';
+import { AuthService } from './auth.service';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class AuthGuard implements CanActivate {
+  constructor(private authService: AuthService, private router: Router) {}
+  
+  canActivate(
+    route: ActivatedRouteSnapshot,
+    state: RouterStateSnapshot
+  ): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
+    // 检查用户是否已认证
+    if (this.authService.isLoggedIn()) {
+      return true; // 允许访问
+    } else {
+      // 未认证，重定向到登录页
+      return this.router.createUrlTree(['/login'], { queryParams: { returnUrl: state.url } });
+    }
+  }
+}
+
+// 2. CanDeactivate 守卫（控制是否可以离开路由）
+@Injectable()
+export class CanDeactivateGuard implements CanDeactivate<CanComponentDeactivate> {
+  canDeactivate(
+    component: CanComponentDeactivate,
+    currentRoute: ActivatedRouteSnapshot,
+    currentState: RouterStateSnapshot,
+    nextState?: RouterStateSnapshot
+  ): Observable<boolean> | Promise<boolean> | boolean {
+    // 调用组件的 canDeactivate 方法
+    return component.canDeactivate ? component.canDeactivate() : true;
+  }
+}
+
+// 组件必须实现的接口
+export interface CanComponentDeactivate {
+  canDeactivate: () =\u003e Observable<boolean> | Promise<boolean> | boolean;
+}
+
+// 在表单组件中实现接口
+@Component({
+  selector: 'app-edit-form',
+  template: '<form>...</form>'
+})
+export class EditFormComponent implements CanComponentDeactivate {
+  @Input() hasUnsavedChanges = false;
+  
+  canDeactivate(): boolean {
+    if (this.hasUnsavedChanges) {
+      // 显示确认对话框
+      return confirm('您有未保存的更改，确定要离开吗？');
+    }
+    return true;
+  }
+}
+
+// 3. 路由解析器（在路由激活前预加载数据）
+import { Injectable } from '@angular/core';
+import { Resolve, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
+import { Observable, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
+import { User, UserService } from './user.service';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class UserResolver implements Resolve<User | null> {
+  constructor(private userService: UserService) {}
+  
+  resolve(
+    route: ActivatedRouteSnapshot,
+    state: RouterStateSnapshot
+  ): Observable<User | null> {
+    const userId = +route.paramMap.get('id');
+    return this.userService.getUserById(userId).pipe(
+      catchError(error =\u003e {
+        console.error('获取用户数据失败:', error);
+        return of(null); // 返回 null 或其他默认值
+      })
+    );
+  }
+}
+
+// 在组件中使用解析的数据
+@Component({
+  selector: 'app-user-detail',
+  template: `
+    \u003cdiv *ngIf="user"\u003e
+      \u003h3\u003e用户详情 - {{ user.name }}\u003c/h3\u003e
+      \u003cp\u003eID: {{ user.id }}\u003c/p\u003e
+      \u003cp\u003e年龄: {{ user.age }}\u003c/p\u003e
+    \u003c/div\u003e
+    \u003cdiv *ngIf="!user"\u003e找不到用户信息\u003c/div\u003e
+  `
+})
+export class UserDetailComponent {
+  user: User | null;
+  
+  constructor(private route: ActivatedRoute) {
+    // 从路由快照中获取解析的数据
+    this.user = this.route.snapshot.data.user;
+  }
+}
+            \u003c/div\u003e
+            \u003c
+            \u003cbutton onclick="runRoutingDemo()"\u003e运行路由演示\u003c/button\u003e
+            \u003cdiv id="routingResult" class="result"\u003e点击按钮查看路由演示结果...\u003c/div\u003e
+        \u003c/div\u003e
+        
+        \u003cdiv class="demo-section"\u003e
+            \u003ch2\u003e5. Angular 表单处理\u003c/h2\u003e
+            \u003c
+            \u003ch3\u003e5.1 模板驱动表单 vs 响应式表单\u003c/h3\u003e
+            \u003cdiv class="comparison"\u003e
+                \u003cdiv class="comparison-item"\u003e
+                    \u003ch4\u003e模板驱动表单\u003c/h4\u003e
+                    \u003cpre style="font-family: monospace; white-space: pre-wrap;"\u003e// 1. 导入 FormsModule
+import { FormsModule } from '@angular/forms';
+
+@NgModule({
+  imports: [FormsModule],
+  // ...
+})
+export class AppModule { }
+
+// 2. 创建模板驱动表单
+/*
+\u003cform #userForm="ngForm" (ngSubmit)="onSubmit(userForm)"\u003e
+  \u003cdiv class="form-group"\u003e
+    \u003clabel for="name"\u003e姓名\u003c/label\u003e
+    \u003cinput 
+      type="text" 
+      id="name" 
+      name="name" 
+      ngModel 
+      required 
+      minlength="3"
+      class="form-control"
+    \u003e
+  \u003c/div\u003e
+  \u003cdiv class="form-group"\u003e
+    \u003clabel for="age"\u003e年龄\u003c/label\u003e
+    \u003cinput 
+      type="number" 
+      id="age" 
+      name="age" 
+      ngModel 
+      min="18" 
+      max="100"
+      class="form-control"
+    \u003e
+  \u003c/div\u003e
+  \u003cbutton type="submit" [disabled]="!userForm.form.valid"\u003e提交\u003c/button\u003e
+\u003c/form\u003e
+*/
+
+// 3. 在组件中处理表单
+@Component({
+  selector: 'app-template-form',
+  templateUrl: './template-form.component.html'
+})
+export class TemplateFormComponent {
+  onSubmit(form: NgForm): void {
+    if (form.valid) {
+      console.log('表单数据:', form.value);
+      // 处理表单提交逻辑
+    }
+  }
+}
+\u003c/pre\u003e
+                \u003c/div\u003e
+                \u003cdiv class="comparison-item"\u003e
+                    \u003ch4\u003e响应式表单\u003c/h4\u003e
+                    \u003cpre style="font-family: monospace; white-space: pre-wrap;"\u003e// 1. 导入 ReactiveFormsModule
+import { ReactiveFormsModule } from '@angular/forms';
+
+@NgModule({
+  imports: [ReactiveFormsModule],
+  // ...
+})
+export class AppModule { }
+
+// 2. 在组件中创建响应式表单
+@Component({
+  selector: 'app-reactive-form',
+  template: `
+    \u003cform [formGroup]="userForm" (ngSubmit)="onSubmit()"\u003e
+      \u003cdiv class="form-group"\u003e
+        \u003clabel for="name"\u003e姓名\u003c/label\u003e
+        \u003cinput 
+          type="text" 
+          id="name" 
+          formControlName="name" 
+          class="form-control"
+        \u003e
+        \u003cdiv *ngIf="userForm.get('name').invalid && userForm.get('name').touched"\u003e
+          \u003cdiv *ngIf="userForm.get('name').errors.required"\u003e姓名是必填项\u003c/div\u003e
+          \u003cdiv *ngIf="userForm.get('name').errors.minlength"\u003e姓名至少需要3个字符\u003c/div\u003e
+        \u003c/div\u003e
+      \u003c/div\u003e
+      \u003cdiv class="form-group"\u003e
+        \u003clabel for="age"\u003e年龄\u003c/label\u003e
+        \u003cinput 
+          type="number" 
+          id="age" 
+          formControlName="age" 
+          class="form-control"
+        \u003e
+      \u003c/div\u003e
+      \u003cbutton type="submit" [disabled]="userForm.invalid"\u003e提交\u003c/button\u003e
+    \u003c/form\u003e
+  `
+})
+export class ReactiveFormComponent implements OnInit {
+  userForm: FormGroup;
+  
+  constructor(private fb: FormBuilder) {}
+  
+  ngOnInit(): void {
+    // 使用 FormBuilder 创建表单
+    this.userForm = this.fb.group({
+      name: ['', [Validators.required, Validators.minLength(3)]],
+      age: [null, [Validators.min(18), Validators.max(100)]]
+    });
+    
+    // 订阅表单值变化
+    this.userForm.valueChanges.subscribe(value =\u003e {
+      console.log('表单值变化:', value);
+    });
+  }
+  
+  onSubmit(): void {
+    if (this.userForm.valid) {
+      console.log('表单数据:', this.userForm.value);
+      // 处理表单提交逻辑
+    }
+  }
+}
+\u003c/pre\u003e
+                \u003c/div\u003e
+            \u003c/div\u003e
+            \u003c
+            \u003ch3\u003e5.2 表单验证与错误处理\u003c/h3\u003e
+            \u003cdiv class="code-block"\u003e
+// 1. 内置验证器
+import { Validators } from '@angular/forms';
+
+this.userForm = this.fb.group({
+  // 必填
+  username: ['', Validators.required],
+  // 最小长度
+  password: ['', [Validators.required, Validators.minLength(6)]],
+  // 最大长度
+  description: ['', Validators.maxLength(200)],
+  // 最小和最大值
+  age: [null, [Validators.min(18), Validators.max(100)]],
+  // 电子邮件
+  email: ['', [Validators.required, Validators.email]],
+  // 正则表达式
+  phone: ['', [Validators.pattern(/^1[3-9]\d{9}$/)]]
+});
+
+// 2. 自定义验证器
+function forbiddenNameValidator(forbiddenName: RegExp): ValidatorFn {
+  return (control: AbstractControl): ValidationErrors | null =\u003e {
+    forbiddenName: {
+      value: control.value
+    }
+  };
+}
+
+// 使用自定义验证器
+this.userForm = this.fb.group({
+  username: ['', [
+    Validators.required,
+    forbiddenNameValidator(/admin/i)  // 不能使用 'admin' 作为用户名
+  ]]
+});
+
+// 3. 表单组级别的验证器
+function passwordsMatchValidator(formGroup: FormGroup): ValidationErrors | null {
+  const password = formGroup.get('password').value;
+  const confirmPassword = formGroup.get('confirmPassword').value;
+  
+  return password === confirmPassword ? null : { passwordsMismatch: true };
+}
+
+this.registrationForm = this.fb.group({
+  username: ['', Validators.required],
+  password: ['', [Validators.required, Validators.minLength(6)]],
+  confirmPassword: ['', Validators.required]
+}, { validators: passwordsMatchValidator });
+
+// 4. 异步验证器
+function uniqueUsernameValidator(userService: UserService): AsyncValidatorFn {
+  return (control: AbstractControl): Promise<ValidationErrors | null> | Observable<ValidationErrors | null> =\u003e {
+    return userService.checkUsernameAvailability(control.value).pipe(
+      map(isAvailable =\u003e isAvailable ? null : { usernameTaken: true }),
+      catchError(() =\u003e of(null))
+    );
+  };
+}
+
+this.userForm = this.fb.group({
+  username: ['', 
+    [Validators.required],  // 同步验证器
+    [uniqueUsernameValidator(this.userService)]  // 异步验证器
+  ]
+});
+
+// 5. 表单状态和错误处理
+@Component({
+  selector: 'app-form-validation',
+  template: `
+    \u003cform [formGroup]="loginForm" (ngSubmit)="onSubmit()"\u003e
+      \u003cdiv class="form-group"\u003e
+        \u003clabel for="username"\u003e用户名\u003c/label\u003e
+        \u003cinput 
+          type="text" 
+          id="username" 
+          formControlName="username" 
+          class="form-control"
+          [ngClass]="{ 'is-invalid': loginForm.get('username').invalid && loginForm.get('username').touched }"
+        \u003e
+        \u003cdiv *ngIf="loginForm.get('username').invalid && loginForm.get('username').touched" class="invalid-feedback"\u003e
+          \u003cdiv *ngIf="loginForm.get('username').errors.required"\u003e用户名是必填项\u003c/div\u003e
+          \u003cdiv *ngIf="loginForm.get('username').errors.minlength"\u003e用户名至少需要3个字符\u003c/div\u003e
+          \u003cdiv *ngIf="loginForm.get('username').errors.usernameTaken"\u003e用户名已被占用\u003c/div\u003e
+        \u003c/div\u003e
+      \u003c/div\u003e
+      \u003cbutton type="submit" [disabled]="loginForm.invalid || loginForm.pending"\u003e登录\u003c/button\u003e
+    \u003c/form\u003e
+  `
+})
+export class FormValidationComponent implements OnInit {
+  loginForm: FormGroup;
+  
+  constructor(private fb: FormBuilder, private userService: UserService) {}
+  
+  ngOnInit(): void {
+    this.loginForm = this.fb.group({
+      username: ['', 
+        [Validators.required, Validators.minLength(3)],
+        [uniqueUsernameValidator(this.userService)]
+      ],
+      password: ['', [Validators.required, Validators.minLength(6)]]
+    });
+  }
+  
+  onSubmit(): void {
+    if (this.loginForm.valid) {
+      // 处理表单提交
+    }
+  }
+}
+            \u003c/div\u003e
+            \u003c
+            \u003cbutton onclick="runFormsDemo()"\u003e运行表单演示\u003c/button\u003e
+            \u003cdiv id="formsResult" class="result"\u003e点击按钮查看表单演示结果...\u003c/div\u003e
+        \u003c/div\u003e
+    \u003c/div\u003e
+
+    \u003cscript\u003e
+        // 架构演示函数
+        function runArchitectureDemo() {
+            const resultDiv = document.getElementById('architectureResult');
+            const results = [
+                'Angular 应用架构核心概念:',
+                '',
+                '1. 模块（Modules）:',
+                '   - NgModule: 装饰器，定义模块的元数据',
+                '   - declarations: 声明模块中的组件、指令、管道',
+                '   - imports: 导入其他模块',
+                '   - providers: 注册服务提供者',
+                '   - bootstrap: 定义引导组件',
+                '',
+                '2. 组件（Components）:',
+                '   - @Component: 装饰器，定义组件配置',
+                '   - selector: 组件的 HTML 标签名',
+                '   - templateUrl: 组件模板文件路径',
+                '   - styleUrls: 组件样式文件路径',
+                '   - 组件类：包含组件的逻辑和状态',
+                '',
+                '3. 服务（Services）:',
+                '   - @Injectable: 装饰器，标记可注入的服务',
+                '   - 提供数据访问、业务逻辑等功能',
+                '   - 通过依赖注入系统使用',
+                '',
+                '4. 指令（Directives）:',
+                '   - @Directive: 装饰器，定义自定义指令',
+                '   - 结构指令: 如 *ngIf, *ngFor',
+                '   - 属性指令: 如 ngClass, ngStyle',
+                '',
+                '5. 管道（Pipes）:',
+                '   - @Pipe: 装饰器，定义数据转换管道',
+                '   - 用于在模板中转换数据显示格式',
+                '   - 内置管道: DatePipe, UpperCasePipe 等'
+            ];
+            resultDiv.textContent = results.join('\n');
+        }
+        
+        // 组件演示函数
+        function runComponentsDemo() {
+            const resultDiv = document.getElementById('componentsResult');
+            const results = [
+                'Angular 组件系统与生命周期:',
+                '',
+                '组件生命周期钩子顺序:',
+                '1. constructor: 组件实例化，注入依赖',
+                '2. ngOnChanges: 输入属性变化时调用',
+                '3. ngOnInit: 组件初始化，首次数据绑定后',
+                '4. ngDoCheck: 自定义变更检测',
+                '5. ngAfterContentInit: 内容投影初始化后',
+                '6. ngAfterContentChecked: 内容投影变更检测后',
+                '7. ngAfterViewInit: 视图初始化后',
+                '8. ngAfterViewChecked: 视图变更检测后',
+                '9. ngOnDestroy: 组件销毁前，清理资源',
+                '',
+                '组件通信方式:',
+                '- @Input: 父组件向子组件传递数据',
+                '- @Output: 子组件向父组件发送事件',
+                '- 服务共享: 通过共享服务实现非父子组件通信',
+                '- @ViewChild/@ContentChild: 获取子组件实例',
+                '- 依赖注入: 通过注入器访问服务和组件'
+            ];
+            resultDiv.textContent = results.join('\n');
+        }
+        
+        // 依赖注入演示函数
+        function runDIADemo() {
+            const resultDiv = document.getElementById('diaResult');
+            const results = [
+                'Angular 依赖注入系统:',
+                '',
+                '依赖注入核心概念:',
+                '1. 注入器（Injector）: 负责创建和管理依赖实例',
+                '2. 提供者（Provider）: 告诉注入器如何创建依赖',
+                '3. 依赖（Dependency）: 被注入的服务或对象',
+                '',
+                '提供者类型:',
+                '- useClass: 使用类提供依赖',
+                '- useValue: 使用常量值提供依赖',
+                '- useFactory: 使用工厂函数创建依赖',
+                '- useExisting: 为现有依赖创建别名',
+                '- InjectionToken: 用于注入非类依赖',
+                '',
+                '提供服务的方式:',
+                '1. @Injectable({ providedIn: \'root\' }): 根注入器',
+                '2. 在 NgModule 中通过 providers 数组提供',
+                '3. 在组件中通过 providers 属性提供',
+                '',
+                '依赖注入优势:',
+                '- 松耦合: 组件不直接创建依赖',
+                '- 可测试: 容易提供模拟依赖',
+                '- 可复用: 服务可以被多个组件共享',
+                '- 可维护: 依赖关系清晰'
+            ];
+            resultDiv.textContent = results.join('\n');
+        }
+        
+        // 路由演示函数
+        function runRoutingDemo() {
+            const resultDiv = document.getElementById('routingResult');
+            const results = [
+                'Angular 路由系统:',
+                '',
+                '路由配置类型:',
+                '- 基本路由: 简单的路径到组件映射',
+                '- 参数路由: 带参数的路径（如 /users/:id）',
+                '- 子路由: 嵌套路由配置',
+                '- 懒加载路由: 按需加载模块',
+                '- 通配符路由: 处理未匹配的路径',
+                '',
+                '路由功能:',
+                '- 路由导航: 声明式（routerLink）和编程式（router.navigate）',
+                '- 路由参数: 获取路径参数、查询参数和片段',
+                '- 路由守卫: 控制路由访问权限',
+                '- 路由解析器: 在路由激活前预加载数据',
+                '- 路由事件: 监听和响应路由变化',
+                '',
+                '路由守卫类型:',
+                '- CanActivate: 控制是否可以进入路由',
+                '- CanDeactivate: 控制是否可以离开路由',
+                '- CanActivateChild: 控制是否可以进入子路由',
+                '- CanLoad: 控制是否可以懒加载模块',
+                '- Resolve: 在路由激活前解析数据'
+            ];
+            resultDiv.textContent = results.join('\n');
+        }
+        
+        // 表单演示函数
+        function runFormsDemo() {
+            const resultDiv = document.getElementById('formsResult');
+            const results = [
+                'Angular 表单处理:',
+                '',
+                '表单类型对比:',
+                '模板驱动表单:',
+                '- 优势: 简单易用，类似 AngularJS',
+                '- 适合: 简单表单，快速开发',
+                '- 特点: 大部分逻辑在模板中',
+                '- 使用: ngModel 指令，NgForm 服务',
+                '',
+                '响应式表单:',
+                '- 优势: 更灵活，更好的类型支持，适合复杂表单',
+                '- 适合: 复杂表单，动态表单，需要单元测试',
+                '- 特点: 大部分逻辑在组件类中',
+                '- 使用: FormControl, FormGroup, FormBuilder',
+                '',
+                '表单验证:',
+                '- 内置验证器: required, minLength, maxLength, email, pattern 等',
+                '- 自定义验证器: 同步验证器和异步验证器',
+                '- 表单状态: pristine, dirty, touched, untouched, valid, invalid',
+                '- 错误处理: 显示验证错误消息，禁用提交按钮',
+                '',
+                '表单数据处理:',
+                '- 值变化订阅: valueChanges Observable',
+                '- 状态变化订阅: statusChanges Observable',
+                '- 表单重置: reset() 方法',
+                '- 表单提交: ngSubmit 事件'
+            ];
+            resultDiv.textContent = results.join('\n');
+        }
+        
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Angular 基础演示页面加载完成');
+        });
+    \u003c/script\u003e
+\u003c/body\u003e
+\u003c/html\u003e

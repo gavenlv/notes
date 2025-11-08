@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vue.js 框架基础详解</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+        
+        h1, h2, h3, h4 {
+            color: #2c3e50;
+        }
+        
+        h1 {
+            text-align: center;
+            border-bottom: 2px solid #4fc08d;
+            padding-bottom: 10px;
+            margin-bottom: 40px;
+        }
+        
+        h2 {
+            border-left: 4px solid #4fc08d;
+            padding-left: 15px;
+            margin-top: 50px;
+        }
+        
+        h3 {
+            color: #4fc08d;
+            margin-top: 30px;
+        }
+        
+        .container {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .code-block {
+            background-color: #282c34;
+            color: #abb2bf;
+            padding: 20px;
+            border-radius: 6px;
+            margin: 15px 0;
+            overflow-x: auto;
+            font-family: 'Courier New', Courier, monospace;
+            white-space: pre-wrap;
+            line-height: 1.5;
+        }
+        
+        .demo-section {
+            margin-bottom: 40px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 6px;
+        }
+        
+        button {
+            background-color: #4fc08d;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: #42b983;
+        }
+        
+        .result {
+            background-color: #e8f4f8;
+            border: 1px solid #b3e5fc;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 15px 0;
+            font-family: 'Courier New', Courier, monospace;
+        }
+        
+        .concept-box {
+            background-color: #f0f0f0;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 15px 0;
+            border-left: 4px solid #4fc08d;
+        }
+        
+        .comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .comparison-item {
+            padding: 15px;
+            border-radius: 6px;
+            border: 1px solid #ddd;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Vue.js 框架基础详解</h1>
+        
+        <div class="demo-section">
+            <h2>1. Vue.js 核心概念</h2>
+            <div class="concept-box">
+                <p>Vue.js 是一个渐进式 JavaScript 框架，用于构建用户界面。它具有以下特点：</p>
+                <ul>
+                    <li>渐进式：可以自底向上逐层应用，灵活选择使用范围</li>
+                    <li>响应式：自动追踪依赖并在数据变化时更新 DOM</li>
+                    <li>组件化：支持以可复用组件构建界面</li>
+                    <li>易于上手：学习曲线平缓，适合初学者和专业开发者</li>
+                </ul>
+            </div>
+            <
+            <h3>1.1 实例与数据绑定</h3>
+            <div class="code-block">
+// 创建 Vue 实例
+const app = new Vue({
+  el: '#app', // 挂载点
+  data: {
+    message: 'Hello Vue!',
+    count: 0
+  },
+  methods: {
+    increment() {
+      this.count++;
+    }
+  },
+  computed: {
+    reversedMessage() {
+      return this.message.split('').reverse().join('');
+    }
+  }
+});
+
+// Vue 3 写法
+const app3 = Vue.createApp({
+  data() {
+    return {
+      message: 'Hello Vue 3!',
+      count: 0
+    }
+  },
+  methods: {
+    increment() {
+      this.count++;
+    }
+  },
+  computed: {
+    reversedMessage() {
+      return this.message.split('').reverse().join('');
+    }
+  }
+});
+
+app3.mount('#app');
+            </div>
+            <
+            <h3>1.2 模板语法</h3>
+            <div class="code-block">
+<!-- 文本插值 -->
+<span>Message: {{ message }}</span>
+
+<!-- 使用 JavaScript 表达式 -->
+<span>计算: {{ count * 2 }}</span>
+<span>三元运算: {{ count > 0 ? 'Count is positive' : 'Count is zero' }}</span>
+
+<!-- HTML 特性绑定 -->
+<div v-bind:class="{ active: isActive }"></div>
+<div :class="{ active: isActive }">简写形式</div>
+
+<!-- 条件渲染 -->
+<div v-if="show">这是一个条件元素</div>
+<div v-else-if="isMedium">这是中等条件</div>
+<div v-else>这是默认条件</div>
+
+<!-- 列表渲染 -->
+<ul>
+  <li v-for="(item, index) in items" :key="item.id">
+    {{ index + 1 }} - {{ item.name }}
+  </li>
+</ul>
+
+<!-- 事件处理 -->
+<button v-on:click="increment">增加</button>
+<button @click="increment">简写形式</button>
+            </div>
+            <
+            <button onclick="runTemplateDemo()">运行模板语法演示</button>
+            <div id="templateResult" class="result">点击按钮查看模板语法演示结果...</div>
+        </div>
+        
+        <div class="demo-section">
+            <h2>2. Vue 实例与生命周期</h2>
+            <
+            <h3>2.1 Vue 实例属性与方法</h3>
+            <div class="code-block">
+const vm = new Vue({
+  // 实例挂载的 DOM 元素
+  el: '#app',
+  
+  // 实例数据
+  data: {
+    message: 'Hello Vue!',
+    user: {
+      name: 'Alice',
+      age: 30
+    }
+  },
+  
+  // 计算属性
+  computed: {
+    fullName() {
+      return this.user.name + ' Doe';
+    }
+  },
+  
+  // 监听器
+  watch: {
+    message(newVal, oldVal) {
+      console.log(`消息从 ${oldVal} 变为 ${newVal}`);
+    },
+    // 深度监听
+    user: {
+      handler(newUser, oldUser) {
+        console.log('用户信息已更新');
+      },
+      deep: true
+    }
+  },
+  
+  // 方法
+  methods: {
+    greet() {
+      console.log(this.message);
+    }
+  },
+  
+  // 生命周期钩子
+  beforeCreate() {
+    // 实例创建前，数据观测和事件配置尚未完成
+  },
+  created() {
+    // 实例创建后，数据观测完成，但尚未挂载
+  },
+  beforeMount() {
+    // 挂载开始前，编译模板
+  },
+  mounted() {
+    // 挂载完成，实例已经挂载到 DOM
+  },
+  beforeUpdate() {
+    // 数据更新前
+  },
+  updated() {
+    // 数据更新后，DOM 已重新渲染
+  },
+  beforeDestroy() {
+    // 实例销毁前
+  },
+  destroyed() {
+    // 实例销毁后
+  }
+});
+            </div>
+            <
+            <h3>2.2 Vue 3 生命周期</h3>
+            <div class="code-block">
+const app = Vue.createApp({
+  data() {
+    return {
+      message: 'Hello Vue 3!'
+    }
+  },
+  
+  // Vue 3 选项式 API 生命周期
+  beforeCreate() {
+    console.log('beforeCreate - Vue 3');
+  },
+  created() {
+    console.log('created - Vue 3');
+  },
+  beforeMount() {
+    console.log('beforeMount - Vue 3');
+  },
+  mounted() {
+    console.log('mounted - Vue 3');
+  },
+  beforeUpdate() {
+    console.log('beforeUpdate - Vue 3');
+  },
+  updated() {
+    console.log('updated - Vue 3');
+  },
+  beforeUnmount() {
+    console.log('beforeUnmount - Vue 3'); // 注意这里的变化
+  },
+  unmounted() {
+    console.log('unmounted - Vue 3'); // 注意这里的变化
+  }
+});
+
+// Vue 3 组合式 API 生命周期
+import { onBeforeMount, onMounted, onBeforeUpdate, onUpdated, onBeforeUnmount, onUnmounted } from 'vue';
+
+const appComposition = Vue.createApp({
+  setup() {
+    // 组件挂载前
+    onBeforeMount(() => {
+      console.log('组合式 API: 挂载前');
+    });
+    
+    // 组件挂载后
+    onMounted(() => {
+      console.log('组合式 API: 挂载后');
+    });
+    
+    // 组件更新前
+    onBeforeUpdate(() => {
+      console.log('组合式 API: 更新前');
+    });
+    
+    // 组件更新后
+    onUpdated(() => {
+      console.log('组合式 API: 更新后');
+    });
+    
+    // 组件卸载前
+    onBeforeUnmount(() => {
+      console.log('组合式 API: 卸载前');
+    });
+    
+    // 组件卸载后
+    onUnmounted(() => {
+      console.log('组合式 API: 卸载后');
+    });
+    
+    return {
+      message: 'Hello Vue 3 Composition API!'
+    };
+  }
+});
+            </div>
+            <
+            <button onclick="runLifecycleDemo()">运行生命周期演示</button>
+            <div id="lifecycleResult" class="result">点击按钮查看生命周期演示结果...</div>
+        </div>
+        
+        <div class="demo-section">
+            <h2>3. Vue 组件系统</h2>
+            <
+            <h3>3.1 组件注册</h3>
+            <div class="code-block">
+// 全局注册组件
+Vue.component('my-component', {
+  template: '<div>这是一个全局组件</div>',
+  props: ['title'],
+  data() {
+    return {
+      count: 0
+    }
+  },
+  methods: {
+    increment() {
+      this.count++;
+    }
+  }
+});
+
+// 局部注册组件
+const ChildComponent = {
+  template: '<div>这是一个局部组件 - {{ message }}</div>',
+  props: ['message']
+};
+
+const ParentComponent = {
+  template: `
+    <div>
+      <h2>父组件</h2>
+      <child-component :message="parentMessage" />
+    </div>
+  `,
+  data() {
+    return {
+      parentMessage: '来自父组件的消息'
+    }
+  },
+  components: {
+    'child-component': ChildComponent
+  }
+};
+
+// Vue 3 组件注册
+const app = Vue.createApp({
+  components: {
+    'child-component': ChildComponent
+  }
+});
+
+// Vue 3 全局注册
+app.component('global-component', {
+  template: '<div>Vue 3 全局组件</div>'
+});
+            </div>
+            <
+            <h3>3.2 组件通信</h3>
+            <div class="code-block">
+// 1. 父组件向子组件传递数据（Props）
+const ChildWithProps = {
+  template: `
+    <div>
+      <h3>子组件接收的 Props</h3>
+      <p>消息: {{ message }}</p>
+      <p>计数: {{ count }}</p>
+    </div>
+  `,
+  props: {
+    message: {
+      type: String,
+      default: '默认消息'
+    },
+    count: {
+      type: Number,
+      required: true,
+      validator: (value) => {
+        return value >= 0;
+      }
+    }
+  }
+};
+
+// 2. 子组件向父组件发送事件（自定义事件）
+const ChildWithEvents = {
+  template: `
+    <div>
+      <h3>子组件触发事件</h3>
+      <button @click="increment">增加计数</button>
+      <button @click="sendData">发送数据给父组件</button>
+    </div>
+  `,
+  methods: {
+    increment() {
+      // 触发自定义事件
+      this.$emit('increment');
+    },
+    sendData() {
+      // 触发自定义事件并传递数据
+      this.$emit('send-data', { name: 'Alice', age: 30 });
+    }
+  }
+};
+
+const ParentComponent = {
+  template: `
+    <div>
+      <h2>父组件接收事件</h2>
+      <p>父组件计数: {{ counter }}</p>
+      <p v-if="receivedData">收到的数据: {{ receivedData.name }}, {{ receivedData.age }}</p>
+      <child-with-events 
+        @increment="handleIncrement"
+        @send-data="handleReceiveData"
+      />
+    </div>
+  `,
+  data() {
+    return {
+      counter: 0,
+      receivedData: null
+    }
+  },
+  methods: {
+    handleIncrement() {
+      this.counter++;
+    },
+    handleReceiveData(data) {
+      this.receivedData = data;
+    }
+  },
+  components: {
+    'child-with-events': ChildWithEvents
+  }
+};
+
+// 3. 非父子组件通信 - Event Bus
+const bus = new Vue();
+
+// 发送事件的组件
+bus.$emit('custom-event', data);
+
+// 接收事件的组件
+bus.$on('custom-event', (data) => {
+  console.log('接收到事件:', data);
+});
+
+// Vue 3 中使用 mitt 或其他事件总线库
+import mitt from 'mitt';
+const emitter = mitt();
+
+emitter.emit('event', { data: 'some data' });
+emitter.on('event', (e) => console.log('Vue 3 事件:', e));
+            </div>
+            <
+            <button onclick="runComponentsDemo()">运行组件演示</button>
+            <div id="componentsResult" class="result">点击按钮查看组件演示结果...</div>
+        </div>
+        
+        <div class="demo-section">
+            <h2>4. Vue 3 Composition API</h2>
+            <
+            <h3>4.1 setup 函数</h3>
+            <div class="code-block">
+import { ref, reactive, computed, watch, onMounted } from 'vue';
+
+const CounterComponent = {
+  template: `
+    <div>
+      <h3>Composition API 计数器</h3>
+      <p>计数: {{ count }}</p>
+      <p>双倍计数: {{ doubleCount }}</p>
+      <button @click="increment">增加</button>
+      <button @click="decrement">减少</button>
+    </div>
+  `,
+  setup(props, { emit, slots, attrs }) {
+    // ref 用于创建响应式的基本类型
+    const count = ref(0);
+    
+    // reactive 用于创建响应式的对象或数组
+    const user = reactive({
+      name: 'Alice',
+      age: 30
+    });
+    
+    // 计算属性
+    const doubleCount = computed(() => count.value * 2);
+    
+    // 方法
+    function increment() {
+      count.value++;
+    }
+    
+    function decrement() {
+      count.value--;
+    }
+    
+    // 监听属性变化
+    watch(count, (newValue, oldValue) => {
+      console.log(`计数从 ${oldValue} 变为 ${newValue}`);
+    });
+    
+    // 生命周期钩子
+    onMounted(() => {
+      console.log('组件已挂载');
+    });
+    
+    // 返回模板中使用的数据和方法
+    return {
+      count,
+      user,
+      doubleCount,
+      increment,
+      decrement
+    };
+  }
+};
+            </div>
+            <
+            <h3>4.2 响应式系统 API</h3>
+            <div class="code-block">
+import { 
+  ref, reactive, computed, 
+  watch, watchEffect, 
+  toRefs, toRaw, isRef 
+} from 'vue';
+
+// 1. ref - 创建响应式引用
+const count = ref(0);
+console.log(count.value); // 访问值需要 .value
+
+// 2. reactive - 创建响应式对象
+const state = reactive({
+  name: 'Vue',
+  version: '3.0',
+  features: ['Composition API', 'Reactive System']
+});
+
+// 3. computed - 计算属性
+const displayName = computed(() => {
+  return `${state.name} ${state.version}`;
+});
+
+// 4. watch - 监听响应式数据变化
+watch(count, (newVal, oldVal) => {
+  console.log(`Count changed: ${oldVal} -> ${newVal}`);
+});
+
+// 监听多个值
+watch([count, () => state.name], ([newCount, newName], [oldCount, oldName]) => {
+  console.log(`Count: ${oldCount} -> ${newCount}`);
+  console.log(`Name: ${oldName} -> ${newName}`);
+});
+
+// 5. watchEffect - 自动追踪依赖的副作用
+watchEffect(() => {
+  console.log(`Count is: ${count.value}`);
+  console.log(`Name is: ${state.name}`);
+});
+
+// 6. toRefs - 将响应式对象转换为普通对象，其中每个属性都是 ref
+const stateRefs = toRefs(state);
+// 现在 stateRefs.name 是一个 ref，可以在模板中使用
+
+// 7. toRaw - 获取响应式对象的原始对象
+const rawState = toRaw(state);
+
+// 8. isRef - 检查值是否为 ref
+console.log(isRef(count)); // true
+            </div>
+            <
+            <button onclick="runCompositionDemo()">运行 Composition API 演示</button>
+            <div id="compositionResult" class="result">点击按钮查看 Composition API 演示结果...</div>
+        </div>
+        
+        <div class="demo-section">
+            <h2>5. Vue 指令与过滤器</h2>
+            <
+            <h3>5.1 内置指令</h3>
+            <div class="code-block">
+<!-- v-text - 更新元素的文本内容 -->
+<span v-text="message"></span>  <!-- 等价于 {{ message }} -->
+
+<!-- v-html - 更新元素的 innerHTML -->
+<div v-html="htmlContent"></div>
+
+<!-- v-show - 根据表达式的值切换元素的 display CSS 属性 -->
+<div v-show="isVisible">条件显示，不改变 DOM 结构</div>
+
+<!-- v-if - 根据表达式的值条件性地渲染元素 -->
+<div v-if="isLoggedIn">欢迎登录！</div>
+<div v-else>请登录...</div>
+
+<!-- v-for - 基于源数据多次渲染元素或模板块 -->
+<ul>
+  <li v-for="(item, index) in items" :key="item.id">
+    {{ index }} - {{ item.text }}
+  </li>
+</ul>
+
+<!-- v-on - 绑定事件监听器 -->
+<button v-on:click="handleClick">点击我</button>
+<button @click="handleClick">简写形式</button>
+
+<!-- v-bind - 动态地绑定一个或多个属性 -->
+<img v-bind:src="imageSrc">
+<img :src="imageSrc">  <!-- 简写形式 -->
+
+<!-- v-model - 在表单元素上创建双向数据绑定 -->
+<input v-model="message" placeholder="请输入...">
+<select v-model="selected">
+  <option value="A">选项 A</option>
+  <option value="B">选项 B</option>
+</select>
+
+<!-- v-once - 只渲染元素和组件一次 -->
+<span v-once>这个值只会更新一次: {{ message }}</span>
+
+<!-- v-pre - 跳过这个元素及其子元素的编译过程 -->
+<span v-pre>{{ 这里的内容不会被编译 }}</span>
+
+<!-- v-cloak - 防止页面加载时出现闪烁的表达式 -->
+<div v-cloak>{{ message }}</div>
+
+<!-- v-slot - 用于具名插槽或作用域插槽（Vue 2.6.0+） -->
+<template v-slot:header>
+  <h1>这是页面标题</h1>
+</template>
+<
+<template #footer>  <!-- 简写形式 -->
+  <p>这是页脚信息</p>
+</template>
+            </div>
+            <
+            <h3>5.2 自定义指令</h3>
+            <div class="code-block">
+// 全局自定义指令
+Vue.directive('focus', {
+  // 当被绑定的元素插入到 DOM 中时
+  inserted: function(el) {
+    // 聚焦元素
+    el.focus();
+  },
+  // 指令所在组件的 VNode 更新时
+  update: function(el, binding) {
+    // 可以响应式地更新指令行为
+    if (binding.value) {
+      el.focus();
+    }
+  }
+});
+
+// 使用自定义指令
+// <input v-focus />
+
+// 带参数的自定义指令
+Vue.directive('color', {
+  bind: function(el, binding) {
+    el.style.color = binding.value || 'red';
+  }
+});
+
+// 使用带参数的指令
+// <div v-color="'blue'">这是蓝色文本</div>
+
+// Vue 3 自定义指令
+const app = Vue.createApp({
+  // ...
+});
+
+app.directive('custom-focus', {
+  mounted(el, binding) {
+    if (binding.value) {
+      el.focus();
+    }
+  },
+  updated(el, binding) {
+    if (binding.value) {
+      el.focus();
+    }
+  }
+});
+
+// 局部自定义指令
+const ComponentWithDirective = {
+  directives: {
+    'local-focus': {
+      inserted(el) {
+        el.focus();
+      }
+    }
+  },
+  template: '<input v-local-focus />'
+};
+            </div>
+            <
+            <button onclick="runDirectivesDemo()">运行指令演示</button>
+            <div id="directivesResult" class="result">点击按钮查看指令演示结果...</div>
+        </div>
+    </div>
+
+    <script>
+        // 模板语法演示函数
+        function runTemplateDemo() {
+            const resultDiv = document.getElementById('templateResult');
+            const results = [
+                'Vue 模板语法特点:',
+                '',
+                '1. 文本插值:',
+                '   {{ message }} - 插入文本内容',
+                '   {{ count * 2 }} - 支持 JavaScript 表达式',
+                '',
+                '2. 指令系统:',
+                '   v-bind:attribute="value" 或 :attribute="value" - 属性绑定',
+                '   v-on:event="handler" 或 @event="handler" - 事件绑定',
+                '   v-if/v-else-if/v-else - 条件渲染',
+                '   v-for="item in items" - 列表渲染',
+                '   v-model="data" - 双向数据绑定',
+                '',
+                '3. 修饰符:',
+                '   @click.stop - 阻止冒泡',
+                '   @click.prevent - 阻止默认行为',
+                '   v-model.number - 转换为数字',
+                '   v-model.trim - 去除首尾空格',
+                '',
+                '4. 模板表达式限制:',
+                '   - 只能是单个表达式',
+                '   - 不能使用语句（如 if、for 等）',
+                '   - 不能修改原始数据'
+            ];
+            resultDiv.textContent = results.join('\n');
+        }
+        
+        // 生命周期演示函数
+        function runLifecycleDemo() {
+            const resultDiv = document.getElementById('lifecycleResult');
+            const results = [
+                'Vue 生命周期流程:',
+                '',
+                'Vue 2 生命周期:',
+                '1. 初始化阶段:',
+                '   - beforeCreate: 实例创建前，数据未初始化',
+                '   - created: 实例创建完成，数据已初始化，DOM 未挂载',
+                '',
+                '2. 挂载阶段:',
+                '   - beforeMount: 模板编译完成，DOM 未挂载',
+                '   - mounted: DOM 已挂载，可以访问 DOM 元素',
+                '',
+                '3. 更新阶段:',
+                '   - beforeUpdate: 数据更新前，DOM 未更新',
+                '   - updated: 数据更新完成，DOM 已更新',
+                '',
+                '4. 销毁阶段:',
+                '   - beforeDestroy: 实例销毁前，清理定时器等',
+                '   - destroyed: 实例已销毁',
+                '',
+                'Vue 3 生命周期变化:',
+                '   - beforeDestroy > beforeUnmount',
+                '   - destroyed > unmounted',
+                '   - 组合式 API 提供了相应的 onXXX 函数'
+            ];
+            resultDiv.textContent = results.join('\n');
+        }
+        
+        // 组件演示函数
+        function runComponentsDemo() {
+            const resultDiv = document.getElementById('componentsResult');
+            const results = [
+                'Vue 组件系统特点:',
+                '',
+                '1. 组件注册方式:',
+                '   - 全局注册: Vue.component(name, options)',
+                '   - 局部注册: 在组件选项中通过 components 对象注册',
+                '',
+                '2. 组件通信:',
+                '   - 父向子: props 传递数据',
+                '   - 子向父: $emit 触发自定义事件',
+                '   - 兄弟组件: Event Bus 或 Vuex/Pinia',
+                '   - 跨层级: Provide/Inject 或全局状态管理',
+                '',
+                '3. Props 验证:',
+                '   - type: 指定类型 (String, Number, Boolean 等)',
+                '   - required: 是否必填',
+                '   - default: 默认值',
+                '   - validator: 自定义验证函数',
+                '',
+                '4. 组件高级特性:',
+                '   - 插槽 (Slots): 分发内容',
+                '   - 动态组件: <component :is="componentName">',
+                '   - 异步组件: 按需加载'
+            ];
+            resultDiv.textContent = results.join('\n');
+        }
+        
+        // Composition API 演示函数
+        function runCompositionDemo() {
+            const resultDiv = document.getElementById('compositionResult');
+            const results = [
+                'Vue 3 Composition API 核心功能:',
+                '',
+                '1. 响应式 API:',
+                '   - ref(): 创建响应式引用 (适合基本类型)',
+                '   - reactive(): 创建响应式对象 (适合对象类型)',
+                '   - computed(): 创建计算属性',
+                '   - watch(): 监听响应式数据变化',
+                '   - watchEffect(): 自动追踪依赖的副作用',
+                '',
+                '2. setup() 函数:',
+                '   - 组件选项的入口点',
+                '   - 执行时机: beforeCreate 之后，created 之前',
+                '   - 接收 props 和 context 参数',
+                '   - 返回模板中使用的数据和方法',
+                '',
+                '3. 优势:',
+                '   - 更好的逻辑复用',
+                '   - 更好的类型推断',
+                '   - 更灵活的代码组织',
+                '   - 更小的生产包体积',
+                '',
+                '4. 与 Options API 对比:',
+                '   - Options API: 按选项类型组织代码',
+                '   - Composition API: 按逻辑关注点组织代码'
+            ];
+            resultDiv.textContent = results.join('\n');
+        }
+        
+        // 指令演示函数
+        function runDirectivesDemo() {
+            const resultDiv = document.getElementById('directivesResult');
+            const results = [
+                'Vue 指令系统:',
+                '',
+                '1. 常用内置指令:',
+                '   - v-text: 更新文本内容',
+                '   - v-html: 更新 HTML 内容',
+                '   - v-show: 条件显示 (基于 display CSS 属性)',
+                '   - v-if/v-else: 条件渲染 (基于 DOM 增删)',
+                '   - v-for: 列表渲染',
+                '   - v-on: 事件绑定',
+                '   - v-bind: 属性绑定',
+                '   - v-model: 双向数据绑定',
+                '',
+                '2. 自定义指令钩子函数:',
+                '   - bind: 指令绑定到元素时',
+                '   - inserted: 元素插入到父节点时',
+                '   - update: 元素更新时',
+                '   - componentUpdated: 组件更新完成时',
+                '   - unbind: 指令解绑时',
+                '',
+                '3. 指令参数和修饰符:',
+                '   - 参数: v-directive:arg',
+                '   - 修饰符: v-directive.modifier',
+                '   - 例如: v-on:click.stop.prevent'
+            ];
+            resultDiv.textContent = results.join('\n');
+        }
+        
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Vue.js 基础演示页面加载完成');
+        });
+    </script>
+</body>
+</html>
