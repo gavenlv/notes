@@ -47,8 +47,9 @@
 - [postgresql](data/postgresql/) - PostgreSQL关系型数据库 (待完成)
 - [python-data-quality](data/python-data-quality/) - Python数据质量工具 (待完成)
 - [rabbitmq](data/rabbitmq/) - RabbitMQ消息代理 (待完成)
-- [redis](data/redis/) - Redis内存数据库 (待完成)
+- [redis](data/redis/) - Redis内存数据库
 - [soda-data-quality](data/soda-data-quality/) - Soda数据质量工具 (待完成)
+- [spark](data/spark/README.md) - Apache Spark分布式计算框架
 
 ### 开发运维 (devops)
 - [ansible](devops/ansible/README.md) - Ansible自动化配置工具
@@ -65,6 +66,7 @@
 - [javascript](language/javascript/) - JavaScript编程语言 (待完成)
 - [powershell](language/powershell/) - PowerShell脚本语言 (待完成)
 - [python](language/python/) - Python编程语言 (待完成)
+- [scala](language/scala/) - Scala函数式编程语言
 - [shell](language/shell/) - Shell脚本语言 (待完成)
 - [sql](language/sql/) - SQL查询语言 (待完成)
 
@@ -86,26 +88,16 @@
 以下目录标记为"待完成"，表示目录已创建但内容尚未填充：
 
 - Interview/bi (待完成)
-- Interview/clickhouse (待完成)
 - Interview/frontend-interview (待完成)
 - Interview/softskill (待完成)
-- bi/birt (待完成)
 - bi/jasper (待完成)
 - bi/metabase (待完成)
 - bi/qlik_sense (待完成)
-- cloud/gcp (待完成)
-- data/dolphinscheduler (待完成)
-- data/doris (待完成)
 - data/kafka (待完成)
 - data/mongodb (待完成)
-- data/mysql (待完成)
 - data/postgresql (待完成)
 - data/python-data-quality (待完成)
-- data/rabbitmq (待完成)
-- data/redis (待完成)
 - data/soda-data-quality (待完成)
-- devops/jenkins (待完成)
-- language/css (待完成)
 - language/es6 (待完成)
 - language/java (待完成)
 - language/javascript (待完成)

@@ -14,18 +14,163 @@
 
 ### 3.1.2 软件要求
 
-| 组件 | 最低版本 | 推荐版本 |
-|------|---------|---------|
-| Java | JDK 8 | JDK 11 |
-| Python | 3.6 | 3.8+ |
-| Scala | 2.11 | 2.12/2.13 |
-| Hadoop | 2.7 | 3.x |
+| 平台 | 组件 | 最低版本 | 推荐版本 |
+|------|------|---------|---------|
+| 通用 | Java | JDK 8 | JDK 11 |
+| Linux | Python | 3.6 | 3.8+ |
+| Windows | Python | 3.6 | 3.8+ |
+| macOS | Python | 3.6 | 3.8+ |
+| 通用 | Scala | 2.11 | 2.12/2.13 |
+| 通用 | Hadoop | 2.7 | 3.x |
+| Windows | WSL | - | 最新版 |
+| Windows | Git | 2.x | 最新版 |
+
+### 3.1.3 Windows环境额外要求
+
+Windows环境下安装Spark需要额外考虑以下几点：
+
+1. **Windows Subsystem for Linux (WSL)**：推荐安装WSL 2，提供更好的Linux兼容性
+2. **Java Development Kit (JDK)**：确保Java正确安装并配置环境变量
+3. **Python环境**：可通过Anaconda、Python官方安装包或包管理器安装
+4. **Hadoop依赖**：Windows下需要特殊的winutils.exe工具
+
+| 组件 | 说明 | 下载地址 |
+|------|------|---------|
+| JDK 11 | Java开发环境 | https://adoptium.net |
+| Python 3.8+ | Python运行环境 | https://python.org |
+| Anaconda | Python发行版 | https://anaconda.com |
+| winutils.exe | Hadoop Windows工具 | https://github.com/cdarlint/winutils |
+| WSL 2 | Windows Linux子系统 | https://learn.microsoft.com/windows/wsl |
 
 ## 3.2 本地模式安装
 
 本地模式是最简单的安装方式，适合学习和开发。
 
-### 3.2.1 下载和解压Spark
+### 3.2.1 Linux/macOS下载和解压Spark
+
+```bash
+# code/installation/download_spark.sh
+#!/bin/bash
+
+# 下载Spark
+cd /opt
+wget https://archive.apache.org/dist/spark/spark-3.4.0/spark-3.4.0-bin-hadoop3.tgz
+
+# 解压
+tar -xzf spark-3.4.0-bin-hadoop3.tgz
+ln -s spark-3.4.0-bin-hadoop3 spark
+
+# 设置权限
+chmod -R 755 spark
+```
+
+### 3.2.2 Windows下载和解压Spark
+
+#### 3.2.2.1 直接下载和安装
+
+```powershell
+# code/installation/download_spark_windows.ps1
+# 使用PowerShell下载和安装Spark
+
+# 创建安装目录
+$sparkInstallDir = "C:\spark"
+if (!(Test-Path -Path $sparkInstallDir)) {
+    New-Item -ItemType Directory -Path $sparkInstallDir
+}
+
+# 下载Spark
+$sparkVersion = "3.4.0"
+$sparkUrl = "https://archive.apache.org/dist/spark/spark-$sparkVersion/spark-$sparkVersion-bin-hadoop3.tgz"
+$sparkZip = "$sparkInstallDir\spark-$sparkVersion-bin-hadoop3.tgz"
+
+Invoke-WebRequest -Uri $sparkUrl -OutFile $sparkZip
+
+# 解压Spark (需要7-Zip或使用PowerShell扩展功能)
+# 如果已安装7-Zip，可以使用:
+# & "C:\Program Files\7-Zip\7z.exe" x $sparkZip -o"$sparkInstallDir"
+
+# 使用PowerShell解压 (需要.NET Framework 4.5+)
+Add-Type -AssemblyName System.IO.Compression.FileSystem
+[System.IO.Compression.ZipFile]::ExtractToDirectory($sparkZip, $sparkInstallDir)
+
+# 创建软链接或重命名目录
+$extractedFolder = "$sparkInstallDir\spark-$sparkVersion-bin-hadoop3"
+if (!(Test-Path -Path "$sparkInstallDir\spark")) {
+    if (Test-Path -Path $extractedFolder) {
+        Rename-Item -Path $extractedFolder -NewName "spark"
+    }
+}
+
+Write-Host "Spark installed successfully at $sparkInstallDir\spark"
+```
+
+#### 3.2.2.2 使用包管理器安装
+
+```powershell
+# 使用Chocolatey安装 (需要先安装Chocolatey)
+choco install spark
+
+# 使用Scoop安装 (需要先安装Scoop)
+scoop install spark
+```
+
+#### 3.2.2.3 Windows环境配置
+
+```powershell
+# code/installation/setup_env_windows.ps1
+# Windows环境变量设置
+
+# 设置Spark环境变量
+$sparkHome = "C:\spark"
+[Environment]::SetEnvironmentVariable("SPARK_HOME", $sparkHome, "User")
+
+# 将Spark添加到PATH
+$path = [Environment]::GetEnvironmentVariable("PATH", "User")
+$newPath = "$path;$sparkHome\bin"
+[Environment]::SetEnvironmentVariable("PATH", $newPath, "User")
+
+# 设置Hadoop环境变量（Windows下需要）
+$hadoopHome = "$sparkHome"
+[Environment]::SetEnvironmentVariable("HADOOP_HOME", $hadoopHome, "User")
+
+# 设置Python环境
+$pythonPath = (Get-Command python).Source
+[Environment]::SetEnvironmentVariable("PYSPARK_PYTHON", $pythonPath, "User")
+
+Write-Host "Environment variables set. Please restart PowerShell to apply changes."
+```
+
+#### 3.2.2.4 安装winutils
+
+```powershell
+# code/installation/install_winutils.ps1
+# 下载和安装winutils (Hadoop Windows工具)
+
+# 创建Hadoop bin目录
+$hadoopBinDir = "C:\spark\hadoop\bin"
+if (!(Test-Path -Path $hadoopBinDir)) {
+    New-Item -ItemType Directory -Path $hadoopBinDir -Force
+}
+
+# 下载winutils.exe
+$winutilsUrl = "https://github.com/cdarlint/winutils/raw/master/hadoop-3.0.0/bin/winutils.exe"
+$winutilsPath = "$hadoopBinDir\winutils.exe"
+
+Invoke-WebRequest -Uri $winutilsUrl -OutFile $winutilsPath
+
+# 下载hadoop.dll
+$hadoopDllUrl = "https://github.com/cdarlint/winutils/raw/master/hadoop-3.0.0/bin/hadoop.dll"
+$hadoopDllPath = "$hadoopBinDir\hadoop.dll"
+
+Invoke-WebRequest -Uri $hadoopDllUrl -OutFile $hadoopDllPath
+
+Write-Host "winutils installed successfully at $hadoopBinDir"
+```
+
+### 3.2.3 配置环境变量 (Linux/macOS)
+
+```bash
+# code/installation/setup_env.sh
 
 ```bash
 # code/installation/download_spark.sh
@@ -58,7 +203,7 @@ echo 'export PYSPARK_PYTHON=/usr/bin/python3' >> ~/.bashrc
 source ~/.bashrc
 ```
 
-### 3.2.3 验证安装
+### 3.2.5 验证安装 (Linux/macOS)
 
 ```bash
 # code/installation/verify_installation.sh
@@ -73,6 +218,84 @@ spark-submit $SPARK_HOME/examples/src/main/python/pi.py 10
 # 启动Spark Shell
 spark-shell --version
 pyspark --version
+```
+
+### 3.2.6 验证安装 (Windows)
+
+```powershell
+# code/installation/verify_installation_windows.ps1
+# Windows环境验证Spark安装
+
+# 验证Spark版本
+C:\spark\bin\spark-submit.cmd --version
+
+# 运行示例程序
+C:\spark\bin\spark-submit.cmd C:\spark\examples\src\main\python\pi.py 10
+
+# 验证Spark Shell
+C:\spark\bin\spark-shell.cmd --version
+C:\spark\bin\pyspark.cmd --version
+
+Write-Host "Spark installation verified successfully!"
+```
+
+### 3.2.7 使用WSL 2安装Spark (Windows推荐方法)
+
+对于Windows用户，使用WSL 2可以提供更接近原生Linux的体验，避免了Windows环境下的许多兼容性问题。
+
+#### 3.2.7.1 安装WSL 2
+
+```powershell
+# 以管理员身份运行PowerShell，执行以下命令安装WSL
+wsl --install
+
+# 重启计算机后，配置Ubuntu (或其他Linux发行版)
+# 在WSL终端中执行:
+sudo apt update && sudo apt upgrade -y
+sudo apt install -y openjdk-11-jdk python3 python3-pip scala wget curl
+```
+
+#### 3.2.7.2 在WSL中安装Spark
+
+```bash
+# code/installation/install_spark_wsl.sh
+#!/bin/bash
+
+# 在WSL环境中安装Spark
+
+# 创建安装目录
+sudo mkdir -p /opt/spark
+sudo chown $USER:$USER /opt/spark
+
+# 下载Spark
+cd /opt/spark
+wget https://archive.apache.org/dist/spark/spark-3.4.0/spark-3.4.0-bin-hadoop3.tgz
+
+# 解压
+tar -xzf spark-3.4.0-bin-hadoop3.tgz
+ln -s spark-3.4.0-bin-hadoop3 spark
+
+# 设置环境变量
+echo 'export SPARK_HOME=/opt/spark/spark' >> ~/.bashrc
+echo 'export PATH=$PATH:$SPARK_HOME/bin:$SPARK_HOME/sbin' >> ~/.bashrc
+echo 'export PYSPARK_PYTHON=/usr/bin/python3' >> ~/.bashrc
+
+# 应用环境变量
+source ~/.bashrc
+
+# 验证安装
+$SPARK_HOME/bin/spark-submit --version
+echo "Spark installed successfully in WSL!"
+```
+
+#### 3.2.7.3 配置WSL访问Windows文件系统
+
+```bash
+# 在WSL中创建Windows文件访问软链接
+ln -s /mnt/c/workspace /workspace
+
+# 测试访问Windows文件系统
+ls -la /mnt/c/
 ```
 
 ## 3.3 集群模式安装
@@ -292,9 +515,229 @@ $SPARK_HOME/bin/spark-submit \
   10
 ```
 
-## 3.4 开发环境配置
+## 3.4 Windows开发环境配置
 
-### 3.4.1 IntelliJ IDEA配置
+### 3.4.1 Windows PowerShell配置
+
+```powershell
+# code/installation/windows/powershell_config.ps1
+# PowerShell配置文件 ($PROFILE)
+
+# 创建Profile文件
+if (!(Test-Path -Path $PROFILE)) {
+    New-Item -ItemType File -Path $PROFILE -Force
+}
+
+# 添加Spark环境变量
+@"
+# Spark Environment Variables
+`$env:SPARK_HOME = "C:\spark"
+`$env:HADOOP_HOME = "C:\spark"
+`$env:PYSPARK_PYTHON = "python"
+`$env:JAVA_HOME = (Get-Command java).Source | Split-Path -Parent
+`$env:PATH = "`$env:PATH;`$env:SPARK_HOME\bin;`$env:JAVA_HOME\bin"
+
+# Spark Aliases
+function Run-PySpark { & "$env:SPARK_HOME\bin\pyspark.cmd" $args }
+function Run-SparkShell { & "$env:SPARK_HOME\bin\spark-shell.cmd" $args }
+function Run-SparkSubmit { & "$env:SPARK_HOME\bin\spark-submit.cmd" $args }
+
+Set-Alias -Name pyspark -Value Run-PySpark
+Set-Alias -Name spark-shell -Value Run-SparkShell
+Set-Alias -Name spark-submit -Value Run-SparkSubmit
+"@ | Out-File -FilePath $PROFILE -Append
+
+Write-Host "PowerShell profile configured. Restart PowerShell to apply changes."
+```
+
+### 3.4.2 Windows Anaconda配置
+
+```powershell
+# code/installation/windows/anaconda_config.ps1
+# Anaconda环境配置
+
+# 创建Spark专用的Conda环境
+conda create -n pyspark python=3.8 -y
+
+# 激活环境
+conda activate pyspark
+
+# 安装PySpark及相关依赖
+pip install pyspark=3.4.0
+pip install pyarrow findspark jupyterlab
+
+# 配置环境变量
+$condaEnvPath = conda info --envs | Select-String "pyspark" | ForEach-Object { ($_ -split '\s+')[1] }
+@"
+# Spark Environment Variables for Anaconda
+`$env:SPARK_HOME = "C:\spark"
+`$env:PYSPARK_PYTHON = "$condaEnvPath\python.exe"
+`$env:JAVA_HOME = (Get-Command java).Source | Split-Path -Parent
+`$env:PATH = "`$env:PATH;`$env:SPARK_HOME\bin;`$env:JAVA_HOME\bin"
+"@ | Out-File -FilePath "$condaEnvPath\etc\conda\activate.d\env_vars.bat" -Encoding Ascii
+
+Write-Host "Anaconda environment for PySpark configured successfully."
+```
+
+### 3.4.3 Windows Jupyter Notebook配置
+
+```python
+# code/installation/windows/jupyter_config.py
+# Windows Jupyter Notebook Spark配置
+
+import os
+import sys
+import subprocess
+
+# 设置Spark路径
+spark_home = r"C:\spark"
+os.environ['SPARK_HOME'] = spark_home
+
+# 查找Python路径
+python_path = sys.executable
+os.environ['PYSPARK_PYTHON'] = python_path
+
+# 添加PySpark到Python路径
+pyspark_path = os.path.join(spark_home, 'python')
+sys.path.insert(0, pyspark_path)
+
+# 查找Py4J JAR文件
+import glob
+py4j_files = glob.glob(os.path.join(pyspark_path, 'lib', 'py4j-*.jar'))
+if py4j_files:
+    sys.path.insert(0, py4j_files[0])
+
+# 创建Jupyter内核配置
+kernel_name = "pyspark"
+kernel_dir = os.path.join(os.path.expanduser("~"), "AppData", "Roaming", "jupyter", "kernels", kernel_name)
+
+if not os.path.exists(kernel_dir):
+    os.makedirs(kernel_dir)
+
+kernel_json = {
+    "argv": [
+        python_path, "-m", "ipykernel_launcher",
+        "-f", "{connection_file}"
+    ],
+    "display_name": "PySpark (Spark 3.4)",
+    "language": "python",
+    "env": {
+        "SPARK_HOME": spark_home,
+        "PYSPARK_PYTHON": python_path,
+        "PYTHONPATH": os.pathsep.join([pyspark_path] + py4j_files),
+        "JAVA_HOME": subprocess.check_output(["where", "java"], text=True).split("
+")[0].strip()
+    }
+}
+
+import json
+with open(os.path.join(kernel_dir, "kernel.json"), "w") as f:
+    json.dump(kernel_json, f, indent=2)
+
+print("Jupyter kernel for PySpark configured successfully!")
+print(f"Kernel installed at: {kernel_dir}")
+print("Restart Jupyter to use the new kernel.")
+```
+
+### 3.4.4 Windows VS Code配置
+
+```json
+// code/installation/windows/vscode_settings.json
+// VS Code工作区设置
+
+{
+    "python.defaultInterpreterPath": "C:\\path\\to\\your\\python\\env\\python.exe",
+    "python.terminal.activateEnvironment": true,
+    "python.envFile": "${workspaceFolder}/.env",
+    "files.associations": {
+        "*.py": "python"
+    },
+    "python.analysis.typeCheckingMode": "basic",
+    "jupyter.askForKernelRestart": false,
+    "python.testing.pytestEnabled": true,
+    "python.testing.unittestEnabled": false
+}
+```
+
+```python
+# code/installation/windows/test_spark.py
+# VS Code中测试Spark环境的简单脚本
+
+import os
+import sys
+
+# 添加Spark路径
+spark_home = os.environ.get('SPARK_HOME', 'C:\\spark')
+sys.path.insert(0, os.path.join(spark_home, 'python'))
+
+# 添加Py4J路径
+import glob
+py4j_files = glob.glob(os.path.join(spark_home, 'python', 'lib', 'py4j-*.jar'))
+if py4j_files:
+    sys.path.insert(0, py4j_files[0])
+
+try:
+    from pyspark.sql import SparkSession
+    
+    # 创建Spark会话
+    spark = SparkSession.builder \
+        .appName("VS Code Test") \
+        .config("spark.driver.memory", "1g") \
+        .config("spark.sql.warehouse.dir", "file:///C:/temp/spark-warehouse") \
+        .getOrCreate()
+    
+    # 测试创建DataFrame
+    df = spark.createDataFrame([(1, "test1"), (2, "test2")], ["id", "value"])
+    df.show()
+    
+    # 停止Spark会话
+    spark.stop()
+    
+    print("Spark is working correctly in VS Code!")
+    
+except Exception as e:
+    print(f"Error setting up Spark in VS Code: {e}")
+```
+
+### 3.4.5 Windows批处理脚本
+
+```batch
+@echo off
+REM code/installation/windows/spark_env.bat
+REM Windows批处理脚本设置Spark环境
+
+REM 设置Spark环境变量
+set SPARK_HOME=C:\spark
+set HADOOP_HOME=C:\spark
+set JAVA_HOME=C:\Program Files\Java\jdk-11
+
+REM 设置Python路径
+set PYSPARK_PYTHON=python
+
+REM 更新PATH
+set PATH=%PATH%;%SPARK_HOME%\bin;%JAVA_HOME%\bin
+
+REM 显示当前环境变量
+echo SPARK_HOME: %SPARK_HOME%
+echo JAVA_HOME: %JAVA_HOME%
+echo PYSPARK_PYTHON: %PYSPARK_PYTHON%
+```
+
+```batch
+@echo off
+REM code/installation/windows/run_pyspark.bat
+REM 启动PySpark的批处理脚本
+
+REM 设置环境
+call spark_env.bat
+
+REM 启动PySpark
+%SPARK_HOME%\bin\pyspark.cmd
+```
+
+## 3.5 开发环境配置
+
+### 3.5.1 IntelliJ IDEA配置
 
 #### 3.4.1.1 Scala开发环境
 

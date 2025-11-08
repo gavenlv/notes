@@ -1,0 +1,9 @@
+redis>=4.5.0
+msgpack>=1.0.0
+pytest>=7.0.0
+pytest-asyncio>=0.20.0
+pytest-benchmark>=4.0.0
+
+# 可选依赖（用于高级功能）
+# hiredis>=2.0.0  # 高性能Redis客户端
+# redis-py-cluster>=2.1.0  # Redis集群支持

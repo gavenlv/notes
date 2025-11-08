@@ -7,30 +7,14 @@
 ```
 language/scala/
 ├── README.md                    # 本文件
-├── chapter1/                    # 第1章：Scala基础入门
-│   ├── README.md
-│   └── code/
-├── chapter2/                    # 第2章：函数式编程基础
-│   ├── README.md
-│   └── code/
-├── chapter3/                    # 第3章：面向对象编程
-│   ├── README.md
-│   └── code/
-├── chapter4/                    # 第4章：集合框架
-│   ├── README.md
-│   └── code/
-├── chapter5/                    # 第5章：高级特性
-│   ├── README.md
-│   └── code/
-├── chapter6/                    # 第6章：并发编程
-│   ├── README.md
-│   └── code/
-├── chapter7/                    # 第7章：类型系统深入
-│   ├── README.md
-│   └── code/
-├── chapter8/                    # 第8章：实战项目
-│   ├── README.md
-│   └── code/
+├── 1_scala_basics.md            # 第1章：Scala基础入门
+├── 2_functional_programming.md  # 第2章：函数式编程基础
+├── 3_object_oriented_programming.md  # 第3章：面向对象编程
+├── 4_collections_framework.md   # 第4章：集合框架
+├── 5_advanced_features.md       # 第5章：高级特性
+├── 6_concurrent_programming.md  # 第6章：并发编程
+├── 7_type_system.md             # 第7章：类型系统深入
+├── 8_practical_project.md       # 第8章：实战项目
 ├── code/                        # 所有可运行代码
 │   ├── build.sbt
 │   ├── src/
@@ -86,50 +70,50 @@ sbt sbtVersion
 
 ## 📖 学习路径
 
-### 第1章：Scala基础入门
+### [第1章：Scala基础入门](1_scala_basics.md)
 - Scala语言概述
 - 变量和数据类型
 - 控制结构
 - 函数定义
 - 基础I/O操作
 
-### 第2章：函数式编程基础
+### [第2章：函数式编程基础](2_functional_programming.md)
 - 不可变性与纯函数
 - 高阶函数
 - 模式匹配
 - 递归与尾递归优化
 
-### 第3章：面向对象编程
+### [第3章：面向对象编程](3_object_oriented_programming.md)
 - 类和对象
 - 继承和多态
 - 特质（Traits）
 - 伴生对象
 
-### 第4章：集合框架
+### [第4章：集合框架](4_collections_framework.md)
 - 不可变集合
 - 可变集合
 - 集合操作
 - 性能分析
 
-### 第5章：高级特性
+### [第5章：高级特性](5_advanced_features.md)
 - 隐式转换
 - 类型类
 - 上下文边界
 - 宏编程基础
 
-### 第6章：并发编程
+### [第6章：并发编程](6_concurrent_programming.md)
 - Future和Promise
 - Akka Actor模型
 - 并发集合
 - 异步编程模式
 
-### 第7章：类型系统深入
+### [第7章：类型系统深入](7_type_system.md)
 - 类型推断
 - 泛型编程
 - 路径依赖类型
 - 类型类模式
 
-### 第8章：实战项目
+### [第8章：实战项目](8_practical_project.md)
 - Web应用开发
 - 数据处理管道
 - 微服务架构
@@ -157,7 +141,7 @@ sbt sbtVersion
 ### 运行单个示例
 ```bash
 cd code/
-sbt "runMain chapter1.HelloWorld"
+sbt "runMain 01-scala-basics.HelloWorld"
 ```
 
 ### 运行所有测试
