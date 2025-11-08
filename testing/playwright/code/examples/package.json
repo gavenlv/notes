@@ -1,0 +1,36 @@
+{
+  "name": "playwright-codegen-examples",
+  "version": "1.0.0",
+  "description": "Playwright CodeGen扩展示例和演示",
+  "main": "codegen-demo.js",
+  "scripts": {
+    "demo": "node codegen-demo.js",
+    "advanced": "node codegen-advanced-demo.js",
+    "workflow": "node codegen-workflow.js",
+    "integration": "node codegen-integration-demo.js",
+    "best-practices": "node codegen-best-practices.js",
+    "troubleshooting": "node codegen-troubleshooting.js",
+    "runner": "node codegen-demo-runner.js",
+    "test": "npx playwright test",
+    "codegen": "npx playwright codegen",
+    "codegen:mobile": "npx playwright codegen --device='iPhone 12'",
+    "codegen:tablet": "npx playwright codegen --device='iPad Pro'",
+    "codegen:debug": "npx playwright codegen --debug",
+    "all": "node run-all-demos.js"
+  },
+  "keywords": [
+    "playwright",
+    "codegen",
+    "testing",
+    "automation",
+    "browser-testing"
+  ],
+  "author": "Playwright CodeGen 扩展专题",
+  "license": "MIT",
+  "devDependencies": {
+    "@playwright/test": "^1.40.0"
+  },
+  "dependencies": {
+    "playwright": "^1.40.0"
+  }
+}

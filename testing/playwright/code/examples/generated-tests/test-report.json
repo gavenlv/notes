@@ -1,0 +1,269 @@
+{
+  "timestamp": "2025-11-08T01:23:16.715Z",
+  "summary": {
+    "total": 43,
+    "successful": 0,
+    "failed": 43
+  },
+  "details": [
+    {
+      "name": "ecommerce-desktop-development-homepage",
+      "success": false,
+      "error": "Command failed: npx playwright codegen https://demo.ecommerce.com --output=./generated-tests/ecommerce-desktop-development-homepage-1762564963610.spec.js --viewport=1920,1080 --slow-mo=500",
+      "timestamp": "2025-11-08T01:23:16.716Z"
+    },
+    {
+      "name": "ecommerce-desktop-development-product-list",
+      "success": false,
+      "error": "Command failed: npx playwright codegen https://demo.ecommerce.com/products --output=./generated-tests/ecommerce-desktop-development-product-list-1762564963610.spec.js --viewport=1920,1080 --slow-mo=500",
+      "timestamp": "2025-11-08T01:23:16.716Z"
+    },
+    {
+      "name": "ecommerce-desktop-development-product-detail",
+      "success": false,
+      "error": "Command failed: npx playwright codegen https://demo.ecommerce.com/product/1 --output=./generated-tests/ecommerce-desktop-development-product-detail-1762564963610.spec.js --viewport=1920,1080 --slow-mo=500",
+      "timestamp": "2025-11-08T01:23:16.716Z"
+    },
+    {
+      "name": "ecommerce-desktop-development-cart",
+      "success": false,
+      "error": "Command failed: npx playwright codegen https://demo.ecommerce.com/cart --output=./generated-tests/ecommerce-desktop-development-cart-1762564963610.spec.js --viewport=1920,1080 --slow-mo=500",
+      "timestamp": "2025-11-08T01:23:16.716Z"
+    },
+    {
+      "name": "ecommerce-desktop-development-checkout",
+      "success": false,
+      "error": "Command failed: npx playwright codegen https://demo.ecommerce.com/checkout --output=./generated-tests/ecommerce-desktop-development-checkout-1762564963610.spec.js --viewport=1920,1080 --slow-mo=500",
+      "timestamp": "2025-11-08T01:23:16.716Z"
+    },
+    {
+      "name": "ecommerce-desktop-staging-homepage",
+      "success": false,
+      "error": "Command failed: npx playwright codegen https://demo.ecommerce.com --output=./generated-tests/ecommerce-desktop-staging-homepage-1762564963610.spec.js --viewport=1920,1080",
+      "timestamp": "2025-11-08T01:23:16.716Z"
+    },
+    {
+      "name": "ecommerce-desktop-staging-product-list",
+      "success": false,
+      "error": "Command failed: npx playwright codegen https://demo.ecommerce.com/products --output=./generated-tests/ecommerce-desktop-staging-product-list-1762564963610.spec.js --viewport=1920,1080",
+      "timestamp": "2025-11-08T01:23:16.716Z"
+    },
+    {
+      "name": "ecommerce-desktop-staging-product-detail",
+      "success": false,
+      "error": "Command failed: npx playwright codegen https://demo.ecommerce.com/product/1 --output=./generated-tests/ecommerce-desktop-staging-product-detail-1762564963610.spec.js --viewport=1920,1080",
+      "timestamp": "2025-11-08T01:23:16.716Z"
+    },
+    {
+      "name": "ecommerce-desktop-staging-cart",
+      "success": false,
+      "error": "Command failed: npx playwright codegen https://demo.ecommerce.com/cart --output=./generated-tests/ecommerce-desktop-staging-cart-1762564963610.spec.js --viewport=1920,1080",
+      "timestamp": "2025-11-08T01:23:16.716Z"
+    },
+    {
+      "name": "ecommerce-desktop-staging-checkout",
+      "success": false,
+      "error": "Command failed: npx playwright codegen https://demo.ecommerce.com/checkout --output=./generated-tests/ecommerce-desktop-staging-checkout-1762564963610.spec.js --viewport=1920,1080",
+      "timestamp": "2025-11-08T01:23:16.716Z"
+    },
+    {
+      "name": "ecommerce-iPhone 12-development-homepage",
+      "success": false,
+      "error": "Command failed: npx playwright codegen https://demo.ecommerce.com --output=./generated-tests/ecommerce-iPhone 12-development-homepage-1762564963610.spec.js --device=iPhone 12 --slow-mo=500",
+      "timestamp": "2025-11-08T01:23:16.716Z"
+    },
+    {
+      "name": "ecommerce-iPhone 12-development-product-list",
+      "success": false,
+      "error": "Command failed: npx playwright codegen https://demo.ecommerce.com/products --output=./generated-tests/ecommerce-iPhone 12-development-product-list-1762564963610.spec.js --device=iPhone 12 --slow-mo=500",
+      "timestamp": "2025-11-08T01:23:16.716Z"
+    },
+    {
+      "name": "ecommerce-iPhone 12-development-product-detail",
+      "success": false,
+      "error": "Command failed: npx playwright codegen https://demo.ecommerce.com/product/1 --output=./generated-tests/ecommerce-iPhone 12-development-product-detail-1762564963610.spec.js --device=iPhone 12 --slow-mo=500",
+      "timestamp": "2025-11-08T01:23:16.716Z"
+    },
+    {
+      "name": "ecommerce-iPhone 12-development-cart",
+      "success": false,
+      "error": "Command failed: npx playwright codegen https://demo.ecommerce.com/cart --output=./generated-tests/ecommerce-iPhone 12-development-cart-1762564963610.spec.js --device=iPhone 12 --slow-mo=500",
+      "timestamp": "2025-11-08T01:23:16.716Z"
+    },
+    {
+      "name": "ecommerce-iPhone 12-development-checkout",
+      "success": false,
+      "error": "Command failed: npx playwright codegen https://demo.ecommerce.com/checkout --output=./generated-tests/ecommerce-iPhone 12-development-checkout-1762564963610.spec.js --device=iPhone 12 --slow-mo=500",
+      "timestamp": "2025-11-08T01:23:16.716Z"
+    },
+    {
+      "name": "ecommerce-iPhone 12-staging-homepage",
+      "success": false,
+      "error": "Command failed: npx playwright codegen https://demo.ecommerce.com --output=./generated-tests/ecommerce-iPhone 12-staging-homepage-1762564963610.spec.js --device=iPhone 12",
+      "timestamp": "2025-11-08T01:23:16.716Z"
+    },
+    {
+      "name": "ecommerce-iPhone 12-staging-product-list",
+      "success": false,
+      "error": "Command failed: npx playwright codegen https://demo.ecommerce.com/products --output=./generated-tests/ecommerce-iPhone 12-staging-product-list-1762564963610.spec.js --device=iPhone 12",
+      "timestamp": "2025-11-08T01:23:16.716Z"
+    },
+    {
+      "name": "ecommerce-iPhone 12-staging-product-detail",
+      "success": false,
+      "error": "Command failed: npx playwright codegen https://demo.ecommerce.com/product/1 --output=./generated-tests/ecommerce-iPhone 12-staging-product-detail-1762564963610.spec.js --device=iPhone 12",
+      "timestamp": "2025-11-08T01:23:16.716Z"
+    },
+    {
+      "name": "ecommerce-iPhone 12-staging-cart",
+      "success": false,
+      "error": "Command failed: npx playwright codegen https://demo.ecommerce.com/cart --output=./generated-tests/ecommerce-iPhone 12-staging-cart-1762564963610.spec.js --device=iPhone 12",
+      "timestamp": "2025-11-08T01:23:16.716Z"
+    },
+    {
+      "name": "ecommerce-iPhone 12-staging-checkout",
+      "success": false,
+      "error": "Command failed: npx playwright codegen https://demo.ecommerce.com/checkout --output=./generated-tests/ecommerce-iPhone 12-staging-checkout-1762564963610.spec.js --device=iPhone 12",
+      "timestamp": "2025-11-08T01:23:16.716Z"
+    },
+    {
+      "name": "ecommerce-iPad (gen 7)-development-homepage",
+      "success": false,
+      "error": "Command failed: npx playwright codegen https://demo.ecommerce.com --output=./generated-tests/ecommerce-iPad (gen 7)-development-homepage-1762564963610.spec.js --device=iPad (gen 7) --slow-mo=500",
+      "timestamp": "2025-11-08T01:23:16.716Z"
+    },
+    {
+      "name": "ecommerce-iPad (gen 7)-development-product-list",
+      "success": false,
+      "error": "Command failed: npx playwright codegen https://demo.ecommerce.com/products --output=./generated-tests/ecommerce-iPad (gen 7)-development-product-list-1762564963610.spec.js --device=iPad (gen 7) --slow-mo=500",
+      "timestamp": "2025-11-08T01:23:16.716Z"
+    },
+    {
+      "name": "ecommerce-iPad (gen 7)-development-product-detail",
+      "success": false,
+      "error": "Command failed: npx playwright codegen https://demo.ecommerce.com/product/1 --output=./generated-tests/ecommerce-iPad (gen 7)-development-product-detail-1762564963610.spec.js --device=iPad (gen 7) --slow-mo=500",
+      "timestamp": "2025-11-08T01:23:16.716Z"
+    },
+    {
+      "name": "ecommerce-iPad (gen 7)-development-cart",
+      "success": false,
+      "error": "Command failed: npx playwright codegen https://demo.ecommerce.com/cart --output=./generated-tests/ecommerce-iPad (gen 7)-development-cart-1762564963610.spec.js --device=iPad (gen 7) --slow-mo=500",
+      "timestamp": "2025-11-08T01:23:16.716Z"
+    },
+    {
+      "name": "ecommerce-iPad (gen 7)-development-checkout",
+      "success": false,
+      "error": "Command failed: npx playwright codegen https://demo.ecommerce.com/checkout --output=./generated-tests/ecommerce-iPad (gen 7)-development-checkout-1762564963610.spec.js --device=iPad (gen 7) --slow-mo=500",
+      "timestamp": "2025-11-08T01:23:16.716Z"
+    },
+    {
+      "name": "ecommerce-iPad (gen 7)-staging-homepage",
+      "success": false,
+      "error": "Command failed: npx playwright codegen https://demo.ecommerce.com --output=./generated-tests/ecommerce-iPad (gen 7)-staging-homepage-1762564963610.spec.js --device=iPad (gen 7)",
+      "timestamp": "2025-11-08T01:23:16.716Z"
+    },
+    {
+      "name": "ecommerce-iPad (gen 7)-staging-product-list",
+      "success": false,
+      "error": "Command failed: npx playwright codegen https://demo.ecommerce.com/products --output=./generated-tests/ecommerce-iPad (gen 7)-staging-product-list-1762564963610.spec.js --device=iPad (gen 7)",
+      "timestamp": "2025-11-08T01:23:16.716Z"
+    },
+    {
+      "name": "ecommerce-iPad (gen 7)-staging-product-detail",
+      "success": false,
+      "error": "Command failed: npx playwright codegen https://demo.ecommerce.com/product/1 --output=./generated-tests/ecommerce-iPad (gen 7)-staging-product-detail-1762564963610.spec.js --device=iPad (gen 7)",
+      "timestamp": "2025-11-08T01:23:16.716Z"
+    },
+    {
+      "name": "ecommerce-iPad (gen 7)-staging-cart",
+      "success": false,
+      "error": "Command failed: npx playwright codegen https://demo.ecommerce.com/cart --output=./generated-tests/ecommerce-iPad (gen 7)-staging-cart-1762564963610.spec.js --device=iPad (gen 7)",
+      "timestamp": "2025-11-08T01:23:16.716Z"
+    },
+    {
+      "name": "ecommerce-iPad (gen 7)-staging-checkout",
+      "success": false,
+      "error": "Command failed: npx playwright codegen https://demo.ecommerce.com/checkout --output=./generated-tests/ecommerce-iPad (gen 7)-staging-checkout-1762564963610.spec.js --device=iPad (gen 7)",
+      "timestamp": "2025-11-08T01:23:16.716Z"
+    },
+    {
+      "name": "responsive-mobile-small",
+      "success": false,
+      "error": "Command failed: npx playwright codegen https://demo.responsive.com --viewport=320,568 --output=./generated-tests/responsive-mobile-small-1762564986497.spec.js",
+      "timestamp": "2025-11-08T01:23:16.716Z"
+    },
+    {
+      "name": "responsive-mobile-large",
+      "success": false,
+      "error": "Command failed: npx playwright codegen https://demo.responsive.com --viewport=414,896 --output=./generated-tests/responsive-mobile-large-1762564986497.spec.js",
+      "timestamp": "2025-11-08T01:23:16.716Z"
+    },
+    {
+      "name": "responsive-tablet-portrait",
+      "success": false,
+      "error": "Command failed: npx playwright codegen https://demo.responsive.com --viewport=768,1024 --output=./generated-tests/responsive-tablet-portrait-1762564986497.spec.js",
+      "timestamp": "2025-11-08T01:23:16.716Z"
+    },
+    {
+      "name": "responsive-tablet-landscape",
+      "success": false,
+      "error": "Command failed: npx playwright codegen https://demo.responsive.com --viewport=1024,768 --output=./generated-tests/responsive-tablet-landscape-1762564986497.spec.js",
+      "timestamp": "2025-11-08T01:23:16.716Z"
+    },
+    {
+      "name": "responsive-desktop-small",
+      "success": false,
+      "error": "Command failed: npx playwright codegen https://demo.responsive.com --viewport=1280,720 --output=./generated-tests/responsive-desktop-small-1762564986497.spec.js",
+      "timestamp": "2025-11-08T01:23:16.716Z"
+    },
+    {
+      "name": "responsive-desktop-large",
+      "success": false,
+      "error": "Command failed: npx playwright codegen https://demo.responsive.com --viewport=1920,1080 --output=./generated-tests/responsive-desktop-large-1762564986497.spec.js",
+      "timestamp": "2025-11-08T01:23:16.716Z"
+    },
+    {
+      "name": "cross-browser-chromium",
+      "success": false,
+      "error": "Command failed: npx playwright codegen https://demo.crossbrowser.com --browser=chromium --viewport=1920,1080 --output=./generated-tests/cross-browser-chromium-1762564991169.spec.js",
+      "timestamp": "2025-11-08T01:23:16.716Z"
+    },
+    {
+      "name": "cross-browser-firefox",
+      "success": false,
+      "error": "Command failed: npx playwright codegen https://demo.crossbrowser.com --browser=firefox --viewport=1920,1080 --output=./generated-tests/cross-browser-firefox-1762564991169.spec.js",
+      "timestamp": "2025-11-08T01:23:16.716Z"
+    },
+    {
+      "name": "cross-browser-webkit",
+      "success": false,
+      "error": "Command failed: npx playwright codegen https://demo.crossbrowser.com --browser=webkit --viewport=1920,1080 --output=./generated-tests/cross-browser-webkit-1762564991169.spec.js",
+      "timestamp": "2025-11-08T01:23:16.716Z"
+    },
+    {
+      "name": "i18n-english",
+      "success": false,
+      "error": "Command failed: npx playwright codegen https://demo.i18n.com --locale=en-US --timezone=America/New_York --output=./generated-tests/i18n-english-1762564993389.spec.js",
+      "timestamp": "2025-11-08T01:23:16.716Z"
+    },
+    {
+      "name": "i18n-chinese",
+      "success": false,
+      "error": "Command failed: npx playwright codegen https://demo.i18n.com --locale=zh-CN --timezone=Asia/Shanghai --output=./generated-tests/i18n-chinese-1762564993389.spec.js",
+      "timestamp": "2025-11-08T01:23:16.716Z"
+    },
+    {
+      "name": "i18n-japanese",
+      "success": false,
+      "error": "Command failed: npx playwright codegen https://demo.i18n.com --locale=ja-JP --timezone=Asia/Tokyo --output=./generated-tests/i18n-japanese-1762564993389.spec.js",
+      "timestamp": "2025-11-08T01:23:16.716Z"
+    },
+    {
+      "name": "i18n-german",
+      "success": false,
+      "error": "Command failed: npx playwright codegen https://demo.i18n.com --locale=de-DE --timezone=Europe/Berlin --output=./generated-tests/i18n-german-1762564993389.spec.js",
+      "timestamp": "2025-11-08T01:23:16.716Z"
+    }
+  ],
+  "files": []
+}

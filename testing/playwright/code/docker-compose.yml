@@ -1,0 +1,38 @@
+# docker-compose.yml
+version: '3.8'
+services:
+  app:
+    build: .
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+    environment:
+      - DATABASE_URL=postgresql://user:password@db:5432/testdb
+      - NODE_ENV=development
+      
+  db:
+    image: postgres:13
+    environment:
+      POSTGRES_DB: testdb
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      
+  playwright-tests:
+    build: .
+    command: npx playwright test
+    depends_on:
+      - app
+    environment:
+      BASE_URL: http://app:3000
+      TEST_ENV: development
+    volumes:
+      - ./test-results:/app/test-results
+      - ./playwright-report:/app/playwright-report
+
+volumes:
+  postgres_data:
