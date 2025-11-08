@@ -1,0 +1,2523 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JavaScript最佳实践示例</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: #34495e;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            border-left: 4px solid #3498db;
+            padding-left: 15px;
+        }
+        h3 {
+            color: #7f8c8d;
+            margin-top: 25px;
+            margin-bottom: 15px;
+        }
+        h4 {
+            color: #95a5a6;
+            margin-top: 20px;
+        }
+        .best-practice-section {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 25px;
+            border-left: 3px solid #3498db;
+        }
+        .bad-example {
+            background-color: #fee;
+            border-left: 4px solid #e74c3c;
+            padding: 15px;
+            border-radius: 0 5px 5px 0;
+            margin: 15px 0;
+            position: relative;
+        }
+        .good-example {
+            background-color: #efe;
+            border-left: 4px solid #2ecc71;
+            padding: 15px;
+            border-radius: 0 5px 5px 0;
+            margin: 15px 0;
+            position: relative;
+        }
+        .bad-example::before,
+        .good-example::before {
+            position: absolute;
+            top: 5px;
+            right: 10px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        .bad-example::before {
+            content: "不推荐";
+            color: #e74c3c;
+        }
+        .good-example::before {
+            content: "推荐";
+            color: #2ecc71;
+        }
+        .code-block {
+            background-color: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            overflow-x: auto;
+            margin: 10px 0;
+            white-space: pre;
+        }
+        .code-comment {
+            color: #7f8c8d;
+        }
+        .code-string {
+            color: #2ecc71;
+        }
+        .code-keyword {
+            color: #3498db;
+        }
+        .code-number {
+            color: #e74c3c;
+        }
+        .card {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .comparison {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin: 20px 0;
+        }
+        .comparison-column {
+            flex: 1;
+            min-width: 300px;
+        }
+        .highlight-box {
+            background-color: #e8f4fd;
+            border: 1px solid #3498db;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        .note-box {
+            background-color: #fff8e1;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 0 5px 5px 0;
+        }
+        .danger-box {
+            background-color: #ffeaea;
+            border-left: 4px solid #e74c3c;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 0 5px 5px 0;
+        }
+        .success-box {
+            background-color: #e8f8f5;
+            border-left: 4px solid #2ecc71;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 0 5px 5px 0;
+        }
+        ul, ol {
+            padding-left: 25px;
+        }
+        li {
+            margin-bottom: 8px;
+        }
+        .feature-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin: 15px 0;
+        }
+        .feature-item {
+            background-color: #ecf0f1;
+            padding: 10px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #2c3e50;
+        }
+        .practice-demo {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        button:active {
+            transform: translateY(1px);
+        }
+        .demo-result {
+            background-color: #f8f9fa;
+            border: 1px solid #ddd;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 15px;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+        .performance-indicator {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 5px 0;
+        }
+        .performance-bar {
+            height: 10px;
+            background-color: #eee;
+            border-radius: 5px;
+            flex-grow: 1;
+            overflow: hidden;
+        }
+        .performance-fill {
+            height: 100%;
+            border-radius: 5px;
+        }
+        .fast {
+            background-color: #2ecc71;
+        }
+        .medium {
+            background-color: #f39c12;
+        }
+        .slow {
+            background-color: #e74c3c;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>JavaScript最佳实践</h1>
+        <p>本页面介绍JavaScript编程中的最佳实践，帮助你编写更清晰、更高效、更可维护的代码。遵循这些实践可以提高代码质量，减少错误，并使团队协作更加顺畅。</p>
+        
+        <h2>1. 代码风格与命名规范</h2>
+        <div class="best-practice-section">
+            <p>一致的代码风格和命名规范可以提高代码的可读性和可维护性。推荐使用ESLint和Prettier等工具来自动化代码风格检查和格式化。</p>
+            
+            <h3>变量和函数命名</h3>
+            <div class="comparison">
+                <div class="comparison-column">
+                    <div class="bad-example">
+                        <h4>不推荐的命名</h4>
+                        <div class="code-block">// 单字母变量名
+let x = 5;
+let y = 10;
+
+// 不直观的函数名
+function func1(a, b) {
+  return a + b;
+}
+
+// 混合大小写不一致
+let UserName = "John";
+let user_age = 30;
+
+// 匈牙利命名法（不推荐在现代JS中使用）
+let strName = "John";
+let intAge = 30;</div>
+                    </div>
+                </div>
+                <div class="comparison-column">
+                    <div class="good-example">
+                        <h4>推荐的命名</h4>
+                        <div class="code-block">// 描述性变量名
+let counter = 5;
+let maxRetries = 10;
+
+// 动词开头的函数名
+function calculateSum(firstNumber, secondNumber) {
+  return firstNumber + secondNumber;
+}
+
+// 一致的驼峰命名法
+let userName = "John";
+let userAge = 30;
+
+// 常量使用全大写和下划线
+const MAX_RETRY_ATTEMPTS = 5;</div>
+                    </div>
+                </div>
+            </div>
+            
+            <h3>类和构造函数命名</h3>
+            <div class="comparison">
+                <div class="comparison-column">
+                    <div class="bad-example">
+                        <h4>不推荐的命名</h4>
+                        <div class="code-block">// 使用驼峰命名类
+class userAccount {
+  constructor(name, email) {
+    this.name = name;
+    this.email = email;
+  }
+}
+
+// 构造函数使用小写
+function user(name, age) {
+  this.name = name;
+  this.age = age;
+}</div>
+                    </div>
+                </div>
+                <div class="comparison-column">
+                    <div class="good-example">
+                        <h4>推荐的命名</h4>
+                        <div class="code-block">// 类使用大驼峰命名法
+class UserAccount {
+  constructor(name, email) {
+    this.name = name;
+    this.email = email;
+  }
+}
+
+// 构造函数使用大驼峰命名法
+function User(name, age) {
+  this.name = name;
+  this.age = age;
+}</div>
+                    </div>
+                </div>
+            </div>
+            
+            <h3>文件命名</h3>
+            <div class="highlight-box">
+                <ul>
+                    <li><strong>组件/类文件</strong>：使用大驼峰命名法，例如 <code>UserProfile.js</code></li>
+                    <li><strong>功能模块</strong>：使用小驼峰或连字符，例如 <code>userService.js</code> 或 <code>user-service.js</code></li>
+                    <li><strong>实用工具</strong>：通常使用 <code>utils.js</code> 或更具体的名称如 <code>dateUtils.js</code></li>
+                </ul>
+            </div>
+            
+            <div class="practice-demo">
+                <h4>命名风格检测器</h4>
+                <p>输入变量名或函数名，检测是否符合命名规范：</p>
+                <input type="text" id="nameToCheck" placeholder="输入要检测的名称">
+                <button onclick="checkNamingConvention()">检测</button>
+                <div id="namingCheckResult" class="demo-result">结果将显示在这里</div>
+            </div>
+        </div>
+        
+        <h2>2. 变量声明与作用域</h2>
+        <div class="best-practice-section">
+            <p>正确使用变量声明关键字（var、let、const）对于避免作用域问题和意外的变量行为至关重要。</p>
+            
+            <h3>使用 const 和 let，避免 var</h3>
+            <div class="comparison">
+                <div class="comparison-column">
+                    <div class="bad-example">
+                        <h4>不推荐的做法</h4>
+                        <div class="code-block">// 使用 var 声明变量
+var message = "Hello";
+
+// var 存在变量提升和函数作用域问题
+function example() {
+  if (true) {
+    var count = 10;
+  }
+  console.log(count); // 输出 10，即使在 if 块外
+}
+
+// 可以重复声明
+var message = "World";</div>
+                    </div>
+                </div>
+                <div class="comparison-column">
+                    <div class="good-example">
+                        <h4>推荐的做法</h4>
+                        <div class="code-block">// 对于不会重新赋值的变量使用 const
+const PI = 3.14159;
+const USER_ROLES = ["admin", "user", "guest"];
+
+// 对于需要重新赋值的变量使用 let
+let counter = 0;
+counter += 1;
+
+// let 有块级作用域
+function example() {
+  if (true) {
+    let count = 10;
+  }
+  // console.log(count); // 报错：count is not defined
+}
+
+// 不能重复声明
+// let message = "Hello";
+// let message = "World"; // 报错</div>
+                    </div>
+                </div>
+            </div>
+            
+            <h3>作用域优化</h3>
+            <div class="note-box">
+                <strong>最佳实践：</strong>
+                <ul>
+                    <li>尽可能使用 const 声明变量，只在必要时使用 let</li>
+                    <li>将变量声明放在最小的必要作用域内</li>
+                    <li>避免在全局作用域中声明不必要的变量</li>
+                    <li>使用块级作用域（{}）来限制变量的可见性</li>
+                </ul>
+            </div>
+            
+            <div class="practice-demo">
+                <h4>变量声明演示</h4>
+                <button onclick="runVarDemo()">运行 var 作用域演示</button>
+                <button onclick="runLetConstDemo()">运行 let/const 作用域演示</button>
+                <div id="scopeDemoResult" class="demo-result">结果将显示在这里</div>
+            </div>
+        </div>
+        
+        <h2>3. 函数编写最佳实践</h2>
+        <div class="best-practice-section">
+            <p>函数是JavaScript的核心构建块，良好的函数设计可以提高代码的可读性、可测试性和复用性。</p>
+            
+            <h3>函数设计原则</h3>
+            <div class="highlight-box">
+                <ul>
+                    <li><strong>单一职责原则</strong>：一个函数应该只做一件事，并把它做好</li>
+                    <li><strong>函数名应该表明其功能</strong>：使用清晰、描述性的名称</li>
+                    <li><strong>保持函数简洁</strong>：函数不应过长，理想情况下不超过20-30行</li>
+                    <li><strong>避免副作用</strong>：函数应尽可能保持纯函数特性</li>
+                </ul>
+            </div>
+            
+            <h3>函数定义方式</h3>
+            <div class="comparison">
+                <div class="comparison-column">
+                    <div class="bad-example">
+                        <h4>不推荐的做法</h4>
+                        <div class="code-block">// 过长的函数，做太多事情
+function processUserData(user) {
+  // 验证用户
+  if (!user.name) return false;
+  
+  // 格式化数据
+  user.fullName = user.name + " " + user.surname;
+  user.email = user.email.toLowerCase();
+  
+  // 计算年龄
+  const birthDate = new Date(user.dob);
+  const ageDifMs = Date.now() - birthDate.getTime();
+  const ageDate = new Date(ageDifMs);
+  user.age = Math.abs(ageDate.getUTCFullYear() - 1970);
+  
+  // 保存到数据库（副作用）
+  saveToDatabase(user);
+  
+  return user;
+}
+
+// 函数表达式没有命名
+const calculate = function(a, b) {
+  return a + b;
+};</div>
+                    </div>
+                </div>
+                <div class="comparison-column">
+                    <div class="good-example">
+                        <h4>推荐的做法</h4>
+                        <div class="code-block">// 拆分为多个单一职责的函数
+function validateUser(user) {
+  return !!user.name;
+}
+
+function formatUserData(user) {
+  const formattedUser = { ...user };
+  formattedUser.fullName = `${user.name} ${user.surname}`;
+  formattedUser.email = user.email.toLowerCase();
+  return formattedUser;
+}
+
+function calculateAge(birthDate) {
+  const birth = new Date(birthDate);
+  const ageDifMs = Date.now() - birth.getTime();
+  const ageDate = new Date(ageDifMs);
+  return Math.abs(ageDate.getUTCFullYear() - 1970);
+}
+
+function processUserData(user) {
+  if (!validateUser(user)) return false;
+  
+  const formattedUser = formatUserData(user);
+  formattedUser.age = calculateAge(user.dob);
+  
+  return formattedUser;
+}
+
+// 使用命名函数表达式或箭头函数
+const calculateSum = function calculateSum(a, b) {
+  return a + b;
+};
+
+// 或者使用箭头函数
+const calculateTotal = (items) => 
+  items.reduce((total, item) => total + item.price, 0);</div>
+                    </div>
+                </div>
+            </div>
+            
+            <h3>参数处理</h3>
+            <div class="comparison">
+                <div class="comparison-column">
+                    <div class="bad-example">
+                        <h4>不推荐的做法</h4>
+                        <div class="code-block">// 过多参数
+function createUser(name, email, password, age, address, phone, role) {
+  // 函数体
+}
+
+// 缺少参数验证
+function divide(a, b) {
+  return a / b; // 没有检查 b 是否为 0
+}
+
+// 可变参数处理不当
+function logMessages() {
+  for (let i = 0; i \u003c arguments.length; i++) {
+    console.log(arguments[i]);
+  }
+}</div>
+                    </div>
+                </div>
+                <div class="comparison-column">
+                    <div class="good-example">
+                        <h4>推荐的做法</h4>
+                        <div class="code-block">// 使用选项对象模式
+function createUser({ 
+  name, 
+  email, 
+  password, 
+  age = 0, 
+  address = '', 
+  phone = '', 
+  role = 'user' 
+}) {
+  // 函数体
+}
+
+// 调用方式
+createUser({
+  name: 'John',
+  email: 'john@example.com',
+  password: 'secure123'
+});
+
+// 参数验证
+function divide(a, b) {
+  if (typeof a !== 'number' || typeof b !== 'number') {
+    throw new TypeError('参数必须是数字');
+  }
+  if (b === 0) {
+    throw new Error('除数不能为零');
+  }
+  return a / b;
+}
+
+// 使用剩余参数
+function logMessages(...messages) {
+  messages.forEach(message => console.log(message));
+}</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="practice-demo">
+                <h4>函数最佳实践演示</h4>
+                <button onclick="runFunctionDemo()">运行函数设计演示</button>
+                <div id="functionDemoResult" class="demo-result">结果将显示在这里</div>
+            </div>
+        </div>
+        
+        <h2>4. 数组和对象操作</h2>
+        <div class="best-practice-section">
+            <p>使用现代JavaScript方法操作数组和对象可以使代码更简洁、更易读。</p>
+            
+            <h3>数组操作</h3>
+            <div class="comparison">
+                <div class="comparison-column">
+                    <div class="bad-example">
+                        <h4>不推荐的做法</h4>
+                        <div class="code-block">// 使用传统for循环进行转换
+function doubleNumbers(numbers) {
+  const result = [];
+  for (let i = 0; i \u003c numbers.length; i++) {
+    result.push(numbers[i] * 2);
+  }
+  return result;
+}
+
+// 使用传统for循环过滤
+function getEvenNumbers(numbers) {
+  const result = [];
+  for (let i = 0; i \u003c numbers.length; i++) {
+    if (numbers[i] % 2 === 0) {
+      result.push(numbers[i]);
+    }
+  }
+  return result;
+}
+
+// 使用传统方式查找
+function findUser(users, id) {
+  for (let i = 0; i \u003c users.length; i++) {
+    if (users[i].id === id) {
+      return users[i];
+    }
+  }
+  return null;
+}</div>
+                    </div>
+                </div>
+                <div class="comparison-column">
+                    <div class="good-example">
+                        <h4>推荐的做法</h4>
+                        <div class="code-block">// 使用map进行转换
+function doubleNumbers(numbers) {
+  return numbers.map(number => number * 2);
+}
+
+// 使用filter进行过滤
+function getEvenNumbers(numbers) {
+  return numbers.filter(number => number % 2 === 0);
+}
+
+// 使用find进行查找
+function findUser(users, id) {
+  return users.find(user => user.id === id) || null;
+}
+
+// 使用reduce进行聚合
+function calculateTotal(numbers) {
+  return numbers.reduce((total, number) => total + number, 0);
+}
+
+// 链式调用
+function processData(numbers) {
+  return numbers
+    .filter(n => n > 0)
+    .map(n => n * 2)
+    .reduce((sum, n) => sum + n, 0);
+}</div>
+                    </div>
+                </div>
+            </div>
+            
+            <h3>对象操作</h3>
+            <div class="comparison">
+                <div class="comparison-column">
+                    <div class="bad-example">
+                        <h4>不推荐的做法</h4>
+                        <div class="code-block">// 手动复制属性
+function createUserCopy(user) {
+  return {
+    id: user.id,
+    name: user.name,
+    email: user.email,
+    // 可能会遗漏属性更新
+  };
+}
+
+// 使用delete删除属性
+function removeSensitiveData(user) {
+  const userCopy = {...user};
+  delete userCopy.password;
+  delete userCopy.ssn;
+  return userCopy;
+}
+
+// 检查属性存在性的方式
+function hasProperty(obj, prop) {
+  return obj[prop] !== undefined;
+}</div>
+                    </div>
+                </div>
+                <div class="comparison-column">
+                    <div class="good-example">
+                        <h4>推荐的做法</h4>
+                        <div class="code-block">// 使用展开运算符复制对象
+function createUserCopy(user) {
+  return { ...user };
+}
+
+// 使用解构和展开运算符排除属性
+function removeSensitiveData(user) {
+  const { password, ssn, ...safeUser } = user;
+  return safeUser;
+}
+
+// 更好的属性存在性检查
+function hasProperty(obj, prop) {
+  return Object.prototype.hasOwnProperty.call(obj, prop);
+}
+
+// 使用Object.keys, Object.values, Object.entries
+function logObjectProperties(obj) {
+  Object.entries(obj).forEach(([key, value]) => {
+    console.log(`${key}: ${value}`);
+  });
+}
+
+// 使用可选链和空值合并
+function getUserName(user) {
+  return user?.profile?.name ?? 'Anonymous';
+}</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="practice-demo">
+                <h4>数组和对象操作演示</h4>
+                <button onclick="runArrayDemo()">运行数组方法演示</button>
+                <button onclick="runObjectDemo()">运行对象操作演示</button>
+                <div id="arrayObjectDemoResult" class="demo-result">结果将显示在这里</div>
+            </div>
+        </div>
+        
+        <h2>5. 异步编程最佳实践</h2>
+        <div class="best-practice-section">
+            <p>异步编程是JavaScript的核心特性之一，正确处理异步操作对于构建响应迅速的应用至关重要。</p>
+            
+            <h3>Promise使用最佳实践</h3>
+            <div class="comparison">
+                <div class="comparison-column">
+                    <div class="bad-example">
+                        <h4>不推荐的做法</h4>
+                        <div class="code-block">// 回调地狱
+function fetchUserData(userId, callback) {
+  fetchUser(userId, function(user) {
+    fetchUserPosts(user.id, function(posts) {
+      fetchComments(posts[0].id, function(comments) {
+        callback({ user, posts, comments });
+      }, handleError);
+    }, handleError);
+  }, handleError);
+}
+
+// Promise 错误处理不完整
+fetchData()
+  .then(data => processData(data))
+  .then(result => saveResult(result)); // 没有 catch 块
+
+// 不必要的嵌套 Promise
+function fetchAndProcess() {
+  return new Promise((resolve, reject) => {
+    fetchData().then(data => {
+      processData(data).then(result => {
+        resolve(result);
+      }).catch(reject);
+    }).catch(reject);
+  });
+}</div>
+                    </div>
+                </div>
+                <div class="comparison-column">
+                    <div class="good-example">
+                        <h4>推荐的做法</h4>
+                        <div class="code-block">// 使用Promise链
+function fetchUserData(userId) {
+  return fetchUser(userId)
+    .then(user => fetchUserPosts(user.id)
+      .then(posts => ({
+        user,
+        posts
+      }))
+    )
+    .then(({ user, posts }) => fetchComments(posts[0].id)
+      .then(comments => ({
+        user,
+        posts,
+        comments
+      }))
+    );
+}
+
+// 完整的错误处理
+fetchData()
+  .then(data => processData(data))
+  .then(result => saveResult(result))
+  .catch(error => {
+    console.error('操作失败:', error);
+    // 显示错误消息或执行恢复操作
+  });
+
+// 使用async/await简化异步代码
+async function fetchUserData(userId) {
+  try {
+    const user = await fetchUser(userId);
+    const posts = await fetchUserPosts(user.id);
+    const comments = await fetchComments(posts[0].id);
+    return { user, posts, comments };
+  } catch (error) {
+    console.error('获取用户数据失败:', error);
+    throw error; // 可以选择重新抛出或处理
+  }
+}
+
+// 并行执行
+async function fetchAllData() {
+  const [users, posts, comments] = await Promise.all([
+    fetchUsers(),
+    fetchPosts(),
+    fetchComments()
+  ]);
+  return { users, posts, comments };
+}</div>
+                    </div>
+                </div>
+            </div>
+            
+            <h3>异步错误处理</h3>
+            <div class="danger-box">
+                <strong>重要提示：</strong>
+                <ul>
+                    <li>始终为Promise链添加.catch()块</li>
+                    <li>在async/await函数中使用try-catch</li>
+                    <li>考虑使用全局unhandledrejection事件监听器</li>
+                    <li>避免在Promise构造函数中抛出同步错误</li>
+                </ul>
+            </div>
+            
+            <div class="practice-demo">
+                <h4>异步编程演示</h4>
+                <button onclick="runAsyncDemo()">运行异步编程对比演示</button>
+                <div id="asyncDemoResult" class="demo-result">结果将显示在这里</div>
+            </div>
+        </div>
+        
+        <h2>6. 性能优化</h2>
+        <div class="best-practice-section">
+            <p>性能优化对于创建响应迅速、高效的JavaScript应用至关重要。以下是一些常见的性能优化最佳实践。</p>
+            
+            <h3>DOM操作优化</h3>
+            <div class="comparison">
+                <div class="comparison-column">
+                    <div class="bad-example">
+                        <h4>不推荐的做法</h4>
+                        <div class="code-block">// 频繁的DOM操作
+function renderList(items) {
+  const list = document.getElementById('list');
+  for (let i = 0; i \u003c items.length; i++) {
+    const li = document.createElement('li');
+    li.textContent = items[i];
+    list.appendChild(li); // 每次循环都修改DOM
+  }
+}
+
+// 不必要的重新渲染
+function updateCounter(count) {
+  // 即使count没有变化，也总是更新DOM
+  document.getElementById('counter').textContent = count;
+}
+
+// 使用innerHTML
+function renderTable(data) {
+  let html = '<table>';
+  data.forEach(item => {
+    html += `<tr><td>${item.name}</td><td>${item.value}</td></tr>`;
+  });
+  html += '</table>';
+  document.getElementById('table-container').innerHTML = html;
+}</div>
+                    </div>
+                </div>
+                <div class="comparison-column">
+                    <div class="good-example">
+                        <h4>推荐的做法</h4>
+                        <div class="code-block">// 使用文档片段批量操作DOM
+function renderList(items) {
+  const list = document.getElementById('list');
+  const fragment = document.createDocumentFragment();
+  
+  for (let i = 0; i \u003c items.length; i++) {
+    const li = document.createElement('li');
+    li.textContent = items[i];
+    fragment.appendChild(li); // 先添加到文档片段
+  }
+  
+  list.appendChild(fragment); // 一次性更新DOM
+}
+
+// 智能更新
+let currentCount = 0;
+function updateCounter(count) {
+  if (count !== currentCount) {
+    document.getElementById('counter').textContent = count;
+    currentCount = count;
+  }
+}
+
+// 使用更安全、更高效的DOM API
+function renderTable(data) {
+  const table = document.createElement('table');
+  const tbody = document.createElement('tbody');
+  
+  data.forEach(item => {
+    const row = tbody.insertRow();
+    row.insertCell(0).textContent = item.name;
+    row.insertCell(1).textContent = item.value;
+  });
+  
+  table.appendChild(tbody);
+  
+  const container = document.getElementById('table-container');
+  container.innerHTML = '';
+  container.appendChild(table);
+}
+
+// 考虑使用虚拟滚动处理大数据集
+function virtualScroll(items, container) {
+  // 只渲染可视区域内的项目
+  // ...
+}</div>
+                    </div>
+                </div>
+            </div>
+            
+            <h3>JavaScript性能优化</h3>
+            <div class="highlight-box">
+                <ul>
+                    <li><strong>避免不必要的计算</strong>：缓存计算结果</li>
+                    <li><strong>使用适当的数据结构</strong>：根据操作类型选择合适的数据结构</li>
+                    <li><strong>减少重绘和回流</strong>：批量修改样式，使用transform和opacity</li>
+                    <li><strong>使用事件委托</strong>：减少事件监听器数量</li>
+                    <li><strong>避免内存泄漏</strong>：及时清理定时器、事件监听器等</li>
+                    <li><strong>懒加载资源</strong>：按需加载JavaScript、图像等</li>
+                </ul>
+            </div>
+            
+            <h3>性能对比</h3>
+            <div class="card">
+                <h4>常见操作性能对比</h4>
+                <div class="performance-indicator">
+                    <span>for循环 vs forEach</span>
+                    <div class="performance-bar">
+                        <div class="performance-fill fast" style="width: 90%"></div>
+                    </div>
+                    <span>for更快</span>
+                </div>
+                <div class="performance-indicator">
+                    <span>DOM直接操作 vs 文档片段</span>
+                    <div class="performance-bar">
+                        <div class="performance-fill fast" style="width: 85%"></div>
+                    </div>
+                    <span>文档片段更快</span>
+                </div>
+                <div class="performance-indicator">
+                    <span>数组索引访问 vs find方法</span>
+                    <div class="performance-bar">
+                        <div class="performance-fill fast" style="width: 95%"></div>
+                    </div>
+                    <span>索引访问更快</span>
+                </div>
+                <div class="performance-indicator">
+                    <span>字符串拼接 + vs 模板字符串</span>
+                    <div class="performance-bar">
+                        <div class="performance-fill medium" style="width: 60%"></div>
+                    </div>
+                    <span>现代浏览器中性能相近</span>
+                </div>
+            </div>
+            
+            <div class="practice-demo">
+                <h4>性能优化演示</h4>
+                <button onclick="runPerformanceDemo()">运行DOM操作性能对比</button>
+                <div id="performanceDemoResult" class="demo-result">性能测试结果将显示在这里</div>
+            </div>
+        </div>
+        
+        <h2>7. 安全最佳实践</h2>
+        <div class="best-practice-section">
+            <p>Web应用安全是至关重要的，以下是JavaScript中常见的安全最佳实践。</p>
+            
+            <h3>防止XSS攻击</h3>
+            <div class="comparison">
+                <div class="comparison-column">
+                    <div class="bad-example">
+                        <h4>不推荐的做法</h4>
+                        <div class="code-block">// 直接使用innerHTML
+function displayUserInput(userInput) {
+  document.getElementById('output').innerHTML = userInput;
+  // 如果userInput包含恶意脚本如 \u003cscript\u003ealert('XSS')\u003c/script\u003e 将被执行
+}
+
+// 不验证或转义用户输入
+function search(query) {
+  // 直接使用用户输入构造查询
+  const results = database.query(`SELECT * FROM users WHERE name LIKE '%${query}%'`);
+  // 可能导致SQL注入
+}
+
+// 不安全的JSONP实现
+function loadData(url) {
+  const script = document.createElement('script');
+  script.src = url;
+  document.body.appendChild(script);
+  // 如果url可控，可能导致XSS
+}</div>
+                    </div>
+                </div>
+                <div class="comparison-column">
+                    <div class="good-example">
+                        <h4>推荐的做法</h4>
+                        <div class="code-block">// 使用textContent代替innerHTML
+function displayUserInput(userInput) {
+  document.getElementById('output').textContent = userInput;
+}
+
+// 或者正确转义HTML
+function escapeHtml(unsafe) {
+  return unsafe
+    .replace(/&/g, "&amp;")
+    .replace(/\u003c/g, "&lt;")
+    .replace(/\u003e/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+function displayEscapedInput(userInput) {
+  document.getElementById('output').innerHTML = escapeHtml(userInput);
+}
+
+// 使用参数化查询
+function search(query) {
+  // 使用预处理语句或ORM框架
+  const results = database.query(
+    'SELECT * FROM users WHERE name LIKE ?',
+    [`%${query}%`]
+  );
+}
+
+// 使用CORS和内容安全策略
+// 在服务器端设置适当的CORS头
+// 设置内容安全策略头: Content-Security-Policy: script-src 'self' trusted-cdn.com;</div>
+                    </div>
+                </div>
+            </div>
+            
+            <h3>安全编码原则</h3>
+            <div class="danger-box">
+                <strong>重要安全原则：</strong>
+                <ul>
+                    <li>永远不要信任用户输入</li>
+                    <li>对所有输入进行验证和清理</li>
+                    <li>使用HTTPS保护数据传输</li>
+                    <li>实现适当的身份验证和授权</li>
+                    <li>使用安全的随机数生成器</li>
+                    <li>避免在客户端存储敏感信息</li>
+                    <li>设置适当的HTTP安全头部</li>
+                    <li>定期更新依赖库以修复安全漏洞</li>
+                </ul>
+            </div>
+            
+            <h3>常见安全漏洞和防范措施</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>安全漏洞</th>
+                        <th>描述</th>
+                        <th>防范措施</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>XSS (跨站脚本攻击)</td>
+                        <td>注入恶意脚本到网页中</td>
+                        <td>转义HTML，使用CSP，避免innerHTML</td>
+                    </tr>
+                    <tr>
+                        <td>CSRF (跨站请求伪造)</td>
+                        <td>诱导用户执行非预期的操作</td>
+                        <td>使用CSRF令牌，验证Origin/Referer头</td>
+                    </tr>
+                    <tr>
+                        <td>SQL注入</td>
+                        <td>通过用户输入操纵SQL查询</td>
+                        <td>使用参数化查询，ORM框架</td>
+                    </tr>
+                    <tr>
+                        <td>不安全的反序列化</td>
+                        <td>反序列化不受信任的数据</td>
+                        <td>验证输入，限制反序列化类</td>
+                    </tr>
+                    <tr>
+                        <td>敏感信息泄露</td>
+                        <td>暴露敏感数据</td>
+                        <td>最小权限原则，加密敏感数据</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div class="practice-demo">
+                <h4>XSS防护演示</h4>
+                <input type="text" id="userInput" placeholder="输入可能包含HTML的内容">
+                <button onclick="unsafeRender()">不安全渲染</button>
+                <button onclick="safeRender()">安全渲染</button>
+                <div>
+                    <h5>渲染结果:</h5>
+                    <div id="renderOutput" style="border: 1px solid #ddd; padding: 10px; min-height: 50px;"></div>
+                </div>
+            </div>
+        </div>
+        
+        <h2>8. 代码组织与模块化</h2>
+        <div class="best-practice-section">
+            <p>良好的代码组织和模块化可以提高代码的可维护性和复用性。</p>
+            
+            <h3>模块化编程</h3>
+            <div class="comparison">
+                <div class="comparison-column">
+                    <div class="bad-example">
+                        <h4>不推荐的做法</h4>
+                        <div class="code-block">// 单一大型文件
+// app.js
+const PI = 3.14159;
+
+function calculateArea(radius) {
+  return PI * radius * radius;
+}
+
+function calculateCircumference(radius) {
+  return 2 * PI * radius;
+}
+
+function validateEmail(email) {
+  const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return re.test(email);
+}
+
+function formatDate(date) {
+  return new Date(date).toLocaleDateString();
+}
+
+// 所有函数都在全局作用域
+window.calculateArea = calculateArea;
+window.validateEmail = validateEmail;
+// ...</div>
+                    </div>
+                </div>
+                <div class="comparison-column">
+                    <div class="good-example">
+                        <h4>推荐的做法</h4>
+                        <div class="code-block">// 使用ES6模块系统
+// circle.js
+const PI = 3.14159;
+
+export function calculateArea(radius) {
+  return PI * radius * radius;
+}
+
+export function calculateCircumference(radius) {
+  return 2 * PI * radius;
+}
+
+// utilities.js
+export function validateEmail(email) {
+  const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return re.test(email);
+}
+
+export function formatDate(date) {
+  return new Date(date).toLocaleDateString();
+}
+
+// app.js
+import { calculateArea, calculateCircumference } from './circle.js';
+import { validateEmail, formatDate } from './utilities.js';
+
+// 只导入需要的函数
+const area = calculateArea(5);
+const isValid = validateEmail('user@example.com');
+
+// 或者使用默认导出
+// userService.js
+export default {
+  getUser(id) { /* ... */ },
+  saveUser(user) { /* ... */ }
+};</div>
+                    </div>
+                </div>
+            </div>
+            
+            <h3>设计模式</h3>
+            <div class="highlight-box">
+                <p>使用适当的设计模式可以解决常见的编程问题，以下是一些在JavaScript中常用的设计模式：</p>
+                <div class="feature-list">
+                    <div class="feature-item">模块模式</div>
+                    <div class="feature-item">单例模式</div>
+                    <div class="feature-item">工厂模式</div>
+                    <div class="feature-item">观察者模式</div>
+                    <div class="feature-item">发布-订阅模式</div>
+                    <div class="feature-item">策略模式</div>
+                    <div class="feature-item">命令模式</div>
+                    <div class="feature-item">装饰器模式</div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h4>模块模式示例</h4>
+                <div class="code-block">// 使用IIFE实现模块模式
+const counterModule = (function() {
+  // 私有变量
+  let count = 0;
+  
+  // 私有函数
+  function validateNumber(num) {
+    return typeof num === 'number' \u0026\u0026 !isNaN(num);
+  }
+  
+  // 暴露公共方法
+  return {
+    increment() {
+      count++;
+      return count;
+    },
+    decrement() {
+      count--;
+      return count;
+    },
+    getCount() {
+      return count;
+    },
+    setCount(newCount) {
+      if (validateNumber(newCount)) {
+        count = newCount;
+        return true;
+      }
+      return false;
+    }
+  };
+})();
+
+// 使用模块
+counterModule.increment(); // 1
+counterModule.increment(); // 2
+console.log(counterModule.getCount()); // 2
+counterModule.setCount(10);
+console.log(counterModule.getCount()); // 10
+// count变量是私有的，无法直接访问</div>
+            </div>
+            
+            <div class="practice-demo">
+                <h4>模块化演示</h4>
+                <button onclick="runModuleDemo()">运行模块模式演示</button>
+                <div id="moduleDemoResult" class="demo-result">结果将显示在这里</div>
+            </div>
+        </div>
+        
+        <h2>9. 调试与测试</h2>
+        <div class="best-practice-section">
+            <p>有效的调试和测试策略对于编写高质量代码至关重要。</p>
+            
+            <h3>调试技巧</h3>
+            <div class="highlight-box">
+                <ul>
+                    <li><strong>使用console.log()适可而止</strong>：不要在生产代码中留下调试日志</li>
+                    <li><strong>使用断点</strong>：在浏览器开发工具中设置断点进行逐步调试</li>
+                    <li><strong>使用console.table()</strong>：更友好地展示对象和数组</li>
+                    <li><strong>使用console.time()/timeEnd()</strong>：测量代码执行时间</li>
+                    <li><strong>使用Chrome DevTools</strong>：利用Sources、Network、Performance等面板</li>
+                    <li><strong>使用错误边界</strong>：在React等框架中捕获组件错误</li>
+                </ul>
+            </div>
+            
+            <h3>测试最佳实践</h3>
+            <div class="success-box">
+                <strong>测试类型：</strong>
+                <ul>
+                    <li><strong>单元测试</strong>：测试单个函数或组件</li>
+                    <li><strong>集成测试</strong>：测试多个组件或服务的交互</li>
+                    <li><strong>E2E测试</strong>：模拟用户操作的端到端测试</li>
+                    <li><strong>性能测试</strong>：测试应用的性能指标</li>
+                </ul>
+                <p>推荐的测试框架：Jest、Mocha、Chai、Cypress、Puppeteer</p>
+            </div>
+            
+            <div class="card">
+                <h4>单元测试示例 (使用Jest)</h4>
+                <div class="code-block">// math.js
+export function add(a, b) {
+  return a + b;
+}
+
+export function subtract(a, b) {
+  return a - b;
+}
+
+// math.test.js
+import { add, subtract } from './math';
+
+describe('Math functions', () =\u003e {
+  test('adds two numbers correctly', () =\u003e {
+    expect(add(1, 2)).toBe(3);
+    expect(add(-1, 1)).toBe(0);
+    expect(add(0, 0)).toBe(0);
+  });
+  
+  test('subtracts two numbers correctly', () =\u003e {
+    expect(subtract(5, 3)).toBe(2);
+    expect(subtract(10, 5)).toBe(5);
+    expect(subtract(0, 0)).toBe(0);
+  });
+});</div>
+            </div>
+            
+            <div class="practice-demo">
+                <h4>调试工具演示</h4>
+                <button onclick="runDebugDemo()">运行调试工具演示</button>
+                <div id="debugDemoResult" class="demo-result">调试信息将显示在这里</div>
+            </div>
+        </div>
+        
+        <h2>10. 工具与资源</h2>
+        <div class="best-practice-section">
+            <p>以下是一些推荐的工具和资源，可以帮助你编写更好的JavaScript代码。</p>
+            
+            <h3>代码质量工具</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>工具名称</th>
+                        <th>用途</th>
+                        <th>特点</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>ESLint</td>
+                        <td>代码质量检查</td>
+                        <td>可配置规则，插件生态丰富</td>
+                    </tr>
+                    <tr>
+                        <td>Prettier</td>
+                        <td>代码格式化</td>
+                        <td>统一代码风格，减少争论</td>
+                    </tr>
+                    <tr>
+                        <td>Jest</td>
+                        <td>测试框架</td>
+                        <td>零配置，内置断言，覆盖率报告</td>
+                    </tr>
+                    <tr>
+                        <td>Webpack</td>
+                        <td>模块打包器</td>
+                        <td>代码分割，按需加载，优化构建</td>
+                    </tr>
+                    <tr>
+                        <td>Babel</td>
+                        <td>JavaScript编译器</td>
+                        <td>转译新语法，兼容旧浏览器</td>
+                    </tr>
+                    <tr>
+                        <td>TypeScript</td>
+                        <td>JavaScript超集</td>
+                        <td>静态类型检查，IDE支持</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <h3>学习资源</h3>
+            <div class="highlight-box">
+                <ul>
+                    <li><strong>官方文档</strong>：MDN Web Docs, JavaScript官方文档</li>
+                    <li><strong>在线课程</strong>：JavaScript.info, freeCodeCamp, Udemy</li>
+                    <li><strong>书籍</strong>：《JavaScript高级程序设计》、《你不知道的JavaScript》、《JavaScript设计模式》</li>
+                    <li><strong>博客</strong>：Adept.js, CSS-Tricks, Smashing Magazine</li>
+                    <li><strong>视频</strong>：YouTube频道（Traversy Media, Net Ninja, Academind）</li>
+                    <li><strong>社区</strong>：Stack Overflow, GitHub, Dev.to</li>
+                </ul>
+            </div>
+            
+            <h3>性能分析工具</h3>
+            <div class="feature-list">
+                <div class="feature-item">Chrome DevTools Performance</div>
+                <div class="feature-item">Lighthouse</div>
+                <div class="feature-item">WebPageTest</div>
+                <div class="feature-item">BundleAnalyzerPlugin</div>
+                <div class="feature-item">Chrome DevTools Memory</div>
+                <div class="feature-item">SpeedCurve</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 1. 命名规范检测器
+        function checkNamingConvention() {
+            const input = document.getElementById('nameToCheck').value.trim();
+            const result = document.getElementById('namingCheckResult');
+            
+            if (!input) {
+                result.textContent = '请输入要检测的名称';
+                return;
+            }
+            
+            let feedback = `检测名称: ${input}\n`;
+            
+            // 检查是否符合变量命名规则
+            if (!/^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test(input)) {
+                feedback += '❌ 不符合JavaScript命名规则（只能包含字母、数字、下划线和$，不能以数字开头）\n';
+            } else {
+                feedback += '✅ 符合JavaScript基本命名规则\n';
+            }
+            
+            // 检查驼峰命名
+            if (/^[a-z][a-zA-Z0-9]*$/.test(input)) {
+                feedback += '✅ 符合小驼峰命名法（变量、函数）\n';
+            } else if (/^[A-Z][a-zA-Z0-9]*$/.test(input)) {
+                feedback += '✅ 符合大驼峰命名法（类、构造函数）\n';
+            } else if (/^[A-Z_][A-Z0-9_]*$/.test(input)) {
+                feedback += '✅ 符合常量命名法（全大写加下划线）\n';
+            } else {
+                feedback += '⚠️ 命名风格不一致（建议使用驼峰命名法）\n';
+            }
+            
+            // 检查长度
+            if (input.length \u003c 2) {
+                feedback += '⚠️ 名称太短，建议使用更具描述性的名称\n';
+            } else if (input.length \u003e 30) {
+                feedback += '⚠️ 名称较长，建议保持简洁\n';
+            } else {
+                feedback += '✅ 名称长度适中\n';
+            }
+            
+            // 检查是否为保留字
+            const reservedWords = [
+                'abstract', 'arguments', 'await', 'boolean', 'break', 'byte', 'case', 'catch', 'char', 'class',
+                'const', 'continue', 'debugger', 'default', 'delete', 'do', 'double', 'else', 'enum', 'eval',
+                'export', 'extends', 'false', 'final', 'finally', 'float', 'for', 'function', 'goto', 'if',
+                'implements', 'import', 'in', 'instanceof', 'int', 'interface', 'let', 'long', 'native',
+                'new', 'null', 'package', 'private', 'protected', 'public', 'return', 'short', 'static',
+                'super', 'switch', 'synchronized', 'this', 'throw', 'throws', 'transient', 'true', 'try',
+                'typeof', 'var', 'void', 'volatile', 'while', 'with', 'yield'
+            ];
+            
+            if (reservedWords.includes(input)) {
+                feedback += '❌ 名称是JavaScript保留字，不能作为标识符\n';
+            }
+            
+            result.textContent = feedback;
+        }
+        
+        // 2. 变量作用域演示
+        function runVarDemo() {
+            const result = document.getElementById('scopeDemoResult');
+            result.textContent = '开始var作用域演示...\n';
+            
+            // 演示var的变量提升
+            result.textContent += '\n--- 变量提升演示 ---\n';
+            try {
+                result.textContent += `在声明前访问var变量: ${variableDemo}\n`;
+                var variableDemo = 'Hello';
+                result.textContent += `声明后访问var变量: ${variableDemo}\n`;
+            } catch (e) {
+                result.textContent += `错误: ${e.message}\n`;
+            }
+            
+            // 演示var的函数作用域
+            result.textContent += '\n--- 函数作用域演示 ---\n';
+            function demoFunctionScope() {
+                if (true) {
+                    var x = 10;
+                    result.textContent += `在if块内: x = ${x}\n`;
+                }
+                result.textContent += `在if块外: x = ${x}\n`; // x在函数作用域内都可访问
+            }
+            
+            demoFunctionScope();
+            
+            // 演示var可以重复声明
+            result.textContent += '\n--- 重复声明演示 ---\n';
+            var duplicateVar = 'First';
+            result.textContent += `第一次声明: ${duplicateVar}\n`;
+            var duplicateVar = 'Second'; // 不会报错
+            result.textContent += `重复声明后: ${duplicateVar}\n`;
+        }
+        
+        function runLetConstDemo() {
+            const result = document.getElementById('scopeDemoResult');
+            result.textContent = '开始let/const作用域演示...\n';
+            
+            // 演示let没有变量提升（实际上有提升但存在TDZ）
+            result.textContent += '\n--- let变量TDZ演示 ---\n';
+            try {
+                // result.textContent += `在声明前访问let变量: ${letDemo}\n`; // 这行会报错
+                result.textContent += '注意: 在声明前访问let变量会抛出ReferenceError\n';
+                let letDemo = 'Hello';
+                result.textContent += `声明后访问let变量: ${letDemo}\n`;
+            } catch (e) {
+                result.textContent += `错误: ${e.message}\n`;
+            }
+            
+            // 演示let的块级作用域
+            result.textContent += '\n--- 块级作用域演示 ---\n';
+            function demoBlockScope() {
+                if (true) {
+                    let y = 20;
+                    result.textContent += `在if块内: y = ${y}\n`;
+                }
+                // result.textContent += `在if块外: y = ${y}\n`; // 这行会报错，y在块外不可访问
+                result.textContent += '注意: 在if块外访问let变量会抛出ReferenceError\n';
+            }
+            
+            demoBlockScope();
+            
+            // 演示const不可重新赋值
+            result.textContent += '\n--- const不可重新赋值演示 ---\n';
+            try {
+                const PI = 3.14159;
+                result.textContent += `声明常量: PI = ${PI}\n`;
+                // PI = 3.14; // 这行会报错
+                result.textContent += '注意: 尝试修改const变量会抛出TypeError\n';
+                
+                // 但const对象的属性可以修改
+                const person = { name: 'John' };
+                person.name = 'Jane';
+                result.textContent += `修改const对象属性: ${person.name}\n`;
+            } catch (e) {
+                result.textContent += `错误: ${e.message}\n`;
+            }
+        }
+        
+        // 3. 函数最佳实践演示
+        function runFunctionDemo() {
+            const result = document.getElementById('functionDemoResult');
+            result.textContent = '开始函数设计演示...\n';
+            
+            // 演示单一职责原则
+            result.textContent += '\n--- 单一职责函数演示 ---\n';
+            
+            // 数据验证函数
+            function validateUserData(user) {
+                if (!user || typeof user !== 'object') {
+                    return { valid: false, error: '无效的用户对象' };
+                }
+                if (!user.name || user.name.trim() === '') {
+                    return { valid: false, error: '用户名不能为空' };
+                }
+                if (!user.email || !user.email.includes('@')) {
+                    return { valid: false, error: '邮箱格式不正确' };
+                }
+                return { valid: true };
+            }
+            
+            // 数据转换函数
+            function formatUserData(user) {
+                return {
+                    id: user.id,
+                    fullName: user.name,
+                    email: user.email.toLowerCase(),
+                    displayName: user.name.charAt(0).toUpperCase() + user.name.slice(1)
+                };
+            }
+            
+            // 主处理函数
+            function processUser(user) {
+                // 验证数据
+                const validation = validateUserData(user);
+                if (!validation.valid) {
+                    return { success: false, error: validation.error };
+                }
+                
+                // 格式化数据
+                const formattedUser = formatUserData(user);
+                
+                return { success: true, data: formattedUser };
+            }
+            
+            // 测试用例
+            const testUser1 = { id: 1, name: 'john', email: 'JOHN@EXAMPLE.COM' };
+            const testUser2 = { id: 2, name: '', email: 'invalid-email' };
+            
+            const result1 = processUser(testUser1);
+            const result2 = processUser(testUser2);
+            
+            result.textContent += `测试1结果: ${result1.success ? '成功' : '失败'}\n`;
+            if (result1.success) {
+                result.textContent += `格式化后的用户: ${JSON.stringify(result1.data, null, 2)}\n`;
+            }
+            
+            result.textContent += `测试2结果: ${result2.success ? '成功' : '失败'}\n`;
+            if (!result2.success) {
+                result.textContent += `错误信息: ${result2.error}\n`;
+            }
+            
+            // 演示参数处理
+            result.textContent += '\n--- 参数处理演示 ---\n';
+            
+            // 使用选项对象模式
+            function createConfig({ 
+                timeout = 3000, 
+                retries = 3, 
+                debug = false,
+                baseUrl = 'https://api.example.com'
+            } = {}) {
+                return {
+                    timeout,
+                    retries,
+                    debug,
+                    baseUrl
+                };
+            }
+            
+            const defaultConfig = createConfig();
+            const customConfig = createConfig({ timeout: 5000, debug: true });
+            
+            result.textContent += `默认配置: ${JSON.stringify(defaultConfig, null, 2)}\n`;
+            result.textContent += `自定义配置: ${JSON.stringify(customConfig, null, 2)}\n`;
+        }
+        
+        // 4. 数组和对象操作演示
+        function runArrayDemo() {
+            const result = document.getElementById('arrayObjectDemoResult');
+            result.textContent = '开始数组方法演示...\n';
+            
+            const numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+            result.textContent += `原始数组: [${numbers}]\n`;
+            
+            // 使用map进行转换
+            const doubled = numbers.map(n => n * 2);
+            result.textContent += `\n使用map翻倍: [${doubled}]\n`;
+            
+            // 使用filter进行过滤
+            const evens = numbers.filter(n => n % 2 === 0);
+            result.textContent += `使用filter筛选偶数: [${evens}]\n`;
+            
+            // 使用reduce进行聚合
+            const sum = numbers.reduce((total, n) => total + n, 0);
+            result.textContent += `使用reduce求和: ${sum}\n`;
+            
+            // 使用find查找元素
+            const firstGreaterThanFive = numbers.find(n => n \u003e 5);
+            result.textContent += `使用find查找第一个大于5的数: ${firstGreaterThanFive}\n`;
+            
+            // 链式调用
+            const resultChain = numbers
+                .filter(n => n % 2 !== 0) // 筛选奇数
+                .map(n => n * 2)          // 翻倍
+                .reduce((sum, n) => sum + n, 0); // 求和
+            
+            result.textContent += `\n链式调用结果（奇数翻倍求和）: ${resultChain}\n`;
+            
+            // 解释每个步骤
+            result.textContent += '\n链式调用步骤详解:\n';
+            const step1 = numbers.filter(n => n % 2 !== 0);
+            result.textContent += `1. 筛选奇数: [${step1}]\n`;
+            const step2 = step1.map(n => n * 2);
+            result.textContent += `2. 每个数翻倍: [${step2}]\n`;
+            const step3 = step2.reduce((sum, n) => sum + n, 0);
+            result.textContent += `3. 求和结果: ${step3}\n`;
+        }
+        
+        function runObjectDemo() {
+            const result = document.getElementById('arrayObjectDemoResult');
+            result.textContent = '开始对象操作演示...\n';
+            
+            const user = {
+                id: 1,
+                name: 'John Doe',
+                email: 'john@example.com',
+                password: 'hashedPassword123',
+                role: 'admin',
+                settings: {
+                    theme: 'dark',
+                    notifications: true
+                }
+            };
+            
+            result.textContent += `原始用户对象: ${JSON.stringify(user, null, 2)}\n`;
+            
+            // 1. 使用展开运算符复制对象
+            const userCopy = { ...user };
+            result.textContent += `\n1. 展开运算符复制: ${JSON.stringify(userCopy, null, 2)}\n`;
+            
+            // 2. 使用解构排除属性
+            const { password, ...safeUser } = user;
+            result.textContent += `\n2. 解构排除敏感属性: ${JSON.stringify(safeUser, null, 2)}\n`;
+            result.textContent += `注意: 密码已被排除\n`;
+            
+            // 3. 对象合并
+            const userUpdates = {
+                email: 'john.doe@example.com',
+                lastLogin: new Date().toISOString()
+            };
+            
+            const updatedUser = { ...user, ...userUpdates };
+            result.textContent += `\n3. 对象合并更新: ${JSON.stringify(updatedUser, null, 2)}\n`;
+            result.textContent += `注意: 邮箱已更新，添加了lastLogin字段\n`;
+            
+            // 4. 对象遍历
+            result.textContent += `\n4. 使用Object.entries遍历对象属性:\n`;
+            Object.entries(user).forEach(([key, value]) => {
+                if (typeof value === 'object' && value !== null) {
+                    result.textContent += `  ${key}: [对象]\n`;
+                } else {
+                    result.textContent += `  ${key}: ${value}\n`;
+                }
+            });
+            
+            // 5. 可选链和空值合并
+            result.textContent += `\n5. 可选链和空值合并演示:\n`;
+            
+            // 安全访问嵌套属性
+            const theme = user?.settings?.theme ?? 'light';
+            const language = user?.settings?.language ?? 'en';
+            
+            result.textContent += `  主题: ${theme}\n`;
+            result.textContent += `  语言: ${language} (默认值)\n`;
+        }
+        
+        // 5. 异步编程演示
+        function runAsyncDemo() {
+            const result = document.getElementById('asyncDemoResult');
+            result.textContent = '开始异步编程对比演示...\n';
+            
+            // 模拟异步API请求
+            function simulateApiCall(delay, value) {
+                return new Promise((resolve) => {
+                    setTimeout(() => {
+                        result.textContent += `  API调用完成: ${value} (延迟${delay}ms)\n`;
+                        resolve(value);
+                    }, delay);
+                });
+            }
+            
+            // 1. 回调地狱示例
+            result.textContent += '\n--- 回调地狱示例 ---\n';
+            function callbackHellDemo() {
+                simulateApiCall(500, '用户数据').then(userData => {
+                    simulateApiCall(300, '文章列表').then(articles => {
+                        simulateApiCall(200, '评论数据').then(comments => {
+                            result.textContent += '  所有数据获取完成！\n';
+                            result.textContent += `  组合结果: ${userData}, ${articles}, ${comments}\n`;
+                            
+                            // 演示完成后执行Promise链示例
+                            setTimeout(() => {
+                                promiseChainDemo();
+                            }, 1000);
+                        });
+                    });
+                });
+            }
+            
+            // 2. Promise链示例
+            function promiseChainDemo() {
+                result.textContent += '\n--- Promise链示例 ---\n';
+                
+                simulateApiCall(500, '用户数据')
+                    .then(userData => {
+                        return simulateApiCall(300, '文章列表')
+                            .then(articles => ({ userData, articles }));
+                    })
+                    .then(({ userData, articles }) => {
+                        return simulateApiCall(200, '评论数据')
+                            .then(comments => ({ userData, articles, comments }));
+                    })
+                    .then(({ userData, articles, comments }) => {
+                        result.textContent += '  Promise链完成！\n';
+                        result.textContent += `  组合结果: ${userData}, ${articles}, ${comments}\n`;
+                        
+                        // 演示完成后执行async/await示例
+                        setTimeout(() => {
+                            asyncAwaitDemo();
+                        }, 1000);
+                    });
+            }
+            
+            // 3. async/await示例
+            async function asyncAwaitDemo() {
+                result.textContent += '\n--- async/await示例 ---\n';
+                
+                try {
+                    const userData = await simulateApiCall(500, '用户数据');
+                    const articles = await simulateApiCall(300, '文章列表');
+                    const comments = await simulateApiCall(200, '评论数据');
+                    
+                    result.textContent += '  async/await完成！\n';
+                    result.textContent += `  组合结果: ${userData}, ${articles}, ${comments}\n`;
+                    
+                    // 演示并行执行
+                    setTimeout(() => {
+                        parallelExecutionDemo();
+                    }, 1000);
+                } catch (error) {
+                    result.textContent += `  错误: ${error.message}\n`;
+                }
+            }
+            
+            // 4. 并行执行示例
+            async function parallelExecutionDemo() {
+                result.textContent += '\n--- 并行执行示例 ---\n';
+                result.textContent += '  开始并行API调用...\n';
+                
+                try {
+                    const startTime = Date.now();
+                    
+                    const [userData, articles, comments] = await Promise.all([
+                        simulateApiCall(500, '用户数据'),
+                        simulateApiCall(300, '文章列表'),
+                        simulateApiCall(200, '评论数据')
+                    ]);
+                    
+                    const endTime = Date.now();
+                    
+                    result.textContent += '  并行执行完成！\n';
+                    result.textContent += `  总耗时: ${endTime - startTime}ms\n`;
+                    result.textContent += `  组合结果: ${userData}, ${articles}, ${comments}\n`;
+                    
+                    result.textContent += '\n--- 结论 ---\n';
+                    result.textContent += '  1. 回调地狱: 嵌套层级深，难以维护\n';
+                    result.textContent += '  2. Promise链: 更扁平，但仍有then链\n';
+                    result.textContent += '  3. async/await: 最接近同步代码，可读性最好\n';
+                    result.textContent += '  4. 并行执行: Promise.all显著提高性能\n';
+                } catch (error) {
+                    result.textContent += `  错误: ${error.message}\n`;
+                }
+            }
+            
+            // 开始演示
+            callbackHellDemo();
+        }
+        
+        // 6. 性能优化演示
+        function runPerformanceDemo() {
+            const result = document.getElementById('performanceDemoResult');
+            result.textContent = '开始DOM操作性能对比...\n';
+            
+            // 创建测试数据
+            const testSize = 1000;
+            const testData = Array.from({ length: testSize }, (_, i) => `项目 ${i + 1}`);
+            
+            result.textContent += `测试数据: ${testSize}个项目\n\n`;
+            
+            // 1. 直接DOM操作（较慢）
+            function directDomManipulation() {
+                const container = document.createElement('div');
+                const list = document.createElement('ul');
+                container.appendChild(list);
+                
+                const startTime = performance.now();
+                
+                for (let i = 0; i < testData.length; i++) {
+                    const li = document.createElement('li');
+                    li.textContent = testData[i];
+                    list.appendChild(li); // 每次都触发DOM更新
+                }
+                
+                const endTime = performance.now();
+                
+                result.textContent += `1. 直接DOM操作: ${(endTime - startTime).toFixed(2)}ms\n`;
+                result.textContent += '   特点: 每次循环都修改DOM，触发重排/重绘\n';
+                
+                return endTime - startTime;
+            }
+            
+            // 2. 使用文档片段（较快）
+            function documentFragmentManipulation() {
+                const container = document.createElement('div');
+                const list = document.createElement('ul');
+                container.appendChild(list);
+                
+                const startTime = performance.now();
+                const fragment = document.createDocumentFragment();
+                
+                for (let i = 0; i < testData.length; i++) {
+                    const li = document.createElement('li');
+                    li.textContent = testData[i];
+                    fragment.appendChild(li); // 先添加到文档片段
+                }
+                
+                list.appendChild(fragment); // 一次性更新DOM
+                
+                const endTime = performance.now();
+                
+                result.textContent += `2. 文档片段操作: ${(endTime - startTime).toFixed(2)}ms\n`;
+                result.textContent += '   特点: 批量操作，只触发一次DOM更新\n';
+                
+                return endTime - startTime;
+            }
+            
+            // 3. 使用innerHTML（有时更快，但有安全风险）
+            function innerHTMLManipulation() {
+                const container = document.createElement('div');
+                const list = document.createElement('ul');
+                container.appendChild(list);
+                
+                const startTime = performance.now();
+                
+                let html = '';
+                for (let i = 0; i < testData.length; i++) {
+                    html += `<li>${testData[i]}</li>`;
+                }
+                list.innerHTML = html;
+                
+                const endTime = performance.now();
+                
+                result.textContent += `3. innerHTML操作: ${(endTime - startTime).toFixed(2)}ms\n`;
+                result.textContent += '   特点: 简洁但有XSS风险，依赖浏览器优化\n';
+                
+                return endTime - startTime;
+            }
+            
+            // 执行性能测试
+            const time1 = directDomManipulation();
+            const time2 = documentFragmentManipulation();
+            const time3 = innerHTMLManipulation();
+            
+            // 计算性能提升
+            const improvement1 = ((time1 - time2) / time1 * 100).toFixed(1);
+            const improvement2 = ((time1 - time3) / time1 * 100).toFixed(1);
+            
+            result.textContent += '\n--- 性能对比总结 ---\n';
+            result.textContent += `文档片段比直接操作快 ${improvement1}%\n`;
+            result.textContent += `innerHTML比直接操作快 ${improvement2}%\n\n`;
+            
+            result.textContent += '--- 性能优化建议 ---\n';
+            result.textContent += '1. 减少DOM操作次数，使用批量处理\n';
+            result.textContent += '2. 使用文档片段(DocumentFragment)进行批量DOM操作\n';
+            result.textContent += '3. 避免在循环中修改DOM\n';
+            result.textContent += '4. 使用requestAnimationFrame进行视觉更新\n';
+            result.textContent += '5. 合理使用虚拟滚动处理大数据集\n';
+            result.textContent += '6. 注意: innerHTML性能可能很好，但有XSS安全风险\n';
+        }
+        
+        // 7. XSS防护演示
+        function unsafeRender() {
+            const userInput = document.getElementById('userInput').value || '<script>alert("XSS攻击!")</script>';
+            const output = document.getElementById('renderOutput');
+            
+            // 不安全的方式 - 直接使用innerHTML
+            output.innerHTML = userInput;
+            output.style.backgroundColor = '#fee';
+        }
+        
+        function safeRender() {
+            const userInput = document.getElementById('userInput').value || '<script>alert("XSS攻击!")</script>';
+            const output = document.getElementById('renderOutput');
+            
+            // 安全的方式 - 使用textContent
+            output.textContent = userInput;
+            output.style.backgroundColor = '#efe';
+        }
+        
+        // 8. 模块模式演示
+        function runModuleDemo() {
+            const result = document.getElementById('moduleDemoResult');
+            result.textContent = '开始模块模式演示...\n';
+            
+            // 实现计数器模块
+            const counterModule = (function() {
+                // 私有变量
+                let count = 0;
+                
+                // 私有方法
+                function validateNumber(num) {
+                    return typeof num === 'number' && !isNaN(num);
+                }
+                
+                // 公共API
+                return {
+                    increment() {
+                        count++;
+                        return count;
+                    },
+                    decrement() {
+                        count--;
+                        return count;
+                    },
+                    getCount() {
+                        return count;
+                    },
+                    setCount(newCount) {
+                        if (validateNumber(newCount)) {
+                            count = newCount;
+                            return true;
+                        }
+                        return false;
+                    },
+                    reset() {
+                        count = 0;
+                        return count;
+                    }
+                };
+            })();
+            
+            // 测试模块功能
+            result.textContent += '\n--- 计数器模块测试 ---\n';
+            result.textContent += `初始值: ${counterModule.getCount()}\n`;
+            result.textContent += `递增: ${counterModule.increment()}\n`;
+            result.textContent += `递增: ${counterModule.increment()}\n`;
+            result.textContent += `当前值: ${counterModule.getCount()}\n`;
+            result.textContent += `递减: ${counterModule.decrement()}\n`;
+            result.textContent += `设置为10: ${counterModule.setCount(10) ? '成功' : '失败'}\n`;
+            result.textContent += `当前值: ${counterModule.getCount()}\n`;
+            result.textContent += `尝试设置无效值: ${counterModule.setCount('not a number') ? '成功' : '失败'}\n`;
+            result.textContent += `重置: ${counterModule.reset()}\n`;
+            
+            // 演示私有变量保护
+            result.textContent += '\n--- 私有变量保护演示 ---\n';
+            result.textContent += '注意: 无法直接访问模块内部的count变量\n';
+            result.textContent += '模块外部尝试修改私有变量不会影响内部状态\n';
+            
+            // 创建购物车模块
+            const cartModule = (function() {
+                const items = [];
+                
+                function calculateTotal() {
+                    return items.reduce((total, item) => total + (item.price * item.quantity), 0);
+                }
+                
+                return {
+                    addItem(name, price, quantity = 1) {
+                        items.push({ name, price, quantity });
+                        return items.length;
+                    },
+                    removeItem(index) {
+                        if (index >= 0 && index < items.length) {
+                            items.splice(index, 1);
+                            return true;
+                        }
+                        return false;
+                    },
+                    getItems() {
+                        return [...items]; // 返回副本避免外部修改
+                    },
+                    getTotal() {
+                        return calculateTotal();
+                    },
+                    clearCart() {
+                        items.length = 0;
+                        return true;
+                    }
+                };
+            })();
+            
+            // 测试购物车模块
+            result.textContent += '\n--- 购物车模块测试 ---\n';
+            cartModule.addItem('笔记本电脑', 5999, 1);
+            cartModule.addItem('鼠标', 99, 2);
+            cartModule.addItem('键盘', 299, 1);
+            
+            const cartItems = cartModule.getItems();
+            result.textContent += `购物车商品数: ${cartItems.length}\n`;
+            
+            result.textContent += '购物车内容:\n';
+            cartItems.forEach((item, index) => {
+                result.textContent += `  ${index + 1}. ${item.name} - ¥${item.price} x ${item.quantity}\n`;
+            });
+            
+            result.textContent += `购物车总价: ¥${cartModule.getTotal()}\n`;
+            
+            // 演示模块模式的优势
+            result.textContent += '\n--- 模块模式的优势 ---\n';
+            result.textContent += '1. 封装: 私有变量和方法受到保护\n';
+            result.textContent += '2. 命名空间: 避免全局命名冲突\n';
+            result.textContent += '3. 代码组织: 相关功能集中管理\n';
+            result.textContent += '4. 信息隐藏: 只暴露必要的公共接口\n';
+            result.textContent += '5. 可维护性: 模块化代码更易于维护和测试\n';
+        }
+        
+        // 9. 调试工具演示
+        function runDebugDemo() {
+            const result = document.getElementById('debugDemoResult');
+            result.textContent = '调试工具演示...\n\n';
+            
+            // 模拟数据
+            const users = [
+                { id: 1, name: '张三', age: 28, role: 'admin' },
+                { id: 2, name: '李四', age: 22, role: 'user' },
+                { id: 3, name: '王五', age: 35, role: 'user' }
+            ];
+            
+            result.textContent += '--- console.table() 演示 ---\n';
+            result.textContent += '在实际开发中，使用console.table()可以更清晰地展示表格数据\n';
+            console.table(users); // 打开浏览器控制台查看效果
+            
+            // 模拟性能测量
+            result.textContent += '\n--- console.time() 演示 ---\n';
+            result.textContent += '开始性能测试...\n';
+            
+            console.time('循环测试');
+            // 执行一些操作
+            let sum = 0;
+            for (let i = 0; i < 1000000; i++) {
+                sum += i;
+            }
+            console.timeEnd('循环测试'); // 打开浏览器控制台查看效果
+            
+            result.textContent += '循环计算完成，查看控制台获取执行时间\n';
+            
+            // 演示条件断点概念
+            result.textContent += '\n--- 条件断点演示 ---\n';
+            result.textContent += '在Chrome DevTools的Sources面板中，可以设置条件断点:\n';
+            result.textContent += '1. 点击行号设置断点\n';
+            result.textContent += '2. 右键点击断点选择"Edit breakpoint"\n';
+            result.textContent += '3. 输入条件表达式，如 i === 5\n';
+            result.textContent += '4. 断点仅在条件为真时触发\n';
+            
+            // 演示错误捕获和堆栈跟踪
+            result.textContent += '\n--- 错误处理演示 ---\n';
+            try {
+                // 故意抛出错误以演示堆栈跟踪
+                function functionA() {
+                    functionB();
+                }
+                
+                function functionB() {
+                    functionC();
+                }
+                
+                function functionC() {
+                    throw new Error('演示错误堆栈跟踪');
+                }
+                
+                functionA();
+            } catch (error) {
+                result.textContent += `捕获到错误: ${error.message}\n`;
+                result.textContent += '错误堆栈（部分）:\n';
+                const stackLines = error.stack.split('\n').slice(0, 5);
+                stackLines.forEach(line => {
+                    result.textContent += `  ${line}\n`;
+                });
+                result.textContent += '\n在实际开发中，可以使用这些信息定位错误源\n';
+            }
+            
+            // 演示常用调试技巧
+            result.textContent += '\n--- 常用调试技巧 ---\n';
+            result.textContent += '1. 使用 debugger 语句在代码中设置断点\n';
+            result.textContent += '2. 利用Watch面板监控变量值变化\n';
+            result.textContent += '3. 使用Console面板执行临时代码\n';
+            result.textContent += '4. 使用Network面板分析网络请求\n';
+            result.textContent += '5. 使用Application面板检查本地存储\n';
+            result.textContent += '6. 使用Memory面板检测内存泄漏\n';
+            result.textContent += '7. 使用Source Map关联压缩代码和源码\n';
+        }
+        
+        // 10. 工具与资源演示
+        function runToolsDemo() {
+            const result = document.getElementById('toolsDemoResult');
+            result.textContent = 'JavaScript开发工具与资源推荐...\n\n';
+            
+            // 开发工具推荐
+            result.textContent += '--- 开发工具推荐 ---
+';
+            result.textContent += '1. 编辑器\n';
+            result.textContent += '   - VS Code: 最流行的现代代码编辑器，插件丰富\n';
+            result.textContent += '   - WebStorm: 专业的JavaScript IDE，功能全面\n';
+            result.textContent += '   - Sublime Text: 轻量级但强大的编辑器\n\n';
+            
+            result.textContent += '2. 调试工具\n';
+            result.textContent += '   - Chrome DevTools: 强大的浏览器内置调试工具\n';
+            result.textContent += '   - React Developer Tools: React应用调试\n';
+            result.textContent += '   - Redux DevTools: Redux状态管理调试\n\n';
+            
+            result.textContent += '3. 构建工具\n';
+            result.textContent += '   - Webpack: 模块打包器\n';
+            result.textContent += '   - Vite: 现代前端构建工具，极速开发体验\n';
+            result.textContent += '   - Rollup: JavaScript模块打包器，适合库开发\n\n';
+            
+            result.textContent += '4. 包管理\n';
+            result.textContent += '   - npm: Node.js包管理器\n';
+            result.textContent += '   - Yarn: 快速、可靠的包管理器\n';
+            result.textContent += '   - pnpm: 高效的包管理器，节省磁盘空间\n\n';
+            
+            result.textContent += '5. 代码质量工具\n';
+            result.textContent += '   - ESLint: 代码检查工具\n';
+            result.textContent += '   - Prettier: 代码格式化工具\n';
+            result.textContent += '   - Husky: Git钩子工具\n';
+            result.textContent += '   - Jest: JavaScript测试框架\n\n';
+            
+            // 常用库推荐
+            result.textContent += '--- 常用JavaScript库推荐 ---
+';
+            result.textContent += '1. UI库\n';
+            result.textContent += '   - React: 用于构建用户界面的JavaScript库\n';
+            result.textContent += '   - Vue: 渐进式JavaScript框架\n';
+            result.textContent += '   - Angular: 完整的前端框架\n';
+            result.textContent += '   - Svelte: 编译时框架，生成原生JavaScript\n\n';
+            
+            result.textContent += '2. 工具库\n';
+            result.textContent += '   - Lodash: 实用工具函数库\n';
+            result.textContent += '   - dayjs/moment: 日期时间处理\n';
+            result.textContent += '   - Axios: HTTP客户端\n';
+            result.textContent += '   - UUID: 生成唯一标识符\n\n';
+            
+            result.textContent += '3. 动画库\n';
+            result.textContent += '   - GSAP: 高性能动画库\n';
+            result.textContent += '   - Framer Motion: React动画库\n';
+            result.textContent += '   - anime.js: 轻量级动画库\n\n';
+            
+            result.textContent += '4. 状态管理\n';
+            result.textContent += '   - Redux: 可预测的状态容器\n';
+            result.textContent += '   - Vuex: Vue的状态管理库\n';
+            result.textContent += '   - MobX: 响应式状态管理\n';
+            result.textContent += '   - Recoil: React的状态管理库\n\n';
+            
+            result.textContent += '--- 在线资源推荐 ---
+';
+            result.textContent += '1. 学习资源\n';
+            result.textContent += '   - MDN Web Docs: 最权威的Web开发文档\n';
+            result.textContent += '   - JavaScript.info: 现代JavaScript教程\n';
+            result.textContent += '   - You-Dont-Know-JS: 深入了解JavaScript\n';
+            result.textContent += '   - Frontend Masters: 高质量前端课程\n\n';
+            
+            result.textContent += '2. 代码示例与参考\n';
+            result.textContent += '   - Stack Overflow: 解决编程问题\n';
+            result.textContent += '   - GitHub: 开源项目和代码示例\n';
+            result.textContent += '   - CodePen: 在线代码编辑器\n';
+            result.textContent += '   - JSFiddle: 在线JavaScript测试环境\n\n';
+            
+            result.textContent += '3. 性能优化\n';
+            result.textContent += '   - Lighthouse: 网站质量评估工具\n';
+            result.textContent += '   - WebPageTest: 网站性能测试\n';
+            result.textContent += '   - Chrome DevTools Performance: 性能分析工具\n';
+        }
+        
+        // 初始化页面时自动执行命名检测示例
+        document.addEventListener('DOMContentLoaded', function() {
+            // 可以在这里添加页面初始化代码
+        });
+        
+        // 添加一些辅助功能
+        function highlightCode() {
+            // 简单的代码高亮模拟
+            const codeBlocks = document.querySelectorAll('code');
+            codeBlocks.forEach(block => {
+                block.style.backgroundColor = '#f5f5f5';
+                block.style.padding = '10px';
+                block.style.borderRadius = '4px';
+                block.style.fontFamily = 'monospace';
+                block.style.display = 'block';
+                block.style.whiteSpace = 'pre-wrap';
+            });
+        }
+        
+        // 页面加载完成后执行
+        document.addEventListener('DOMContentLoaded', function() {
+            highlightCode();
+            // 自动运行命名规范演示
+            runNamingDemo();
+        });
+    </script>
+    <!-- 演示区域的HTML元素 -->
+    <div class="demo-container">
+        <!-- 1. 命名规范演示 -->
+        <section id="naming-section">
+            <h3>1. 代码风格与命名规范演示</h3>
+            <button onclick="runNamingDemo()">运行命名规范演示</button>
+            <pre id="namingDemoResult" class="result"></pre>
+        </section>
+        <br>
+        <br>
+        
+        <!-- 2. 变量声明演示 -->
+        <section id="variables-section">
+            <h3>2. 变量声明与作用域演示</h3>
+            <button onclick="runVariablesDemo()">运行变量声明演示</button>
+            <pre id="variablesDemoResult" class="result"></pre>
+        </section>
+        <br>
+        <br>
+        
+        <!-- 3. 函数最佳实践演示 -->
+        <section id="functions-section">
+            <h3>3. 函数编写最佳实践演示</h3>
+            <button onclick="runFunctionsDemo()">运行函数演示</button>
+            <pre id="functionsDemoResult" class="result"></pre>
+        </section>
+        <br>
+        <br>
+        
+        <!-- 4. 数组和对象操作演示 -->
+        <section id="collections-section">
+            <h3>4. 数组和对象操作演示</h3>
+            <button onclick="runCollectionsDemo()">运行集合操作演示</button>
+            <pre id="collectionsDemoResult" class="result"></pre>
+        </section>
+        <br>
+        <br>
+        
+        <!-- 5. 异步编程演示 -->
+        <section id="async-section">
+            <h3>5. 异步编程最佳实践演示</h3>
+            <button onclick="runAsyncDemo()">运行异步编程演示</button>
+            <p class="note">注意: 此演示会依次展示回调地狱、Promise链、async/await和并行执行的区别</p>
+            <pre id="asyncDemoResult" class="result"></pre>
+        </section>
+        <br>
+        <br>
+        
+        <!-- 6. 性能优化演示 -->
+        <section id="performance-section">
+            <h3>6. 性能优化演示</h3>
+            <button onclick="runPerformanceDemo()">运行性能测试演示</button>
+            <p class="note">注意: 此演示比较不同DOM操作方式的性能差异</p>
+            <pre id="performanceDemoResult" class="result"></pre>
+        </section>
+        <br>
+        <br>
+        
+        <!-- 7. 安全最佳实践演示 -->
+        <section id="security-section">
+            <h3>7. 安全最佳实践演示 - XSS防护对比</h3>
+            <div class="input-group">
+                <label for="userInput">输入文本 (包含XSS尝试):</label>
+                <input type="text" id="userInput" size="50" placeholder="<script>alert('XSS')</script>">
+            </div>
+            <div class="button-group">
+                <button onclick="unsafeRender()">不安全渲染 (innerHTML)</button>
+                <button onclick="safeRender()">安全渲染 (textContent)</button>
+            </div>
+            <div id="renderOutput" class="output-box">输出区域</div>
+        </section>
+        <br>
+        <br>
+        
+        <!-- 8. 代码组织演示 -->
+        <section id="module-section">
+            <h3>8. 代码组织与模块化演示 - 模块模式</h3>
+            <button onclick="runModuleDemo()">运行模块模式演示</button>
+            <pre id="moduleDemoResult" class="result"></pre>
+        </section>
+        <br>
+        <br>
+        <!-- 9. 调试与测试演示 -->
+        <section id="debug-section">
+            <h3>9. 调试与测试演示</h3>
+            <button onclick="runDebugDemo()">运行调试工具演示</button>
+            <p class="note">注意: 部分演示需要打开浏览器控制台查看效果</p>
+            <pre id="debugDemoResult" class="result"></pre>
+        </section>
+        <br>
+        <br>
+        <!-- 10. 工具与资源演示 -->
+        <section id="tools-section">
+            <h3>10. 开发工具与资源推荐</h3>
+            <button onclick="runToolsDemo()">查看推荐工具与资源</button>
+            <pre id="toolsDemoResult" class="result"></pre>
+        </section>
+    </div>
+    <!-- 页面样式 -->
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+        
+        h1, h2, h3 {
+            color: #2c3e50;
+            margin-top: 30px;
+        }
+        
+        h1 {
+            text-align: center;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+            margin-bottom: 40px;
+        }
+        
+        h2 {
+            border-left: 4px solid #3498db;
+            padding-left: 15px;
+            margin-top: 50px;
+        }
+        
+        .demo-container {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            margin-top: 20px;
+        }
+        
+        section {
+            margin-bottom: 40px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 6px;
+        }
+        
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 0;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: #2980b9;
+        }
+        
+        .result {
+            background-color: #282c34;
+            color: #abb2bf;
+            padding: 20px;
+            border-radius: 6px;
+            margin-top: 15px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            font-family: 'Courier New', Courier, monospace;
+            line-height: 1.5;
+        }
+        
+        .code-block {
+            background-color: #f5f5f5;
+            border-left: 4px solid #3498db;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 0 4px 4px 0;
+            font-family: 'Courier New', Courier, monospace;
+            white-space: pre-wrap;
+            line-height: 1.5;
+        }
+        
+        .note {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        
+        .input-group {
+            margin: 15px 0;
+        }
+        
+        input[type="text"] {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            width: 100%;
+            max-width: 600px;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin: 15px 0;
+        }
+        
+        .output-box {
+            min-height: 100px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: #fff;
+            margin-top: 15px;
+            font-family: 'Courier New', Courier, monospace;
+        }
+        
+        .comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .comparison-item {
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 6px;
+            border: 1px solid #ddd;
+        }
+        
+        .comparison-item h4 {
+            margin-top: 0;
+            color: #3498db;
+        }
+        
+        .bad {
+            border-left: 4px solid #e74c3c;
+        }
+        
+        .good {
+            border-left: 4px solid #2ecc71;
+        }
+        
+        @media (max-width: 768px) {
+            .comparison {
+                grid-template-columns: 1fr;
+            }
+            
+            .demo-container {
+                padding: 15px;
+            }
+            
+            body {
+                padding: 10px;
+            }
+        }
+    </style>
+</body>
+</html>

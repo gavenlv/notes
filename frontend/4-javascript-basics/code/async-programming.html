@@ -1,0 +1,1172 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JavaScript异步编程示例</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: #34495e;
+            margin-top: 30px;
+            margin-bottom: 20px;
+            border-left: 4px solid #3498db;
+            padding-left: 15px;
+        }
+        h3 {
+            color: #7f8c8d;
+            margin-top: 20px;
+        }
+        .example-section {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 25px;
+            border-left: 3px solid #3498db;
+        }
+        .result-box {
+            background-color: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 15px;
+            font-family: monospace;
+            max-height: 300px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        button:active {
+            transform: translateY(1px);
+        }
+        .code-block {
+            background-color: #f5f5f5;
+            padding: 15px;
+            border-radius: 5px;
+            border-left: 3px solid #e74c3c;
+            font-family: monospace;
+            overflow-x: auto;
+            margin-bottom: 20px;
+            white-space: pre;
+        }
+        .timeline {
+            position: relative;
+            margin: 20px 0;
+            padding-left: 30px;
+        }
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 10px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background-color: #3498db;
+        }
+        .timeline-item {
+            position: relative;
+            padding-bottom: 20px;
+        }
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -30px;
+            top: 5px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: #e74c3c;
+            border: 2px solid #3498db;
+        }
+        .highlight {
+            background-color: #ffffcc;
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-weight: bold;
+        }
+        .step {
+            background-color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            border-left: 3px solid #2ecc71;
+        }
+        .warning {
+            background-color: #fdf2e9;
+            padding: 15px;
+            border-radius: 5px;
+            border-left: 3px solid #e67e22;
+            margin: 15px 0;
+        }
+        .success {
+            background-color: #e8f8f5;
+            padding: 15px;
+            border-radius: 5px;
+            border-left: 3px solid #2ecc71;
+            margin: 15px 0;
+        }
+        .delay-input {
+            width: 100px;
+            padding: 8px;
+            margin: 0 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .progress-container {
+            width: 100%;
+            height: 20px;
+            background-color: #ecf0f1;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 15px 0;
+        }
+        .progress-bar {
+            height: 100%;
+            background-color: #3498db;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>JavaScript异步编程</h1>
+        <p>JavaScript是一门单线程语言，但通过异步编程，我们可以处理需要等待的操作（如网络请求、文件读写等）而不阻塞主线程。本页面演示了JavaScript中异步编程的各种方式。</p>
+        
+        <h2>1. 回调函数（Callbacks）</h2>
+        <div class="example-section">
+            <p>回调函数是JavaScript中处理异步操作的最基本方式。它是一个函数，作为参数传递给另一个函数，并在异步操作完成后被调用。</p>
+            
+            <div class="code-block">// 回调函数示例
+function fetchData(callback) {
+    setTimeout(function() {
+        const data = '这是获取的数据';
+        callback(null, data); // 成功时调用回调，第一个参数为null表示无错误
+    }, 1000);
+}
+
+// 调用带有回调的函数
+fetchData(function(error, result) {
+    if (error) {
+        console.error('发生错误:', error);
+        return;
+    }
+    console.log('成功获取数据:', result);
+});</div>
+            
+            <button onclick="runCallbackDemo()">运行回调函数演示</button>
+            <div id="callbackResult" class="result-box">结果将显示在这里</div>
+        </div>
+        
+        <h2>2. Promise基础</h2>
+        <div class="example-section">
+            <p>Promise是ES6引入的用于处理异步操作的对象，它代表一个异步操作的最终完成（或失败）及其结果值。</p>
+            
+            <div class="code-block">// 创建Promise
+const myPromise = new Promise((resolve, reject) => {
+    // 模拟异步操作
+    setTimeout(() => {
+        const success = true;
+        if (success) {
+            resolve('操作成功完成！'); // 成功时调用resolve
+        } else {
+            reject(new Error('操作失败！')); // 失败时调用reject
+        }
+    }, 1000);
+});
+
+// 使用Promise
+myPromise
+    .then(result => {
+        console.log('成功:', result);
+        return '处理后的结果';
+    })
+    .then(processedResult => {
+        console.log('处理结果:', processedResult);
+    })
+    .catch(error => {
+        console.error('错误:', error);
+    })
+    .finally(() => {
+        console.log('无论成功失败都会执行');
+    });</div>
+            
+            <button onclick="runPromiseDemo()">运行Promise演示</button>
+            <div id="promiseResult" class="result-box">结果将显示在这里</div>
+        </div>
+        
+        <h2>3. Promise组合方法</h2>
+        <div class="example-section">
+            <h3>3.1 Promise.all()</h3>
+            <p>等待所有Promise都完成，如果有一个失败，则整体失败。</p>
+            
+            <div class="code-block">// Promise.all示例
+const promise1 = Promise.resolve(3);
+const promise2 = 42;
+const promise3 = new Promise((resolve, reject) => {
+    setTimeout(resolve, 1000, 'foo');
+});
+
+Promise.all([promise1, promise2, promise3])
+    .then(values => {
+        console.log(values); // [3, 42, "foo"]
+    })
+    .catch(error => {
+        console.error('有Promise失败:', error);
+    });</div>
+            
+            <h3>3.2 Promise.race()</h3>
+            <p>等待第一个完成的Promise，无论成功或失败。</p>
+            
+            <div class="code-block">// Promise.race示例
+const promise1 = new Promise((resolve, reject) => {
+    setTimeout(resolve, 500, '一个结果');
+});
+
+const promise2 = new Promise((resolve, reject) => {
+    setTimeout(resolve, 100, '另一个结果');
+});
+
+Promise.race([promise1, promise2])
+    .then(value => {
+        console.log(value); // "另一个结果"，因为它先完成
+    });</div>
+            
+            <h3>3.3 Promise.allSettled()</h3>
+            <p>等待所有Promise都完成，无论成功或失败，返回每个Promise的结果。</p>
+            
+            <div class="code-block">// Promise.allSettled示例
+const promise1 = Promise.resolve(3);
+const promise2 = new Promise((resolve, reject) => {
+    setTimeout(reject, 1000, '失败');
+});
+
+Promise.allSettled([promise1, promise2])
+    .then(results => {
+        results.forEach(result => {
+            if (result.status === 'fulfilled') {
+                console.log('成功值:', result.value);
+            } else {
+                console.log('错误原因:', result.reason);
+            }
+        });
+    });</div>
+            
+            <button onclick="runPromiseCombineDemo()">运行Promise组合演示</button>
+            <div id="promiseCombineResult" class="result-box">结果将显示在这里</div>
+        </div>
+        
+        <h2>4. async/await</h2>
+        <div class="example-section">
+            <p>async/await是ES2017引入的语法糖，基于Promise构建，使异步代码看起来更像同步代码。</p>
+            
+            <div class="code-block">// async函数
+async function fetchData() {
+    try {
+        // await等待Promise完成
+        const result = await new Promise((resolve, reject) => {
+            setTimeout(() => {
+                resolve('异步操作完成');
+            }, 1000);
+        });
+        
+        console.log(result); // 输出: 异步操作完成
+        return result;
+    } catch (error) {
+        console.error('发生错误:', error);
+    }
+}
+
+// 调用async函数
+fetchData()
+    .then(result => {
+        console.log('async函数返回结果:', result);
+    })
+    .catch(error => {
+        console.error('async函数出错:', error);
+    });</div>
+            
+            <button onclick="runAsyncAwaitDemo()">运行async/await演示</button>
+            <div id="asyncAwaitResult" class="result-box">结果将显示在这里</div>
+        </div>
+        
+        <h2>5. 实际应用场景</h2>
+        <div class="example-section">
+            <h3>5.1 顺序执行异步操作</h3>
+            <p>演示如何按顺序执行多个异步操作，每个操作依赖前一个操作的结果。</p>
+            
+            <div class="timeline">
+                <div class="timeline-item">
+                    <strong>步骤1:</strong> 获取用户信息
+                </div>
+                <div class="timeline-item">
+                    <strong>步骤2:</strong> 根据用户ID获取订单
+                </div>
+                <div class="timeline-item">
+                    <strong>步骤3:</strong> 根据订单获取商品详情
+                </div>
+            </div>
+            
+            <button onclick="runSequentialDemo()">运行顺序异步操作</button>
+            <div id="sequentialResult" class="result-box">结果将显示在这里</div>
+            
+            <h3>5.2 并行执行异步操作</h3>
+            <p>演示如何并行执行多个独立的异步操作以提高效率。</p>
+            
+            <div class="step">
+                <strong>同时加载:</strong>
+                <ul>
+                    <li>加载用户数据</li>
+                    <li>加载产品列表</li>
+                    <li>加载推荐内容</li>
+                </ul>
+            </div>
+            
+            <button onclick="runParallelDemo()">运行并行异步操作</button>
+            <div id="parallelResult" class="result-box">结果将显示在这里</div>
+            
+            <h3>5.3 错误处理策略</h3>
+            <p>演示异步操作中的错误处理最佳实践。</p>
+            
+            <div class="code-block">// 异步错误处理
+async function robustOperation() {
+    try {
+        // 操作1
+        const result1 = await operation1();
+        console.log('操作1完成:', result1);
+        
+        try {
+            // 操作2，如果失败不影响整体流程
+            const result2 = await operation2();
+            console.log('操作2完成:', result2);
+        } catch (error) {
+            console.warn('操作2失败，但继续执行:', error.message);
+        }
+        
+        // 操作3
+        const result3 = await operation3();
+        return result3;
+    } catch (error) {
+        console.error('主要流程错误:', error);
+        // 可能的降级处理或默认值
+        return '默认结果';
+    } finally {
+        // 清理工作，无论成功失败都会执行
+        console.log('清理资源');
+    }
+}</div>
+            
+            <button onclick="runErrorHandlingDemo()">运行错误处理演示</button>
+            <div id="errorHandlingResult" class="result-box">结果将显示在这里</div>
+        </div>
+        
+        <h2>6. 实际异步场景模拟</h2>
+        <div class="example-section">
+            <h3>6.1 模拟API请求</h3>
+            <p>模拟网络请求场景，包括成功和失败情况。</p>
+            
+            <div class="progress-container">
+                <div id="apiProgressBar" class="progress-bar"></div>
+            </div>
+            
+            <button onclick="simulateApiRequest()">模拟API请求</button>
+            <div id="apiRequestResult" class="result-box">结果将显示在这里</div>
+            
+            <h3>6.2 取消异步操作</h3>
+            <p>演示如何取消正在进行的异步操作。</p>
+            
+            <div class="code-block">// 使用AbortController取消异步操作
+async function cancellableOperation(signal) {
+    return new Promise((resolve, reject) => {
+        // 检查信号是否已经被中止
+        if (signal.aborted) {
+            return reject(new Error('操作已取消'));
+        }
+        
+        // 设置超时
+        const timeoutId = setTimeout(() => {
+            resolve('操作完成');
+        }, 3000);
+        
+        // 监听中止信号
+        signal.addEventListener('abort', () => {
+            clearTimeout(timeoutId);
+            reject(new Error('操作被取消'));
+        });
+    });
+}
+
+// 使用方法
+const controller = new AbortController();
+const { signal } = controller;
+
+cancellableOperation(signal)
+    .then(result => console.log(result))
+    .catch(error => console.error(error));
+
+// 取消操作
+// controller.abort();</div>
+            
+            <button onclick="startCancellableOperation()">开始可取消的操作</button>
+            <button onclick="cancelOperation()">取消操作</button>
+            <div id="cancelResult" class="result-box">结果将显示在这里</div>
+            
+            <h3>6.3 防抖与节流</h3>
+            <p>演示如何处理频繁触发的异步操作，如用户输入、窗口调整等。</p>
+            
+            <div class="code-block">// 防抖函数
+function debounce(func, delay) {
+    let timeoutId;
+    return function(...args) {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => {
+            func.apply(this, args);
+        }, delay);
+    };
+}
+
+// 节流函数
+function throttle(func, limit) {
+    let inThrottle;
+    return function(...args) {
+        if (!inThrottle) {
+            func.apply(this, args);
+            inThrottle = true;
+            setTimeout(() => {
+                inThrottle = false;
+            }, limit);
+        }
+    };
+}</div>
+            
+            <div class="demo-area">
+                <input type="text" id="debounceInput" placeholder="输入测试防抖..." style="width: 300px; padding: 8px;">
+                <div id="debounceResult" class="result-box" style="margin-top: 10px;">防抖结果将显示在这里</div>
+            </div>
+        </div>
+        
+        <h2>7. 异步编程最佳实践</h2>
+        <div class="example-section">
+            <div class="success">
+                <h3>✅ 推荐做法</h3>
+                <ul>
+                    <li>使用 <strong>async/await</strong> 语法使代码更易读</li>
+                    <li>始终用 <strong>try/catch</strong> 捕获异步操作中的错误</li>
+                    <li>独立的异步操作使用 <strong>Promise.all()</strong> 并行执行</li>
+                    <li>为长时间运行的操作提供 <strong>取消机制</strong></li>
+                    <li>使用 <strong>Promise.allSettled()</strong> 处理允许部分失败的场景</li>
+                </ul>
+            </div>
+            
+            <div class="warning">
+                <h3>❌ 避免做法</h3>
+                <ul>
+                    <li>避免回调地狱（Callback Hell）</li>
+                    <li>不要在没有错误处理的情况下使用Promise或async/await</li>
+                    <li>避免不必要的串行执行独立的异步操作</li>
+                    <li>不要忽略Promise的返回值（未使用的Promise）</li>
+                    <li>避免在循环中使用await而不使用Promise.all</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 辅助函数
+        function displayResult(elementId, content) {
+            const element = document.getElementById(elementId);
+            element.textContent = content;
+        }
+        
+        function appendResult(elementId, content) {
+            const element = document.getElementById(elementId);
+            element.textContent += '\n' + content;
+        }
+        
+        // 1. 回调函数演示
+        function runCallbackDemo() {
+            displayResult('callbackResult', '开始回调函数演示...');
+            
+            // 模拟异步获取用户数据
+            function getUserData(userId, callback) {
+                setTimeout(() => {
+                    appendResult('callbackResult', `获取用户 ${userId} 数据中...`);
+                    const userData = {
+                        id: userId,
+                        name: '张三',
+                        age: 30
+                    };
+                    callback(null, userData);
+                }, 1000);
+            }
+            
+            // 模拟异步获取用户订单
+            function getUserOrders(userId, callback) {
+                setTimeout(() => {
+                    appendResult('callbackResult', `获取用户 ${userId} 的订单中...`);
+                    const orders = [
+                        { id: 1, product: '手机' },
+                        { id: 2, product: '电脑' }
+                    ];
+                    callback(null, orders);
+                }, 1000);
+            }
+            
+            // 模拟回调地狱
+            getUserData(1, function(error, user) {
+                if (error) {
+                    appendResult('callbackResult', `错误: ${error.message}`);
+                    return;
+                }
+                
+                appendResult('callbackResult', `成功获取用户: ${JSON.stringify(user)}`);
+                
+                getUserOrders(user.id, function(error, orders) {
+                    if (error) {
+                        appendResult('callbackResult', `错误: ${error.message}`);
+                        return;
+                    }
+                    
+                    appendResult('callbackResult', `成功获取订单: ${JSON.stringify(orders)}`);
+                    appendResult('callbackResult', '回调函数演示完成!');
+                });
+            });
+        }
+        
+        // 2. Promise基础演示
+        function runPromiseDemo() {
+            displayResult('promiseResult', '开始Promise演示...');
+            
+            // 创建一个返回Promise的函数
+            function fetchData(success = true) {
+                return new Promise((resolve, reject) => {
+                    setTimeout(() => {
+                        appendResult('promiseResult', '异步操作完成');
+                        if (success) {
+                            resolve('操作成功！');
+                        } else {
+                            reject(new Error('操作失败！'));
+                        }
+                    }, 1000);
+                });
+            }
+            
+            // 成功的Promise
+            appendResult('promiseResult', '创建成功的Promise...');
+            fetchData(true)
+                .then(result => {
+                    appendResult('promiseResult', `成功: ${result}`);
+                    return '处理后的' + result;
+                })
+                .then(processed => {
+                    appendResult('promiseResult', `处理结果: ${processed}`);
+                })
+                .catch(error => {
+                    appendResult('promiseResult', `捕获到错误: ${error.message}`);
+                })
+                .finally(() => {
+                    appendResult('promiseResult', 'finally块执行');
+                    
+                    // 失败的Promise
+                    appendResult('promiseResult', '\n创建失败的Promise...');
+                    fetchData(false)
+                        .then(result => {
+                            appendResult('promiseResult', `成功: ${result}`);
+                        })
+                        .catch(error => {
+                            appendResult('promiseResult', `捕获到错误: ${error.message}`);
+                        })
+                        .finally(() => {
+                            appendResult('promiseResult', 'finally块执行');
+                            appendResult('promiseResult', 'Promise演示完成!');
+                        });
+                });
+        }
+        
+        // 3. Promise组合方法演示
+        function runPromiseCombineDemo() {
+            displayResult('promiseCombineResult', '开始Promise组合演示...');
+            
+            // 创建延迟Promise
+            function delay(ms, value) {
+                return new Promise(resolve => setTimeout(() => resolve(value), ms));
+            }
+            
+            // 创建失败的Promise
+            function fail(ms, errorMessage) {
+                return new Promise((_, reject) => setTimeout(() => reject(new Error(errorMessage)), ms));
+            }
+            
+            // Promise.all演示
+            appendResult('promiseCombineResult', '\n=== Promise.all演示 ===');
+            Promise.all([
+                delay(500, '结果1'),
+                delay(1000, '结果2'),
+                delay(800, '结果3')
+            ])
+            .then(results => {
+                appendResult('promiseCombineResult', `Promise.all成功: ${JSON.stringify(results)}`);
+            })
+            .catch(error => {
+                appendResult('promiseCombineResult', `Promise.all失败: ${error.message}`);
+            })
+            .finally(() => {
+                // Promise.all包含失败的情况
+                Promise.all([
+                    delay(500, '结果A'),
+                    fail(800, '故意失败'),
+                    delay(1000, '结果B')
+                ])
+                .then(results => {
+                    appendResult('promiseCombineResult', `Promise.all成功: ${JSON.stringify(results)}`);
+                })
+                .catch(error => {
+                    appendResult('promiseCombineResult', `Promise.all失败: ${error.message}`);
+                    
+                    // Promise.race演示
+                    appendResult('promiseCombineResult', '\n=== Promise.race演示 ===');
+                    Promise.race([
+                        delay(1000, '慢结果'),
+                        delay(500, '快结果'),
+                        delay(800, '中结果')
+                    ])
+                    .then(result => {
+                        appendResult('promiseCombineResult', `Promise.race结果: ${result}`);
+                        
+                        // Promise.allSettled演示
+                        appendResult('promiseCombineResult', '\n=== Promise.allSettled演示 ===');
+                        Promise.allSettled([
+                            delay(500, '成功1'),
+                            fail(800, '失败1'),
+                            delay(1000, '成功2')
+                        ])
+                        .then(results => {
+                            appendResult('promiseCombineResult', 'Promise.allSettled结果:');
+                            results.forEach((result, index) => {
+                                if (result.status === 'fulfilled') {
+                                    appendResult('promiseCombineResult', `  Promise ${index + 1}: 成功 - ${result.value}`);
+                                } else {
+                                    appendResult('promiseCombineResult', `  Promise ${index + 1}: 失败 - ${result.reason.message}`);
+                                }
+                            });
+                            appendResult('promiseCombineResult', '\nPromise组合演示完成!');
+                        });
+                    });
+                });
+            });
+        }
+        
+        // 4. async/await演示
+        function runAsyncAwaitDemo() {
+            displayResult('asyncAwaitResult', '开始async/await演示...');
+            
+            // 模拟异步操作
+            function fetchUser() {
+                return new Promise(resolve => setTimeout(() => resolve({ id: 1, name: '李四' }), 800));
+            }
+            
+            function fetchPosts(userId) {
+                return new Promise(resolve => setTimeout(() => {
+                    resolve([
+                        { id: 1, title: '第一篇文章', userId },
+                        { id: 2, title: '第二篇文章', userId }
+                    ]);
+                }, 1200));
+            }
+            
+            function fetchComments(postId) {
+                return new Promise(resolve => setTimeout(() => {
+                    resolve([
+                        { id: 1, content: '评论1', postId },
+                        { id: 2, content: '评论2', postId }
+                    ]);
+                }, 600));
+            }
+            
+            // 使用async/await的函数
+            async function getUserWithComments() {
+                try {
+                    // 顺序获取数据
+                    appendResult('asyncAwaitResult', '获取用户信息...');
+                    const user = await fetchUser();
+                    appendResult('asyncAwaitResult', `获取到用户: ${JSON.stringify(user)}`);
+                    
+                    appendResult('asyncAwaitResult', '获取用户文章...');
+                    const posts = await fetchPosts(user.id);
+                    appendResult('asyncAwaitResult', `获取到文章: ${JSON.stringify(posts)}`);
+                    
+                    appendResult('asyncAwaitResult', '获取第一篇文章评论...');
+                    const comments = await fetchComments(posts[0].id);
+                    appendResult('asyncAwaitResult', `获取到评论: ${JSON.stringify(comments)}`);
+                    
+                    // 返回组合结果
+                    const result = {
+                        user,
+                        posts,
+                        comments
+                    };
+                    
+                    return result;
+                } catch (error) {
+                    appendResult('asyncAwaitResult', `发生错误: ${error.message}`);
+                    throw error;
+                }
+            }
+            
+            // 调用async函数
+            getUserWithComments()
+                .then(result => {
+                    appendResult('asyncAwaitResult', '\nasync函数成功完成!');
+                    appendResult('asyncAwaitResult', '最终结果:');
+                    appendResult('asyncAwaitResult', `- 用户: ${result.user.name}`);
+                    appendResult('asyncAwaitResult', `- 文章数: ${result.posts.length}`);
+                    appendResult('asyncAwaitResult', `- 评论数: ${result.comments.length}`);
+                })
+                .catch(error => {
+                    appendResult('asyncAwaitResult', `捕获到错误: ${error.message}`);
+                });
+        }
+        
+        // 5. 顺序执行异步操作演示
+        function runSequentialDemo() {
+            displayResult('sequentialResult', '开始顺序异步操作演示...');
+            
+            // 模拟依赖的API调用
+            async function getUserInfo(userId) {
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                appendResult('sequentialResult', `✅ 获取用户信息: 用户${userId}`);
+                return { userId, name: '用户' + userId, email: 'user' + userId + '@example.com' };
+            }
+            
+            async function getOrders(userId) {
+                await new Promise(resolve => setTimeout(resolve, 800));
+                appendResult('sequentialResult', `✅ 获取用户订单: 用户${userId}的订单`);
+                return [
+                    { orderId: 101, userId, amount: 100 },
+                    { orderId: 102, userId, amount: 200 }
+                ];
+            }
+            
+            async function getOrderDetails(orderId) {
+                await new Promise(resolve => setTimeout(resolve, 600));
+                appendResult('sequentialResult', `✅ 获取订单详情: 订单${orderId}的详情`);
+                return { 
+                    orderId, 
+                    items: ['产品A', '产品B'],
+                    status: '已发货'
+                };
+            }
+            
+            // 顺序执行函数
+            async function processUserFlow() {
+                try {
+                    // 步骤1: 获取用户信息
+                    appendResult('sequentialResult', '🔄 开始步骤1: 获取用户信息');
+                    const user = await getUserInfo(1001);
+                    
+                    // 步骤2: 根据用户ID获取订单
+                    appendResult('sequentialResult', '🔄 开始步骤2: 获取用户订单');
+                    const orders = await getOrders(user.userId);
+                    
+                    // 步骤3: 根据订单获取商品详情
+                    appendResult('sequentialResult', '🔄 开始步骤3: 获取订单详情');
+                    const orderDetails = await getOrderDetails(orders[0].orderId);
+                    
+                    appendResult('sequentialResult', '\n🎉 流程完成! 最终结果:');
+                    appendResult('sequentialResult', `- 用户名: ${user.name}`);
+                    appendResult('sequentialResult', `- 订单数: ${orders.length}`);
+                    appendResult('sequentialResult', `- 第一个订单状态: ${orderDetails.status}`);
+                    appendResult('sequentialResult', `- 订单包含商品: ${orderDetails.items.join(', ')}`);
+                    
+                } catch (error) {
+                    appendResult('sequentialResult', `❌ 流程失败: ${error.message}`);
+                }
+            }
+            
+            processUserFlow();
+        }
+        
+        // 6. 并行执行异步操作演示
+        function runParallelDemo() {
+            displayResult('parallelResult', '开始并行异步操作演示...');
+            
+            // 模拟独立的API调用
+            function fetchUserData() {
+                return new Promise(resolve => {
+                    setTimeout(() => {
+                        appendResult('parallelResult', '✅ 用户数据加载完成');
+                        resolve({ users: ['用户1', '用户2', '用户3'] });
+                    }, 1500);
+                });
+            }
+            
+            function fetchProductData() {
+                return new Promise(resolve => {
+                    setTimeout(() => {
+                        appendResult('parallelResult', '✅ 产品数据加载完成');
+                        resolve({ products: ['产品A', '产品B', '产品C'] });
+                    }, 1200);
+                });
+            }
+            
+            function fetchRecommendations() {
+                return new Promise(resolve => {
+                    setTimeout(() => {
+                        appendResult('parallelResult', '✅ 推荐数据加载完成');
+                        resolve({ recommendations: ['推荐1', '推荐2'] });
+                    }, 800);
+                });
+            }
+            
+            // 并行执行函数
+            async function loadAllData() {
+                try {
+                    appendResult('parallelResult', '🔄 开始并行加载所有数据...');
+                    
+                    // 使用Promise.all并行执行所有异步操作
+                    const [users, products, recommendations] = await Promise.all([
+                        fetchUserData(),
+                        fetchProductData(),
+                        fetchRecommendations()
+                    ]);
+                    
+                    appendResult('parallelResult', '\n🎉 所有数据加载完成!');
+                    appendResult('parallelResult', `- 用户数据: ${JSON.stringify(users)}`);
+                    appendResult('parallelResult', `- 产品数据: ${JSON.stringify(products)}`);
+                    appendResult('parallelResult', `- 推荐数据: ${JSON.stringify(recommendations)}`);
+                    
+                    // 对比串行执行的时间
+                    appendResult('parallelResult', '\n📊 性能对比:');
+                    appendResult('parallelResult', `- 并行执行时间: 约1.5秒`);
+                    appendResult('parallelResult', `- 串行执行时间: 约3.5秒 (1.5+1.2+0.8)`);
+                    appendResult('parallelResult', `- 性能提升: 约57%`);
+                    
+                } catch (error) {
+                    appendResult('parallelResult', `❌ 数据加载失败: ${error.message}`);
+                }
+            }
+            
+            loadAllData();
+        }
+        
+        // 7. 错误处理策略演示
+        function runErrorHandlingDemo() {
+            displayResult('errorHandlingResult', '开始错误处理演示...');
+            
+            // 模拟可能失败的操作
+            function operation1() {
+                return new Promise((resolve) => {
+                    setTimeout(() => {
+                        appendResult('errorHandlingResult', '✅ 操作1成功完成');
+                        resolve('操作1结果');
+                    }, 800);
+                });
+            }
+            
+            function operation2(shouldFail = true) {
+                return new Promise((resolve, reject) => {
+                    setTimeout(() => {
+                        if (shouldFail) {
+                            appendResult('errorHandlingResult', '❌ 操作2失败');
+                            reject(new Error('操作2故意失败'));
+                        } else {
+                            appendResult('errorHandlingResult', '✅ 操作2成功完成');
+                            resolve('操作2结果');
+                        }
+                    }, 600);
+                });
+            }
+            
+            function operation3() {
+                return new Promise((resolve) => {
+                    setTimeout(() => {
+                        appendResult('errorHandlingResult', '✅ 操作3成功完成');
+                        resolve('操作3结果');
+                    }, 1000);
+                });
+            }
+            
+            // 错误处理策略函数
+            async function errorHandlingStrategy() {
+                appendResult('errorHandlingResult', '🔄 开始执行带错误处理的流程');
+                
+                try {
+                    // 操作1 - 关键操作，失败则整体失败
+                    appendResult('errorHandlingResult', '\n🔄 执行操作1 (关键)');
+                    const result1 = await operation1();
+                    
+                    // 操作2 - 非关键操作，失败不影响后续流程
+                    appendResult('errorHandlingResult', '\n🔄 执行操作2 (非关键)');
+                    let result2 = '操作2默认值'; // 默认值
+                    try {
+                        result2 = await operation2(true);
+                    } catch (error) {
+                        appendResult('errorHandlingResult', `⚠️ 操作2失败但继续执行: ${error.message}`);
+                        // 可以有降级逻辑
+                    }
+                    
+                    // 操作3 - 关键操作，需要操作1成功
+                    appendResult('errorHandlingResult', '\n🔄 执行操作3 (关键)');
+                    const result3 = await operation3();
+                    
+                    // 成功完成所有关键操作
+                    appendResult('errorHandlingResult', '\n🎉 流程成功完成!');
+                    appendResult('errorHandlingResult', `- 操作1结果: ${result1}`);
+                    appendResult('errorHandlingResult', `- 操作2结果: ${result2}`);
+                    appendResult('errorHandlingResult', `- 操作3结果: ${result3}`);
+                    
+                } catch (error) {
+                    // 捕获关键操作的错误
+                    appendResult('errorHandlingResult', `\n❌ 关键操作失败: ${error.message}`);
+                    appendResult('errorHandlingResult', '🔄 执行降级策略...');
+                    
+                    // 模拟降级处理
+                    setTimeout(() => {
+                        appendResult('errorHandlingResult', '✅ 降级策略执行成功');
+                        appendResult('errorHandlingResult', '📝 记录错误日志');
+                    }, 500);
+                } finally {
+                    // 无论成功失败都执行清理
+                    setTimeout(() => {
+                        appendResult('errorHandlingResult', '\n🧹 执行清理工作');
+                        appendResult('errorHandlingResult', '✅ 释放资源');
+                        appendResult('errorHandlingResult', '✅ 重置状态');
+                        appendResult('errorHandlingResult', '\n🔚 错误处理演示完成');
+                    }, 1200);
+                }
+            }
+            
+            errorHandlingStrategy();
+        }
+        
+        // 8. 模拟API请求
+        function simulateApiRequest() {
+            displayResult('apiRequestResult', '开始模拟API请求...');
+            const progressBar = document.getElementById('apiProgressBar');
+            progressBar.style.width = '0%';
+            
+            // 模拟进度更新
+            let progress = 0;
+            const progressInterval = setInterval(() => {
+                progress += Math.random() * 10;
+                if (progress > 90) progress = 90;
+                progressBar.style.width = `${progress}%`;
+            }, 200);
+            
+            // 模拟API请求
+            function simulateFetch(url, options = {}) {
+                return new Promise((resolve, reject) => {
+                    setTimeout(() => {
+                        // 随机模拟成功或失败（80%成功率）
+                        const success = Math.random() > 0.2;
+                        
+                        clearInterval(progressInterval);
+                        progressBar.style.width = '100%';
+                        
+                        if (success) {
+                            resolve({
+                                ok: true,
+                                json: () => Promise.resolve({
+                                    data: {
+                                        id: 1,
+                                        name: '示例数据',
+                                        status: 'active'
+                                    },
+                                    message: '请求成功'
+                                })
+                            });
+                        } else {
+                            reject(new Error('网络错误或服务器内部错误'));
+                        }
+                    }, 2000 + Math.random() * 1000); // 2-3秒的随机延迟
+                });
+            }
+            
+            // 执行请求并处理
+            async function fetchData() {
+                try {
+                    appendResult('apiRequestResult', '🔄 发送请求到: /api/data');
+                    const response = await simulateFetch('/api/data');
+                    
+                    if (!response.ok) {
+                        throw new Error(`HTTP错误! 状态码: ${response.status}`);
+                    }
+                    
+                    const data = await response.json();
+                    appendResult('apiRequestResult', `✅ 请求成功!`);
+                    appendResult('apiRequestResult', `📊 响应数据: ${JSON.stringify(data, null, 2)}`);
+                    
+                } catch (error) {
+                    appendResult('apiRequestResult', `❌ 请求失败: ${error.message}`);
+                    appendResult('apiRequestResult', '🔄 尝试重试...');
+                    
+                    // 模拟重试逻辑
+                    setTimeout(async () => {
+                        try {
+                            appendResult('apiRequestResult', '🔄 重试请求...');
+                            const response = await simulateFetch('/api/data');
+                            const data = await response.json();
+                            appendResult('apiRequestResult', `✅ 重试成功!`);
+                            appendResult('apiRequestResult', `📊 响应数据: ${JSON.stringify(data, null, 2)}`);
+                        } catch (retryError) {
+                            appendResult('apiRequestResult', `❌ 重试失败: ${retryError.message}`);
+                            appendResult('apiRequestResult', '💬 显示用户友好的错误信息');
+                        } finally {
+                            appendResult('apiRequestResult', '🔚 API请求演示完成');
+                        }
+                    }, 1500);
+                }
+            }
+            
+            fetchData();
+        }
+        
+        // 9. 取消异步操作
+        let abortController = null;
+        
+        function startCancellableOperation() {
+            if (abortController) {
+                displayResult('cancelResult', '❌ 已有操作在进行中，请先取消');
+                return;
+            }
+            
+            displayResult('cancelResult', '🔄 开始可取消的操作...');
+            
+            // 创建AbortController
+            abortController = new AbortController();
+            const { signal } = abortController;
+            
+            // 可取消的操作
+            function cancellableOperation(signal, duration = 5000) {
+                return new Promise((resolve, reject) => {
+                    // 检查信号是否已经被中止
+                    if (signal.aborted) {
+                        return reject(new Error('操作已被预先取消'));
+                    }
+                    
+                    appendResult('cancelResult', `⏱️ 操作将持续 ${duration/1000} 秒`);
+                    
+                    // 模拟进度
+                    let progress = 0;
+                    const totalSteps = 10;
+                    const stepDelay = duration / totalSteps;
+                    
+                    const progressInterval = setInterval(() => {
+                        progress++;
+                        const percentage = (progress / totalSteps) * 100;
+                        appendResult('cancelResult', `📊 进度: ${percentage.toFixed(0)}%`);
+                        
+                        if (progress >= totalSteps) {
+                            clearInterval(progressInterval);
+                            resolve('操作成功完成');
+                        }
+                    }, stepDelay);
+                    
+                    // 监听中止信号
+                    signal.addEventListener('abort', () => {
+                        clearInterval(progressInterval);
+                        reject(new Error('操作被用户取消'));
+                    });
+                });
+            }
+            
+            // 执行可取消的操作
+            cancellableOperation(signal, 5000)
+                .then(result => {
+                    appendResult('cancelResult', `✅ ${result}`);
+                })
+                .catch(error => {
+                    appendResult('cancelResult', `❌ ${error.message}`);
+                })
+                .finally(() => {
+                    appendResult('cancelResult', '🔚 操作结束');
+                    abortController = null; // 重置控制器
+                });
+        }
+        
+        function cancelOperation() {
+            if (!abortController) {
+                displayResult('cancelResult', '❌ 没有可取消的操作');
+                return;
+            }
+            
+            appendResult('cancelResult', '⚠️ 正在取消操作...');
+            abortController.abort();
+        }
+        
+        // 10. 防抖演示
+        const debounceInput = document.getElementById('debounceInput');
+        
+        // 简单的防抖实现
+        function debounce(func, delay) {
+            let timeoutId;
+            return function(...args) {
+                clearTimeout(timeoutId);
+                timeoutId = setTimeout(() => {
+                    func.apply(this, args);
+                }, delay);
+            };
+        }
+        
+        // 防抖处理函数
+        const debouncedSearch = debounce((text) => {
+            displayResult('debounceResult', `🔍 执行搜索: "${text}"`);
+            
+            // 模拟搜索延迟
+            setTimeout(() => {
+                if (text.trim()) {
+                    appendResult('debounceResult', `✅ 搜索完成: 找到 ${Math.floor(Math.random() * 100)} 个结果`);
+                } else {
+                    appendResult('debounceResult', `ℹ️ 请输入搜索内容`);
+                }
+            }, 300);
+        }, 500); // 500ms延迟
+        
+        // 添加输入事件监听
+        debounceInput.addEventListener('input', (event) => {
+            const text = event.target.value;
+            displayResult('debounceResult', `⏱️ 等待输入停止: "${text}"`);
+            debouncedSearch(text);
+        });
+        
+        // 初始化
+        displayResult('debounceResult', '开始输入测试防抖效果...');
+    </script>
+</body>
+</html>

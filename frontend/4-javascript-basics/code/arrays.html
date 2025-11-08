@@ -1,0 +1,871 @@
+\u003c!DOCTYPE html\u003e
+\u003chtml lang="zh-CN"\u003e
+\u003chead\u003e
+    \u003cmeta charset="UTF-8"\u003e
+    \u003cmeta name="viewport" content="width=device-width, initial-scale=1.0"\u003e
+    \u003ctitle\u003eJavaScript数组 - 基础操作与高级应用\u003c/title\u003e
+    \u003cstyle\u003e
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f5f5;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 30px;
+            text-align: center;
+            font-size: 2.2em;
+        }
+        
+        h2 {
+            color: #3498db;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e0e0e0;
+            font-size: 1.8em;
+        }
+        
+        h3 {
+            color: #2980b9;
+            margin-top: 25px;
+            margin-bottom: 15px;
+            font-size: 1.4em;
+        }
+        
+        h4 {
+            color: #27ae60;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+        
+        p {
+            margin-bottom: 15px;
+            font-size: 1.05em;
+        }
+        
+        .example-box {
+            background-color: #f8f9fa;
+            border-left: 4px solid #3498db;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        
+        .code-block {
+            background-color: #f0f0f0;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            margin: 15px 0;
+        }
+        
+        .result-box {
+            background-color: #e8f4f8;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 10px;
+            border: 1px solid #b8e0ea;
+        }
+        
+        .btn {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 0;
+            transition: background-color 0.3s;
+        }
+        
+        .btn:hover {
+            background-color: #2980b9;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        th {
+            background-color: #3498db;
+            color: white;
+            font-weight: bold;
+        }
+        
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+        
+        .highlight {
+            background-color: #fff3cd;
+            padding: 15px;
+            border-radius: 4px;
+            border-left: 4px solid #ffc107;
+            margin: 15px 0;
+        }
+        
+        .warning {
+            background-color: #f8d7da;
+            padding: 15px;
+            border-radius: 4px;
+            border-left: 4px solid #dc3545;
+            margin: 15px 0;
+        }
+        
+        .success {
+            background-color: #d4edda;
+            padding: 15px;
+            border-radius: 4px;
+            border-left: 4px solid #28a745;
+            margin: 15px 0;
+        }
+        
+        ul, ol {
+            margin-left: 20px;
+            margin-bottom: 15px;
+        }
+        
+        li {
+            margin-bottom: 8px;
+        }
+        
+        .array-operations {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .operation-card {
+            flex: 1;
+            min-width: 250px;
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 6px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .operation-card h4 {
+            color: #3498db;
+            margin-top: 0;
+            border-bottom: 1px solid #e0e0e0;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .array-methods {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .method-card {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 6px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            border-left: 3px solid #27ae60;
+        }
+        
+        .method-card h5 {
+            color: #2c3e50;
+            margin-top: 0;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+        
+        .method-card .signature {
+            font-family: 'Courier New', monospace;
+            background-color: #e9ecef;
+            padding: 5px 10px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            font-size: 0.9em;
+        }
+    \u003c/style\u003e
+\u003c/head\u003e
+\u003cbody\u003e
+    \u003cdiv class="container"\u003e
+        \u003ch1\u003eJavaScript数组 - 基础操作与高级应用\u003c/h1\u003e
+        
+        \u003ch2\u003e1. 数组基础概念\u003c/h2\u003e
+        \u003cp\u003e数组是JavaScript中用来存储多个值的有序集合。数组中的每个值称为元素，每个元素都有一个索引（从0开始）。\u003c/p\u003e
+        
+        \u003cdiv class="highlight"\u003e
+            \u003cstrong\u003e注意：\u003c/strong\u003eJavaScript数组具有以下特点：\u003cbr\u003e
+            1. 可以存储任意类型的数据（数字、字符串、对象、函数等）\u003cbr\u003e
+            2. 数组长度可以动态变化\u003cbr\u003e
+            3. 数组索引从0开始\u003cbr\u003e
+            4. 数组是对象的一种特殊类型（typeof返回"object"）
+        \u003c/div\u003e
+        
+        \u003ch2\u003e2. 数组的创建方法\u003c/h2\u003e
+        
+        \u003ch3\u003e2.1 数组字面量（最常用）\u003c/h3\u003e
+        \u003cdiv class="example-box"\u003e
+            \u003ch4\u003e示例：数组字面量创建数组\u003c/h4\u003e
+            \u003cdiv class="code-block"\u003e
+                // 创建空数组
+                let emptyArray = [];
+                
+                // 创建包含元素的数组
+                let numbers = [1, 2, 3, 4, 5];
+                let fruits = ['Apple', 'Banana', 'Orange', 'Mango'];
+                
+                // 创建混合类型数组
+                let mixedArray = [1, 'two', true, { name: 'John' }, [5, 6]];
+                
+                // 创建指定长度的数组（元素都是undefined）
+                let arrayWithLength = new Array(5); // [undefined, undefined, undefined, undefined, undefined]
+                
+                console.log('numbers数组:', numbers);
+                console.log('fruits数组:', fruits);
+                console.log('mixedArray数组:', mixedArray);
+            \u003c/div\u003e
+            \u003cbutton class="btn" onclick="runArrayLiteralExample()"\u003e运行示例\u003c/button\u003e
+            \u003cdiv class="result-box" id="arrayLiteralResult"\u003e\u003c/div\u003e
+        \u003c/div\u003e
+        
+        \u003ch3\u003e2.2 Array构造函数\u003c/h3\u003e
+        \u003cdiv class="example-box"\u003e
+            \u003ch4\u003e示例：使用Array构造函数创建数组\u003c/h4\u003e
+            \u003cdiv class="code-block"\u003e
+                // 创建空数组
+                let emptyArray = new Array();
+                
+                // 创建指定长度的数组
+                let arrayWithLength = new Array(5); // 创建包含5个undefined元素的数组
+                
+                // 创建包含元素的数组
+                let numbers = new Array(1, 2, 3, 4, 5);
+                let fruits = new Array('Apple', 'Banana', 'Orange');
+                
+                // 注意：单个数字参数被视为长度，非数字或多个参数被视为元素
+                let singleNumber = new Array(10); // [undefined x 10]
+                let singleString = new Array('Hello'); // ['Hello']
+                
+                console.log('numbers数组:', numbers);
+                console.log('arrayWithLength数组长度:', arrayWithLength.length);
+                console.log('singleNumber数组长度:', singleNumber.length);
+                console.log('singleString数组:', singleString);
+            \u003c/div\u003e
+            \u003cbutton class="btn" onclick="runArrayConstructorExample()"\u003e运行示例\u003c/button\u003e
+            \u003cdiv class="result-box" id="arrayConstructorResult"\u003e\u003c/div\u003e
+        \u003c/div\u003e
+        
+        \u003cdiv class="warning"\u003e
+            \u003cstrong\u003e注意：\u003c/strong\u003e使用Array构造函数时需要注意，如果只传递一个数字参数，它会被当作数组长度而不是元素。
+        \u003c/div\u003e
+        
+        \u003ch3\u003e2.3 ES6新增方法\u003c/h3\u003e
+        \u003cdiv class="example-box"\u003e
+            \u003ch4\u003e示例：ES6数组创建方法\u003c/h4\u003cdiv class="code-block"\u003e
+                // Array.from() - 从类数组或可迭代对象创建数组
+                let arrayLike = { 0: 'a', 1: 'b', 2: 'c', length: 3 };
+                let fromArray = Array.from(arrayLike); // ['a', 'b', 'c']
+                
+                // 第二个参数可以传入映射函数
+                let numbers = Array.from([1, 2, 3], x =\u003e x * 2); // [2, 4, 6]
+                
+                // Array.of() - 创建包含任意数量参数的数组
+                let ofArray1 = Array.of(10); // [10] - 注意与new Array(10)的区别
+                let ofArray2 = Array.of(1, 2, 3, 4, 5); // [1, 2, 3, 4, 5]
+                
+                console.log('fromArray数组:', fromArray);
+                console.log('映射后的numbers数组:', numbers);
+                console.log('ofArray1数组:', ofArray1);
+                console.log('ofArray2数组:', ofArray2);
+            \u003c/div\u003e
+            \u003cbutton class="btn" onclick="runES6ArrayMethodsExample()"\u003e运行示例\u003c/button\u003e
+            \u003cdiv class="result-box" id="es6ArrayMethodsResult"\u003e\u003c/div\u003e
+        \u003c/div\u003e
+        
+        \u003ch2\u003e3. 数组访问与修改\u003c/h2\u003e
+        
+        \u003ch3\u003e3.1 访问数组元素\u003c/h3\u003e
+        \u003cdiv class="example-box"\u003e
+            \u003ch4\u003e示例：访问数组元素\u003c/h4\u003e
+            \u003cdiv class="code-block"\u003e
+                let fruits = ['Apple', 'Banana', 'Orange', 'Mango', 'Grape'];
+                
+                // 通过索引访问元素
+                console.log('第一个元素:', fruits[0]); // 'Apple'
+                console.log('第二个元素:', fruits[1]); // 'Banana'
+                console.log('最后一个元素:', fruits[fruits.length - 1]); // 'Grape'
+                
+                // 访问不存在的索引返回undefined
+                console.log('不存在的元素:', fruits[10]); // undefined
+                
+                // 数组越界不会报错
+                console.log('越界访问:', fruits[-1]); // undefined
+            \u003c/div\u003e
+            \u003cbutton class="btn" onclick="runArrayAccessExample()"\u003e运行示例\u003c/button\u003e
+            \u003cdiv class="result-box" id="arrayAccessResult"\u003e\u003c/div\u003e
+        \u003c/div\u003e
+        
+        \u003ch3\u003e3.2 修改数组元素\u003c/h3\u003e
+        \u003cdiv class="example-box"\u003e
+            \u003ch4\u003e示例：修改数组元素\u003c/h4\u003e
+            \u003cdiv class="code-block"\u003e
+                let fruits = ['Apple', 'Banana', 'Orange', 'Mango'];
+                console.log('原始数组:', fruits);
+                
+                // 修改现有元素
+                fruits[1] = 'Cherry';
+                console.log('修改后数组:', fruits); // ['Apple', 'Cherry', 'Orange', 'Mango']
+                
+                // 添加新元素（扩展数组长度）
+                fruits[4] = 'Pear';
+                console.log('添加新元素后:', fruits); // ['Apple', 'Cherry', 'Orange', 'Mango', 'Pear']
+                
+                // 修改数组长度（截断或扩展）
+                fruits.length = 3;
+                console.log('截断后数组:', fruits); // ['Apple', 'Cherry', 'Orange']
+                
+                fruits.length = 5;
+                console.log('扩展后数组:', fruits); // ['Apple', 'Cherry', 'Orange', undefined, undefined]
+            \u003c/div\u003e
+            \u003cbutton class="btn" onclick="runArrayModificationExample()"\u003e运行示例\u003c/button\u003e
+            \u003cdiv class="result-box" id="arrayModificationResult"\u003e\u003c/div\u003e
+        \u003c/div\u003e
+        
+        \u003ch2\u003e4. 数组的基本属性\u003c/h2\u003e
+        
+        \u003ch3\u003e4.1 length属性\u003c/h3\u003e
+        \u003cp\u003elength属性返回或设置数组中的元素数量。修改length属性可以截断或扩展数组。\u003c/p\u003e
+        
+        \u003cdiv class="example-box"\u003e
+            \u003ch4\u003e示例：length属性的使用\u003c/h4\u003e
+            \u003cdiv class="code-block"\u003e
+                let numbers = [1, 2, 3, 4, 5];
+                console.log('数组长度:', numbers.length); // 5
+                
+                // 获取最后一个元素的标准方法
+                let lastElement = numbers[numbers.length - 1];
+                console.log('最后一个元素:', lastElement); // 5
+                
+                // 通过设置length截断数组
+                numbers.length = 3;
+                console.log('截断后数组:', numbers); // [1, 2, 3]
+                
+                // 通过设置length扩展数组
+                numbers.length = 6;
+                console.log('扩展后数组:', numbers); // [1, 2, 3, undefined, undefined, undefined]
+                
+                // 创建空数组的快速方法
+                numbers.length = 0;
+                console.log('清空后数组:', numbers); // []
+            \u003c/div\u003e
+            \u003cbutton class="btn" onclick="runArrayLengthExample()"\u003e运行示例\u003c/button\u003e
+            \u003cdiv class="result-box" id="arrayLengthResult"\u003e\u003c/div\u003e
+        \u003c/div\u003e
+        
+        \u003ch2\u003e5. 数组操作方法\u003c/h2\u003e
+        
+        \u003ch3\u003e5.1 添加和删除元素\u003c/h3\u003e
+        
+        \u003cdiv class="array-operations"\u003e
+            \u003cdiv class="operation-card"\u003e
+                \u003ch4\u003e在开头添加/删除\u003c/h4\u003e
+                \u003cul\u003e
+                    \u003cli\u003e\u003cstrong\u003eunshift()\u003c/strong\u003e: 在数组开头添加一个或多个元素，返回新长度\u003c/li\u003e
+                    \u003cli\u003e\u003cstrong\u003eshift()\u003c/strong\u003e: 删除并返回数组的第一个元素\u003c/li\u003e
+                \u003c/ul\u003e
+            \u003c/div\u003e
+            \u003cdiv class="operation-card"\u003e
+                \u003ch4\u003e在末尾添加/删除\u003c/h4\u003e
+                \u003cul\u003e
+                    \u003cli\u003e\u003cstrong\u003epush()\u003c/strong\u003e: 在数组末尾添加一个或多个元素，返回新长度\u003c/li\u003e
+                    \u003cli\u003e\u003cstrong\u003epop()\u003c/strong\u003e: 删除并返回数组的最后一个元素\u003c/li\u003e
+                \u003c/ul\u003e
+            \u003c/div\u003e
+        \u003c/div\u003e
+        
+        \u003cdiv class="example-box"\u003e
+            \u003ch4\u003e示例：添加和删除元素\u003c/h4\u003e
+            \u003cdiv class="code-block"\u003e
+                let fruits = ['Banana', 'Orange', 'Mango'];
+                console.log('初始数组:', fruits);
+                
+                // push - 在末尾添加元素
+                let newLength1 = fruits.push('Apple', 'Grape');
+                console.log('push后数组:', fruits);
+                console.log('push返回新长度:', newLength1);
+                
+                // pop - 移除末尾元素
+                let lastFruit = fruits.pop();
+                console.log('pop后数组:', fruits);
+                console.log('pop返回被移除元素:', lastFruit);
+                
+                // unshift - 在开头添加元素
+                let newLength2 = fruits.unshift('Cherry', 'Pear');
+                console.log('unshift后数组:', fruits);
+                console.log('unshift返回新长度:', newLength2);
+                
+                // shift - 移除开头元素
+                let firstFruit = fruits.shift();
+                console.log('shift后数组:', fruits);
+                console.log('shift返回被移除元素:', firstFruit);
+            \u003c/div\u003e
+            \u003cbutton class="btn" onclick="runAddRemoveExample()"\u003e运行示例\u003c/button\u003e
+            \u003cdiv class="result-box" id="addRemoveResult"\u003e\u003c/div\u003e
+        \u003c/div\u003e
+        
+        \u003ch3\u003e5.2 数组截取与合并\u003c/h3\u003e
+        
+        \u003cdiv class="example-box"\u003e
+            \u003ch4\u003e示例：slice和splice方法\u003c/h4\u003e
+            \u003cdiv class="code-block"\u003e
+                // slice - 截取数组的一部分，不修改原数组
+                let originalArray = [1, 2, 3, 4, 5, 6, 7];
+                
+                // slice(start, end) - 包含start，不包含end
+                let slice1 = originalArray.slice(2, 5); // [3, 4, 5]
+                let slice2 = originalArray.slice(3); // [4, 5, 6, 7] - 从索引3到末尾
+                let slice3 = originalArray.slice(-3); // [5, 6, 7] - 从倒数第3个元素开始
+                let slice4 = originalArray.slice(); // [1, 2, 3, 4, 5, 6, 7] - 复制整个数组
+                
+                console.log('原始数组:', originalArray); // 原数组不变
+                console.log('slice(2, 5):', slice1);
+                console.log('slice(3):', slice2);
+                console.log('slice(-3):', slice3);
+                console.log('slice() 复制:', slice4);
+                
+                // splice - 修改原数组，可以删除、插入或替换元素
+                let arrayToModify = [1, 2, 3, 4, 5];
+                
+                // splice(start, deleteCount, item1, item2, ...)
+                let removedElements;
+                
+                // 删除元素
+                removedElements = arrayToModify.splice(1, 2); // 删除从索引1开始的2个元素
+                console.log('\n删除后数组:', arrayToModify); // [1, 4, 5]
+                console.log('删除的元素:', removedElements); // [2, 3]
+                
+                // 插入元素
+                arrayToModify.splice(1, 0, 'a', 'b', 'c'); // 在索引1处插入元素，不删除
+                console.log('插入后数组:', arrayToModify); // [1, 'a', 'b', 'c', 4, 5]
+                
+                // 替换元素
+                removedElements = arrayToModify.splice(3, 2, 100, 200); // 从索引3开始删除2个元素，插入新元素
+                console.log('替换后数组:', arrayToModify); // [1, 'a', 'b', 100, 200, 5]
+                console.log('被替换的元素:', removedElements); // ['c', 4]
+            \u003c/div\u003e
+            \u003cbutton class="btn" onclick="runSliceSpliceExample()"\u003e运行示例\u003c/button\u003e
+            \u003cdiv class="result-box" id="sliceSpliceResult"\u003e\u003c/div\u003e
+        \u003c/div\u003e
+        
+        \u003cdiv class="highlight"\u003e
+            \u003cstrong\u003e重要区别：\u003c/strong\u003e\u003cbr\u003e
+            - \u003cstrong\u003eslice()\u003c/strong\u003e: 不修改原数组，返回新数组的副本\u003cbr\u003e
+            - \u003cstrong\u003esplice()\u003c/strong\u003e: 修改原数组，返回被删除的元素数组
+        \u003c/div\u003e
+        
+        \u003ch3\u003e5.3 数组连接\u003c/h3\u003e
+        \u003cdiv class="example-box"\u003e
+            \u003ch4\u003e示例：concat方法\u003c/h4\u003e
+            \u003cdiv class="code-block"\u003e
+                // concat - 连接两个或多个数组，不修改原数组
+                let array1 = [1, 2, 3];
+                let array2 = [4, 5, 6];
+                let array3 = [7, 8, 9];
+                
+                // 连接两个数组
+                let combined1 = array1.concat(array2);
+                console.log('array1 + array2:', combined1); // [1, 2, 3, 4, 5, 6]
+                
+                // 连接多个数组
+                let combined2 = array1.concat(array2, array3);
+                console.log('array1 + array2 + array3:', combined2); // [1, 2, 3, 4, 5, 6, 7, 8, 9]
+                
+                // 连接非数组值
+                let combined3 = array1.concat('a', 'b');
+                console.log('array1 + 非数组值:', combined3); // [1, 2, 3, 'a', 'b']
+                
+                // 连接嵌套数组（不会扁平化）
+                let nestedArray = [10, [11, 12]];
+                let combined4 = array1.concat(nestedArray);
+                console.log('array1 + 嵌套数组:', combined4); // [1, 2, 3, 10, [11, 12]]
+                
+                // 原数组不变
+                console.log('array1保持不变:', array1); // [1, 2, 3]
+            \u003c/div\u003e
+            \u003cbutton class="btn" onclick="runConcatExample()"\u003e运行示例\u003c/button\u003e
+            \u003cdiv class="result-box" id="concatResult"\u003e\u003c/div\u003e
+        \u003c/div\u003e
+        
+        \u003ch2\u003e6. 数组的遍历方法\u003c/h2\u003e
+        
+        \u003cdiv class="example-box"\u003e
+            \u003ch4\u003e示例：数组遍历方法\u003c/h4\u003e
+            \u003cdiv class="code-block"\u003e
+                let numbers = [1, 2, 3, 4, 5];
+                console.log('原始数组:', numbers);
+                
+                // 1. for循环（最传统）
+                console.log('\n1. for循环:');
+                for (let i = 0; i \u003c numbers.length; i++) {
+                    console.log(`索引 ${i}: ${numbers[i]}`);
+                }
+                
+                // 2. forEach方法
+                console.log('\n2. forEach方法:');
+                numbers.forEach(function(element, index, array) {
+                    console.log(`索引 ${index}: ${element}`);
+                });
+                
+                // 3. for...of循环 (ES6)
+                console.log('\n3. for...of循环:');
+                for (let value of numbers) {
+                    console.log(`值: ${value}`);
+                }
+                
+                // 4. for...in循环（不推荐用于数组，因为会遍历所有可枚举属性）
+                console.log('\n4. for...in循环:');
+                for (let index in numbers) {
+                    console.log(`索引 ${index}: ${numbers[index]}`);
+                }
+                
+                // 5. map方法（返回新数组）
+                let doubled = numbers.map(function(num) {
+                    return num * 2;
+                });
+                console.log('\n5. map方法 - 每个元素乘2:', doubled);
+                
+                // 6. filter方法（返回满足条件的元素组成的新数组）
+                let evenNumbers = numbers.filter(function(num) {
+                    return num % 2 === 0;
+                });
+                console.log('\n6. filter方法 - 偶数:', evenNumbers);
+                
+                // 7. reduce方法（将数组归约为单个值）
+                let sum = numbers.reduce(function(accumulator, currentValue) {
+                    return accumulator + currentValue;
+                }, 0);
+                console.log('\n7. reduce方法 - 总和:', sum);
+            \u003c/div\u003e
+            \u003cbutton class="btn" onclick="runArrayIterationExample()"\u003e运行示例\u003c/button\u003e
+            \u003cdiv class="result-box" id="arrayIterationResult"\u003e\u003c/div\u003e
+        \u003c/div\u003e
+        
+        \u003cdiv class="warning"\u003e
+            \u003cstrong\u003e注意：\u003c/strong\u003e不推荐使用for...in循环遍历数组，因为它会：\u003cbr\u003e
+            1. 遍历所有可枚举属性，包括原型链上的属性\u003cbr\u003e
+            2. 索引被视为字符串而不是数字\u003cbr\u003e
+            3. 遍历顺序不一定是数组索引的顺序
+        \u003c/div\u003e
+        
+        \u003ch2\u003e7. 数组搜索与排序\u003c/h2\u003e
+        
+        \u003ch3\u003e7.1 搜索方法\u003c/h3\u003e
+        
+        \u003cdiv class="array-methods"\u003e
+            \u003cdiv class="method-card"\u003e
+                \u003ch5\u003eindexOf()\u003c/h5\u003e
+                \u003cdiv class="signature"\u003earray.indexOf(searchElement, [fromIndex])\u003c/div\u003e
+                \u003cp\u003e返回元素在数组中首次出现的索引，如果不存在则返回-1。\u003c/p\u003e
+            \u003c/div\u003e
+            
+            \u003cdiv class="method-card"\u003e
+                \u003ch5\u003elastIndexOf()\u003c/h5\u003e
+                \u003cdiv class="signature"\u003earray.lastIndexOf(searchElement, [fromIndex])\u003c/div\u003e
+                \u003cp\u003e返回元素在数组中最后一次出现的索引，如果不存在则返回-1。\u003c/p\u003e
+            \u003c/div\u003e
+            
+            \u003cdiv class="method-card"\u003e
+                \u003ch5\u003eincludes() (ES6)\u003c/h5\u003e
+                \u003cdiv class="signature"\u003earray.includes(searchElement, [fromIndex])\u003c/div\u003e
+                \u003cp\u003e判断数组是否包含指定元素，返回布尔值。\u003c/p\u003e
+            \u003c/div\u003e
+            
+            \u003cdiv class="method-card"\u003e
+                \u003ch5\u003efind() (ES6)\u003c/h5\u003e
+                \u003cdiv class="signature"\u003earray.find(callback(element, index, array))\u003c/div\u003e
+                \u003cp\u003e返回满足回调函数条件的第一个元素，否则返回undefined。\u003c/p\u003e
+            \u003c/div\u003e
+            
+            \u003cdiv class="method-card"\u003e
+                \u003ch5\u003efindIndex() (ES6)\u003c/h5\u003e
+                \u003cdiv class="signature"\u003earray.findIndex(callback(element, index, array))\u003c/div\u003e
+                \u003cp\u003e返回满足回调函数条件的第一个元素的索引，否则返回-1。\u003c/p\u003e
+            \u003c/div\u003e
+        \u003c/div\u003e
+        
+        \u003cdiv class="example-box"\u003e
+            \u003ch4\u003e示例：搜索方法\u003c/h4\u003e
+            \u003cdiv class="code-block"\u003e
+                let numbers = [5, 12, 8, 5, 17, 21, 5];
+                let fruits = ['Apple', 'Banana', 'Orange', 'Mango'];
+                
+                // indexOf - 查找首次出现的索引
+                console.log('numbers中5首次出现的索引:', numbers.indexOf(5)); // 0
+                console.log('numbers中从索引1开始查找5:', numbers.indexOf(5, 1)); // 3
+                console.log('numbers中100的索引:', numbers.indexOf(100)); // -1
+                
+                // lastIndexOf - 查找最后出现的索引
+                console.log('numbers中5最后出现的索引:', numbers.lastIndexOf(5)); // 6
+                console.log('numbers中从索引4向前查找5:', numbers.lastIndexOf(5, 4)); // 3
+                
+                // includes - 检查是否包含元素
+                console.log('fruits是否包含Banana:', fruits.includes('Banana')); // true
+                console.log('fruits是否包含Grape:', fruits.includes('Grape')); // false
+                console.log('fruits从索引2开始是否包含Apple:', fruits.includes('Apple', 2)); // false
+                
+                // find - 查找满足条件的第一个元素
+                let firstGreaterThan10 = numbers.find(function(num) {
+                    return num \u003e 10;
+                });
+                console.log('numbers中第一个大于10的数:', firstGreaterThan10); // 12
+                
+                // findIndex - 查找满足条件的第一个元素的索引
+                let indexOfFirstGreaterThan10 = numbers.findIndex(function(num) {
+                    return num \u003e 10;
+                });
+                console.log('numbers中第一个大于10的数的索引:', indexOfFirstGreaterThan10); // 1
+                
+                // 查找对象数组中的元素
+                let people = [
+                    { id: 1, name: 'John' },
+                    { id: 2, name: 'Jane' },
+                    { id: 3, name: 'Bob' }
+                ];
+                
+                let person = people.find(function(p) {
+                    return p.id === 2;
+                });
+                console.log('id为2的人:', person); // { id: 2, name: 'Jane' }
+                
+                let index = people.findIndex(function(p) {
+                    return p.name === 'Bob';
+                });
+                console.log('name为Bob的人的索引:', index); // 2
+            \u003c/div\u003e
+            \u003cbutton class="btn" onclick="runSearchMethodsExample()"\u003e运行示例\u003c/button\u003e
+            \u003cdiv class="result-box" id="searchMethodsResult"\u003e\u003c/div\u003e
+        \u003c/div\u003e
+        
+        \u003ch3\u003e7.2 排序方法\u003c/h3\u003e
+        \u003cdiv class="example-box"\u003e
+            \u003ch4\u003e示例：sort方法\u003c/h4\u003e
+            \u003cdiv class="code-block"\u003e
+                // sort - 原地排序数组（修改原数组）
+                
+                // 默认排序（将元素转换为字符串并按Unicode顺序排序）
+                let numbers1 = [10, 2, 25, 1, 3];
+                numbers1.sort();
+                console.log('默认排序（字符串顺序）:', numbers1); // [1, 10, 2, 25, 3]
+                
+                // 数字排序（升序）
+                let numbers2 = [10, 2, 25, 1, 3];
+                numbers2.sort(function(a, b) {
+                    return a - b; // 升序
+                });
+                console.log('数字升序排序:', numbers2); // [1, 2, 3, 10, 25]
+                
+                // 数字排序（降序）
+                let numbers3 = [10, 2, 25, 1, 3];
+                numbers3.sort(function(a, b) {
+                    return b - a; // 降序
+                });
+                console.log('数字降序排序:', numbers3); // [25, 10, 3, 2, 1]
+                
+                // 使用箭头函数
+                let numbers4 = [10, 2, 25, 1, 3];
+                numbers4.sort((a, b) =\u003e a - b);
+                console.log('使用箭头函数升序排序:', numbers4); // [1, 2, 3, 10, 25]
+                
+                // 按对象属性排序
+                let people = [
+                    { name: 'John', age: 30 },
+                    { name: 'Jane', age: 25 },
+                    { name: 'Bob', age: 35 }
+                ];
+                
+                // 按年龄升序
+                people.sort(function(a, b) {
+                    return a.age - b.age;
+                });
+                console.log('按年龄升序排序:', people);
+                
+                // 按名称字母顺序
+                people.sort(function(a, b) {
+                    if (a.name \u003c b.name) return -1;
+                    if (a.name \u003e b.name) return 1;
+                    return 0;
+                });
+                console.log('按名称字母顺序排序:', people);
+            
+            // reverse - 反转数组顺序（修改原数组）
+            let fruits = ['Apple', 'Banana', 'Orange', 'Mango'];
+            fruits.reverse();
+            console.log('反转后的数组:', fruits); // ['Mango', 'Orange', 'Banana', 'Apple']
+            
+            // 先排序再反转（实现降序）
+            let numbers5 = [10, 2, 25, 1, 3];
+            numbers5.sort((a, b) =\u003e a - b).reverse();
+            console.log('排序后反转（降序）:', numbers5); // [25, 10, 3, 2, 1]
+            
+            // 打乱数组（Fisher-Yates 洗牌算法）
+            function shuffleArray(array) {
+                for (let i = array.length - 1; i \u003e 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [array[i], array[j]] = [array[j], array[i]]; // 解构赋值交换元素
+                }
+                return array;
+            }
+            
+            let originalArray = [1, 2, 3, 4, 5];
+            let shuffledArray = shuffleArray([...originalArray]); // 创建副本后打乱
+            console.log('原始数组:', originalArray);
+            console.log('打乱后的数组:', shuffledArray);
+            
+            // 注意：sort()会修改原数组，如需保持原数组不变，应先创建副本
+            let original = [5, 2, 8, 1, 9];
+            let sortedCopy = [...original].sort((a, b) =\u003e a - b);
+            console.log('原始数组保持不变:', original);
+            console.log('排序后的副本:', sortedCopy);
+            
+            // 对特殊值的处理
+            let mixedArray = [undefined, null, 0, false, true, 'a'];
+            mixedArray.sort();
+            console.log('混合值排序:', mixedArray); // [0, false, null, true, 'a', undefined]
+            // 注意：undefined会被排到数组末尾
+            
+            // 对空值的处理
+            let arrayWithHoles = [1, , 3, , 5]; // 稀疏数组
+            console.log('排序前的稀疏数组:', arrayWithHoles);
+            arrayWithHoles.sort();
+            console.log('排序后的稀疏数组:', arrayWithHoles); // 空位会被移到末尾
+            
+            // 性能考虑：对于大型数组，提供高效的比较函数很重要
+            let largeArray = Array.from({length: 10000}, (_, i) =\u003e Math.floor(Math.random() * 10000));
+            console.log('大数组长度:', largeArray.length);
+            
+            // 测量排序时间
+            console.time('快速排序');
+            largeArray.sort((a, b) =\u003e a - b);
+            console.timeEnd('快速排序');
+            
+            // 验证数组是否已排序
+            function isSorted(array) {
+                for (let i = 1; i \u003c array.length; i++) {
+                    if (array[i] \u003c array[i - 1]) return false;
+                }
+                return true;
+            }
+            
+            console.log('数组是否已排序:', isSorted(largeArray));
+            
+            // 随机生成的数组内容可能不会完全相同，这里只是验证排序函数的正确性
+            
+            // 处理非数字类型的数组
+            let stringArray = ['banana', 'apple', 'Cherry', 'date'];
+            
+            // 默认排序（区分大小写）
+            stringArray.sort();
+            console.log('区分大小写排序:', stringArray); // ['Cherry', 'apple', 'banana', 'date']
+            
+            // 不区分大小写排序
+            stringArray.sort(function(a, b) {
+                return a.toLowerCase().localeCompare(b.toLowerCase());
+            });
+            console.log('不区分大小写排序:', stringArray); // ['apple', 'banana', 'Cherry', 'date']
+            
+            // 使用localeCompare进行本地化排序
+            let mixedCaseArray = ['äpfel', 'Apple', 'Banane', 'banana'];
+            mixedCaseArray.sort(function(a, b) {
+                return a.localeCompare(b, 'de'); // 德语本地化排序
+            });
+            console.log('本地化排序:', mixedCaseArray);
+            
+            // 多条件排序
+            let complexObjects = [
+                { firstName: 'John', lastName: 'Doe', age: 30 },
+                { firstName: 'Jane', lastName: 'Smith', age: 25 },
+                { firstName: 'John', lastName: 'Smith', age: 35 },
+                { firstName: 'Jane', lastName: 'Doe', age: 28 }
+            ];
+            
+            // 先按firstName排序，再按lastName排序，最后按age排序
+            complexObjects.sort(function(a, b) {
+                // 先比较firstName
+                if (a.firstName !== b.firstName) {
+                    return a.firstName.localeCompare(b.firstName);
+                }
+                // 如果firstName相同，比较lastName
+                if (a.lastName !== b.lastName) {
+                    return a.lastName.localeCompare(b.lastName);
+                }
+                // 如果lastName也相同，比较age
+                return a.age - b.age;
+            });
+            
+            console.log('多条件排序结果:', complexObjects);
+            
+            // 排序稳定性（在JavaScript中，sort()方法是稳定的，相同键值的元素相对顺序保持不变）
+            let stableSortArray = [
+                { id: 1, name: 'Alice', group: 'A' },
+                { id: 2, name: 'Bob', group: 'B' },
+                { id: 3, name: 'Charlie', group: 'A' },
+                { id: 4, name: 'David', group: 'B' }
+            ];
+            
+            // 先按name排序
+            stableSortArray.sort((a, b) =\u003e a.name.localeCompare(b.name));
+            console.log('按name排序后:', stableSortArray);
+            
+            // 再按group排序（保持相同group内的name顺序）
+            stableSortArray.sort((a, b) =\u003e a.group.localeCompare(b.group));
+            console.log('按group排序后（稳定）:', stableSortArray);
+            
+            // 排序性能优化：对于已经部分排序的数组，sort()方法通常会更高效
+            let almostSortedArray = Array.from({length: 10000}, (_, i) =\u003e i);
+            // 打乱前100个元素
+            for (let i = 0; i \u003c 100; i++) {
+                const j = Math.floor(Math.random() * 100);
+                [almostSortedArray[i], almostSortedArray[j]] = [almostSortedArray[j], almostSortedArray[i]];
+            }
+            
+            console.time('排序几乎有序的数组');
+            almostSortedArray.sort((a, b) =\u003e a - b);
+            console.timeEnd('排序几乎有序的数组');
+            
+            // 注意：JavaScript的sort()方法在不同浏览器中实现可能不同，但通常是高效的
+            // 对于非常大的数组或特殊排序需求，可能需要考虑其他排序算法
+            
+            console.log('排序功能示例演示完成');
+        \u003c/script\u003e
+    \u003c/body\u003e
+\u003c/html\u003e

@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTML表单示例</title>
+    <style>
+        /* 简单的CSS样式，让表单更美观 */
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            color: #333;
+        }
+        form {
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input[type="text"],
+        input[type="email"],
+        input[type="password"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        input[type="radio"],
+        input[type="checkbox"] {
+            margin-right: 5px;
+        }
+        .radio-group,
+        .checkbox-group {
+            margin-top: 5px;
+        }
+        .radio-group label,
+        .checkbox-group label {
+            display: inline-block;
+            font-weight: normal;
+            margin-right: 15px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .form-note {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 5px;
+        }
+        .section {
+            margin: 30px 0;
+            padding: 20px;
+            background-color: #f0f7ff;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <h1>HTML表单示例</h1>
+    <p>这个页面展示了HTML中各种表单元素的用法和属性。</p>
+    
+    <div class="section">
+        <h2>基本信息表单</h2>
+        <form action="#" method="post">
+            <div class="form-group">
+                <label for="fullname">姓名 *</label>
+                <input type="text" id="fullname" name="fullname" required placeholder="请输入您的姓名">
+            </div>
+            
+            <div class="form-group">
+                <label for="email">电子邮箱 *</label>
+                <input type="email" id="email" name="email" required placeholder="请输入您的电子邮箱">
+                <div class="form-note">我们将使用此邮箱与您联系</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="phone">手机号码</label>
+                <input type="tel" id="phone" name="phone" placeholder="请输入您的手机号码">
+            </div>
+            
+            <div class="form-group">
+                <label for="password">设置密码 *</label>
+                <input type="password" id="password" name="password" required minlength="6" placeholder="请设置密码">
+                <div class="form-note">密码至少需要6个字符</div>
+            </div>
+            
+            <button type="submit">提交基本信息</button>
+        </form>
+    </div>
+    
+    <div class="section">
+        <h2>个人偏好表单</h2>
+        <form action="#" method="post">
+            <div class="form-group">
+                <label>性别</label>
+                <div class="radio-group">
+                    <label>
+                        <input type="radio" name="gender" value="male" checked> 男
+                    </label>
+                    <label>
+                        <input type="radio" name="gender" value="female"> 女
+                    </label>
+                    <label>
+                        <input type="radio" name="gender" value="other"> 其他
+                    </label>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="birthdate">出生日期</label>
+                <input type="date" id="birthdate" name="birthdate">
+            </div>
+            
+            <div class="form-group">
+                <label for="country">所在国家/地区</label>
+                <select id="country" name="country">
+                    <option value="">请选择</option>
+                    <option value="cn" selected>中国</option>
+                    <option value="hk">中国香港</option>
+                    <option value="tw">中国台湾</option>
+                    <option value="us">美国</option>
+                    <option value="jp">日本</option>
+                    <option value="kr">韩国</option>
+                    <option value="other">其他</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>兴趣爱好（可多选）</label>
+                <div class="checkbox-group">
+                    <label>
+                        <input type="checkbox" name="hobbies" value="reading" checked> 阅读
+                    </label>
+                    <label>
+                        <input type="checkbox" name="hobbies" value="sports"> 运动
+                    </label>
+                    <label>
+                        <input type="checkbox" name="hobbies" value="music"> 音乐
+                    </label>
+                    <label>
+                        <input type="checkbox" name="hobbies" value="travel"> 旅行
+                    </label>
+                    <label>
+                        <input type="checkbox" name="hobbies" value="coding"> 编程
+                    </label>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>技术水平</label>
+                <div class="radio-group">
+                    <label>
+                        <input type="radio" name="skillLevel" value="beginner"> 初学者
+                    </label>
+                    <label>
+                        <input type="radio" name="skillLevel" value="intermediate"> 中级
+                    </label>
+                    <label>
+                        <input type="radio" name="skillLevel" value="advanced" checked> 高级
+                    </label>
+                    <label>
+                        <input type="radio" name="skillLevel" value="expert"> 专家
+                    </label>
+                </div>
+            </div>
+            
+            <button type="submit">提交偏好设置</button>
+            <button type="reset">重置表单</button>
+        </form>
+    </div>
+    
+    <div class="section">
+        <h2>反馈表单</h2>
+        <form action="#" method="post">
+            <div class="form-group">
+                <label for="rating">整体评分</label>
+                <input type="range" id="rating" name="rating" min="1" max="5" value="4">
+                <div class="form-note">当前评分：<span id="ratingValue">4</span> 星</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="feedback">您的反馈</label>
+                <textarea id="feedback" name="feedback" rows="4" cols="50" placeholder="请输入您的反馈和建议..."></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label for="color">主题颜色偏好</label>
+                <input type="color" id="color" name="color" value="#4CAF50">
+            </div>
+            
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" name="subscribe" checked> 订阅我们的新闻通讯
+                </label>
+            </div>
+            
+            <button type="submit">提交反馈</button>
+        </form>
+    </div>
+    
+    <script>
+        // 简单的JavaScript来显示评分值
+        const ratingInput = document.getElementById('rating');
+        const ratingValue = document.getElementById('ratingValue');
+        
+        ratingInput.addEventListener('input', function() {
+            ratingValue.textContent = this.value;
+        });
+    </script>
+    
+    <h2>表单元素说明</h2>
+    <table border="1" cellpadding="10" style="width:100%; border-collapse: collapse; margin-top: 20px;">
+        <tr style="background-color: #f2f2f2;">
+            <th>输入类型</th>
+            <th>HTML代码</th>
+            <th>用途</th>
+        </tr>
+        <tr>
+            <td>文本输入</td>
+            <td><code>&lt;input type="text"&gt;</code></td>
+            <td>普通文本输入，如姓名、用户名等</td>
+        </tr>
+        <tr>
+            <td>电子邮件</td>
+            <td><code>&lt;input type="email"&gt;</code></td>
+            <td>电子邮件地址输入，浏览器会验证格式</td>
+        </tr>
+        <tr>
+            <td>密码</td>
+            <td><code>&lt;input type="password"&gt;</code></td>
+            <td>密码输入，输入内容会被隐藏</td>
+        </tr>
+        <tr>
+            <td>单选按钮</td>
+            <td><code>&lt;input type="radio"&gt;</code></td>
+            <td>从多个选项中选择一个</td>
+        </tr>
+        <tr>
+            <td>复选框</td>
+            <td><code>&lt;input type="checkbox"&gt;</code></td>
+            <td>从多个选项中选择零个或多个</td>
+        </tr>
+        <tr>
+            <td>下拉列表</td>
+            <td><code>&lt;select&gt;&lt;option&gt;</code></td>
+            <td>从预定义的选项列表中选择</td>
+        </tr>
+        <tr>
+            <td>多行文本</td>
+            <td><code>&lt;textarea&gt;</code></td>
+            <td>用于较长的文本输入，如评论、留言等</td>
+        </tr>
+        <tr>
+            <td>日期选择器</td>
+            <td><code>&lt;input type="date"&gt;</code></td>
+            <td>用于选择日期</td>
+        </tr>
+        <tr>
+            <td>范围滑块</td>
+            <td><code>&lt;input type="range"&gt;</code></td>
+            <td>用于选择范围内的值</td>
+        </tr>
+        <tr>
+            <td>颜色选择器</td>
+            <td><code>&lt;input type="color"&gt;</code></td>
+            <td>用于选择颜色</td>
+        </tr>
+    </table>
+    
+    <h2>表单最佳实践</h2>
+    <ul>
+        <li>始终使用<code>&lt;label&gt;</code>元素关联表单控件，提高可访问性</li>
+        <li>使用适当的输入类型，获得更好的用户体验和浏览器验证</li>
+        <li>标记必填字段，使用<code>required</code>属性</li>
+        <li>提供清晰的表单反馈和错误提示</li>
+        <li>对重要信息（如密码）提供输入格式要求</li>
+        <li>在移动设备上确保表单控件足够大，易于点击</li>
+    </ul>
+    
+    <p style="text-align: center; margin-top: 40px; color: #666;">— HTML表单示例 —</p>
+</body>
+</html>

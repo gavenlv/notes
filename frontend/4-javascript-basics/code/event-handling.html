@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JavaScript DOM事件处理示例</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: #34495e;
+            margin-top: 30px;
+            margin-bottom: 20px;
+            border-left: 4px solid #3498db;
+            padding-left: 15px;
+        }
+        h3 {
+            color: #7f8c8d;
+            margin-top: 20px;
+        }
+        .example-section {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 25px;
+            border-left: 3px solid #3498db;
+        }
+        .result-box {
+            background-color: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 15px;
+            font-family: monospace;
+            max-height: 200px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        button:active {
+            transform: translateY(1px);
+        }
+        .demo-area {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px dashed #ddd;
+            border-radius: 5px;
+            min-height: 100px;
+        }
+        .highlight {
+            background-color: #ffffcc;
+            padding: 2px 5px;
+            border-radius: 3px;
+        }
+        .code-block {
+            background-color: #f5f5f5;
+            padding: 15px;
+            border-radius: 5px;
+            border-left: 3px solid #e74c3c;
+            font-family: monospace;
+            overflow-x: auto;
+            margin-bottom: 20px;
+        }
+        .event-box {
+            padding: 20px;
+            margin: 10px 0;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .parent-box {
+            background-color: #3498db;
+            color: white;
+            padding: 30px;
+        }
+        .child-box {
+            background-color: #e74c3c;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        .grandchild-box {
+            background-color: #2ecc71;
+            color: white;
+            padding: 10px;
+            text-align: center;
+        }
+        .event-box:hover {
+            transform: scale(1.02);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        input[type="text"],
+        input[type="email"],
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+            margin-top: 5px;
+        }
+        .key-display {
+            font-size: 18px;
+            font-weight: bold;
+            margin: 10px 0;
+            min-height: 30px;
+        }
+        .mouse-position {
+            font-family: monospace;
+            background-color: #ecf0f1;
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+        .event-list {
+            max-height: 200px;
+            overflow-y: auto;
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .event-item {
+            padding: 5px;
+            margin: 5px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .timer-display {
+            font-size: 24px;
+            font-weight: bold;
+            text-align: center;
+            margin: 20px 0;
+            color: #e74c3c;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>JavaScript DOM事件处理</h1>
+        <p>事件是JavaScript与HTML交互的基础。当用户在页面上执行操作时（如点击按钮、移动鼠标、输入文本等），浏览器会触发相应的事件。通过事件处理，我们可以编写响应用户操作的代码。</p>
+        
+        <h2>1. 事件监听器的添加方式</h2>
+        <div class="example-section">
+            <h3>1.1 内联事件处理器（不推荐）</h3>
+            <div class="code-block">
+<!-- HTML中直接使用事件属性 -->
+<button onclick="alert('按钮被点击了!')">点击我（内联方式）</button>
+            </div>
+            <button onclick="alert('按钮被点击了!')">点击我（内联方式）</button>
+            
+            <h3>1.2 DOM元素属性方式（不推荐）</h3>
+            <div class="code-block">
+// JavaScript中设置事件属性
+document.getElementById('btn-property').onclick = function() {
+    alert('按钮通过属性被点击了!');
+};
+            </div>
+            <button id="btn-property">点击我（属性方式）</button>
+            
+            <h3>1.3 addEventListener方法（推荐）</h3>
+            <div class="code-block">
+// 使用addEventListener添加事件监听器
+document.getElementById('btn-add-event').addEventListener('click', function() {
+    alert('按钮通过addEventListener被点击了!');
+});
+
+// 可以添加多个监听器
+document.getElementById('btn-add-event').addEventListener('click', function() {
+    console.log('另一个点击处理器');
+});
+            </div>
+            <button id="btn-add-event">点击我（addEventListener方式）</button>
+            <button onclick="runEventListenerDemo()">运行事件监听器演示</button>
+            <div id="eventListenerResult" class="result-box">结果将显示在这里</div>
+        </div>
+        
+        <h2>2. 事件对象（Event）</h2>
+        <div class="example-section">
+            <div class="code-block">
+// 事件处理函数接收事件对象作为参数
+element.addEventListener('click', function(event) {
+    // event是事件对象，包含事件相关的信息
+    console.log('事件类型:', event.type);
+    console.log('目标元素:', event.target);
+    console.log('当前元素:', event.currentTarget);
+    console.log('点击坐标:', event.clientX, event.clientY);
+});
+            </div>
+            <button id="btn-event-object">点击我查看事件对象信息</button>
+            <div id="eventObjectResult" class="result-box">点击按钮查看事件对象信息</div>
+            
+            <h3>常用事件对象属性和方法</h3>
+            <ul>
+                <li><strong>event.type</strong>: 事件类型（如'click'、'mouseover'）</li>
+                <li><strong>event.target</strong>: 触发事件的元素（最具体的元素）</li>
+                <li><strong>event.currentTarget</strong>: 当前处理事件的元素（绑定监听器的元素）</li>
+                <li><strong>event.clientX/clientY</strong>: 鼠标相对于浏览器窗口的坐标</li>
+                <li><strong>event.pageX/pageY</strong>: 鼠标相对于文档的坐标（包括滚动）</li>
+                <li><strong>event.preventDefault()</strong>: 阻止默认事件行为</li>
+                <li><strong>event.stopPropagation()</strong>: 阻止事件冒泡</li>
+                <li><strong>event.stopImmediatePropagation()</strong>: 阻止事件冒泡并停止调用其他监听器</li>
+            </ul>
+        </div>
+        
+        <h2>3. 事件冒泡和捕获</h2>
+        <div class="example-section">
+            <p>当一个元素触发事件时，事件会沿着DOM树进行传播。事件传播分为三个阶段：捕获阶段、目标阶段和冒泡阶段。</p>
+            <ul>
+                <li><strong>捕获阶段</strong>: 事件从Document开始，向下传播到目标元素的父元素
+                <li><strong>目标阶段</strong>: 事件到达触发事件的元素
+                <li><strong>冒泡阶段</strong>: 事件从目标元素开始，向上传播到Document
+            </ul>
+            
+            <div class="demo-area">
+                <div id="parent-box" class="event-box parent-box">
+                    父元素
+                    <div id="child-box" class="event-box child-box">
+                        子元素
+                        <div id="grandchild-box" class="event-box grandchild-box">
+                            孙元素
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <button onclick="setupBubbleDemo()">设置冒泡演示</button>
+            <button onclick="setupCaptureDemo()">设置捕获演示</button>
+            <button onclick="clearBubbleDemo()">清除演示</button>
+            <div id="bubbleResult" class="result-box">点击任何盒子查看事件传播顺序
+            </div>
+        </div>
+        
+        <h2>4. 常用事件类型演示</h2>
+        
+        <div class="example-section">
+            <h3>4.1 鼠标事件</h3>
+            <button id="btn-mouse-events">鼠标事件测试按钮</button>
+            <div class="mouse-position">
+                鼠标位置: <span id="mouse-coordinates">移动鼠标查看坐标</span>
+            </div>
+            
+            <h3>4.2 键盘事件</h3>
+            <p>在下方输入框中按下按键：</p>
+            <input type="text" id="keyboard-input" placeholder="在此输入文本...">
+            <div class="key-display">
+                按下的键: <span id="key-pressed">无</span>
+            </div>
+            
+            <h3>4.3 表单事件</h3>
+            <form id="demo-form">
+                <div class="form-group">
+                    <label for="username">用户名:</label>
+                    <input type="text" id="username" name="username">
+                </div>
+                <div class="form-group">
+                    <label for="email">邮箱:</label>
+                    <input type="email" id="email" name="email">
+                </div>
+                <button type="submit">提交表单</button>
+                <button type="reset">重置表单</button>
+            </form>
+            <div id="formEventsResult" class="result-box">表单事件信息将显示在这里</div>
+            
+            <h3>4.4 窗口事件</h3>
+            <button onclick="setupWindowEvents()">设置窗口事件监听</button>
+            <button onclick="removeWindowEvents()">移除窗口事件监听</button>
+            <div id="windowEventsResult" class="result-box">窗口事件信息将显示在这里。尝试调整窗口大小或滚动页面。</div>
+        </div>
+        
+        <h2>5. 事件委托（Event Delegation）</h2>
+        <div class="example-section">
+            <p>事件委托是一种利用事件冒泡原理的优化技术，它将事件监听器附加到父元素，而不是每个子元素上。</p>
+            <div class="code-block">
+// 事件委托示例
+const parentElement = document.getElementById('items-container');
+
+parentElement.addEventListener('click', function(event) {
+    // 检查点击的是否是目标元素（通过类名或标签名等）
+    if (event.target.classList.contains('list-item')) {
+        // 处理点击事件
+        console.log('点击了项目:', event.target.textContent);
+        // 这里可以根据不同的子元素执行不同的操作
+    }
+});
+            </div>
+            <div class="demo-area">
+                <div id="items-container">
+                    <div class="event-item list-item">项目 1</div>
+                    <div class="event-item list-item">项目 2</div>
+                    <div class="event-item list-item">项目 3</div>
+                    <div class="event-item list-item">项目 4</div>
+                    <div class="event-item list-item">项目 5</div>
+                </div>
+            </div>
+            <button onclick="addNewItem()">添加新项目（测试动态添加）</button>
+            <div id="delegationResult" class="result-box">点击上面的项目查看事件委托效果</div>
+        </div>
+        
+        <h2>6. 定时器事件</h2>
+        <div class="example-section">
+            <h3>6.1 setTimeout和clearTimeout</h3>
+            <div class="code-block">
+// 设置一次性定时器
+const timeoutId = setTimeout(function() {
+    console.log('1秒后执行');
+}, 1000);
+
+// 取消定时器
+clearTimeout(timeoutId);
+            </div>
+            <button onclick="startTimeout()">启动3秒定时器</button>
+            <button onclick="clearTimeoutDemo()">取消定时器</button>
+            <
+            <h3>6.2 setInterval和clearInterval</h3>
+            <div class="code-block">
+// 设置周期性定时器
+const intervalId = setInterval(function() {
+    console.log('每秒执行一次');
+}, 1000);
+
+// 取消定时器
+clearInterval(intervalId);
+            </div>
+            <div class="timer-display">倒计时: <span id="countdown">10</span> 秒</div>
+            <button onclick="startInterval()">启动倒计时器</button>
+            <button onclick="clearIntervalDemo()">停止倒计时器</button>
+            <div id="timerResult" class="result-box">定时器事件信息将显示在这里</div>
+        </div>
+    </div>
+
+    <script>
+        // 辅助函数：显示结果
+        function displayResult(elementId, content) {
+            const element = document.getElementById(elementId);
+            element.textContent = content;
+        }
+        
+        // 添加新行到结果
+        function appendResult(elementId, content) {
+            const element = document.getElementById(elementId);
+            element.textContent += '\n' + content;
+        }
+        
+        // 1. 事件监听器演示
+        function runEventListenerDemo() {
+            let output = '';
+            
+            // 使用属性方式设置事件处理器（会覆盖之前的处理器）
+            const propertyBtn = document.getElementById('btn-property');
+            propertyBtn.onclick = function() {
+                alert('这是新的点击处理器，会覆盖之前的!');
+            };
+            
+            // 使用addEventListener添加多个监听器
+            const addEventBtn = document.getElementById('btn-add-event');
+            // 移除所有之前的监听器（需要引用原函数才能移除）
+            const newHandler1 = function() { output += '第一个监听器被触发\n'; };
+            const newHandler2 = function() { output += '第二个监听器被触发\n'; };
+            const newHandler3 = function() { output += '第三个监听器被触发\n'; };
+            
+            // 移除可能存在的监听器
+            addEventBtn.removeEventListener('click', newHandler1);
+            addEventBtn.removeEventListener('click', newHandler2);
+            addEventBtn.removeEventListener('click', newHandler3);
+            
+            // 添加新的监听器
+            addEventBtn.addEventListener('click', newHandler1);
+            addEventBtn.addEventListener('click', newHandler2);
+            addEventBtn.addEventListener('click', newHandler3);
+            
+            output += '已为按钮添加三个监听器，点击按钮查看效果\n';
+            output += '\naddEventListener的优点：\n';
+            output += '1. 可以为同一个事件添加多个处理函数\n';
+            output += '2. 可以精确控制事件传播阶段（捕获/冒泡）\n';
+            output += '3. 可以方便地移除特定的事件监听器\n';
+            output += '4. 符合标准DOM事件模型\n';
+            
+            displayResult('eventListenerResult', output);
+        }
+        
+        // 2. 事件对象示例
+        document.getElementById('btn-event-object').addEventListener('click', function(event) {
+            let output = '';
+            
+            output += '点击事件对象信息:\n';
+            output += `- 事件类型: ${event.type}\n`;
+            output += `- 目标元素: ${event.target.tagName.toLowerCase()}\n`;
+            output += `- 当前元素: ${event.currentTarget.tagName.toLowerCase()}\n`;
+            output += `- 点击坐标 (clientX, clientY): ${event.clientX}, ${event.clientY}\n`;
+            output += `- 点击坐标 (pageX, pageY): ${event.pageX}, ${event.pageY}\n`;
+            output += `- 是否按下Shift键: ${event.shiftKey}\n`;
+            output += `- 是否按下Ctrl键: ${event.ctrlKey}\n`;
+            output += `- 是否按下Alt键: ${event.altKey}\n`;
+            output += `- 事件时间戳: ${event.timeStamp}\n`;
+            
+            displayResult('eventObjectResult', output);
+        });
+        
+        // 3. 事件冒泡和捕获演示
+        let isBubbleMode = true;
+        
+        function logEvent(elementId, phase) {
+            const phaseText = phase === 'capture' ? '捕获阶段' : '冒泡阶段';
+            appendResult('bubbleResult', `[${phaseText}] 触发了 ${elementId} 的点击事件`);
+        }
+        
+        function setupBubbleDemo() {
+            clearBubbleDemo(); // 先清除之前的事件
+            isBubbleMode = true;
+            
+            const parent = document.getElementById('parent-box');
+            const child = document.getElementById('child-box');
+            const grandchild = document.getElementById('grandchild-box');
+            
+            // 默认是冒泡阶段监听
+            parent.addEventListener('click', function() { logEvent('parent-box', 'bubble'); });
+            child.addEventListener('click', function() { logEvent('child-box', 'bubble'); });
+            grandchild.addEventListener('click', function() { logEvent('grandchild-box', 'bubble'); });
+            
+            displayResult('bubbleResult', '冒泡模式已设置。点击任何盒子查看事件冒泡顺序。');
+        }
+        
+        function setupCaptureDemo() {
+            clearBubbleDemo(); // 先清除之前的事件
+            isBubbleMode = false;
+            
+            const parent = document.getElementById('parent-box');
+            const child = document.getElementById('child-box');
+            const grandchild = document.getElementById('grandchild-box');
+            
+            // 使用捕获阶段监听（第三个参数为true）
+            parent.addEventListener('click', function() { logEvent('parent-box', 'capture'); }, true);
+            child.addEventListener('click', function() { logEvent('child-box', 'capture'); }, true);
+            grandchild.addEventListener('click', function() { logEvent('grandchild-box', 'capture'); }, true);
+            
+            displayResult('bubbleResult', '捕获模式已设置。点击任何盒子查看事件捕获顺序。');
+        }
+        
+        function clearBubbleDemo() {
+            const parent = document.getElementById('parent-box');
+            const child = document.getElementById('child-box');
+            const grandchild = document.getElementById('grandchild-box');
+            
+            // 移除所有点击事件监听器（这种方式不完美，因为我们没有保存原始函数引用）
+            // 实际开发中应该保存函数引用以便正确移除
+            parent.innerHTML = parent.innerHTML;
+            
+            // 重新获取元素并重建结构
+            const newParent = document.getElementById('parent-box');
+            newParent.innerHTML = `
+                父元素
+                <div id="child-box" class="event-box child-box">
+                    子元素
+                    <div id="grandchild-box" class="event-box grandchild-box">
+                        孙元素
+                    </div>
+                </div>
+            `;
+            
+            displayResult('bubbleResult', '事件监听器已清除。');
+        }
+        
+        // 4. 常用事件类型演示
+        
+        // 鼠标事件
+        const mouseBtn = document.getElementById('btn-mouse-events');
+        const coordinatesDisplay = document.getElementById('mouse-coordinates');
+        
+        // 为按钮添加鼠标事件
+        mouseBtn.addEventListener('click', function() { appendResult('formEventsResult', '鼠标点击事件触发'); });
+        mouseBtn.addEventListener('dblclick', function() { appendResult('formEventsResult', '鼠标双击事件触发'); });
+        mouseBtn.addEventListener('mouseover', function() { appendResult('formEventsResult', '鼠标悬停事件触发'); });
+        mouseBtn.addEventListener('mouseout', function() { appendResult('formEventsResult', '鼠标离开事件触发'); });
+        mouseBtn.addEventListener('mousedown', function() { appendResult('formEventsResult', '鼠标按下事件触发'); });
+        mouseBtn.addEventListener('mouseup', function() { appendResult('formEventsResult', '鼠标释放事件触发'); });
+        
+        // 鼠标移动事件（全局）
+        document.addEventListener('mousemove', function(event) {
+            coordinatesDisplay.textContent = `clientX: ${event.clientX}, clientY: ${event.clientY} | pageX: ${event.pageX}, pageY: ${event.pageY}`;
+        });
+        
+        // 键盘事件
+        const keyboardInput = document.getElementById('keyboard-input');
+        const keyDisplay = document.getElementById('key-pressed');
+        
+        keyboardInput.addEventListener('keydown', function(event) {
+            keyDisplay.textContent = `键码: ${event.keyCode}, 键值: '${event.key}', 按下Shift: ${event.shiftKey}`;
+            appendResult('formEventsResult', `键盘按下事件: 键码 ${event.keyCode}, 键值 '${event.key}'`);
+        });
+        
+        keyboardInput.addEventListener('keyup', function(event) {
+            appendResult('formEventsResult', `键盘释放事件: 键码 ${event.keyCode}, 键值 '${event.key}'`);
+        });
+        
+        keyboardInput.addEventListener('keypress', function(event) {
+            appendResult('formEventsResult', `键盘按压事件: 键码 ${event.keyCode}, 键值 '${event.key}'`);
+        });
+        
+        // 表单事件
+        const demoForm = document.getElementById('demo-form');
+        const usernameInput = document.getElementById('username');
+        const emailInput = document.getElementById('email');
+        
+        demoForm.addEventListener('submit', function(event) {
+            event.preventDefault(); // 阻止表单默认提交
+            appendResult('formEventsResult', '表单提交事件触发');
+        });
+        
+        demoForm.addEventListener('reset', function() {
+            appendResult('formEventsResult', '表单重置事件触发');
+        });
+        
+        usernameInput.addEventListener('focus', function() {
+            appendResult('formEventsResult', '用户名输入框获取焦点');
+        });
+        
+        usernameInput.addEventListener('blur', function() {
+            appendResult('formEventsResult', '用户名输入框失去焦点');
+        });
+        
+        usernameInput.addEventListener('input', function(event) {
+            appendResult('formEventsResult', `用户名输入变化: ${event.target.value}`);
+        });
+        
+        usernameInput.addEventListener('change', function(event) {
+            appendResult('formEventsResult', `用户名值改变: ${event.target.value}`);
+        });
+        
+        // 窗口事件
+        function handleResize() {
+            appendResult('windowEventsResult', `窗口大小变化: ${window.innerWidth}x${window.innerHeight}`);
+        }
+        
+        function handleScroll() {
+            appendResult('windowEventsResult', `页面滚动: X=${window.scrollX}, Y=${window.scrollY}`);
+        }
+        
+        function setupWindowEvents() {
+            window.addEventListener('resize', handleResize);
+            window.addEventListener('scroll', handleScroll);
+            displayResult('windowEventsResult', '窗口事件监听已设置。尝试调整窗口大小或滚动页面。');
+        }
+        
+        function removeWindowEvents() {
+            window.removeEventListener('resize', handleResize);
+            window.removeEventListener('scroll', handleScroll);
+            displayResult('windowEventsResult', '窗口事件监听已移除。');
+        }
+        
+        // 5. 事件委托演示
+        let itemCounter = 5;
+        
+        // 设置事件委托
+        const itemsContainer = document.getElementById('items-container');
+        itemsContainer.addEventListener('click', function(event) {
+            // 检查点击的是否是列表项
+            if (event.target.classList.contains('list-item')) {
+                const itemText = event.target.textContent;
+                displayResult('delegationResult', `点击了: ${itemText}`);
+                
+                // 可以根据项目内容或索引执行不同操作
+                if (itemText.includes('5')) {
+                    appendResult('delegationResult', '特殊操作: 项目5被点击');
+                }
+            }
+        });
+        
+        // 动态添加新项目
+        function addNewItem() {
+            itemCounter++;
+            const newItem = document.createElement('div');
+            newItem.className = 'event-item list-item';
+            newItem.textContent = `项目 ${itemCounter}`;
+            itemsContainer.appendChild(newItem);
+            
+            displayResult('delegationResult', `已添加新项目: 项目 ${itemCounter}。即使是新添加的项目，也能响应点击事件，这就是事件委托的优势。`);
+        }
+        
+        // 6. 定时器事件演示
+        let timeoutId = null;
+        let intervalId = null;
+        let countdown = 10;
+        
+        function startTimeout() {
+            if (timeoutId) return;
+            
+            displayResult('timerResult', '3秒定时器已启动...');
+            
+            timeoutId = setTimeout(function() {
+                appendResult('timerResult', '3秒定时器触发了!');
+                timeoutId = null;
+            }, 3000);
+        }
+        
+        function clearTimeoutDemo() {
+            if (timeoutId) {
+                clearTimeout(timeoutId);
+                timeoutId = null;
+                displayResult('timerResult', '定时器已取消');
+            }
+        }
+        
+        function startInterval() {
+            if (intervalId) return;
+            
+            countdown = 10;
+            updateCountdown();
+            displayResult('timerResult', '倒计时器已启动');
+            
+            intervalId = setInterval(function() {
+                countdown--;
+                updateCountdown();
+                
+                appendResult('timerResult', `倒计时: ${countdown}秒`);
+                
+                if (countdown <= 0) {
+                    clearIntervalDemo();
+                    appendResult('timerResult', '倒计时结束!');
+                }
+            }, 1000);
+        }
+        
+        function clearIntervalDemo() {
+            if (intervalId) {
+                clearInterval(intervalId);
+                intervalId = null;
+                appendResult('timerResult', '倒计时器已停止');
+            }
+        }
+        
+        function updateCountdown() {
+            document.getElementById('countdown').textContent = countdown;
+        }
+        
+        // 页面加载完成后执行的初始化代码
+        document.addEventListener('DOMContentLoaded', function() {
+            // 初始化设置
+            console.log('页面DOM内容已加载完成，可以安全地操作DOM了');
+        });
+    </script>
+</body>
+</html>

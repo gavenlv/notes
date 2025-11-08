@@ -1,0 +1,1418 @@
+\u003c!DOCTYPE html\u003e
+\u003chtml lang="zh-CN"\u003e
+\u003chead\u003e
+    \u003cmeta charset="UTF-8"\u003e
+    \u003cmeta name="viewport" content="width=device-width, initial-scale=1.0"\u003e
+    \u003ctitle\u003eJavaScript函数 - 定义、调用与特性\u003c/title\u003e
+    \u003cstyle\u003e
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f5f5;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 30px;
+            text-align: center;
+            font-size: 2.2em;
+        }
+        
+        h2 {
+            color: #3498db;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e0e0e0;
+            font-size: 1.8em;
+        }
+        
+        h3 {
+            color: #2980b9;
+            margin-top: 25px;
+            margin-bottom: 15px;
+            font-size: 1.4em;
+        }
+        
+        h4 {
+            color: #27ae60;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+        
+        p {
+            margin-bottom: 15px;
+            font-size: 1.05em;
+        }
+        
+        .example-box {
+            background-color: #f8f9fa;
+            border-left: 4px solid #3498db;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        
+        .code-block {
+            background-color: #f0f0f0;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            margin: 15px 0;
+        }
+        
+        .result-box {
+            background-color: #e8f4f8;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 10px;
+            border: 1px solid #b8e0ea;
+        }
+        
+        .btn {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 0;
+            transition: background-color 0.3s;
+        }
+        
+        .btn:hover {
+            background-color: #2980b9;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        th {
+            background-color: #3498db;
+            color: white;
+            font-weight: bold;
+        }
+        
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+        
+        .highlight {
+            background-color: #fff3cd;
+            padding: 15px;
+            border-radius: 4px;
+            border-left: 4px solid #ffc107;
+            margin: 15px 0;
+        }
+        
+        .warning {
+            background-color: #f8d7da;
+            padding: 15px;
+            border-radius: 4px;
+            border-left: 4px solid #dc3545;
+            margin: 15px 0;
+        }
+        
+        .success {
+            background-color: #d4edda;
+            padding: 15px;
+            border-radius: 4px;
+            border-left: 4px solid #28a745;
+            margin: 15px 0;
+        }
+        
+        ul, ol {
+            margin-left: 20px;
+            margin-bottom: 15px;
+        }
+        
+        li {
+            margin-bottom: 8px;
+        }
+        
+        .function-type {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .function-card {
+            flex: 1;
+            min-width: 250px;
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 6px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .function-card h4 {
+            color: #3498db;
+            margin-top: 0;
+            border-bottom: 1px solid #e0e0e0;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+    \u003c/style\u003e
+\u003c/head\u003e
+\u003cbody\u003e
+    \u003cdiv class="container"\u003e
+        \u003ch1\u003eJavaScript函数 - 定义、调用与特性\u003c/h1\u003e
+        
+        \u003ch2\u003e1. 函数基础概念\u003c/h2\u003e
+        \u003cp\u003e函数是JavaScript中的核心概念，它们允许我们将代码组织成可重用的块。函数可以接收输入参数，执行特定任务，并可选地返回一个值。\u003c/p\u003e
+        
+        \u003cdiv class="function-type"\u003e
+            \u003cdiv class="function-card"\u003e
+                \u003ch4\u003e函数的组成部分\u003c/h4\u003e
+                \u003cul\u003e
+                    \u003cli\u003e函数名称（可选）\u003c/li\u003e
+                    \u003cli\u003e参数列表（可选）\u003c/li\u003e
+                    \u003cli\u003e函数体（必需）\u003c/li\u003e
+                    \u003cli\u003e返回值（可选）\u003c/li\u003e
+                \u003c/ul\u003e
+            \u003c/div\u003e
+            \u003cdiv class="function-card"\u003e
+                \u003ch4\u003e函数的主要类型\u003c/h4\u003e
+                \u003cul\u003e
+                    \u003cli\u003e函数声明（Function Declaration）\u003c/li\u003e
+                    \u003cli\u003e函数表达式（Function Expression）\u003c/li\u003e
+                    \u003cli\u003e箭头函数（Arrow Function）\u003c/li\u003e
+                    \u003cli\u003e函数构造函数（Function Constructor）\u003c/li\u003e
+                \u003c/ul\u003e
+            \u003c/div\u003e
+        \u003c/div\u003e
+        
+        \u003ch2\u003e2. 函数的定义方式\u003c/h2\u003e
+        
+        \u003ch3\u003e2.1 函数声明（Function Declaration）\u003c/h3\u003e
+        \u003cp\u003e函数声明是最传统的函数定义方式，使用function关键字后跟函数名。\u003c/p\u003e
+        
+        \u003cdiv class="example-box"\u003e
+            \u003ch4\u003e示例：函数声明\u003c/h4\u003e
+            \u003cdiv class="code-block"\u003e
+                // 函数声明
+                function greet(name) {
+                    return `Hello, ${name}!`;
+                }
+                
+                // 调用函数
+                let message = greet('World');
+                console.log(message); // 输出: Hello, World!
+            \u003c/div\u003e
+            \u003cbutton class="btn" onclick="runFunctionDeclarationExample()"\u003e运行示例\u003c/button\u003e
+            \u003cdiv class="result-box" id="functionDeclarationResult"\u003e\u003c/div\u003e
+        \u003c/div\u003e
+        
+        \u003cdiv class="highlight"\u003e
+            \u003cstrong\u003e注意：\u003c/strong\u003e函数声明会被提升（hoisted），这意味着我们可以在声明之前调用函数。
+        \u003c/div\u003e
+        
+        \u003ch3\u003e2.2 函数表达式（Function Expression）\u003c/h3\u003e
+        \u003cp\u003e函数表达式是将函数赋值给变量的方式。函数表达式可以是命名的或匿名的。\u003c/p\u003e
+        
+        \u003cdiv class="example-box"\u003e
+            \u003ch4\u003e示例：匿名函数表达式\u003c/h4\u003e
+            \u003cdiv class="code-block"\u003e
+                // 匿名函数表达式
+                let add = function(a, b) {
+                    return a + b;
+                };
+                
+                // 调用函数
+                let sum = add(5, 3);
+                console.log(sum); // 输出: 8
+            \u003c/div\u003e
+            \u003cbutton class="btn" onclick="runAnonymousFunctionExpressionExample()"\u003e运行示例\u003c/button\u003e
+            \u003cdiv class="result-box" id="anonymousFunctionExpressionResult"\u003e\u003c/div\u003e
+        \u003c/div\u003e
+        
+        \u003cdiv class="example-box"\u003e
+            \u003ch4\u003e示例：命名函数表达式\u003c/h4\u003e
+            \u003cdiv class="code-block"\u003e
+                // 命名函数表达式
+                let multiply = function multiplyNumbers(x, y) {
+                    return x * y;
+                };
+                
+                // 调用函数
+                let product = multiply(4, 5);
+                console.log(product); // 输出: 20
+                // console.log(multiplyNumbers(4, 5)); // 错误：multiplyNumbers在外部不可访问
+            \u003c/div\u003e
+            \u003cbutton class="btn" onclick="runNamedFunctionExpressionExample()"\u003e运行示例\u003c/button\u003e
+            \u003cdiv class="result-box" id="namedFunctionExpressionResult"\u003e\u003c/div\u003e
+        \u003c/div\u003e
+        
+        \u003cdiv class="warning"\u003e
+            \u003cstrong\u003e注意：\u003c/strong\u003e函数表达式不会被提升，必须先定义后使用。
+        \u003c/div\u003e
+        
+        \u003ch3\u003e2.3 箭头函数（ES6）\u003c/h3\u003e
+        \u003cp\u003e箭头函数是ES6中引入的一种简洁的函数表达式写法。它使用箭头（=\u003e）来定义函数。\u003c/p\u003e
+        
+        \u003cdiv class="example-box"\u003e
+            \u003ch4\u003e示例：箭头函数基本语法\u003c/h4\u003e
+            \u003cdiv class="code-block"\u003e
+                // 基本箭头函数
+                let square = x =\u003e x * x;
+                
+                // 多个参数
+                let divide = (a, b) =\u003e a / b;
+                
+                // 多行函数体
+                let calculateArea = (length, width) =\u003e {
+                    let area = length * width;
+                    return area;
+                };
+                
+                console.log(square(4)); // 输出: 16
+                console.log(divide(10, 2)); // 输出: 5
+                console.log(calculateArea(3, 4)); // 输出: 12
+            \u003c/div\u003e
+            \u003cbutton class="btn" onclick="runArrowFunctionExample()"\u003e运行示例\u003c/button\u003e
+            \u003cdiv class="result-box" id="arrowFunctionResult"\u003e\u003c/div\u003e
+        \u003c/div\u003e
+        
+        \u003cdiv class="highlight"\u003e
+            \u003cstrong\u003e注意：\u003c/strong\u003e箭头函数有几个重要特性：\u003cbr\u003e
+            1. 没有自己的this绑定（使用外层作用域的this）\u003cbr\u003e
+            2. 不能用作构造函数（不能与new关键字一起使用）\u003cbr\u003e
+            3. 没有arguments对象（但可以使用剩余参数）\u003cbr\u003e
+            4. 没有super关键字（因为它不是构造函数）
+        \u003c/div\u003e
+        
+        \u003ch3\u003e2.4 函数构造函数（不推荐使用）\u003c/h3\u003e
+        \u003cp\u003e使用Function构造函数也可以创建函数，但这种方式很少使用，因为它可读性差，并且可能有安全问题。\u003c/p\u003e
+        
+        \u003cdiv class="example-box"\u003e
+            \u003ch4\u003e示例：函数构造函数（不推荐）\u003c/h4\u003e
+            \u003cdiv class="code-block"\u003e
+                // 使用Function构造函数创建函数（不推荐）
+                let subtract = new Function('a', 'b', 'return a - b;');
+                
+                console.log(subtract(10, 3)); // 输出: 7
+            \u003c/div\u003e
+            \u003cbutton class="btn" onclick="runFunctionConstructorExample()"\u003e运行示例\u003c/button\u003e
+            \u003cdiv class="result-box" id="functionConstructorResult"\u003e\u003c/div\u003e
+        \u003c/div\u003e
+        
+        \u003cdiv class="warning"\u003e
+            \u003cstrong\u003e警告：\u003c/strong\u003e不推荐使用Function构造函数，因为它：\u003cbr\u003e
+            1. 性能较差（每次调用都会解析函数体）\u003cbr\u003e
+            2. 有安全风险（可能执行不可信代码）\u003cbr\u003e
+            3. 不会继承当前作用域（始终在全局作用域中执行）\u003cbr\u003e
+            4. 代码可读性差
+        \u003c/div\u003e
+        
+        \u003ch2\u003e3. 函数参数\u003c/h2\u003e
+        \u003cp\u003eJavaScript函数可以接收任意数量的参数，包括零个参数。函数参数有几种特殊特性。\u003c/p\u003e
+        
+        \u003ch3\u003e3.1 默认参数（ES6）\u003c/h3\u003e
+        \u003cp\u003eES6引入了默认参数，允许我们为函数参数指定默认值。\u003c/p\u003e
+        
+        \u003cdiv class="example-box"\u003e
+            \u003ch4\u003e示例：默认参数\u003c/h4\u003e
+            \u003cdiv class="code-block"\u003e
+                // 默认参数
+                function sayHello(name = 'Guest', greeting = 'Hello') {
+                    return `${greeting}, ${name}!`;
+                }
+                
+                console.log(sayHello()); // 输出: Hello, Guest!
+                console.log(sayHello('John')); // 输出: Hello, John!
+                console.log(sayHello('John', 'Hi')); // 输出: Hi, John!
+            \u003c/div\u003e
+            \u003cbutton class="btn" onclick="runDefaultParametersExample()"\u003e运行示例\u003c/button\u003e
+            \u003cdiv class="result-box" id="defaultParametersResult"\u003e\u003c/div\u003e
+        \u003c/div\u003e
+        
+        \u003ch3\u003e3.2 剩余参数（ES6）\u003c/h3\u003e
+        \u003cp\u003e剩余参数允许我们将不定数量的参数表示为一个数组。\u003c/p\u003e
+        
+        \u003cdiv class="example-box"\u003e
+            \u003ch4\u003e示例：剩余参数\u003c/h4\u003e
+            \u003cdiv class="code-block"\u003e
+                // 剩余参数
+                function sumAll(...numbers) {
+                    return numbers.reduce((sum, num) =\u003e sum + num, 0);
+                }
+                
+                console.log(sumAll(1, 2, 3)); // 输出: 6
+                console.log(sumAll(1, 2, 3, 4, 5)); // 输出: 15
+                console.log(sumAll()); // 输出: 0
+            \u003c/div\u003e
+            \u003cbutton class="btn" onclick="runRestParametersExample()"\u003e运行示例\u003c/button\u003e
+            \u003cdiv class="result-box" id="restParametersResult"\u003e\u003c/div\u003e
+        \u003c/div\u003e
+        
+        \u003cdiv class="highlight"\u003e
+            \u003cstrong\u003e注意：\u003c/strong\u003e剩余参数必须是函数的最后一个参数，并且一个函数只能有一个剩余参数。
+        \u003c/div\u003e
+        
+        \u003ch3\u003e3.3 arguments对象（传统方式）\u003c/h3\u003e
+        \u003cp\u003e在ES6之前，我们通常使用arguments对象来处理不定数量的参数。arguments是一个类数组对象，包含了函数调用时传入的所有参数。\u003c/p\u003e
+        
+        \u003cdiv class="example-box"\u003e
+            \u003ch4\u003e示例：arguments对象\u003c/h4\u003e
+            \u003cdiv class="code-block"\u003e
+                // 使用arguments对象
+                function multiplyAll() {
+                    let product = 1;
+                    for (let i = 0; i \u003c arguments.length; i++) {
+                        product *= arguments[i];
+                    }
+                    return product;
+                }
+                
+                console.log(multiplyAll(2, 3)); // 输出: 6
+                console.log(multiplyAll(2, 3, 4)); // 输出: 24
+            \u003c/div\u003e
+            \u003cbutton class="btn" onclick="runArgumentsExample()"\u003e运行示例\u003c/button\u003e
+            \u003cdiv class="result-box" id="argumentsResult"\u003e\u003c/div\u003e
+        \u003cdiv class="warning"\u003e
+            \u003cstrong\u003e注意：\u003c/strong\u003e箭头函数没有自己的arguments对象。在箭头函数中，arguments引用的是外部作用域的arguments。
+        \u003c/div\u003e
+        
+        \u003ch3\u003e3.4 参数传递方式\u003c/h3\u003e
+        \u003cp\u003eJavaScript中的参数传递遵循以下规则：\u003c/ul\u003e
+        \u003cul\u003e
+            \u003cli\u003e基本数据类型（数字、字符串、布尔值等）按值传递\u003c/li\u003e
+            \u003cli\u003e引用数据类型（对象、数组等）按引用传递（实际上是传递引用的副本）\u003c/li\u003e
+        \u003c/ul\u003e
+        
+        \u003cdiv class="example-box"\u003e
+            \u003ch4\u003e示例：参数传递方式\u003c/h4\u003e
+            \u003cdiv class="code-block"\u003e
+                // 基本数据类型按值传递
+                function modifyNumber(num) {
+                    num = 10;
+                    return num;
+                }
+                
+                let x = 5;
+                console.log(modifyNumber(x)); // 输出: 10
+                console.log(x); // 输出: 5 (原值未改变)
+                
+                // 引用数据类型按引用传递
+                function modifyObject(obj) {
+                    obj.name = 'Modified';
+                    obj = { name: 'New Object' }; // 创建新对象，不影响外部引用
+                    return obj;
+                }
+                
+                let person = { name: 'Original' };
+                console.log(modifyObject(person)); // 输出: { name: 'New Object' }
+                console.log(person.name); // 输出: Modified (原值被修改)
+            \u003c/div\u003e
+            \u003cbutton class="btn" onclick="runParameterPassingExample()"\u003e运行示例\u003c/button\u003e
+            \u003cdiv class="result-box" id="parameterPassingResult"\u003e\u003c/div\u003e
+        \u003c/div\u003e
+        
+        \u003ch2\u003e4. 函数返回值\u003c/h2\u003e
+        \u003cp\u003e函数可以使用return语句返回一个值。如果没有显式的return语句，函数将返回undefined。\u003c/p\u003e
+        
+        \u003cdiv class="example-box"\u003e
+            \u003ch4\u003e示例：函数返回值\u003c/h4\u003e
+            \u003cdiv class="code-block"\u003e
+                // 有返回值的函数
+                function calculateFactorial(n) {
+                    if (n \u003c= 1) return 1;
+                    return n * calculateFactorial(n - 1);
+                }
+                
+                // 无返回值的函数
+                function greetUser(name) {
+                    console.log(`Hello, ${name}!`);
+                    // 没有return语句，隐式返回undefined
+                }
+                
+                console.log(calculateFactorial(5)); // 输出: 120
+                console.log(greetUser('John')); // 输出: undefined (同时会打印Hello, John!)
+            \u003c/div\u003e
+            \u003cbutton class="btn" onclick="runReturnValueExample()"\u003e运行示例\u003c/button\u003e
+            \u003cdiv class="result-box" id="returnValueResult"\u003e\u003c/div\u003e
+        \u003c/div\u003e
+        
+        \u003cdiv class="highlight"\u003e
+            \u003cstrong\u003e注意：\u003c/strong\u003e
+            1. return语句会立即终止函数执行并返回值\u003cbr\u003e
+            2. 一个函数只能返回一个值，但可以是任何类型，包括对象、数组等复杂数据类型\u003cbr\u003e
+            3. 如果需要返回多个值，可以将它们包装在对象或数组中返回
+        \u003c/div\u003e
+        
+        \u003ch2\u003e5. 函数作用域与闭包\u003c/h2\u003e
+        \u003cp\u003eJavaScript中的作用域决定了变量的可访问范围。函数创建了一个新的作用域。\u003c/p\u003e
+        
+        \u003ch3\u003e5.1 作用域链\u003c/h3\u003e
+        \u003cp\u003e当在函数内部引用一个变量时，JavaScript会首先在当前作用域查找，如果找不到，则向上级作用域查找，直到全局作用域。这就是作用域链。\u003c/p\u003e
+        
+        \u003cdiv class="example-box"\u003e
+            \u003ch4\u003e示例：作用域链\u003c/h4\u003e
+            \u003cdiv class="code-block"\u003e
+                // 全局变量
+                let globalVar = 'Global';
+                
+                function outerFunction() {
+                    // 外层函数变量
+                    let outerVar = 'Outer';
+                    
+                    function innerFunction() {
+                        // 内层函数变量
+                        let innerVar = 'Inner';
+                        
+                        // 可以访问所有级别的变量
+                        console.log(globalVar); // Global
+                        console.log(outerVar); // Outer
+                        console.log(innerVar); // Inner
+                    }
+                    
+                    innerFunction();
+                    // console.log(innerVar); // 错误：innerVar在内层函数作用域中
+                }
+                
+                outerFunction();
+                // console.log(outerVar); // 错误：outerVar在outerFunction作用域中
+            \u003c/div\u003e
+            \u003cbutton class="btn" onclick="runScopeChainExample()"\u003e运行示例\u003c/button\u003e
+            \u003cdiv class="result-box" id="scopeChainResult"\u003e\u003c/div\u003e
+        \u003c/div\u003e
+        
+        \u003ch3\u003e5.2 闭包
+        \u003cp\u003e闭包是指有权访问另一个函数作用域中的变量的函数。闭包可以让函数记住并访问创建它时的作用域，即使该函数在其外部作用域之外执行。\u003c/p\u003e
+        
+        \u003cdiv class="example-box"\u003e
+            \u003ch4\u003e示例：闭包基础
+            \u003cdiv class="code-block"\u003e
+                function createCounter() {
+                    let count = 0; // 私有变量
+                    
+                    // 返回闭包函数
+                    return function() {
+                        return ++count;
+                    };
+                }
+                
+                // 创建一个计数器
+                let counter = createCounter();
+                
+                console.log(counter()); // 1
+                console.log(counter()); // 2
+                console.log(counter()); // 3
+                
+                // 创建另一个独立的计数器
+                let counter2 = createCounter();
+                console.log(counter2()); // 1 (独立的计数)
+            \u003c/div\u003e
+            \u003cbutton class="btn" onclick="runClosureExample()"\u003e运行示例\u003c/button\u003e
+            \u003cdiv class="result-box" id="closureResult"\u003e\u003c/div\u003e
+        \u003c/div\u003e
+        
+        \u003cdiv class="example-box"\u003e
+            \u003ch4\u003e示例：闭包应用 - 数据封装
+            \u003cdiv class="code-block"\u003e
+                // 数据封装示例
+                function createPerson(name, age) {
+                    // 私有变量
+                    let _name = name;
+                    let _age = age;
+                    
+                    // 返回公共方法（闭包）
+                    return {
+                        getName: function() {
+                            return _name;
+                        },
+                        getAge: function() {
+                            return _age;
+                        },
+                        setName: function(name) {
+                            _name = name;
+                        },
+                        setAge: function(age) {
+                            if (age \u003e= 0) {
+                                _age = age;
+                            }
+                        },
+                        greet: function() {
+                            return `Hello, my name is ${_name} and I am ${_age} years old.`;
+                        }
+                    };
+                }
+                
+                // 创建一个person对象
+                let person = createPerson('John', 30);
+                
+                console.log(person.greet()); // Hello, my name is John and I am 30 years old.
+                person.setName('Jane');
+                person.setAge(25);
+                console.log(person.greet()); // Hello, my name is Jane and I am 25 years old.
+                console.log(person._name); // undefined (私有变量不可直接访问)
+            \u003c/div\u003e
+            \u003cbutton class="btn" onclick="runDataEncapsulationExample()"\u003e运行示例\u003c/button\u003e
+            \u003cdiv class="result-box" id="dataEncapsulationResult"\u003e\u003c/div\u003e
+        \u003c/div\u003e
+        
+        \u003cdiv class="success"\u003e
+            \u003cstrong\u003e闭包的优点：\u003c/strong\u003e
+            1. 可以创建私有变量和方法，实现数据封装\u003cbr\u003e
+            2. 可以创建函数工厂，生成具有特定行为的函数\u003cbr\u003e
+            3. 可以延迟函数的执行（例如在事件处理中）
+        \u003c/div\u003e
+        
+        \u003cdiv class="warning"\u003e
+            \u003cstrong\u003e闭包的注意事项：\u003c/strong\u003e
+            1. 闭包会保留外部作用域的变量，可能导致内存占用增加\u003cbr\u003e
+            2. 在循环中创建闭包时需要特别注意变量引用问题
+        \u003c/div\u003e
+        
+        \u003ch2\u003e6. 函数作为一等公民\u003c/h2\u003e
+        \u003cp\u003e在JavaScript中，函数是一等公民，这意味着：\u003c/ul\u003e
+        \u003cul\u003e
+            \u003cli\u003e函数可以赋值给变量\u003c/li\u003e
+            \u003cli\u003e函数可以作为参数传递给其他函数\u003c/li\u003e
+            \u003cli\u003e函数可以作为返回值从其他函数中返回\u003c/li\u003e
+            \u003cli\u003e函数可以存储在数据结构（如数组、对象）中\u003c/li\u003e
+        \u003c/ul\u003e
+        
+        \u003cdiv class="example-box"\u003e
+            \u003ch4\u003e示例：函数作为参数
+            \u003cdiv class="code-block"\u003e
+                // 函数作为参数
+                function processArray(arr, processFn) {
+                    let result = [];
+                    for (let i = 0; i \u003c arr.length; i++) {
+                        result.push(processFn(arr[i]));
+                    }
+                    return result;
+                }
+                
+                let numbers = [1, 2, 3, 4, 5];
+                
+                // 传递函数作为参数
+                let doubled = processArray(numbers, function(num) { return num * 2; });
+                let squared = processArray(numbers, function(num) { return num * num; });
+                
+                console.log(doubled); // [2, 4, 6, 8, 10]
+                console.log(squared); // [1, 4, 9, 16, 25]
+            \u003c/div\u003e
+            \u003cbutton class="btn" onclick="runFunctionAsParameterExample()"\u003e运行示例\u003c/button\u003e
+            \u003cdiv class="result-box" id="functionAsParameterResult"\u003e\u003c/div\u003e
+        \u003c/div\u003e
+        
+        \u003cdiv class="example-box"\u003e
+            \u003ch4\u003e示例：函数作为返回值
+            \u003cdiv class="code-block"\u003e
+                // 函数作为返回值
+                function createMultiplier(multiplier) {
+                    return function(num) {
+                        return num * multiplier;
+                    };
+                }
+                
+                // 创建不同的乘法函数
+                let double = createMultiplier(2);
+                let triple = createMultiplier(3);
+                let quadruple = createMultiplier(4);
+                
+                console.log(double(5)); // 10
+                console.log(triple(5)); // 15
+                console.log(quadruple(5)); // 20
+            \u003c/div\u003e
+            \u003cbutton class="btn" onclick="runFunctionAsReturnValueExample()"\u003e运行示例\u003c/button\u003e
+            \u003cdiv class="result-box" id="functionAsReturnValueResult"\u003e\u003c/div\u003e
+        \u003c/div\u003e
+        
+        \u003ch2\u003e7. 函数的高级特性\u003c/h2\u003e
+        
+        \u003ch3\u003e7.1 递归函数
+        \u003cp\u003e递归函数是指在函数内部调用自身的函数。递归可以用来解决许多问题，特别是树形结构和分治算法。\u003c/p\u003e
+        
+        \u003cdiv class="example-box"\u003e
+            \u003ch4\u003e示例：递归计算斐波那契数列
+            \u003cdiv class="code-block"\u003e
+                // 递归计算斐波那契数列
+                function fibonacci(n) {
+                    if (n \u003c= 1) return n;
+                    return fibonacci(n - 1) + fibonacci(n - 2);
+                }
+                
+                // 测试
+                console.log('斐波那契数列前10项:');
+                for (let i = 0; i \u003c 10; i++) {
+                    console.log(`fibonacci(${i}) = ${fibonacci(i)}`);
+                }
+            \u003c/div\u003e
+            \u003cbutton class="btn" onclick="runRecursionExample()"\u003e运行示例\u003c/button\u003e
+            \u003cdiv class="result-box" id="recursionResult"\u003e\u003c/div\u003e
+        \u003c/div\u003e
+        
+        \u003cdiv class="warning"\u003e
+            \u003cstrong\u003e递归注意事项：\u003c/strong\u003e
+            1. 递归必须有基本情况（终止条件），否则会导致无限递归和栈溢出错误\u003cbr\u003e
+            2. 递归可能导致重复计算，可以使用记忆化技术优化\u003cbr\u003e
+            3. 某些递归问题可以转换为迭代解决方案以提高效率
+        \u003c/div\u003e
+        
+        \u003ch3\u003e7.2 立即执行函数表达式（IIFE）\u003c/h3\u003e
+        \u003cp\u003eIIFE是一种定义和立即执行的函数表达式。它常用于创建独立的作用域，避免变量污染。\u003c/p\u003e
+        
+        \u003cdiv class="example-box"\u003e
+            \u003ch4\u003e示例：立即执行函数表达式（IIFE）
+            \u003cdiv class="code-block"\u003e
+                // IIFE基本语法
+                (function() {
+                    // 私有变量，不会污染全局命名空间
+                    let privateVar = 'This is private';
+                    console.log(privateVar);
+                })();
+                
+                // IIFE带参数
+                (function(name, greeting) {
+                    console.log(`${greeting}, ${name}!`);
+                })('World', 'Hello');
+                
+                // 使用箭头函数的IIFE
+                (() =\u003e {
+                    console.log('Arrow function IIFE');
+                })();
+            \u003c/div\u003e
+            \u003cbutton class="btn" onclick="runIIFEExample()"\u003e运行示例\u003c/button\u003e
+            \u003cdiv class="result-box" id="iifeResult"\u003e\u003c/div\u003e
+        \u003c/div\u003e
+        
+        \u003ch2\u003e8. 函数最佳实践
+        \u003c/ul\u003e
+        \u003cul\u003e
+            \u003cli\u003e函数应该有单一职责，只做一件事\u003c/li\u003e
+            \u003cli\u003e函数名应该清晰描述其功能\u003c/li\u003e
+            \u003cli\u003e避免过长的函数体，保持函数简洁\u003c/li\u003e
+            \u003cli\u003e合理使用参数，避免过多参数（可以使用对象传参）\u003c/li\u003e
+            \u003cli\u003e为函数添加注释，特别是复杂函数\u003c/li\u003e
+            \u003cli\u003e使用ES6+特性（箭头函数、默认参数、剩余参数等）提高代码可读性\u003c/li\u003e
+            \u003cli\u003e避免过度使用闭包，注意内存管理\u003c/li\u003e
+        \u003c/ul\u003e
+        
+        \u003ch2\u003e9. 总结
+        
+        \u003ctable\u003e
+            \u003cthead\u003e
+                \u003ctr\u003e
+                    \u003cth\u003e函数类型\u003cth\u003e
+                    \u003cth\u003e语法\u003cth\u003e
+                    \u003cth\u003e优点\u003cth\u003e
+                    \u003cth\u003e注意事项\u003cth\u003e
+                \u003ctr\u003e
+            \u003cthead\u003e
+            \u003ctbody\u003e
+                \u003ctr\u003e
+                    \u003ctd\u003e函数声明\u003c/td\u003e
+                    \u003ctd\u003e
+                        function name() {
+                            // 函数体
+                        }
+                    \u003c/td\u003e
+                    \u003ctd\u003e
+                        - 可以在声明前调用（提升）
+                        - 语法简洁清晰
+                    \u003c/td\u003e
+                    \u003ctd\u003e
+                        只能在全局作用域或函数作用域中定义
+                    \u003c/td\u003e
+                \u003c/tr\u003e
+                \u003ctr\u003e
+                    \u003ctd\u003e函数表达式\u003c/td\u003e
+                    \u003ctd\u003e
+                        let name = function() {
+                            // 函数体
+                        };
+                    \u003c/td\u003e
+                    \u003ctd\u003e
+                        - 可以在任何表达式上下文中使用
+                        - 可以是匿名或命名
+                    \u003c/td\u003e
+                    \u003ctd\u003e
+                        - 不能在定义前调用
+                        - 需要分号结尾
+                    \u003c/td\u003e
+                \u003c/tr\u003e
+                \u003ctr\u003e
+                    \u003ctd\u003e箭头函数\u003c/td\u003e
+                    \u003ctd\u003e
+                        let name = () =\u003e {
+                            // 函数体
+                        };
+                    \u003c/td\u003e
+                    \u003ctd\u003e
+                        - 语法更简洁
+                        - 不绑定自己的this
+                    \u003c/td\u003e
+                    \u003ctd\u003e
+                        - 不能用作构造函数
+                        - 没有arguments对象
+                    \u003c/td\u003e
+                \u003c/tr\u003e
+                \u003ctr\u003e
+                    \u003ctd\u003e闭包函数\u003c/td\u003e
+                    \u003ctd\u003e
+                        function outer() {
+                            let x = 10;
+                            return function inner() {
+                                return x;
+                            };
+                        }
+                    \u003c/td\u003e
+                    \u003ctd\u003e
+                        - 数据封装
+                        - 保持状态
+                    \u003c/td\u003e
+                    \u003ctd\u003e
+                        - 可能导致内存占用增加
+                    \u003c/td\u003e
+                \u003c/tr\u003e
+            \u003ctbody\u003e
+        \u003ctable\u003e
+        
+    \u003cdiv\u003e
+    
+    \u003cscript\u003e
+        // 1. 函数声明示例
+        function runFunctionDeclarationExample() {
+            let results = [];
+            
+            // 函数声明
+            function greet(name) {
+                return `Hello, ${name}!`;
+            }
+            
+            // 调用函数
+            let message = greet('World');
+            results.push(`调用greet('World'): ${message}`);
+            
+            // 展示函数提升
+            try {
+                // 这里不会报错，因为函数声明会被提升
+                results.push(`\n展示函数提升:`);
+                let earlyMessage = earlyGreet('World');
+                results.push(`提前调用earlyGreet('World'): ${earlyMessage}`);
+                
+                function earlyGreet(name) {
+                    return `Early Hello, ${name}!`;
+                }
+            } catch (e) {
+                results.push(`提前调用函数错误: ${e.message}`);
+            }
+            
+            document.getElementById('functionDeclarationResult').innerHTML = results.join('\u003cbr\u003e');
+        }
+        
+        // 2. 匿名函数表达式示例
+        function runAnonymousFunctionExpressionExample() {
+            let results = [];
+            
+            // 匿名函数表达式
+            let add = function(a, b) {
+                return a + b;
+            };
+            
+            // 调用函数
+            let sum = add(5, 3);
+            results.push(`add(5, 3) = ${sum}`);
+            
+            document.getElementById('anonymousFunctionExpressionResult').innerHTML = results.join('\u003cbr\u003e');
+        }
+        
+        // 3. 命名函数表达式示例
+        function runNamedFunctionExpressionExample() {
+            let results = [];
+            
+            // 命名函数表达式
+            let multiply = function multiplyNumbers(x, y) {
+                results.push(`在函数内部调用自身: multiplyNumbers(${x}, ${y})`);
+                return x * y;
+            };
+            
+            // 调用函数
+            let product = multiply(4, 5);
+            results.push(`multiply(4, 5) = ${product}`);
+            
+            // 检查命名函数在外部是否可访问
+            try {
+                // multiplyNumbers(4, 5); // 这会导致错误
+                results.push(`在外部直接调用multiplyNumbers会导致错误（不在作用域内）`);
+            } catch (e) {
+                results.push(`错误: ${e.message}`);
+            }
+            
+            document.getElementById('namedFunctionExpressionResult').innerHTML = results.join('\u003cbr\u003e');
+        }
+        
+        // 4. 箭头函数示例
+        function runArrowFunctionExample() {
+            let results = [];
+            
+            // 基本箭头函数
+            let square = x =\u003e x * x;
+            results.push(`square(4) = ${square(4)}`);
+            
+            // 多个参数
+            let divide = (a, b) =\u003e a / b;
+            results.push(`divide(10, 2) = ${divide(10, 2)}`);
+            
+            // 多行函数体
+            let calculateArea = (length, width) =\u003e {
+                let area = length * width;
+                return area;
+            };
+            results.push(`calculateArea(3, 4) = ${calculateArea(3, 4)}`);
+            
+            // 无参数箭头函数
+            let getRandomNumber = () =\u003e Math.random();
+            results.push(`getRandomNumber() = ${getRandomNumber().toFixed(4)}`);
+            
+            // 一个参数，不需要括号
+            let double = num =\u003e num * 2;
+            results.push(`double(7) = ${double(7)}`);
+            
+            document.getElementById('arrowFunctionResult').innerHTML = results.join('\u003cbr\u003e');
+        }
+        
+        // 5. 函数构造函数示例
+        function runFunctionConstructorExample() {
+            let results = [];
+            
+            try {
+                // 使用Function构造函数创建函数
+                let subtract = new Function('a', 'b', 'return a - b;');
+                results.push(`subtract(10, 3) = ${subtract(10, 3)}`);
+                
+                // 动态构建函数体
+                let operation = 'multiply';
+                let dynamicFunc = new Function('a', 'b', `return a * b; // ${operation}`);
+                results.push(`dynamicFunc(6, 7) = ${dynamicFunc(6, 7)}`);
+            } catch (e) {
+                results.push(`错误: ${e.message}`);
+            }
+            
+            document.getElementById('functionConstructorResult').innerHTML = results.join('\u003cbr\u003e');
+        }
+        
+        // 6. 默认参数示例
+        function runDefaultParametersExample() {
+            let results = [];
+            
+            // 默认参数
+            function sayHello(name = 'Guest', greeting = 'Hello') {
+                return `${greeting}, ${name}!`;
+            }
+            
+            results.push(`sayHello() = ${sayHello()}`);
+            results.push(`sayHello('John') = ${sayHello('John')}`);
+            results.push(`sayHello('John', 'Hi') = ${sayHello('John', 'Hi')}`);
+            results.push(`sayHello(undefined, 'Hey') = ${sayHello(undefined, 'Hey')}`);
+            
+            // 默认参数可以是表达式
+            function getCurrentDate(formatter = new Date().toLocaleDateString()) {
+                return formatter;
+            }
+            results.push(`\ngetCurrentDate() = ${getCurrentDate()}`);
+            results.push(`getCurrentDate('自定义日期') = ${getCurrentDate('自定义日期')}`);
+            
+            document.getElementById('defaultParametersResult').innerHTML = results.join('\u003cbr\u003e');
+        }
+        
+        // 7. 剩余参数示例
+        function runRestParametersExample() {
+            let results = [];
+            
+            // 剩余参数
+            function sumAll(...numbers) {
+                results.push(`numbers参数类型: ${Array.isArray(numbers) ? '数组' : '非数组'}`);
+                results.push(`numbers参数内容: [${numbers.join(', ')}]`);
+                return numbers.reduce((sum, num) =\u003e sum + num, 0);
+            }
+            
+            results.push(`sumAll(1, 2, 3) = ${sumAll(1, 2, 3)}`);
+            results.push(`\nsumAll(1, 2, 3, 4, 5) = ${sumAll(1, 2, 3, 4, 5)}`);
+            results.push(`\nsumAll() = ${sumAll()}`);
+            
+            // 混合使用普通参数和剩余参数
+            function formatGreeting(greeting, ...names) {
+                return names.map(name =\u003e `${greeting}, ${name}!`).join(' ');
+            }
+            results.push(`\nformatGreeting('Hello', 'John', 'Jane', 'Bob') = ${formatGreeting('Hello', 'John', 'Jane', 'Bob')}`);
+            
+            document.getElementById('restParametersResult').innerHTML = results.join('\u003cbr\u003e');
+        }
+        
+        // 8. arguments对象示例
+        function runArgumentsExample() {
+            let results = [];
+            
+            // 使用arguments对象
+            function multiplyAll() {
+                results.push(`arguments类型: ${typeof arguments}`);
+                results.push(`arguments长度: ${arguments.length}`);
+                results.push(`arguments内容: [${Array.from(arguments).join(', ')}]`);
+                
+                let product = 1;
+                for (let i = 0; i \u003c arguments.length; i++) {
+                    product *= arguments[i];
+                }
+                return product;
+            }
+            
+            results.push(`multiplyAll(2, 3) = ${multiplyAll(2, 3)}`);
+            results.push(`\nmultiplyAll(2, 3, 4) = ${multiplyAll(2, 3, 4)}`);
+            
+            // 箭头函数中的arguments行为
+            let arrowFunc = () =\u003e {
+                try {
+                    // 这里的arguments会引用外部作用域的arguments，如果不存在会报错
+                    results.push(`箭头函数中的arguments: ${arguments ? '存在' : '不存在'}`);
+                } catch (e) {
+                    results.push(`箭头函数中访问arguments错误: ${e.message}`);
+                }
+            };
+            arrowFunc();
+            
+            document.getElementById('argumentsResult').innerHTML = results.join('\u003cbr\u003e');
+        }
+        
+        // 9. 参数传递方式示例
+        function runParameterPassingExample() {
+            let results = [];
+            
+            // 基本数据类型按值传递
+            function modifyNumber(num) {
+                results.push(`函数内部修改前: num = ${num}`);
+                num = 10;
+                results.push(`函数内部修改后: num = ${num}`);
+                return num;
+            }
+            
+            let x = 5;
+            results.push(`基本数据类型按值传递:`);
+            results.push(`调用前: x = ${x}`);
+            let result = modifyNumber(x);
+            results.push(`函数返回值: ${result}`);
+            results.push(`调用后: x = ${x} (原值未改变)`);
+            
+            // 引用数据类型按引用传递
+            function modifyObject(obj) {
+                results.push(`\n函数内部修改属性前: obj.name = ${obj.name}`);
+                obj.name = 'Modified';
+                results.push(`函数内部修改属性后: obj.name = ${obj.name}`);
+                
+                results.push(`函数内部创建新对象前`);
+                obj = { name: 'New Object' }; // 创建新对象，不影响外部引用
+                results.push(`函数内部创建新对象后: obj.name = ${obj.name}`);
+                return obj;
+            }
+            
+            let person = { name: 'Original' };
+            results.push(`\n引用数据类型按引用传递:`);
+            results.push(`调用前: person.name = ${person.name}`);
+            let newPerson = modifyObject(person);
+            results.push(`函数返回值: newPerson.name = ${newPerson.name}`);
+            results.push(`调用后: person.name = ${person.name} (属性被修改)`);
+            
+            document.getElementById('parameterPassingResult').innerHTML = results.join('\u003cbr\u003e');
+        }
+        
+        // 10. 返回值示例
+        function runReturnValueExample() {
+            let results = [];
+            
+            // 有返回值的函数
+            function calculateFactorial(n) {
+                if (n \u003c= 1) return 1;
+                return n * calculateFactorial(n - 1);
+            }
+            
+            // 无返回值的函数
+            function greetUser(name) {
+                let message = `Hello, ${name}!`;
+                results.push(`greetUser内部输出: ${message}`);
+                // 没有return语句，隐式返回undefined
+            }
+            
+            results.push(`calculateFactorial(5) = ${calculateFactorial(5)}`);
+            results.push(`greetUser('John') = ${greetUser('John')}`);
+            
+            // 返回对象
+            function createPerson(name, age) {
+                return {
+                    name: name,
+                    age: age,
+                    greet: function() {
+                        return `Hello, I am ${this.name}, ${this.age} years old.`;
+                    }
+                };
+            }
+            
+            let person = createPerson('Alice', 28);
+            results.push(`\n返回复杂对象:`);
+            results.push(`person.name = ${person.name}`);
+            results.push(`person.age = ${person.age}`);
+            results.push(`person.greet() = ${person.greet()}`);
+            
+            document.getElementById('returnValueResult').innerHTML = results.join('\u003cbr\u003e');
+        }
+        
+        // 11. 作用域链示例
+        function runScopeChainExample() {
+            let results = [];
+            
+            // 全局变量
+            let globalVar = 'Global';
+            
+            function outerFunction() {
+                // 外层函数变量
+                let outerVar = 'Outer';
+                
+                function innerFunction() {
+                    // 内层函数变量
+                    let innerVar = 'Inner';
+                    
+                    // 可以访问所有级别的变量
+                    results.push(`innerFunction内部访问globalVar: ${globalVar}`);
+                    results.push(`innerFunction内部访问outerVar: ${outerVar}`);
+                    results.push(`innerFunction内部访问innerVar: ${innerVar}`);
+                }
+                
+                innerFunction();
+                results.push(`\nouterFunction内部访问globalVar: ${globalVar}`);
+                results.push(`outerFunction内部访问outerVar: ${outerVar}`);
+                // 尝试访问innerVar会导致错误
+                try {
+                    // console.log(innerVar); // 错误
+                    results.push(`outerFunction内部无法访问innerVar`);
+                } catch (e) {
+                    results.push(`错误: ${e.message}`);
+                }
+            }
+            
+            outerFunction();
+            results.push(`\n全局作用域访问globalVar: ${globalVar}`);
+            // 尝试访问局部变量会导致错误
+            try {
+                // console.log(outerVar); // 错误
+                // console.log(innerVar); // 错误
+                results.push(`全局作用域无法访问outerVar和innerVar`);
+            } catch (e) {
+                results.push(`错误: ${e.message}`);
+            }
+            
+            document.getElementById('scopeChainResult').innerHTML = results.join('\u003cbr\u003e');
+        }
+        
+        // 12. 闭包示例
+        function runClosureExample() {
+            let results = [];
+            
+            function createCounter() {
+                let count = 0; // 私有变量
+                
+                // 返回闭包函数
+                return function() {
+                    return ++count;
+                };
+            }
+            
+            // 创建一个计数器
+            let counter = createCounter();
+            results.push(`counter() = ${counter()}`);
+            results.push(`counter() = ${counter()}`);
+            results.push(`counter() = ${counter()}`);
+            
+            // 创建另一个独立的计数器
+            let counter2 = createCounter();
+            results.push(`\n创建新计数器counter2`);
+            results.push(`counter2() = ${counter2()}`);
+            results.push(`counter() = ${counter()} (原有计数器继续计数)`);
+            
+            document.getElementById('closureResult').innerHTML = results.join('\u003cbr\u003e');
+        }
+        
+        // 13. 数据封装示例
+        function runDataEncapsulationExample() {
+            let results = [];
+            
+            function createPerson(name, age) {
+                // 私有变量
+                let _name = name;
+                let _age = age;
+                
+                // 返回公共方法（闭包）
+                return {
+                    getName: function() {
+                        return _name;
+                    },
+                    getAge: function() {
+                        return _age;
+                    },
+                    setName: function(name) {
+                        _name = name;
+                    },
+                    setAge: function(age) {
+                        if (age \u003e= 0) {
+                            _age = age;
+                        } else {
+                            results.push(`年龄不能为负数!`);
+                        }
+                    },
+                    greet: function() {
+                        return `Hello, my name is ${_name} and I am ${_age} years old.`;
+                    }
+                };
+            }
+            
+            // 创建一个person对象
+            let person = createPerson('John', 30);
+            results.push(`person.greet() = ${person.greet()}`);
+            
+            // 修改属性
+            person.setName('Jane');
+            person.setAge(25);
+            results.push(`修改后 person.greet() = ${person.greet()}`);
+            
+            // 尝试设置无效年龄
+            results.push(`尝试设置无效年龄 -5`);
+            person.setAge(-5);
+            results.push(`设置无效年龄后 person.getAge() = ${person.getAge()}`);
+            
+            // 尝试直接访问私有变量
+            results.push(`直接访问私有变量 person._name = ${person._name || 'undefined'}`);
+            
+            document.getElementById('dataEncapsulationResult').innerHTML = results.join('\u003cbr\u003e');
+        }
+        
+        // 14. 函数作为参数示例
+        function runFunctionAsParameterExample() {
+            let results = [];
+            
+            // 函数作为参数
+            function processArray(arr, processFn) {
+                let result = [];
+                for (let i = 0; i < arr.length; i++) {
+                    result.push(processFn(arr[i]));
+                }
+                return result;
+            }
+            
+            let numbers = [1, 2, 3, 4, 5];
+            
+            // 传递匿名函数作为参数
+            let doubled = processArray(numbers, function(num) { return num * 2; });
+            results.push(`processArray(numbers, double) = [${doubled.join(', ')}]`);
+            
+            // 传递箭头函数作为参数
+            let squared = processArray(numbers, num => num * num);
+            results.push(`processArray(numbers, square) = [${squared.join(', ')}]`);
+            
+            // 传递命名函数作为参数
+            function isEven(num) { return num % 2 === 0; }
+            let evenNumbers = processArray(numbers, isEven);
+            results.push(`processArray(numbers, isEven) = [${evenNumbers.join(', ')}]`);
+            
+            // 使用内置方法作为参数
+            let mappedNumbers = numbers.map(n => n * 10);
+            results.push(`\n使用Array.map方法: [${mappedNumbers.join(', ')}]`);
+            
+            let filteredNumbers = numbers.filter(n => n > 2);
+            results.push(`使用Array.filter方法: [${filteredNumbers.join(', ')}]`);
+            
+            let reducedSum = numbers.reduce((sum, n) => sum + n, 0);
+            results.push(`使用Array.reduce方法求和: ${reducedSum}`);
+            
+            document.getElementById('functionAsParameterResult').innerHTML = results.join('<br>');
+        }
+        
+        // 15. 函数作为返回值示例
+        function runFunctionAsReturnValueExample() {
+            let results = [];
+            
+            // 函数作为返回值
+            function createMultiplier(multiplier) {
+                results.push(`创建乘法器，乘数为: ${multiplier}`);
+                return function(num) {
+                    return num * multiplier;
+                };
+            }
+            
+            // 创建不同的乘法函数
+            let double = createMultiplier(2);
+            let triple = createMultiplier(3);
+            let quadruple = createMultiplier(4);
+            
+            results.push(`double(5) = ${double(5)}`);
+            results.push(`triple(5) = ${triple(5)}`);
+            results.push(`quadruple(5) = ${quadruple(5)}`);
+            
+            // 创建问候函数生成器
+            function createGreeting(greeting) {
+                return function(name) {
+                    return `${greeting}, ${name}!`;
+                };
+            }
+            
+            let sayHello = createGreeting('Hello');
+            let sayHi = createGreeting('Hi');
+            let sayGoodbye = createGreeting('Goodbye');
+            
+            results.push(`<br>创建问候语函数:`);
+            results.push(`sayHello('John') = ${sayHello('John')}`);
+            results.push(`sayHi('Jane') = ${sayHi('Jane')}`);
+            results.push(`sayGoodbye('Bob') = ${sayGoodbye('Bob')}`);
+            
+            document.getElementById('functionAsReturnValueResult').innerHTML = results.join('<br>');
+        }
+        
+        // 16. 递归示例
+        function runRecursionExample() {
+            let results = [];
+            
+            // 递归计算斐波那契数列
+            function fibonacci(n) {
+                if (n <= 1) return n;
+                return fibonacci(n - 1) + fibonacci(n - 2);
+            }
+            
+            // 测试
+            results.push('斐波那契数列前10项:');
+            for (let i = 0; i < 10; i++) {
+                results.push(`fibonacci(${i}) = ${fibonacci(i)}`);
+            }
+            
+            // 递归计算阶乘
+            function factorial(n) {
+                if (n <= 1) return 1;
+                return n * factorial(n - 1);
+            }
+            
+            results.push('<br>阶乘计算:');
+            for (let i = 0; i <= 5; i++) {
+                results.push(`${i}! = ${factorial(i)}`);
+            }
+            
+            // 递归遍历数组（简化版）
+            function recursiveSum(arr, index = 0) {
+                if (index >= arr.length) return 0;
+                return arr[index] + recursiveSum(arr, index + 1);
+            }
+            
+            let numbers = [1, 2, 3, 4, 5];
+            results.push(`<br>递归数组求和 [${numbers.join(', ')}] = ${recursiveSum(numbers)}`);
+            
+            document.getElementById('recursionResult').innerHTML = results.join('<br>');
+        }
+        
+        // 17. IIFE示例
+        function runIIFEExample() {
+            let results = [];
+            
+            try {
+                // IIFE基本语法
+                (function() {
+                    // 私有变量，不会污染全局命名空间
+                    let privateVar = 'This is private';
+                    results.push(`标准IIFE内部变量: ${privateVar}`);
+                })();
+                
+                // 检查变量是否在全局作用域中可访问
+                try {
+                    // console.log(privateVar); // 错误：privateVar未定义
+                    results.push(`IIFE外部无法访问内部变量privateVar`);
+                } catch (e) {
+                    results.push(`错误: ${e.message}`);
+                }
+                
+                // IIFE带参数
+                (function(name, greeting) {
+                    results.push(`带参数的IIFE: ${greeting}, ${name}!`);
+                })('World', 'Hello');
+                
+                // 使用箭头函数的IIFE
+                (() => {
+                    results.push('使用箭头函数的IIFE');
+                })();
+                
+                // IIFE返回值
+                let result = (function() {
+                    return 'IIFE返回值';
+                })();
+                results.push(`IIFE返回值: ${result}`);
+                
+                // IIFE创建模块模式
+                let calculator = (function() {
+                    // 私有变量和方法
+                    let _precision = 2;
+                    
+                    function _round(value) {
+                        return Number(value.toFixed(_precision));
+                    }
+                    
+                    // 公共API
+                    return {
+                        add: function(a, b) {
+                            return _round(a + b);
+                        },
+                        subtract: function(a, b) {
+                            return _round(a - b);
+                        },
+                        multiply: function(a, b) {
+                            return _round(a * b);
+                        },
+                        divide: function(a, b) {
+                            if (b === 0) return NaN;
+                            return _round(a / b);
+                        },
+                        setPrecision: function(precision) {
+                            _precision = Math.max(0, Math.floor(precision));
+                        }
+                    };
+                })();
+                
+                results.push('<br>使用IIFE创建模块:');
+                results.push(`calculator.add(5.123, 2.456) = ${calculator.add(5.123, 2.456)}`);
+                results.push(`calculator.multiply(3.14, 2.5) = ${calculator.multiply(3.14, 2.5)}`);
+                
+            } catch (e) {
+                results.push(`错误: ${e.message}`);
+            }
+            
+            document.getElementById('iifeResult').innerHTML = results.join('<br>');
+        }
+    </script>
+</body>
+</html>

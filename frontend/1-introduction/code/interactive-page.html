@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>交互式网页示例</title>
+    <style>
+        /* 简单的CSS样式 */
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        .button:hover {
+            background-color: #45a049;
+        }
+        #output {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #f0f0f0;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <h1>JavaScript交互示例</h1>
+    <p>这个示例展示了如何使用JavaScript添加交互功能到网页中。</p>
+    
+    <div>
+        <label for="name">请输入你的名字：</label>
+        <input type="text" id="name" placeholder="输入你的名字">
+        <button class="button" onclick="greetUser()">打招呼</button>
+    </div>
+    
+    <div id="output">结果将显示在这里...</div>
+    
+    <div style="margin-top: 30px;">
+        <h3>点击计数器示例</h3>
+        <button class="button" onclick="incrementCounter()">点击我！</button>
+        <p>点击次数：<span id="counter">0</span></p>
+    </div>
+    
+    <script>
+        // JavaScript代码
+        
+        // 打招呼函数
+        function greetUser() {
+            const name = document.getElementById('name').value;
+            const outputDiv = document.getElementById('output');
+            
+            if (name) {
+                outputDiv.textContent = '你好，' + name + '！欢迎学习前端开发！';
+                outputDiv.style.color = '#2c3e50';
+            } else {
+                outputDiv.textContent = '请输入你的名字！';
+                outputDiv.style.color = '#e74c3c';
+            }
+        }
+        
+        // 计数器变量
+        let count = 0;
+        
+        // 增加计数函数
+        function incrementCounter() {
+            count++;
+            document.getElementById('counter').textContent = count;
+            
+            // 改变颜色（每点击5次）
+            if (count % 5 === 0) {
+                document.getElementById('counter').style.color = '#' + Math.floor(Math.random()*16777215).toString(16);
+            }
+        }
+    </script>
+    
+    <h3 style="margin-top: 30px;">开发者工具提示<h3>
+    <ul>
+        <li>按 F12 打开开发者工具</li>
+        <li>在「控制台」标签页可以查看JavaScript运行结果和错误</li>
+        <li>在「元素」标签页可以查看和修改HTML结构</li>
+    </ul>
+</body>
+</html>

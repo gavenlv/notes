@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JavaScript变量与数据类型</title>
+    <style>
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: #34495e;
+            margin-top: 30px;
+            border-left: 4px solid #3498db;
+            padding-left: 15px;
+        }
+        h3 {
+            color: #7f8c8d;
+            margin-top: 20px;
+        }
+        .code-block {
+            background-color: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+        }
+        .example {
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .result {
+            background-color: #e8f4f8;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 15px;
+            border-left: 4px solid #2980b9;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+            font-size: 14px;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        .notes {
+            background-color: #fff8e1;
+            padding: 15px;
+            border-radius: 5px;
+            border-left: 4px solid #ffc107;
+            margin: 15px 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+    </style>
+</head>
+<body>
+    <h1>JavaScript变量与数据类型</h1>
+    
+    <div class="example">
+        <h2>1. 变量声明</h2>
+        <p>JavaScript中有三种变量声明方式：<code>var</code>、<code>let</code>和<code>const</code>。</p>
+        
+        <h3>1.1 var声明</h3>
+        <div class="code-block">
+// var声明 - 函数作用域，存在变量提升
+var name = 'John';
+var age = 25;
+var isActive = true;
+</div>
+        
+        <h3>1.2 let声明（ES6）</h3>
+        <div class="code-block">
+// let声明 - 块级作用域，不存在变量提升
+let country = 'China';
+let score = 95.5;
+</div>
+        
+        <h3>1.3 const声明（ES6）</h3>
+        <div class="code-block">
+// const声明 - 块级作用域，声明常量
+const PI = 3.14159;
+const MAX_USERS = 100;
+</div>
+        
+        <button onclick="runVarExample()">运行示例</button>
+        <div class="result" id="varResult"></div>
+        
+        <div class="notes">
+            <strong>注意事项：</strong>
+            <ul>
+                <li><code>var</code>是函数作用域，可以重复声明，存在变量提升</li>
+                <li><code>let</code>是块级作用域，不能重复声明，不存在变量提升</li>
+                <li><code>const</code>是块级作用域，不能重复声明，声明后不能重新赋值，但对象的属性可以修改</li>
+                <li>建议优先使用<code>const</code>和<code>let</code>，避免使用<code>var</code></li>
+            </ul>
+        </div>
+    </div>
+    
+    <div class="example">
+        <h2>2. 数据类型</h2>
+        <p>JavaScript有7种基本数据类型和1种引用数据类型。</p>
+        
+        <h3>2.1 基本数据类型</h3>
+        
+        <table>
+            <tr>
+                <th>数据类型</th>
+                <th>描述</th>
+                <th>示例</th>
+            </tr>
+            <tr>
+                <td>Number</td>
+                <td>数字类型，包括整数和浮点数</td>
+                <td>42, 3.14, Infinity, NaN</td>
+            </tr>
+            <tr>
+                <td>String</td>
+                <td>字符串类型</td>
+                <td>'Hello', "World", `Template ${string}`</td>
+            </tr>
+            <tr>
+                <td>Boolean</td>
+                <td>布尔类型</td>
+                <td>true, false</td>
+            </tr>
+            <tr>
+                <td>Undefined</td>
+                <td>未定义类型</td>
+                <td>变量声明但未赋值</td>
+            </tr>
+            <tr>
+                <td>Null</td>
+                <td>空值类型</td>
+                <td>null</td>
+            </tr>
+            <tr>
+                <td>Symbol</td>
+                <td>唯一标识符类型（ES6）</td>
+                <td>Symbol('description')</td>
+            </tr>
+            <tr>
+                <td>BigInt</td>
+                <td>大整数类型（ES2020）</td>
+                <td>9007199254740991n</td>
+            </tr>
+        </table>
+        
+        <div class="code-block">
+// 数字类型
+let integer = 42;
+let float = 3.14;
+let infinity = Infinity;
+let notANumber = NaN;
+
+// 字符串类型
+let singleQuote = 'Hello';
+let doubleQuote = "World";
+let templateString = `Hello, ${name}!`; // 模板字符串
+
+// 布尔类型
+let isOnline = true;
+let isLoggedIn = false;
+
+// Undefined类型
+let undefinedVar;
+
+// Null类型
+let nullVar = null;
+
+// Symbol类型
+let sym = Symbol('unique');
+
+// BigInt类型
+let bigNumber = 9007199254740991n;
+</div>
+        
+        <h3>2.2 引用数据类型</h3>
+        <p>Object（对象）是JavaScript中唯一的引用数据类型。</p>
+        
+        <div class="code-block">
+// 对象字面量
+let person = {
+    name: 'John',
+    age: 25,
+    job: 'Developer',
+    greet: function() {
+        return 'Hello, my name is ' + this.name;
+    }
+};
+
+// 数组（特殊的对象）
+let fruits = ['Apple', 'Banana', 'Orange'];
+
+// 函数（特殊的对象）
+function calculateSum(a, b) {
+    return a + b;
+}
+</div>
+        
+        <button onclick="runDataTypeExample()">运行数据类型示例</button>
+        <div class="result" id="dataTypeResult"></div>
+        
+        <div class="notes">
+            <strong>基本类型 vs 引用类型的区别：</strong>
+            <ul>
+                <li><strong>基本类型</strong>：存储在栈内存中，变量直接存储值</li>
+                <li><strong>引用类型</strong>：存储在堆内存中，变量存储的是指向该对象的引用（内存地址）</li>
+            </ul>
+        </div>
+    </div>
+    
+    <div class="example">
+        <h2>3. 类型检查</h2>
+        <p>使用<code>typeof</code>运算符检查变量的类型：</p>
+        
+        <div class="code-block">
+console.log(typeof 42);         // 'number'
+console.log(typeof 3.14);       // 'number'
+console.log(typeof 'hello');    // 'string'
+console.log(typeof true);       // 'boolean'
+console.log(typeof undefined);  // 'undefined'
+console.log(typeof null);       // 'object' （这是一个历史遗留的错误）
+console.log(typeof {});         // 'object'
+console.log(typeof []);         // 'object' （数组是特殊的对象）
+console.log(typeof function() {}); // 'function'
+console.log(typeof Symbol());   // 'symbol'
+console.log(typeof BigInt(1));  // 'bigint'
+</div>
+        
+        <button onclick="runTypeCheckExample()">运行类型检查示例</button>
+        <div class="result" id="typeCheckResult"></div>
+    </div>
+    
+    <div class="example">
+        <h2>4. 类型转换</h2>
+        
+        <h3>4.1 转换为字符串</h3>
+        <div class="code-block">
+// 方法1：String()函数
+let num = 42;
+let str1 = String(num);  // '42'
+
+// 方法2：toString()方法
+let str2 = num.toString(); // '42'
+
+// 方法3：隐式转换（+ 运算符与字符串）
+let str3 = '' + num;  // '42'
+
+// 布尔值转字符串
+let boolStr = String(true);  // 'true'
+
+// 对象转字符串
+let objStr = String({});  // '[object Object]'
+</div>
+        
+        <h3>4.2 转换为数字</h3>
+        <div class="code-block">
+// 方法1：Number()函数
+let strNum = '42';
+let num1 = Number(strNum);  // 42
+
+// 方法2：parseInt()函数（转换为整数）
+let num2 = parseInt('42px');  // 42
+let num3 = parseInt('px42');  // NaN
+
+// 方法3：parseFloat()函数（转换为浮点数）
+let num4 = parseFloat('3.14');  // 3.14
+
+// 方法4：隐式转换（+ 运算符作为一元操作符）
+let num5 = +strNum;  // 42
+
+// 布尔值转数字
+let num6 = Number(true);  // 1
+let num7 = Number(false); // 0
+</div>
+        
+        <h3>4.3 转换为布尔值</h3>
+        <div class="code-block">
+// 方法1：Boolean()函数
+let value = 'hello';
+let bool1 = Boolean(value);  // true
+
+// 方法2：隐式转换（!! 运算符）
+let bool2 = !!value;  // true
+
+// 以下值会转换为false
+console.log(Boolean(0));         // false
+console.log(Boolean(''));        // false
+console.log(Boolean(null));      // false
+console.log(Boolean(undefined)); // false
+console.log(Boolean(NaN));       // false
+console.log(Boolean(false));     // false
+
+// 其他值都会转换为true
+</div>
+        
+        <button onclick="runTypeConversionExample()">运行类型转换示例</button>
+        <div class="result" id="typeConversionResult"></div>
+        
+        <div class="notes">
+            <strong>重要提示：</strong>
+            <p>JavaScript的类型转换是自动进行的，但了解显式转换可以更好地控制代码行为，避免意外结果。特别是在比较操作中，建议使用严格相等运算符（===）来避免隐式类型转换带来的问题。</p>
+        </div>
+    </div>
+    
+    <div class="example">
+        <h2>5. 变量作用域</h2>
+        <p>JavaScript中有三种作用域：全局作用域、函数作用域和块级作用域（ES6引入）。</p>
+        
+        <div class="code-block">
+// 全局作用域
+let globalVar = 'I am global';
+
+function exampleScope() {
+    // 函数作用域
+    let functionVar = 'I am in function';
+    var varFunctionVar = 'I am var in function';
+    
+    if (true) {
+        // 块级作用域（ES6）
+        let blockVar = 'I am in block';
+        const constBlockVar = 'I am const in block';
+        
+        // var声明的变量不受块级作用域限制
+        var varBlockVar = 'I am var in block';
+        
+        console.log(globalVar);      // 可以访问全局变量
+        console.log(functionVar);    // 可以访问函数变量
+        console.log(blockVar);       // 可以访问块级变量
+        console.log(varBlockVar);    // 可以访问var声明的块变量
+    }
+    
+    console.log(globalVar);      // 可以访问全局变量
+    console.log(functionVar);    // 可以访问函数变量
+    // console.log(blockVar);     // 错误：无法访问块级变量
+    console.log(varBlockVar);    // 可以访问，因为var声明的变量在函数作用域内
+}
+
+exampleScope();
+// console.log(functionVar);   // 错误：无法访问函数内的变量
+// console.log(blockVar);      // 错误：无法访问块级变量
+</div>
+        
+        <button onclick="runScopeExample()">运行作用域示例</button>
+        <div class="result" id="scopeResult"></div>
+    </div>
+    
+    <div class="example">
+        <h2>6. 变量提升</h2>
+        <p>JavaScript中，变量声明会被提升到其作用域的顶部，但赋值不会被提升。</p>
+        
+        <div class="code-block">
+// var声明的变量会被提升
+console.log(varVar);  // undefined（不是错误！）
+var varVar = 'var variable';
+
+// let声明的变量不会被提升（存在暂时性死区）
+// console.log(letVar);  // 错误：Cannot access 'letVar' before initialization
+let letVar = 'let variable';
+
+// const声明的变量不会被提升
+// console.log(constVar);  // 错误：Cannot access 'constVar' before initialization
+const constVar = 'const variable';
+</div>
+        
+        <button onclick="runHoistingExample()">运行变量提升示例</button>
+        <div class="result" id="hoistingResult"></div>
+        
+        <div class="notes">
+            <strong>最佳实践：</strong>
+            <p>始终在使用变量之前声明它们，并尽可能使用<code>const</code>和<code>let</code>来避免变量提升带来的潜在问题。</p>
+        </div>
+    </div>
+    
+    <script>
+        // 1. 变量声明示例
+        function runVarExample() {
+            // 重置结果区域
+            document.getElementById('varResult').innerHTML = '';
+            
+            // var示例
+            var name = 'John';
+            var age = 25;
+            var age = 30; // 可以重复声明
+            
+            // let示例
+            let country = 'China';
+            // let country = 'USA'; // 取消注释会导致错误：无法重复声明
+            country = 'United States'; // 但可以重新赋值
+            
+            // const示例
+            const PI = 3.14159;
+            // const PI = 3.14; // 取消注释会导致错误：无法重复声明
+            // PI = 3.14; // 取消注释会导致错误：无法重新赋值
+            
+            // 对象常量属性可以修改
+            const person = {name: 'Alice', age: 28};
+            person.age = 29; // 这是允许的
+            
+            let result = `
+                <p><strong>var示例：</strong> name = ${name}, age = ${age}</p>
+                <p><strong>let示例：</strong> country = ${country}</p>
+                <p><strong>const示例：</strong> PI = ${PI}</p>
+                <p><strong>const对象示例：</strong> person = {name: ${person.name}, age: ${person.age}}</p>
+            `;
+            
+            document.getElementById('varResult').innerHTML = result;
+        }
+        
+        // 2. 数据类型示例
+        function runDataTypeExample() {
+            // 重置结果区域
+            document.getElementById('dataTypeResult').innerHTML = '';
+            
+            // 数字类型
+            let integer = 42;
+            let float = 3.14;
+            let infinity = Infinity;
+            let notANumber = NaN;
+            
+            // 字符串类型
+            let singleQuote = 'Hello';
+            let doubleQuote = "World";
+            let name = 'JavaScript';
+            let templateString = `Hello, ${name}!`;
+            
+            // 布尔类型
+            let isOnline = true;
+            let isLoggedIn = false;
+            
+            // Undefined类型
+            let undefinedVar;
+            
+            // Null类型
+            let nullVar = null;
+            
+            // Symbol类型
+            let sym1 = Symbol('description');
+            let sym2 = Symbol('description');
+            
+            // 数组（引用类型）
+            let fruits = ['Apple', 'Banana', 'Orange'];
+            
+            // 对象（引用类型）
+            let person = {name: 'John', age: 25};
+            
+            let result = `
+                <p><strong>数字类型：</strong> integer = ${integer}, float = ${float}, infinity = ${infinity}, NaN = ${notANumber}</p>
+                <p><strong>字符串类型：</strong> singleQuote = ${singleQuote}, doubleQuote = ${doubleQuote}, templateString = ${templateString}</p>
+                <p><strong>布尔类型：</strong> isOnline = ${isOnline}, isLoggedIn = ${isLoggedIn}</p>
+                <p><strong>Undefined类型：</strong> undefinedVar = ${undefinedVar}</p>
+                <p><strong>Null类型：</strong> nullVar = ${nullVar}</p>
+                <p><strong>Symbol类型：</strong> sym1 = ${sym1.toString()}, sym2 = ${sym2.toString()}, sym1 === sym2 = ${sym1 === sym2}</p>
+                <p><strong>数组（引用类型）：</strong> fruits = [${fruits}]</p>
+                <p><strong>对象（引用类型）：</strong> person = {name: ${person.name}, age: ${person.age}}</p>
+            `;
+            
+            document.getElementById('dataTypeResult').innerHTML = result;
+        }
+        
+        // 3. 类型检查示例
+        function runTypeCheckExample() {
+            // 重置结果区域
+            document.getElementById('typeCheckResult').innerHTML = '';
+            
+            let results = [];
+            results.push(`typeof 42: ${typeof 42}`);
+            results.push(`typeof 3.14: ${typeof 3.14}`);
+            results.push(`typeof 'hello': ${typeof 'hello'}`);
+            results.push(`typeof true: ${typeof true}`);
+            results.push(`typeof undefined: ${typeof undefined}`);
+            results.push(`typeof null: ${typeof null}`);
+            results.push(`typeof {}: ${typeof {}}`);
+            results.push(`typeof []: ${typeof []}`);
+            results.push(`typeof function() {}: ${typeof function() {}}`);
+            results.push(`typeof Symbol(): ${typeof Symbol()}`);
+            
+            // 检查null的更好方法
+            let nullValue = null;
+            results.push(`nullValue === null: ${nullValue === null}`);
+            
+            // 检查数组的更好方法
+            let arr = [];
+            results.push(`Array.isArray(arr): ${Array.isArray(arr)}`);
+            
+            document.getElementById('typeCheckResult').innerHTML = results.join('<br>');
+        }
+        
+        // 4. 类型转换示例
+        function runTypeConversionExample() {
+            // 重置结果区域
+            document.getElementById('typeConversionResult').innerHTML = '';
+            
+            // 转换为字符串
+            let num = 42;
+            let str1 = String(num);
+            let str2 = num.toString();
+            let str3 = '' + num;
+            
+            // 转换为数字
+            let strNum = '42';
+            let num1 = Number(strNum);
+            let num2 = parseInt('42px');
+            let num3 = parseFloat('3.14');
+            let num4 = +strNum;
+            
+            // 转换为布尔值
+            let falsyValues = [0, '', null, undefined, NaN, false];
+            let truthyResults = [];
+            falsyValues.forEach(value => {
+                truthyResults.push(`${JSON.stringify(value)}: ${Boolean(value)}`);
+            });
+            
+            let result = `
+                <h4>转换为字符串：</h4>
+                <p>String(42): ${str1}</p>
+                <p>42.toString(): ${str2}</p>
+                <p>'' + 42: ${str3}</p>
+                
+                <h4>转换为数字：</h4>
+                <p>Number('42'): ${num1}</p>
+                <p>parseInt('42px'): ${num2}</p>
+                <p>parseFloat('3.14'): ${num3}</p>
+                <p>+ '42': ${num4}</p>
+                
+                <h4>转换为布尔值（falsy值）：</h4>
+                <p>${truthyResults.join('<br>')}</p>
+            `;
+            
+            document.getElementById('typeConversionResult').innerHTML = result;
+        }
+        
+        // 5. 作用域示例
+        function runScopeExample() {
+            // 重置结果区域
+            document.getElementById('scopeResult').innerHTML = '';
+            
+            let results = [];
+            
+            // 全局作用域
+            let globalVar = 'I am global';
+            
+            function exampleScope() {
+                // 函数作用域
+                let functionVar = 'I am in function';
+                var varFunctionVar = 'I am var in function';
+                
+                results.push(`Inside function - globalVar: ${globalVar}`);
+                results.push(`Inside function - functionVar: ${functionVar}`);
+                
+                if (true) {
+                    // 块级作用域
+                    let blockVar = 'I am in block';
+                    const constBlockVar = 'I am const in block';
+                    var varBlockVar = 'I am var in block';
+                    
+                    results.push(`Inside block - blockVar: ${blockVar}`);
+                    results.push(`Inside block - varBlockVar: ${varBlockVar}`);
+                }
+                
+                // 尝试访问块级作用域的变量
+                try {
+                    results.push(`Outside block - blockVar: ${blockVar}`); // 应该抛出错误
+                } catch (e) {
+                    results.push(`Outside block - blockVar: Error (Cannot access blockVar outside block)`);
+                }
+                
+                results.push(`Outside block - varBlockVar: ${varBlockVar}`); // 可以访问，因为var声明的变量在函数作用域内
+            }
+            
+            exampleScope();
+            
+            // 尝试访问函数内的变量
+            try {
+                results.push(`Outside function - functionVar: ${functionVar}`); // 应该抛出错误
+            } catch (e) {
+                results.push(`Outside function - functionVar: Error (Cannot access functionVar outside function)`);
+            }
+            
+            document.getElementById('scopeResult').innerHTML = results.join('<br>');
+        }
+        
+        // 6. 变量提升示例
+        function runHoistingExample() {
+            // 重置结果区域
+            document.getElementById('hoistingResult').innerHTML = '';
+            
+            let results = [];
+            
+            try {
+                // var声明的变量会被提升
+                results.push(`Before varVar declaration: ${typeof varVar}`); // undefined，不是错误
+                var varVar = 'var variable';
+                results.push(`After varVar declaration: ${varVar}`);
+                
+                // 演示let没有变量提升（注释掉以避免页面崩溃）
+                // results.push(`Before letVar declaration: ${typeof letVar}`); // 这会抛出错误
+                
+                // 先声明再使用let
+                let letVar = 'let variable';
+                results.push(`After letVar declaration: ${letVar}`);
+                
+                // 演示const没有变量提升（注释掉以避免页面崩溃）
+                // results.push(`Before constVar declaration: ${typeof constVar}`); // 这会抛出错误
+                
+                // 先声明再使用const
+                const constVar = 'const variable';
+                results.push(`After constVar declaration: ${constVar}`);
+            } catch (e) {
+                results.push(`Error: ${e.message}`);
+            }
+            
+            document.getElementById('hoistingResult').innerHTML = results.join('<br>');
+        }
+    </script>
+</body>
+</html>

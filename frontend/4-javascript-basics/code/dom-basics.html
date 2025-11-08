@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JavaScript DOM操作基础示例</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: #34495e;
+            margin-top: 30px;
+            margin-bottom: 20px;
+            border-left: 4px solid #3498db;
+            padding-left: 15px;
+        }
+        h3 {
+            color: #7f8c8d;
+            margin-top: 20px;
+        }
+        .example-section {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 25px;
+            border-left: 3px solid #3498db;
+        }
+        .result-box {
+            background-color: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 15px;
+            font-family: monospace;
+            max-height: 200px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        button:active {
+            transform: translateY(1px);
+        }
+        .demo-area {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px dashed #ddd;
+            border-radius: 5px;
+            min-height: 100px;
+        }
+        .highlight {
+            background-color: #ffffcc;
+            padding: 2px 5px;
+            border-radius: 3px;
+        }
+        .code-block {
+            background-color: #f5f5f5;
+            padding: 15px;
+            border-radius: 5px;
+            border-left: 3px solid #e74c3c;
+            font-family: monospace;
+            overflow-x: auto;
+            margin-bottom: 20px;
+        }
+        ul {
+            padding-left: 20px;
+        }
+        li {
+            margin-bottom: 8px;
+        }
+        .demo-item {
+            padding: 8px;
+            margin: 5px 0;
+            background-color: #ecf0f1;
+            border-radius: 3px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .demo-item:hover {
+            background-color: #bdc3c7;
+        }
+        .demo-item.selected {
+            background-color: #3498db;
+            color: white;
+        }
+        .class-changer {
+            padding: 10px;
+            background-color: #ecf0f1;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .highlight-bg {
+            background-color: #ffcccc;
+        }
+        .font-large {
+            font-size: 18px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>JavaScript DOM操作基础</h1>
+        
+        <p>DOM（文档对象模型）是HTML和XML文档的编程接口。它提供了对文档结构的结构化表述，并定义了一种方式可以使程序对该结构进行访问，从而改变文档的结构、样式和内容。</p>
+        
+        <h2>1. DOM元素选择方法</h2>
+        <div class="example-section">
+            <h3>1.1 选择单个元素</h3>
+            <div class="code-block">
+// 通过ID选择元素
+document.getElementById('demo');
+
+// 通过CSS选择器选择第一个匹配的元素
+document.querySelector('#demo');
+document.querySelector('.class-name');
+document.querySelector('div p');
+            </div>
+            
+            <h3>1.2 选择多个元素</h3>
+            <div class="code-block">
+// 获取所有指定类的元素
+document.getElementsByClassName('demo-item');
+
+// 获取所有指定标签的元素
+document.getElementsByTagName('div');
+
+// 获取所有指定名称的表单元素
+document.getElementsByName('username');
+
+// 通过CSS选择器选择所有匹配的元素
+document.querySelectorAll('.demo-item');
+document.querySelectorAll('div > p');
+            </div>
+            
+            <button onclick="runElementSelectionDemo()">运行元素选择演示</button>
+            <div id="elementSelectionResult" class="result-box">结果将显示在这里</div>
+        </div>
+        
+        <h2>2. DOM元素属性操作</h2>
+        <div class="example-section">
+            <h3>2.1 获取和设置属性</h3>
+            <div class="code-block">
+// 获取属性值
+element.getAttribute('href');
+
+// 设置属性值
+element.setAttribute('href', 'https://www.example.com');
+
+// 检查属性是否存在
+element.hasAttribute('href');
+
+// 删除属性
+element.removeAttribute('href');
+            </div>
+            
+            <h3>2.2 内置属性操作</h3>
+            <div class="code-block">
+// 直接操作内置属性
+element.id = 'new-id';
+element.className = 'new-class';
+element.src = 'new-image.jpg';
+element.href = 'https://www.example.com';
+element.textContent = '新文本内容';
+element.innerHTML = '<span>新HTML内容</span>';
+            </div>
+            
+            <div class="demo-area">
+                <img id="demoImage" src="" alt="示例图片">
+                <p id="demoText">这是一段可修改的文本。</p>
+            </div>
+            
+            <button onclick="runAttributeDemo()">运行属性操作演示</button>
+            <div id="attributeResult" class="result-box">结果将显示在这里</div>
+        </div>
+        
+        <h2>3. DOM元素内容操作</h2>
+        <div class="example-section">
+            <h3>3.1 文本内容操作</h3>
+            <div class="code-block">
+// 获取和设置文本内容（不解析HTML）
+element.textContent = '新文本内容';
+const text = element.textContent;
+
+// 获取和设置HTML内容（解析HTML标签）
+element.innerHTML = '<strong>粗体文本</strong>';
+const html = element.innerHTML;
+
+// 获取和设置文本内容（旧版方法）
+element.innerText = '新文本内容';
+const innerText = element.innerText;
+            </div>
+            
+            <h3>3.2 内容操作的区别</h3>
+            <ul>
+                <li><strong>textContent</strong>: 获取所有元素的文本内容，包括script和style元素内的文本，忽略HTML标签</li>
+                <li><strong>innerText</strong>: 类似于textContent，但会考虑样式，不会返回隐藏元素的文本</li>
+                <li><strong>innerHTML</strong>: 获取和设置元素的HTML内容，可以解析HTML标签</li>
+            </ul>
+            
+            <div class="demo-area">
+                <div id="contentDemo" style="border: 1px solid #ddd; padding: 10px;">
+                    原始内容 <strong>粗体</strong> <span style="display: none;">隐藏文本</span>
+                </div>
+            </div>
+            
+            <button onclick="runContentDemo()">运行内容操作演示</button>
+            <div id="contentResult" class="result-box">结果将显示在这里</div>
+        </div>
+        
+        <h2>4. DOM元素样式操作</h2>
+        <div class="example-section">
+            <h3>4.1 内联样式操作</h3>
+            <div class="code-block">
+// 设置单个样式
+element.style.color = 'red';
+element.style.fontSize = '16px';
+element.style.marginTop = '20px';
+
+// 获取样式值（注意：只能获取内联样式）
+const color = element.style.color;
+
+// 设置多个样式
+element.style.cssText = 'color: blue; font-size: 18px; padding: 10px;';
+            </div>
+            
+            <h3>4.2 计算样式获取</h3>
+            <div class="code-block">
+// 获取计算后的样式（包括CSS规则中的样式）
+const computedStyle = window.getComputedStyle(element);
+const color = computedStyle.color;
+const fontSize = computedStyle.fontSize;
+const margin = computedStyle.margin;
+            </div>
+            
+            <div class="demo-area">
+                <div id="styleDemo" class="class-changer">
+                    这是一个可修改样式的元素
+                </div>
+            </div>
+            
+            <button onclick="runStyleDemo()">运行样式操作演示</button>
+            <div id="styleResult" class="result-box">结果将显示在这里</div>
+        </div>
+        
+        <h2>5. DOM元素类操作</h2>
+        <div class="example-section">
+            <h3>5.1 classList API</h3>
+            <div class="code-block">
+// 添加类
+element.classList.add('highlight', 'active');
+
+// 删除类
+element.classList.remove('highlight');
+
+// 切换类（存在则删除，不存在则添加）
+element.classList.toggle('active');
+
+// 检查是否包含类
+const hasClass = element.classList.contains('highlight');
+
+// 替换类
+element.classList.replace('old-class', 'new-class');
+            </div>
+            
+            <h3>5.2 className属性</h3>
+            <div class="code-block">
+// 获取所有类（字符串形式）
+const allClasses = element.className;
+
+// 设置类（会覆盖所有现有类）
+element.className = 'new-class another-class';
+
+// 添加类（通过字符串拼接）
+element.className += ' additional-class';
+            </div>
+            
+            <div class="demo-area">
+                <div id="classDemo" class="class-changer">
+                    点击按钮更改我的类
+                </div>
+            </div>
+            
+            <button onclick="addClassDemo()">添加 highlight 类</button>
+            <button onclick="removeClassDemo()">移除 highlight 类</button>
+            <button onclick="toggleClassDemo()">切换 font-large 类</button>
+            <div id="classResult" class="result-box">结果将显示在这里</div>
+        </div>
+        
+        <h2>6. DOM节点创建与插入</h2>
+        <div class="example-section">
+            <h3>6.1 创建节点</h3>
+            <div class="code-block">
+// 创建元素节点
+const newDiv = document.createElement('div');
+
+// 创建文本节点
+const textNode = document.createTextNode('这是新文本');
+
+// 创建注释节点
+const commentNode = document.createComment('这是注释');
+
+// 创建文档片段（用于批量插入）
+const fragment = document.createDocumentFragment();
+            </div>
+            
+            <h3>6.2 节点插入方法</h3>
+            <div class="code-block">
+// 在父元素末尾添加子元素
+parent.appendChild(child);
+
+// 在指定元素前插入新元素
+parent.insertBefore(newElement, referenceElement);
+
+// 在元素开始位置插入HTML
+parent.insertAdjacentHTML('afterbegin', '<p>新内容</p>');
+
+// 在元素末尾插入HTML
+parent.insertAdjacentHTML('beforeend', '<p>新内容</p>');
+
+// 在元素前插入HTML
+parent.insertAdjacentHTML('beforebegin', '<p>新内容</p>');
+
+// 在元素后插入HTML
+parent.insertAdjacentHTML('afterend', '<p>新内容</p>');
+            </div>
+            
+            <div class="demo-area">
+                <div id="insertionDemo">
+                    <p>现有内容</p>
+                </div>
+            </div>
+            
+            <button onclick="runInsertionDemo()">运行插入节点演示</button>
+            <div id="insertionResult" class="result-box">结果将显示在这里</div>
+        </div>
+        
+        <h2>7. DOM节点删除</h2>
+        <div class="example-section">
+            <div class="code-block">
+// 父元素删除子元素
+parent.removeChild(child);
+
+// 元素自删除（较新的方法）
+element.remove();
+
+// 清空元素内容
+element.innerHTML = '';
+
+// 更安全的清空方式
+while (element.firstChild) {
+    element.removeChild(element.firstChild);
+}
+            </div>
+            
+            <div class="demo-area">
+                <div id="removalDemo">
+                    <p class="removable">可删除的段落 1</p>
+                    <p class="removable">可删除的段落 2</p>
+                    <p class="removable">可删除的段落 3</p>
+                </div>
+            </div>
+            
+            <button onclick="removeFirstChild()">删除第一个子元素</button>
+            <button onclick="removeAllChildren()">删除所有子元素</button>
+            <div id="removalResult" class="result-box">结果将显示在这里</div>
+        </div>
+    </div>
+
+    <script>
+        // 辅助函数：显示结果
+        function displayResult(elementId, content) {
+            const element = document.getElementById(elementId);
+            element.textContent = content;
+        }
+
+        // 1. 元素选择演示
+        function runElementSelectionDemo() {
+            let output = '';
+            try {
+                // 创建一些用于演示的元素
+                const demoArea = document.createElement('div');
+                demoArea.id = 'selectionDemo';
+                demoArea.innerHTML = `
+                    <div class="demo-item">项目 1</div>
+                    <div class="demo-item">项目 2</div>
+                    <div class="demo-item special">项目 3</div>
+                `;
+                document.body.appendChild(demoArea);
+                
+                // getElementById
+                const byId = document.getElementById('selectionDemo');
+                output += '1. getElementById: ' + (byId ? '找到元素' : '未找到元素') + '\n';
+                
+                // getElementsByClassName
+                const byClassName = document.getElementsByClassName('demo-item');
+                output += '2. getElementsByClassName: 找到 ' + byClassName.length + ' 个元素\n';
+                Array.from(byClassName).forEach((item, index) => {
+                    output += `   第${index + 1}个: ${item.textContent.trim()}\n`;
+                });
+                
+                // getElementsByTagName
+                const byTagName = document.getElementsByTagName('div');
+                output += '3. getElementsByTagName: 找到 ' + byTagName.length + ' 个div元素\n';
+                
+                // querySelector (第一个匹配项)
+                const queryFirst = document.querySelector('.demo-item');
+                output += '4. querySelector(.demo-item): ' + (queryFirst ? queryFirst.textContent.trim() : '未找到元素') + '\n';
+                
+                // querySelectorAll
+                const queryAll = document.querySelectorAll('.demo-item');
+                output += '5. querySelectorAll: 找到 ' + queryAll.length + ' 个元素\n';
+                queryAll.forEach((item, index) => {
+                    output += `   第${index + 1}个: ${item.textContent.trim()}\n`;
+                });
+                
+                // querySelector 复杂选择器
+                const complexQuery = document.querySelector('.demo-item.special');
+                output += '6. querySelector(.demo-item.special): ' + (complexQuery ? complexQuery.textContent.trim() : '未找到元素') + '\n';
+                
+                // 比较NodeList和HTMLCollection
+                output += '\n7. 返回类型比较:\n';
+                output += '   getElementsByClassName 返回: ' + byClassName.constructor.name + ' (HTMLCollection，实时更新)\n';
+                output += '   querySelectorAll 返回: ' + queryAll.constructor.name + ' (NodeList，静态快照)\n';
+                
+                // 移除演示元素
+                document.body.removeChild(demoArea);
+                
+            } catch (error) {
+                output += '错误: ' + error.message;
+            }
+            displayResult('elementSelectionResult', output);
+        }
+
+        // 2. 属性操作演示
+        function runAttributeDemo() {
+            let output = '';
+            try {
+                const image = document.getElementById('demoImage');
+                const text = document.getElementById('demoText');
+                
+                // 设置属性
+                image.setAttribute('src', 'https://via.placeholder.com/150');
+                image.setAttribute('alt', '示例占位图');
+                
+                // 获取属性
+                output += '1. 图片属性:\n';
+                output += '   src: ' + image.getAttribute('src') + '\n';
+                output += '   alt: ' + image.getAttribute('alt') + '\n';
+                
+                // 检查属性是否存在
+                output += '   has title属性: ' + image.hasAttribute('title') + '\n';
+                
+                // 设置内置属性
+                text.id = 'modifiedText';
+                text.className = 'demo-text highlighted';
+                text.textContent = '已修改的文本内容';
+                
+                output += '\n2. 文本元素属性:\n';
+                output += '   id: ' + text.id + '\n';
+                output += '   className: ' + text.className + '\n';
+                output += '   textContent: ' + text.textContent + '\n';
+                
+                // 设置style属性
+                text.style.color = 'blue';
+                text.style.fontWeight = 'bold';
+                
+                output += '\n3. 样式属性:\n';
+                output += '   color: ' + text.style.color + '\n';
+                output += '   fontWeight: ' + text.style.fontWeight + '\n';
+                
+                // 使用CSS文本设置多个样式
+                image.style.cssText = 'border: 2px solid #3498db; border-radius: 5px;';
+                
+            } catch (error) {
+                output += '错误: ' + error.message;
+            }
+            displayResult('attributeResult', output);
+        }
+
+        // 3. 内容操作演示
+        function runContentDemo() {
+            let output = '';
+            try {
+                const demoElement = document.getElementById('contentDemo');
+                
+                // 获取不同的内容表示
+                output += '1. 内容比较:\n';
+                output += '   textContent: ' + demoElement.textContent + '\n';
+                output += '   innerText: ' + demoElement.innerText + '\n';
+                output += '   innerHTML: ' + demoElement.innerHTML + '\n';
+                
+                // 修改文本内容
+                demoElement.textContent = '新文本内容 <strong>不会解析HTML标签</strong>';
+                output += '\n2. 设置textContent后:\n';
+                output += '   innerHTML: ' + demoElement.innerHTML + '\n';
+                
+                // 修改HTML内容
+                demoElement.innerHTML = '新HTML内容 <strong>会解析HTML标签</strong>';
+                output += '\n3. 设置innerHTML后:\n';
+                output += '   innerHTML: ' + demoElement.innerHTML + '\n';
+                output += '   textContent: ' + demoElement.textContent + '\n';
+                
+                // 内容操作安全提示
+                output += '\n4. 安全提示:\n';
+                output += '   使用innerHTML时要小心XSS攻击，避免直接插入用户输入的内容。\n';
+                output += '   推荐使用textContent或document.createTextNode()处理用户输入。\n';
+                
+            } catch (error) {
+                output += '错误: ' + error.message;
+            }
+            displayResult('contentResult', output);
+        }
+
+        // 4. 样式操作演示
+        function runStyleDemo() {
+            let output = '';
+            try {
+                const demoElement = document.getElementById('styleDemo');
+                
+                // 设置单个样式
+                demoElement.style.color = 'green';
+                demoElement.style.fontSize = '18px';
+                demoElement.style.padding = '15px';
+                
+                output += '1. 设置的内联样式:\n';
+                output += '   color: ' + demoElement.style.color + '\n';
+                output += '   fontSize: ' + demoElement.style.fontSize + '\n';
+                output += '   padding: ' + demoElement.style.padding + '\n';
+                
+                // 获取计算样式
+                const computedStyle = window.getComputedStyle(demoElement);
+                
+                output += '\n2. 计算样式（包括CSS规则）:\n';
+                output += '   backgroundColor: ' + computedStyle.backgroundColor + '\n';
+                output += '   fontFamily: ' + computedStyle.fontFamily + '\n';
+                output += '   margin: ' + computedStyle.margin + '\n';
+                output += '   display: ' + computedStyle.display + '\n';
+                
+                // 使用style.cssText设置多个样式
+                demoElement.style.cssText += 'border: 2px solid orange; border-radius: 8px;';
+                
+                output += '\n3. 设置cssText后:\n';
+                output += '   style.cssText: ' + demoElement.style.cssText + '\n';
+                
+            } catch (error) {
+                output += '错误: ' + error.message;
+            }
+            displayResult('styleResult', output);
+        }
+
+        // 5. 类操作演示
+        function addClassDemo() {
+            const demoElement = document.getElementById('classDemo');
+            demoElement.classList.add('highlight-bg');
+            updateClassDisplay();
+        }
+
+        function removeClassDemo() {
+            const demoElement = document.getElementById('classDemo');
+            demoElement.classList.remove('highlight-bg');
+            updateClassDisplay();
+        }
+
+        function toggleClassDemo() {
+            const demoElement = document.getElementById('classDemo');
+            demoElement.classList.toggle('font-large');
+            updateClassDisplay();
+        }
+
+        function updateClassDisplay() {
+            const demoElement = document.getElementById('classDemo');
+            let output = '';
+            
+            output += '当前类列表:\n';
+            demoElement.classList.forEach(className => {
+                output += `  - ${className}\n`;
+            });
+            
+            output += '\nclassList.contains()检查:\n';
+            output += `  has highlight-bg: ${demoElement.classList.contains('highlight-bg')}\n`;
+            output += `  has font-large: ${demoElement.classList.contains('font-large')}\n`;
+            
+            output += '\nclassName属性值:\n';
+            output += `  ${demoElement.className}\n`;
+            
+            displayResult('classResult', output);
+        }
+
+        // 6. 节点插入演示
+        function runInsertionDemo() {
+            let output = '';
+            try {
+                const parentElement = document.getElementById('insertionDemo');
+                
+                output += '1. 创建和插入元素:\n';
+                
+                // 创建新元素
+                const newHeading = document.createElement('h3');
+                newHeading.textContent = '动态创建的标题';
+                newHeading.style.color = '#3498db';
+                
+                // 在开始位置插入
+                parentElement.insertBefore(newHeading, parentElement.firstChild);
+                output += '   ✅ 在开始位置插入了标题\n';
+                
+                // 创建新段落并添加到末尾
+                const newParagraph = document.createElement('p');
+                newParagraph.textContent = '动态创建的末尾段落';
+                parentElement.appendChild(newParagraph);
+                output += '   ✅ 在末尾添加了段落\n';
+                
+                // 使用insertAdjacentHTML插入
+                parentElement.insertAdjacentHTML('afterbegin', '<p style="color:red;">使用insertAdjacentHTML插入的内容</p>');
+                output += '   ✅ 使用insertAdjacentHTML在开始位置插入\n';
+                
+                // 创建和使用文档片段（用于批量插入）
+                const fragment = document.createDocumentFragment();
+                
+                for (let i = 1; i <= 3; i++) {
+                    const item = document.createElement('div');
+                    item.textContent = `片段项目 ${i}`;
+                    item.style.backgroundColor = '#f9f9f9';
+                    item.style.margin = '5px 0';
+                    item.style.padding = '5px';
+                    fragment.appendChild(item);
+                }
+                
+                parentElement.appendChild(fragment);
+                output += '   ✅ 使用文档片段批量插入了3个项目\n';
+                
+                // 显示当前子元素数量
+                output += '\n2. 当前子元素数量: ' + parentElement.children.length;
+                
+            } catch (error) {
+                output += '错误: ' + error.message;
+            }
+            displayResult('insertionResult', output);
+        }
+
+        // 7. 节点删除演示
+        function removeFirstChild() {
+            let output = '';
+            try {
+                const parentElement = document.getElementById('removalDemo');
+                
+                if (parentElement.firstChild) {
+                    const removedElement = parentElement.removeChild(parentElement.firstChild);
+                    output += '删除了第一个子元素: ' + removedElement.textContent.trim();
+                } else {
+                    output += '没有可删除的子元素';
+                }
+                
+                output += '\n剩余子元素数量: ' + parentElement.children.length;
+                
+            } catch (error) {
+                output += '错误: ' + error.message;
+            }
+            displayResult('removalResult', output);
+        }
+
+        function removeAllChildren() {
+            let output = '';
+            try {
+                const parentElement = document.getElementById('removalDemo');
+                
+                // 记录删除前的数量
+                const beforeCount = parentElement.children.length;
+                
+                // 方法1: 使用innerHTML（简单但可能有性能问题）
+                // parentElement.innerHTML = '';
+                
+                // 方法2: 逐个删除（更安全）
+                while (parentElement.firstChild) {
+                    parentElement.removeChild(parentElement.firstChild);
+                }
+                
+                output += `已删除所有 ${beforeCount} 个子元素`;
+                output += '\n当前子元素数量: ' + parentElement.children.length;
+                
+            } catch (error) {
+                output += '错误: ' + error.message;
+            }
+            displayResult('removalResult', output);
+        }
+    </script>
+</body>
+</html>

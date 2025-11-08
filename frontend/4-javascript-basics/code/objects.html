@@ -1,0 +1,2138 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JavaScript对象 - 基础操作与高级应用</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f5f5;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 30px;
+            text-align: center;
+            font-size: 2.2em;
+        }
+        
+        h2 {
+            color: #3498db;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e0e0e0;
+            font-size: 1.8em;
+        }
+        
+        h3 {
+            color: #2980b9;
+            margin-top: 25px;
+            margin-bottom: 15px;
+            font-size: 1.4em;
+        }
+        
+        h4 {
+            color: #27ae60;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+        
+        p {
+            margin-bottom: 15px;
+            font-size: 1.05em;
+        }
+        
+        .example-box {
+            background-color: #f8f9fa;
+            border-left: 4px solid #3498db;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        
+        .code-block {
+            background-color: #f0f0f0;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            margin: 15px 0;
+        }
+        
+        .result-box {
+            background-color: #e8f4f8;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 10px;
+            border: 1px solid #b8e0ea;
+        }
+        
+        .btn {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 0;
+            transition: background-color 0.3s;
+        }
+        
+        .btn:hover {
+            background-color: #2980b9;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        th {
+            background-color: #3498db;
+            color: white;
+            font-weight: bold;
+        }
+        
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+        
+        .highlight {
+            background-color: #fff3cd;
+            padding: 15px;
+            border-radius: 4px;
+            border-left: 4px solid #ffc107;
+            margin: 15px 0;
+        }
+        
+        .warning {
+            background-color: #f8d7da;
+            padding: 15px;
+            border-radius: 4px;
+            border-left: 4px solid #dc3545;
+            margin: 15px 0;
+        }
+        
+        .success {
+            background-color: #d4edda;
+            padding: 15px;
+            border-radius: 4px;
+            border-left: 4px solid #28a745;
+            margin: 15px 0;
+        }
+        
+        ul, ol {
+            margin-left: 20px;
+            margin-bottom: 15px;
+        }
+        
+        li {
+            margin-bottom: 8px;
+        }
+        
+        .object-properties {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .property-card {
+            flex: 1;
+            min-width: 250px;
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 6px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .property-card h4 {
+            color: #3498db;
+            margin-top: 0;
+            border-bottom: 1px solid #e0e0e0;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>JavaScript对象 - 基础操作与高级应用</h1>
+        
+        <h2>1. 对象基础概念</h2>
+        <p>对象是JavaScript中最重要的数据类型之一，几乎所有的事物在JavaScript中都可以被看作对象。对象是属性的集合，每个属性都有名称和值。</p>
+        
+        <div class="highlight">
+            <strong>注意：</strong>JavaScript对象具有以下特点：<br>
+            1. 是键值对的集合<br>
+            2. 键（属性名）可以是字符串或Symbol<br>
+            3. 值可以是任意数据类型（原始类型、对象、函数等）<br>
+            4. 对象是引用类型，赋值时传递的是引用而不是值<br>
+            5. 对象有原型链，可以继承属性和方法
+        </div>
+        
+        <h2>2. 对象的创建方法</h2>
+        
+        <h3>2.1 对象字面量（最常用）</h3>
+        <div class="example-box">
+            <h4>示例：对象字面量创建对象</h4>
+            <div class="code-block">
+                // 基本对象字面量
+                let person = {
+                    name: 'John Doe',
+                    age: 30,
+                    job: 'Developer',
+                    skills: ['JavaScript', 'HTML', 'CSS']
+                };
+                
+                output += '1. for...in循环（遍历可枚举属性，包括原型链上的）:\n';
+                for (let key in person) {
+                    // 检查属性是否是对象自身的
+                    if (person.hasOwnProperty(key)) {
+                        output += `${key}: ${person[key]}\n`;
+                    }
+                }
+                
+                output += '\n2. Object.keys()（返回可枚举的自身属性名数组）:\n';
+                let keys = Object.keys(person);
+                output += 'keys数组: ' + JSON.stringify(keys) + '\n';
+                keys.forEach(key => {
+                    output += `${key}: ${person[key]}\n`;
+                });
+                
+                output += '\n3. Object.values()（返回可枚举的自身属性值数组）:\n';
+                let values = Object.values(person);
+                output += 'values数组: ' + JSON.stringify(values) + '\n';
+                
+                output += '\n4. Object.entries()（返回可枚举的自身属性[key, value]数组）:\n';
+                let entries = Object.entries(person);
+                output += 'entries数组: ' + JSON.stringify(entries) + '\n';
+                entries.forEach(([key, value]) => {
+                    output += `${key}: ${value}\n`;
+                });
+                
+                output += '\n5. Object.getOwnPropertyNames()（返回所有自身属性名，包括不可枚举的）:\n';
+                // 创建一个包含不可枚举属性的对象
+                let objWithNonEnum = {};
+                Object.defineProperty(objWithNonEnum, 'enumProp', {
+                    value: '可枚举',
+                    enumerable: true
+                });
+                Object.defineProperty(objWithNonEnum, 'nonEnumProp', {
+                    value: '不可枚举',
+                    enumerable: false
+                });
+                
+                output += 'Object.keys: ' + JSON.stringify(Object.keys(objWithNonEnum)) + '\n';
+                output += 'Object.getOwnPropertyNames: ' + JSON.stringify(Object.getOwnPropertyNames(objWithNonEnum)) + '\n';
+                
+                output += '\n6. Reflect.ownKeys()（返回所有自身属性名，包括Symbol和不可枚举的）:\n';
+                let sym = Symbol('test');
+                objWithNonEnum[sym] = 'Symbol属性';
+                output += 'Reflect.ownKeys: ' + JSON.stringify(Reflect.ownKeys(objWithNonEnum)) + '\n';
+            } catch (error) {
+                output += '错误: ' + error.message;
+            }
+            displayResult('objectIterationResult', output);
+        }
+        
+        // 10. 对象合并和克隆示例
+        function runObjectMergeCloneExample() {
+            let output = '';
+            try {
+                // 对象合并方法
+                let obj1 = { a: 1, b: 2 };
+                let obj2 = { b: 3, c: 4 };
+                
+                // 1. Object.assign() - 浅拷贝和合并
+                output += '1. Object.assign():\n';
+                let mergedObj = Object.assign({}, obj1, obj2);
+                output += 'obj1: ' + JSON.stringify(obj1) + '\n';
+                output += 'obj2: ' + JSON.stringify(obj2) + '\n';
+                output += 'mergedObj: ' + JSON.stringify(mergedObj) + '\n';
+                
+                // 2. 扩展运算符（ES6）
+                output += '\n2. 扩展运算符:\n';
+                let mergedObj2 = { ...obj1, ...obj2 };
+                output += 'mergedObj2: ' + JSON.stringify(mergedObj2) + '\n';
+                
+                // 对象克隆
+                let original = {
+                    name: 'John',
+                    address: {
+                        city: 'New York',
+                        country: 'USA'
+                    },
+                    skills: ['JavaScript', 'HTML']
+                };
+                
+                output += '\n3. 浅拷贝（只拷贝顶层属性）:\n';
+                // 方法1：Object.assign
+                let shallowCopy1 = Object.assign({}, original);
+                
+                // 方法2：扩展运算符
+                let shallowCopy2 = { ...original };
+                
+                // 方法3：JSON.parse + JSON.stringify（深拷贝，但有局限性）
+                let deepCopy = JSON.parse(JSON.stringify(original));
+                
+                // 验证浅拷贝
+                shallowCopy1.name = 'Jane';
+                shallowCopy1.address.city = 'Boston'; // 会影响原对象，因为是引用
+                
+                output += '修改后的original.name: ' + original.name + '\n';
+                output += 'original.address.city: ' + original.address.city + '\n';
+                
+                // 验证深拷贝
+                deepCopy.name = 'Bob';
+                deepCopy.address.city = 'Chicago'; // 不会影响原对象
+                
+                output += '\n4. 深拷贝验证:\n';
+                output += 'original.address.city: ' + original.address.city + '\n';
+                output += 'deepCopy.address.city: ' + deepCopy.address.city + '\n';
+                
+                // 注意：JSON方法的局限性
+                let objWithFunctions = {
+                    name: 'John',
+                    greet: function() { return 'Hello'; },
+                    date: new Date(),
+                    regex: /test/
+                };
+                
+                let copyWithJSON = JSON.parse(JSON.stringify(objWithFunctions));
+                output += '\n5. JSON方法的局限性:\n';
+                output += '原始对象greet类型: ' + typeof objWithFunctions.greet + '\n';
+                output += '拷贝后greet类型: ' + typeof copyWithJSON.greet + '\n';
+                output += 'date类型: ' + copyWithJSON.date + '\n';
+                output += 'regex类型: ' + copyWithJSON.regex + '\n';
+                
+                // 自定义深拷贝函数（简单实现）
+                function deepClone(obj) {
+                    if (obj === null || typeof obj !== 'object') return obj;
+                    if (obj instanceof Date) return new Date(obj.getTime());
+                    if (obj instanceof RegExp) return new RegExp(obj);
+                    if (obj instanceof Array) {
+                        let cloneArr = [];
+                        for (let i = 0; i < obj.length; i++) {
+                            cloneArr[i] = deepClone(obj[i]);
+                        }
+                        return cloneArr;
+                    }
+                    // 普通对象
+                    let cloneObj = {};
+                    for (let key in obj) {
+                        if (obj.hasOwnProperty(key)) {
+                            cloneObj[key] = deepClone(obj[key]);
+                        }
+                    }
+                    return cloneObj;
+                }
+                
+                // 测试自定义深拷贝函数
+                let customDeepCopy = deepClone(objWithFunctions);
+                output += '\n6. 自定义深拷贝函数:\n';
+                output += 'greet类型: ' + typeof customDeepCopy.greet + '\n';
+                output += 'date类型: ' + (customDeepCopy.date instanceof Date) + '\n';
+                output += 'regex类型: ' + (customDeepCopy.regex instanceof RegExp) + '\n';
+            } catch (error) {
+                output += '错误: ' + error.message;
+            }
+            displayResult('objectMergeCloneResult', output);
+        }
+        
+        // 11. Symbol示例
+        function runSymbolExample() {
+            let output = '';
+            try {
+                // 创建Symbol
+                let sym1 = Symbol('description');
+                let sym2 = Symbol('description');
+                
+                // 每个Symbol都是唯一的
+                output += 'sym1 === sym2: ' + (sym1 === sym2) + '\n';
+                
+                // 使用Symbol作为属性名
+                let person = {
+                    name: 'John',
+                    [sym1]: 'private data', // Symbol作为属性名
+                    [Symbol('id')]: 12345
+                };
+                
+                // Symbol属性不会出现在常规遍历中
+                output += '\n常规遍历:\n';
+                output += 'Object.keys: ' + JSON.stringify(Object.keys(person)) + '\n';
+                
+                for (let key in person) {
+                    output += key + ': ' + person[key] + '\n';
+                }
+                
+                // 获取Symbol属性
+                output += '\n获取Symbol属性:\n';
+                let symbolKeys = Object.getOwnPropertySymbols(person);
+                output += 'Symbol keys: ' + JSON.stringify(symbolKeys) + '\n';
+                
+                symbolKeys.forEach(sym => {
+                    output += sym.description + ': ' + person[sym] + '\n';
+                });
+                
+                // Symbol.for() - 创建全局Symbol
+                let globalSym1 = Symbol.for('globalSymbol');
+                let globalSym2 = Symbol.for('globalSymbol');
+                output += '\nglobalSym1 === globalSym2: ' + (globalSym1 === globalSym2) + '\n';
+                
+                // Symbol.keyFor() - 获取全局Symbol的键
+                output += 'Symbol.keyFor(globalSym1): ' + Symbol.keyFor(globalSym1) + '\n';
+                output += 'Symbol.keyFor(sym1): ' + Symbol.keyFor(sym1) + '\n';
+                
+                // 使用Symbol作为常量
+                const COLORS = {
+                    RED: Symbol('red'),
+                    GREEN: Symbol('green'),
+                    BLUE: Symbol('blue')
+                };
+                
+                function getColorName(color) {
+                    switch (color) {
+                        case COLORS.RED:
+                            return '红色';
+                        case COLORS.GREEN:
+                            return '绿色';
+                        case COLORS.BLUE:
+                            return '蓝色';
+                        default:
+                            return '未知颜色';
+                    }
+                }
+                
+                output += '\nSymbol常量示例:\n';
+                output += getColorName(COLORS.RED) + '\n';
+                output += getColorName(Symbol('red')) + '\n';
+            } catch (error) {
+                output += '错误: ' + error.message;
+            }
+            displayResult('symbolResult', output);
+        }
+        
+        // 12. Proxy示例
+        function runProxyExample() {
+            let output = '';
+            try {
+                // 创建目标对象
+                let target = {
+                    name: 'John',
+                    age: 30
+                };
+                
+                // 创建代理处理器
+                let handler = {
+                    // 拦截属性获取
+                    get: function(target, prop, receiver) {
+                        output += `获取属性: ${prop}\n`;
+                        // 如果属性不存在，返回默认值
+                        return prop in target ? target[prop] : `未定义的属性: ${prop}`;
+                    },
+                    
+                    // 拦截属性设置
+                    set: function(target, prop, value, receiver) {
+                        output += `设置属性: ${prop} = ${value}\n`;
+                        // 验证年龄必须是数字且大于0
+                        if (prop === 'age' && (typeof value !== 'number' || value < 0)) {
+                            throw new Error('年龄必须是非负数');
+                        }
+                        target[prop] = value;
+                        return true; // 必须返回true表示设置成功
+                    },
+                    
+                    // 拦截属性删除
+                    deleteProperty: function(target, prop) {
+                        output += `删除属性: ${prop}\n`;
+                        // 禁止删除name属性
+                        if (prop === 'name') {
+                            throw new Error('不能删除name属性');
+                        }
+                        delete target[prop];
+                        return true;
+                    },
+                    
+                    // 拦截in操作符
+                    has: function(target, prop) {
+                        output += `检查属性是否存在: ${prop}\n`;
+                        return prop in target;
+                    },
+                    
+                    // 拦截Object.getOwnPropertyDescriptor
+                    getOwnPropertyDescriptor: function(target, prop) {
+                        output += `获取属性描述符: ${prop}\n`;
+                        return Object.getOwnPropertyDescriptor(target, prop);
+                    }
+                };
+                
+                // 创建代理
+                let proxy = new Proxy(target, handler);
+                
+                output += '\n1. 测试get拦截器:\n';
+                output += 'proxy.name: ' + proxy.name + '\n';
+                output += 'proxy.email: ' + proxy.email + '\n';
+                
+                output += '\n2. 测试set拦截器:\n';
+                proxy.age = 31;
+                output += '修改后的age: ' + proxy.age + '\n';
+                
+                try {
+                    proxy.age = -5;
+                } catch (error) {
+                    output += '错误捕获: ' + error.message + '\n';
+                }
+                
+                output += '\n3. 测试has拦截器:\n';
+                output += ('name' in proxy) + '\n';
+                output += ('email' in proxy) + '\n';
+                
+                output += '\n4. 测试deleteProperty拦截器:\n';
+                try {
+                    delete proxy.name;
+                } catch (error) {
+                    output += '错误捕获: ' + error.message + '\n';
+                }
+                
+                delete proxy.age;
+                output += '删除age后的代理: ' + proxy.age + '\n';
+                
+                output += '\n5. 测试getOwnPropertyDescriptor拦截器:\n';
+                output += JSON.stringify(Object.getOwnPropertyDescriptor(proxy, 'name')) + '\n';
+                
+                // 保护对象属性的代理示例
+                output += '\n6. 只读代理示例:\n';
+                let readOnlyTarget = {
+                    name: 'Protected',
+                    data: 'Sensitive'
+                };
+                
+                let readOnlyHandler = {
+                    set: function() {
+                        throw new Error('这是只读对象，不能修改属性');
+                    },
+                    deleteProperty: function() {
+                        throw new Error('这是只读对象，不能删除属性');
+                    }
+                };
+                
+                let readOnlyProxy = new Proxy(readOnlyTarget, readOnlyHandler);
+                
+                try {
+                    readOnlyProxy.name = 'New Name';
+                } catch (error) {
+                    output += '错误捕获: ' + error.message + '\n';
+                }
+                
+                // 访问控制代理示例
+                output += '\n7. 访问控制代理示例:\n';
+                let user = {
+                    username: 'admin',
+                    password: 'secret',
+                    role: 'admin',
+                    getData: function() {
+                        return '敏感数据';
+                    }
+                };
+                
+                let accessControlHandler = {
+                    get: function(target, prop, receiver) {
+                        // 控制对敏感属性的访问
+                        if (prop === 'password') {
+                            throw new Error('密码不能直接访问');
+                        }
+                        return target[prop];
+                    }
+                };
+                
+                let secureUser = new Proxy(user, accessControlHandler);
+                
+                try {
+                    output += secureUser.password + '\n';
+                } catch (error) {
+                    output += '错误捕获: ' + error.message + '\n';
+                }
+                
+                output += 'username可以访问: ' + secureUser.username + '\n';
+            } catch (error) {
+                output += '错误: ' + error.message;
+            }
+            displayResult('proxyResult', output);
+        }
+        
+        // 13. 对象保护示例
+        function runObjectProtectionExample() {
+            let output = '';
+            try {
+                // 创建原始对象
+                let original = {
+                    name: 'John',
+                    age: 30,
+                    address: {
+                        city: 'New York',
+                        country: 'USA'
+                    }
+                };
+                
+                // 1. Object.preventExtensions() - 防止对象扩展（不能添加新属性）
+                output += '\n1. Object.preventExtensions():\n';
+                let extensibleObj = { ...original };
+                Object.preventExtensions(extensibleObj);
+                
+                // 尝试添加新属性
+                extensibleObj.email = 'john@example.com';
+                output += 'email属性是否添加成功: ' + ('email' in extensibleObj) + '\n';
+                
+                // 仍然可以修改和删除现有属性
+                extensibleObj.age = 31;
+                delete extensibleObj.name;
+                output += '修改后的age: ' + extensibleObj.age + '\n';
+                output += 'name属性是否存在: ' + ('name' in extensibleObj) + '\n';
+                
+                // 检查对象是否可扩展
+                output += '对象是否可扩展: ' + Object.isExtensible(extensibleObj) + '\n';
+                
+                // 2. Object.seal() - 密封对象（不能添加或删除属性，但可以修改）
+                output += '\n2. Object.seal():\n';
+                let sealedObj = { ...original };
+                Object.seal(sealedObj);
+                
+                // 尝试添加新属性
+                sealedObj.email = 'john@example.com';
+                output += 'email属性是否添加成功: ' + ('email' in sealedObj) + '\n';
+                
+                // 尝试删除属性
+                delete sealedObj.name;
+                output += 'name属性是否被删除: ' + ('name' in sealedObj) + '\n';
+                
+                // 可以修改现有属性
+                sealedObj.age = 32;
+                output += '修改后的age: ' + sealedObj.age + '\n';
+                
+                // 检查对象是否密封
+                output += '对象是否密封: ' + Object.isSealed(sealedObj) + '\n';
+                output += '对象是否可扩展: ' + Object.isExtensible(sealedObj) + '\n';
+                
+                // 3. Object.freeze() - 冻结对象（不能添加、删除或修改属性）
+                output += '\n3. Object.freeze():\n';
+                let frozenObj = { ...original };
+                Object.freeze(frozenObj);
+                
+                // 尝试修改属性
+                frozenObj.age = 33;
+                output += '修改后的age: ' + frozenObj.age + '\n';
+                
+                // 尝试添加新属性
+                frozenObj.email = 'john@example.com';
+                output += 'email属性是否添加成功: ' + ('email' in frozenObj) + '\n';
+                
+                // 尝试删除属性
+                delete frozenObj.name;
+                output += 'name属性是否被删除: ' + ('name' in frozenObj) + '\n';
+                
+                // 检查对象是否冻结
+                output += '对象是否冻结: ' + Object.isFrozen(frozenObj) + '\n';
+                output += '对象是否密封: ' + Object.isSealed(frozenObj) + '\n';
+                output += '对象是否可扩展: ' + Object.isExtensible(frozenObj) + '\n';
+                
+                // 注意：这些方法都是浅层次的，不影响嵌套对象
+                output += '\n4. 嵌套对象注意事项:\n';
+                frozenObj.address.city = 'Boston'; // 可以修改嵌套对象的属性
+                output += '修改后的城市: ' + frozenObj.address.city + '\n';
+                
+                // 实现深冻结
+                function deepFreeze(obj) {
+                    if (obj === null || typeof obj !== 'object') return obj;
+                    
+                    // 获取所有属性名
+                    let propNames = Object.getOwnPropertyNames(obj);
+                    
+                    // 递归冻结每个属性
+                    propNames.forEach(name => {
+                        let prop = obj[name];
+                        if (typeof prop === 'object' && prop !== null) {
+                            deepFreeze(prop);
+                        }
+                    });
+                    
+                    return Object.freeze(obj);
+                }
+                
+                let objToDeepFreeze = { ...original };
+                deepFreeze(objToDeepFreeze);
+                
+                // 尝试修改嵌套对象
+                objToDeepFreeze.address.city = 'Chicago';
+                output += '\n5. 深冻结后修改嵌套对象:\n';
+                output += '修改后的城市: ' + objToDeepFreeze.address.city + '\n';
+            } catch (error) {
+                output += '错误: ' + error.message;
+            }
+            displayResult('objectProtectionResult', output);
+        }
+    </script>
+</body>
+</html>
+                    name: 'John Doe',
+                    age: 30,
+                    isEmployed: true,
+                    greet: function() {
+                        return `Hello, my name is ${this.name}`;
+                    }
+                };
+                
+                console.log('person对象:', person);
+                console.log('person.name:', person.name);
+                console.log('调用greet方法:', person.greet());
+                
+                // 空对象
+                let emptyObject = {};
+                console.log('空对象:', emptyObject);
+                
+                // 动态属性名（ES6）
+                let dynamicKey = 'job';
+                let personWithDynamicKey = {
+                    name: 'Jane Smith',
+                    [dynamicKey]: 'Developer'
+                };
+                console.log('带动态属性的对象:', personWithDynamicKey);
+                
+                // 简写属性名和方法（ES6）
+                let name = 'Bob';
+                let age = 25;
+                let personWithShorthand = {
+                    name, // 简写属性名
+                    age,
+                    greet() { // 简写方法
+                        return `Hello, I'm ${this.name}`;
+                    }
+                };
+                console.log('使用简写语法的对象:', personWithShorthand);
+                console.log('调用简写方法:', personWithShorthand.greet());
+            </div>
+            <button class="btn" onclick="runObjectLiteralExample()">运行示例</button>
+            <div class="result-box" id="objectLiteralResult"></div>
+        </div>
+        
+        <h3>2.2 Object构造函数</h3>
+        <div class="example-box">
+            <h4>示例：使用Object构造函数创建对象</h4>
+            <div class="code-block">
+                // 创建空对象
+                let person1 = new Object();
+                person1.name = 'John';
+                person1.age = 30;
+                person1.greet = function() {
+                    return `Hello, I'm ${this.name}`;
+                };
+                
+                console.log('使用Object构造函数创建的对象:', person1);
+                console.log('person1.name:', person1.name);
+                console.log('调用greet方法:', person1.greet());
+                
+                // 使用Object.create()创建对象（指定原型）
+                let animalProto = {
+                    type: 'unknown',
+                    speak: function() {
+                        return 'Some sound';
+                    }
+                };
+                
+                let dog = Object.create(animalProto);
+                dog.type = 'dog';
+                dog.name = 'Rex';
+                dog.speak = function() {
+                    return 'Woof!';
+                };
+                
+                console.log('\n使用Object.create创建的对象:', dog);
+                console.log('dog.name:', dog.name);
+                console.log('dog.type:', dog.type);
+                console.log('调用speak方法:', dog.speak());
+                console.log('是否继承自动物原型:', Object.getPrototypeOf(dog) === animalProto);
+            </div>
+            <button class="btn" onclick="runObjectConstructorExample()">运行示例</button>
+            <div class="result-box" id="objectConstructorResult"></div>
+        </div>
+        
+        <h3>2.3 构造函数</h3>
+        <div class="example-box">
+            <h4>示例：使用构造函数创建对象</h4>
+            <div class="code-block">
+                // 定义构造函数
+                function Person(name, age, job) {
+                    this.name = name;
+                    this.age = age;
+                    this.job = job;
+                    this.greet = function() {
+                        return `Hello, my name is ${this.name}`;
+                    };
+                }
+                
+                // 使用new关键字创建实例
+                let person1 = new Person('John', 30, 'Developer');
+                let person2 = new Person('Jane', 25, 'Designer');
+                
+                console.log('person1:', person1);
+                console.log('person2:', person2);
+                console.log('person1.greet():', person1.greet());
+                console.log('person2.greet():', person2.greet());
+                console.log('person1是否是Person的实例:', person1 instanceof Person);
+                console.log('person2是否是Person的实例:', person2 instanceof Person);
+                
+                // 构造函数的问题：每个实例都会创建相同的方法副本
+                console.log('person1.greet === person2.greet:', person1.greet === person2.greet); // false
+            </div>
+            <button class="btn" onclick="runConstructorFunctionExample()">运行示例</button>
+            <div class="result-box" id="constructorFunctionResult"></div>
+        </div>
+        
+        <h3>2.4 原型和原型链</h3>
+        <div class="example-box">
+            <h4>示例：使用原型优化构造函数</h4>
+            <div class="code-block">
+                // 定义构造函数
+                function Person(name, age) {
+                    this.name = name;
+                    this.age = age;
+                }
+                
+                // 将方法添加到原型上，所有实例共享
+                Person.prototype.greet = function() {
+                    return `Hello, my name is ${this.name}`;
+                };
+                
+                Person.prototype.isAdult = function() {
+                    return this.age >= 18;
+                };
+                
+                // 创建实例
+                let person1 = new Person('John', 30);
+                let person2 = new Person('Jane', 17);
+                
+                console.log('person1:', person1);
+                console.log('person2:', person2);
+                console.log('person1.greet():', person1.greet());
+                console.log('person2.greet():', person2.greet());
+                console.log('person1.isAdult():', person1.isAdult()); // true
+                console.log('person2.isAdult():', person2.isAdult()); // false
+                
+                // 现在方法是共享的
+                console.log('person1.greet === person2.greet:', person1.greet === person2.greet); // true
+                
+                // 查看原型链
+                console.log('\n原型链信息:');
+                console.log('person1.__proto__ === Person.prototype:', person1.__proto__ === Person.prototype); // true
+                console.log('Person.prototype.__proto__ === Object.prototype:', Person.prototype.__proto__ === Object.prototype); // true
+                console.log('Object.prototype.__proto__:', Object.prototype.__proto__); // null
+            </div>
+            <button class="btn" onclick="runPrototypeExample()">运行示例</button>
+            <div class="result-box" id="prototypeResult"></div>
+        </div>
+        
+        <h3>2.5 ES6类</h3>
+        <div class="example-box">
+            <h4>示例：使用ES6类创建对象</h4>
+            <div class="code-block">
+                // 使用class关键字定义类
+                class Person {
+                    // 构造函数
+                    constructor(name, age) {
+                        this.name = name;
+                        this.age = age;
+                    }
+                    
+                    // 实例方法
+                    greet() {
+                        return `Hello, my name is ${this.name}`;
+                    }
+                    
+                    isAdult() {
+                        return this.age >= 18;
+                    }
+                    
+                    // 静态方法
+                    static createPerson(name, age) {
+                        return new Person(name, age);
+                    }
+                }
+                
+                // 创建实例
+                let person1 = new Person('John', 30);
+                let person2 = Person.createPerson('Jane', 25); // 使用静态方法创建
+                
+                console.log('person1:', person1);
+                console.log('person2:', person2);
+                console.log('person1.greet():', person1.greet());
+                console.log('person1.isAdult():', person1.isAdult());
+                console.log('person2.isAdult():', person2.isAdult());
+                
+                // ES6类本质上是原型的语法糖
+                console.log('\n类与原型关系:');
+                console.log('person1 instanceof Person:', person1 instanceof Person); // true
+                console.log('person1.__proto__ === Person.prototype:', person1.__proto__ === Person.prototype); // true
+                
+                // 尝试直接调用类（不使用new）会报错
+                try {
+                    let person3 = Person('Bob', 40);
+                } catch (error) {
+                    console.log('错误捕获:', error.message);
+                }
+            </div>
+            <button class="btn" onclick="runES6ClassExample()">运行示例</button>
+            <div class="result-box" id="es6ClassResult"></div>
+        </div>
+        
+        <h2>3. 对象属性操作</h2>
+        
+        <h3>3.1 访问和设置属性</h3>
+        <div class="example-box">
+            <h4>示例：对象属性的访问和设置</h4>
+            <div class="code-block">
+                let person = {
+                    name: 'John Doe',
+                    age: 30,
+                    'job-title': 'Developer' // 带连字符的属性名必须用引号
+                };
+                
+                // 点表示法访问属性
+                console.log('点表示法访问name:', person.name); // John Doe
+                
+                // 方括号表示法访问属性（适用于特殊字符或动态属性名）
+                console.log('方括号表示法访问name:', person['name']); // John Doe
+                console.log('访问带连字符的属性:', person['job-title']); // Developer
+                
+                // 动态属性名访问
+                let propName = 'age';
+                console.log('动态访问age属性:', person[propName]); // 30
+                
+                // 设置属性值
+                person.email = 'john@example.com'; // 添加新属性
+                person['phone'] = '123-456-7890'; // 使用方括号添加
+                console.log('添加属性后的对象:', person);
+                
+                // 修改现有属性
+                person.age = 31;
+                console.log('修改后的age:', person.age); // 31
+                
+                // 删除属性
+                delete person.phone;
+                console.log('删除phone后的对象:', person);
+            </div>
+            <button class="btn" onclick="runPropertyAccessExample()">运行示例</button>
+            <div class="result-box" id="propertyAccessResult"></div>
+        </div>
+        
+        <h3>3.2 属性描述符</h3>
+        <div class="example-box">
+            <h4>示例：使用属性描述符</h4>
+            <div class="code-block">
+                let person = {};
+                
+                // 使用Object.defineProperty添加属性
+                Object.defineProperty(person, 'name', {
+                    value: 'John',
+                    writable: false, // 不可写
+                    enumerable: true, // 可枚举
+                    configurable: true // 可配置
+                });
+                
+                Object.defineProperty(person, 'age', {
+                    value: 30,
+                    writable: true,
+                    enumerable: false, // 不可枚举
+                    configurable: false
+                });
+                
+                // 尝试修改不可写属性
+                console.log('原始name:', person.name); // John
+                person.name = 'Jane'; // 严格模式下会抛出错误
+                console.log('尝试修改后的name:', person.name); // 仍然是John
+                
+                // 尝试修改可写属性
+                console.log('原始age:', person.age); // 30
+                person.age = 31;
+                console.log('修改后的age:', person.age); // 31
+                
+                // 枚举属性
+                console.log('\n枚举属性:');
+                for (let key in person) {
+                    console.log(key + ':', person[key]); // 只显示name，不显示age
+                }
+                
+                console.log('\nObject.keys():', Object.keys(person)); // 只包含可枚举属性
+                
+                // 尝试删除不可配置属性
+                try {
+                    delete person.age;
+                } catch (error) {
+                    console.log('删除不可配置属性的错误:', error.message);
+                }
+                console.log('尝试删除后的age是否存在:', 'age' in person); // true
+                
+                // 获取属性描述符
+                console.log('\nname的描述符:', Object.getOwnPropertyDescriptor(person, 'name'));
+                console.log('age的描述符:', Object.getOwnPropertyDescriptor(person, 'age'));
+                
+                // 使用Object.defineProperties同时定义多个属性
+                Object.defineProperties(person, {
+                    job: {
+                        value: 'Developer',
+                        writable: true,
+                        enumerable: true
+                    },
+                    skills: {
+                        value: ['JavaScript', 'HTML', 'CSS'],
+                        writable: false,
+                        enumerable: true
+                    }
+                });
+                
+                console.log('\n添加多个属性后的对象:', person);
+                
+                // 虽然skills属性不可写，但数组本身仍然可以修改（因为引用没变）
+                person.skills.push('React');
+                console.log('修改后的skills数组:', person.skills); // ['JavaScript', 'HTML', 'CSS', 'React']
+            </div>
+            <button class="btn" onclick="runPropertyDescriptorExample()">运行示例</button>
+            <div class="result-box" id="propertyDescriptorResult"></div>
+        </div>
+        
+        <h3>3.3 getter和setter</h3>
+        <div class="example-box">
+            <h4>示例：使用getter和setter</h4>
+            <div class="code-block">
+                // 方法1：对象字面量中的getter和setter
+                let person1 = {
+                    firstName: 'John',
+                    lastName: 'Doe',
+                    
+                    // getter
+                    get fullName() {
+                        return `${this.firstName} ${this.lastName}`;
+                    },
+                    
+                    // setter
+                    set fullName(value) {
+                        let parts = value.split(' ');
+                        this.firstName = parts[0];
+                        this.lastName = parts[1];
+                    }
+                };
+                
+                console.log('person1的全名:', person1.fullName); // John Doe
+                person1.fullName = 'Jane Smith';
+                console.log('修改后的person1:', person1);
+                console.log('修改后的全名:', person1.fullName); // Jane Smith
+                
+                // 方法2：使用Object.defineProperty定义getter和setter
+                let person2 = {
+                    _age: 0, // 下划线表示私有属性（惯例）
+                    
+                    // 私有属性的getter
+                    get age() {
+                        return this._age;
+                    },
+                    
+                    // 私有属性的setter（带验证）
+                    set age(value) {
+                        if (typeof value !== 'number' || value < 0) {
+                            throw new Error('年龄必须是非负数');
+                        }
+                        this._age = value;
+                    }
+                };
+                
+                console.log('\n设置有效年龄:');
+                person2.age = 30;
+                console.log('person2的年龄:', person2.age); // 30
+                
+                console.log('\n尝试设置无效年龄:');
+                try {
+                    person2.age = -5;
+                } catch (error) {
+                    console.log('错误捕获:', error.message);
+                }
+                
+                // 方法3：ES6类中的getter和setter
+                class Rectangle {
+                    constructor(width, height) {
+                        this._width = width;
+                        this._height = height;
+                    }
+                    
+                    // getter方法
+                    get area() {
+                        return this._width * this._height;
+                    }
+                    
+                    // setter方法
+                    set width(value) {
+                        if (value > 0) {
+                            this._width = value;
+                        } else {
+                            throw new Error('宽度必须大于0');
+                        }
+                    }
+                    
+                    set height(value) {
+                        if (value > 0) {
+                            this._height = value;
+                        } else {
+                            throw new Error('高度必须大于0');
+                        }
+                    }
+                    
+                    get width() {
+                        return this._width;
+                    }
+                    
+                    get height() {
+                        return this._height;
+                    }
+                }
+                
+                console.log('\nES6类的getter和setter:');
+                let rect = new Rectangle(5, 10);
+                console.log('矩形面积:', rect.area); // 50
+                
+                rect.width = 8;
+                rect.height = 12;
+                console.log('修改后的宽度:', rect.width); // 8
+                console.log('修改后的高度:', rect.height); // 12
+                console.log('修改后的面积:', rect.area); // 96
+                
+                try {
+                    rect.width = -1;
+                } catch (error) {
+                    console.log('错误捕获:', error.message);
+                }
+            </div>
+            <button class="btn" onclick="runGetterSetterExample()">运行示例</button>
+            <div class="result-box" id="getterSetterResult"></div>
+        </div>
+        
+        <h2>4. 对象遍历和操作</h2>
+        
+        <h3>4.1 对象遍历方法</h3>
+        <div class="example-box">
+            <h4>示例：遍历对象的方法</h4>
+            <div class="code-block">
+                let person = {
+                    name: 'John Doe',
+                    age: 30,
+                    job: 'Developer',
+                    skills: ['JavaScript', 'HTML', 'CSS']
+                };
+                
+                console.log('1. for...in循环（遍历可枚举属性，包括原型链上的）:');
+                for (let key in person) {
+                    // 检查属性是否是对象自身的
+                    if (person.hasOwnProperty(key)) {
+                        console.log(`${key}:`, person[key]);
+                    }
+                }
+                
+                console.log('\n2. Object.keys()（返回可枚举的自身属性名数组）:');
+                let keys = Object.keys(person);
+                console.log('keys数组:', keys);
+                keys.forEach(key => {
+                    console.log(`${key}:`, person[key]);
+                });
+                
+                console.log('\n3. Object.values()（返回可枚举的自身属性值数组）:');
+                let values = Object.values(person);
+                console.log('values数组:', values);
+                
+                console.log('\n4. Object.entries()（返回可枚举的自身属性[key, value]数组）:');
+                let entries = Object.entries(person);
+                console.log('entries数组:', entries);
+                entries.forEach(([key, value]) => {
+                    console.log(`${key}:`, value);
+                });
+                
+                console.log('\n5. Object.getOwnPropertyNames()（返回所有自身属性名，包括不可枚举的）:');
+                // 创建一个包含不可枚举属性的对象
+                let objWithNonEnum = {};
+                Object.defineProperty(objWithNonEnum, 'enumProp', {
+                    value: '可枚举',
+                    enumerable: true
+                });
+                Object.defineProperty(objWithNonEnum, 'nonEnumProp', {
+                    value: '不可枚举',
+                    enumerable: false
+                });
+                
+                console.log('Object.keys:', Object.keys(objWithNonEnum));
+                console.log('Object.getOwnPropertyNames:', Object.getOwnPropertyNames(objWithNonEnum));
+                
+                console.log('\n6. Reflect.ownKeys()（返回所有自身属性名，包括Symbol和不可枚举的）:');
+                let sym = Symbol('test');
+                objWithNonEnum[sym] = 'Symbol属性';
+                console.log('Reflect.ownKeys:', Reflect.ownKeys(objWithNonEnum));
+            </div>
+            <button class="btn" onclick="runObjectIterationExample()">运行示例</button>
+            <div class="result-box" id="objectIterationResult"></div>
+        </div>
+        
+        <h3>4.2 对象合并和克隆</h3>
+        <div class="example-box">
+            <h4>示例：对象合并和克隆</h4>
+            <div class="code-block">
+                // 对象合并方法
+                let obj1 = { a: 1, b: 2 };
+                let obj2 = { b: 3, c: 4 };
+                
+                // 1. Object.assign() - 浅拷贝和合并
+                console.log('1. Object.assign():');
+                let mergedObj = Object.assign({}, obj1, obj2);
+                console.log('obj1:', obj1);
+                console.log('obj2:', obj2);
+                console.log('mergedObj:', mergedObj); // { a: 1, b: 3, c: 4 }
+                
+                // 2. 扩展运算符（ES6）
+                console.log('\n2. 扩展运算符:');
+                let mergedObj2 = { ...obj1, ...obj2 };
+                console.log('mergedObj2:', mergedObj2); // { a: 1, b: 3, c: 4 }
+                
+                // 对象克隆
+                let original = {
+                    name: 'John',
+                    address: {
+                        city: 'New York',
+                        country: 'USA'
+                    },
+                    skills: ['JavaScript', 'HTML']
+                };
+                
+                console.log('\n3. 浅拷贝（只拷贝顶层属性）:');
+                // 方法1：Object.assign
+                let shallowCopy1 = Object.assign({}, original);
+                
+                // 方法2：扩展运算符
+                let shallowCopy2 = { ...original };
+                
+                // 方法3：JSON.parse + JSON.stringify（深拷贝，但有局限性）
+                let deepCopy = JSON.parse(JSON.stringify(original));
+                
+                // 验证浅拷贝
+                shallowCopy1.name = 'Jane';
+                shallowCopy1.address.city = 'Boston'; // 会影响原对象，因为是引用
+                
+                console.log('修改后的original:', original.name); // name没变，还是John
+                console.log('original.address.city:', original.address.city); // 变成了Boston
+                
+                // 验证深拷贝
+                deepCopy.name = 'Bob';
+                deepCopy.address.city = 'Chicago'; // 不会影响原对象
+                
+                console.log('\n4. 深拷贝验证:');
+                console.log('original.address.city:', original.address.city); // 仍然是Boston
+                console.log('deepCopy.address.city:', deepCopy.address.city); // Chicago
+                
+                // 注意：JSON方法的局限性
+                let objWithFunctions = {
+                    name: 'John',
+                    greet: function() { return 'Hello'; },
+                    date: new Date(),
+                    regex: /test/
+                };
+                
+                let copyWithJSON = JSON.parse(JSON.stringify(objWithFunctions));
+                console.log('\n5. JSON方法的局限性:');
+                console.log('原始对象类型:', typeof objWithFunctions.greet); // function
+                console.log('拷贝后类型:', typeof copyWithJSON.greet); // undefined（函数丢失）
+                console.log('date类型:', copyWithJSON.date); // 变成了字符串
+                console.log('regex类型:', copyWithJSON.regex); // 变成了object {}（正则表达式丢失）
+                
+                // 自定义深拷贝函数（简单实现）
+                function deepClone(obj) {
+                    if (obj === null || typeof obj !== 'object') return obj;
+                    if (obj instanceof Date) return new Date(obj.getTime());
+                    if (obj instanceof RegExp) return new RegExp(obj);
+                    if (obj instanceof Array) {
+                        let cloneArr = [];
+                        for (let i = 0; i < obj.length; i++) {
+                            cloneArr[i] = deepClone(obj[i]);
+                        }
+                        return cloneArr;
+                    }
+                    // 普通对象
+                    let cloneObj = {};
+                    for (let key in obj) {
+                        if (obj.hasOwnProperty(key)) {
+                            cloneObj[key] = deepClone(obj[key]);
+                        }
+                    }
+                    return cloneObj;
+                }
+                
+                // 测试自定义深拷贝函数
+                let customDeepCopy = deepClone(objWithFunctions);
+                console.log('\n6. 自定义深拷贝函数:');
+                console.log('greet类型:', typeof customDeepCopy.greet); // function
+                console.log('date类型:', customDeepCopy.date instanceof Date); // true
+                console.log('regex类型:', customDeepCopy.regex instanceof RegExp); // true
+            </div>
+            <button class="btn" onclick="runObjectMergeCloneExample()">运行示例</button>
+            <div class="result-box" id="objectMergeCloneResult"></div>
+        </div>
+        
+        <h2>5. 对象高级特性</h2>
+        
+        <h3>5.1 Symbol作为属性名</h3>
+        <div class="example-box">
+            <h4>示例：使用Symbol作为属性名</h4>
+            <div class="code-block">
+                // 创建Symbol
+                let sym1 = Symbol('description');
+                let sym2 = Symbol('description');
+                
+                // 每个Symbol都是唯一的
+                console.log('sym1 === sym2:', sym1 === sym2); // false
+                
+                // 使用Symbol作为属性名
+                let person = {
+                    name: 'John',
+                    [sym1]: 'private data', // Symbol作为属性名
+                    [Symbol('id')]: 12345
+                };
+                
+                // Symbol属性不会出现在常规遍历中
+                console.log('\n常规遍历:');
+                console.log('Object.keys:', Object.keys(person)); // 只包含'name'
+                
+                for (let key in person) {
+                    console.log(key, ':', person[key]); // 只显示name
+                }
+                
+                // 获取Symbol属性
+                console.log('\n获取Symbol属性:');
+                let symbolKeys = Object.getOwnPropertySymbols(person);
+                console.log('Symbol keys:', symbolKeys);
+                
+                symbolKeys.forEach(sym => {
+                    console.log(sym.description, ':', person[sym]);
+                });
+                
+                // Symbol.for() - 创建全局Symbol
+                let globalSym1 = Symbol.for('globalSymbol');
+                let globalSym2 = Symbol.for('globalSymbol');
+                console.log('\nglobalSym1 === globalSym2:', globalSym1 === globalSym2); // true
+                
+                // Symbol.keyFor() - 获取全局Symbol的键
+                console.log('Symbol.keyFor(globalSym1):', Symbol.keyFor(globalSym1)); // 'globalSymbol'
+                console.log('Symbol.keyFor(sym1):', Symbol.keyFor(sym1)); // undefined（非全局）
+                
+                // 使用Symbol作为常量
+                const COLORS = {
+                    RED: Symbol('red'),
+                    GREEN: Symbol('green'),
+                    BLUE: Symbol('blue')
+                };
+                
+                function getColorName(color) {
+                    switch (color) {
+                        case COLORS.RED:
+                            return '红色';
+                        case COLORS.GREEN:
+                            return '绿色';
+                        case COLORS.BLUE:
+                            return '蓝色';
+                        default:
+                            return '未知颜色';
+                    }
+                }
+                
+                console.log('\nSymbol常量示例:');
+                console.log(getColorName(COLORS.RED)); // '红色'
+                console.log(getColorName(Symbol('red'))); // '未知颜色'（不同的Symbol）
+            </div>
+            <button class="btn" onclick="runSymbolExample()">运行示例</button>
+            <div class="result-box" id="symbolResult"></div>
+        </div>
+        
+        <h3>5.2 对象代理（Proxy）</h3>
+        <div class="example-box">
+            <h4>示例：使用Proxy拦截对象操作</h4>
+            <div class="code-block">
+                // 创建目标对象
+                let target = {
+                    name: 'John',
+                    age: 30
+                };
+                
+                // 创建代理处理器
+                let handler = {
+                    // 拦截属性获取
+                    get: function(target, prop, receiver) {
+                        console.log(`获取属性: ${prop}`);
+                        // 如果属性不存在，返回默认值
+                        return prop in target ? target[prop] : `未定义的属性: ${prop}`;
+                    },
+                    
+                    // 拦截属性设置
+                    set: function(target, prop, value, receiver) {
+                        console.log(`设置属性: ${prop} = ${value}`);
+                        // 验证年龄必须是数字且大于0
+                        if (prop === 'age' && (typeof value !== 'number' || value < 0)) {
+                            throw new Error('年龄必须是非负数');
+                        }
+                        target[prop] = value;
+                        return true; // 必须返回true表示设置成功
+                    },
+                    
+                    // 拦截属性删除
+                    deleteProperty: function(target, prop) {
+                        console.log(`删除属性: ${prop}`);
+                        // 禁止删除name属性
+                        if (prop === 'name') {
+                            throw new Error('不能删除name属性');
+                        }
+                        delete target[prop];
+                        return true;
+                    },
+                    
+                    // 拦截in操作符
+                    has: function(target, prop) {
+                        console.log(`检查属性是否存在: ${prop}`);
+                        return prop in target;
+                    },
+                    
+                    // 拦截Object.getOwnPropertyDescriptor
+                    getOwnPropertyDescriptor: function(target, prop) {
+                        console.log(`获取属性描述符: ${prop}`);
+                        return Object.getOwnPropertyDescriptor(target, prop);
+                    }
+                };
+                
+                // 创建代理
+                let proxy = new Proxy(target, handler);
+                
+                console.log('\n1. 测试get拦截器:');
+                console.log('proxy.name:', proxy.name);
+                console.log('proxy.email:', proxy.email); // 不存在的属性
+                
+                console.log('\n2. 测试set拦截器:');
+                proxy.age = 31;
+                console.log('修改后的age:', proxy.age);
+                
+                try {
+                    proxy.age = -5;
+                } catch (error) {
+                    console.log('错误捕获:', error.message);
+                }
+                
+                console.log('\n3. 测试has拦截器:');
+                console.log('name' in proxy);
+                console.log('email' in proxy);
+                
+                console.log('\n4. 测试deleteProperty拦截器:');
+                try {
+                    delete proxy.name;
+                } catch (error) {
+                    console.log('错误捕获:', error.message);
+                }
+                
+                delete proxy.age;
+                console.log('删除age后的代理:', proxy.age);
+                
+                console.log('\n5. 测试getOwnPropertyDescriptor拦截器:');
+                console.log(Object.getOwnPropertyDescriptor(proxy, 'name'));
+                
+                // 其他拦截器示例：ownKeys, apply, construct等
+                
+                // 保护对象属性的代理示例
+                console.log('\n6. 只读代理示例:');
+                let readOnlyTarget = {
+                    name: 'Protected',
+                    data: 'Sensitive'
+                };
+                
+                let readOnlyHandler = {
+                    set: function() {
+                        throw new Error('这是只读对象，不能修改属性');
+                    },
+                    deleteProperty: function() {
+                        throw new Error('这是只读对象，不能删除属性');
+                    }
+                };
+                
+                let readOnlyProxy = new Proxy(readOnlyTarget, readOnlyHandler);
+                
+                try {
+                    readOnlyProxy.name = 'New Name';
+                } catch (error) {
+                    console.log('错误捕获:', error.message);
+                }
+                
+                // 访问控制代理示例
+                console.log('\n7. 访问控制代理示例:');
+                let user = {
+                    username: 'admin',
+                    password: 'secret',
+                    role: 'admin',
+                    getData: function() {
+                        return '敏感数据';
+                    }
+                };
+                
+                let accessControlHandler = {
+                    get: function(target, prop, receiver) {
+                        // 控制对敏感属性的访问
+                        if (prop === 'password') {
+                            throw new Error('密码不能直接访问');
+                        }
+                        return target[prop];
+                    }
+                };
+                
+                let secureUser = new Proxy(user, accessControlHandler);
+                
+                try {
+                    console.log(secureUser.password);
+                } catch (error) {
+                    console.log('错误捕获:', error.message);
+                }
+                
+                console.log('username可以访问:', secureUser.username);
+            </div>
+            <button class="btn" onclick="runProxyExample()">运行示例</button>
+            <div class="result-box" id="proxyResult"></div>
+        </div>
+        
+        <h3>5.3 对象冻结和密封</h3>
+        <div class="example-box">
+            <h4>示例：对象冻结和密封</h4>
+            <div class="code-block">
+                // 创建原始对象
+                let original = {
+                    name: 'John',
+                    age: 30,
+                    address: {
+                        city: 'New York',
+                        country: 'USA'
+                    }
+                };
+                
+                // 1. Object.preventExtensions() - 防止对象扩展（不能添加新属性）
+                console.log('\n1. Object.preventExtensions():');
+                let extensibleObj = { ...original };
+                Object.preventExtensions(extensibleObj);
+                
+                // 尝试添加新属性
+                extensibleObj.email = 'john@example.com';
+                console.log('email属性是否添加成功:', 'email' in extensibleObj); // false
+                
+                // 仍然可以修改和删除现有属性
+                extensibleObj.age = 31;
+                delete extensibleObj.name;
+                console.log('修改后的age:', extensibleObj.age); // 31
+                console.log('name属性是否存在:', 'name' in extensibleObj); // false
+                
+                // 检查对象是否可扩展
+                console.log('对象是否可扩展:', Object.isExtensible(extensibleObj)); // false
+                
+                // 2. Object.seal() - 密封对象（不能添加或删除属性，但可以修改）
+                console.log('\n2. Object.seal():');
+                let sealedObj = { ...original };
+                Object.seal(sealedObj);
+                
+                // 尝试添加新属性
+                sealedObj.email = 'john@example.com';
+                console.log('email属性是否添加成功:', 'email' in sealedObj); // false
+                
+                // 尝试删除属性
+                delete sealedObj.name;
+                console.log('name属性是否被删除:', 'name' in sealedObj); // true（仍然存在）
+                
+                // 可以修改现有属性
+                sealedObj.age = 32;
+                console.log('修改后的age:', sealedObj.age); // 32
+                
+                // 检查对象是否密封
+                console.log('对象是否密封:', Object.isSealed(sealedObj)); // true
+                console.log('对象是否可扩展:', Object.isExtensible(sealedObj)); // false（密封的对象自动不可扩展）
+                
+                // 3. Object.freeze() - 冻结对象（不能添加、删除或修改属性）
+                console.log('\n3. Object.freeze():');
+                let frozenObj = { ...original };
+                Object.freeze(frozenObj);
+                
+                // 尝试修改属性
+                frozenObj.age = 33;
+                console.log('修改后的age:', frozenObj.age); // 30（没有变化）
+                
+                // 尝试添加新属性
+                frozenObj.email = 'john@example.com';
+                console.log('email属性是否添加成功:', 'email' in frozenObj); // false
+                
+                // 尝试删除属性
+                delete frozenObj.name;
+                console.log('name属性是否被删除:', 'name' in frozenObj); // true（仍然存在）
+                
+                // 检查对象是否冻结
+                console.log('对象是否冻结:', Object.isFrozen(frozenObj)); // true
+                console.log('对象是否密封:', Object.isSealed(frozenObj)); // true（冻结的对象自动密封）
+                console.log('对象是否可扩展:', Object.isExtensible(frozenObj)); // false（冻结的对象自动不可扩展）
+                
+                // 注意：这些方法都是浅层次的，不影响嵌套对象
+                console.log('\n4. 嵌套对象注意事项:');
+                frozenObj.address.city = 'Boston'; // 可以修改嵌套对象的属性
+                console.log('修改后的城市:', frozenObj.address.city); // Boston
+                
+                // 实现深冻结
+                function deepFreeze(obj) {
+                    if (obj === null || typeof obj !== 'object') return obj;
+                    
+                    // 获取所有属性名
+                    let propNames = Object.getOwnPropertyNames(obj);
+                    
+                    // 递归冻结每个属性
+                    propNames.forEach(name => {
+                        let prop = obj[name];
+                        if (typeof prop === 'object' && prop !== null) {
+                            deepFreeze(prop);
+                        }
+                    });
+                    
+                    return Object.freeze(obj);
+                }
+                
+                let objToDeepFreeze = { ...original };
+                deepFreeze(objToDeepFreeze);
+                
+                // 尝试修改嵌套对象
+                objToDeepFreeze.address.city = 'Chicago';
+                console.log('\n5. 深冻结后修改嵌套对象:');
+                console.log('修改后的城市:', objToDeepFreeze.address.city); // 仍然是Boston（在严格模式下会报错）
+            </div>
+            <button class="btn" onclick="runObjectProtectionExample()">运行示例</button>
+            <div class="result-box" id="objectProtectionResult"></div>
+        </div>
+        
+        <h2>6. 对象最佳实践</h2>
+        
+        <div class="highlight">
+            <h3>6.1 推荐做法</h3>
+            <ul>
+                <li>使用对象字面量（{}）创建对象，而不是Object构造函数</li>
+                <li>使用ES6的class语法进行面向对象编程</li>
+                <li>对于简单的数据集合，使用Map或Set而不是普通对象</li>
+                <li>避免使用for...in循环遍历对象，使用Object.keys()等方法代替</li>
+                <li>使用Symbol作为私有属性的键</li>
+                <li>使用Proxy进行对象操作的拦截和验证</li>
+            </ul>
+        </div>
+        
+        <div class="warning">
+            <h3>6.2 避免的做法</h3>
+            <ul>
+                <li>不要在原型链上修改内置对象的方法</li>
+                <li>避免使用delete操作符（性能较差），考虑使用null或undefined代替</li>
+                <li>不要使用__proto__（已废弃，使用Object.getPrototypeOf/setPrototypeOf代替）</li>
+                <li>避免对象属性名与JavaScript关键字或保留字冲突</li>
+                <li>不要过度嵌套对象，保持扁平结构便于维护</li>
+            </ul>
+        </div>
+    </div>
+    
+    <script>
+        // 用于显示结果的辅助函数
+        function displayResult(elementId, content) {
+            const resultElement = document.getElementById(elementId);
+            // 将换行符转换为HTML换行标签
+            content = content.replace(/\n/g, '<br>');
+            // 将连续空格转换为非换行空格
+            content = content.replace(/  /g, '&nbsp;&nbsp;');
+            resultElement.innerHTML = content;
+        }
+        
+        // 1. 对象字面量示例
+        function runObjectLiteralExample() {
+            let output = '';
+            try {
+                // 基本对象字面量
+                let person = {
+                    name: 'John Doe',
+                    age: 30,
+                    isEmployed: true,
+                    greet: function() {
+                        return `Hello, my name is ${this.name}`;
+                    }
+                };
+                
+                output += 'person对象: ' + JSON.stringify(person) + '\n';
+                output += 'person.name: ' + person.name + '\n';
+                output += '调用greet方法: ' + person.greet() + '\n';
+                
+                // 空对象
+                let emptyObject = {};
+                output += '空对象: ' + JSON.stringify(emptyObject) + '\n';
+                
+                // 动态属性名（ES6）
+                let dynamicKey = 'job';
+                let personWithDynamicKey = {
+                    name: 'Jane Smith',
+                    [dynamicKey]: 'Developer'
+                };
+                output += '带动态属性的对象: ' + JSON.stringify(personWithDynamicKey) + '\n';
+                
+                // 简写属性名和方法（ES6）
+                let name = 'Bob';
+                let age = 25;
+                let personWithShorthand = {
+                    name, // 简写属性名
+                    age,
+                    greet() { // 简写方法
+                        return `Hello, I'm ${this.name}`;
+                    }
+                };
+                output += '使用简写语法的对象: ' + JSON.stringify(personWithShorthand) + '\n';
+                output += '调用简写方法: ' + personWithShorthand.greet() + '\n';
+            } catch (error) {
+                output += '错误: ' + error.message;
+            }
+            displayResult('objectLiteralResult', output);
+        }
+        
+        // 2. Object构造函数示例
+        function runObjectConstructorExample() {
+            let output = '';
+            try {
+                // 创建空对象
+                let person1 = new Object();
+                person1.name = 'John';
+                person1.age = 30;
+                person1.greet = function() {
+                    return `Hello, I'm ${this.name}`;
+                };
+                
+                output += '使用Object构造函数创建的对象: ' + JSON.stringify(person1) + '\n';
+                output += 'person1.name: ' + person1.name + '\n';
+                output += '调用greet方法: ' + person1.greet() + '\n';
+                
+                // 使用Object.create()创建对象（指定原型）
+                let animalProto = {
+                    type: 'unknown',
+                    speak: function() {
+                        return 'Some sound';
+                    }
+                };
+                
+                let dog = Object.create(animalProto);
+                dog.type = 'dog';
+                dog.name = 'Rex';
+                dog.speak = function() {
+                    return 'Woof!';
+                };
+                
+                output += '\n使用Object.create创建的对象: ' + JSON.stringify(dog) + '\n';
+                output += 'dog.name: ' + dog.name + '\n';
+                output += 'dog.type: ' + dog.type + '\n';
+                output += '调用speak方法: ' + dog.speak() + '\n';
+                output += '是否继承自动物原型: ' + (Object.getPrototypeOf(dog) === animalProto) + '\n';
+            } catch (error) {
+                output += '错误: ' + error.message;
+            }
+            displayResult('objectConstructorResult', output);
+        }
+        
+        // 3. 构造函数示例
+        function runConstructorFunctionExample() {
+            let output = '';
+            try {
+                // 定义构造函数
+                function Person(name, age, job) {
+                    this.name = name;
+                    this.age = age;
+                    this.job = job;
+                    this.greet = function() {
+                        return `Hello, my name is ${this.name}`;
+                    };
+                }
+                
+                // 使用new关键字创建实例
+                let person1 = new Person('John', 30, 'Developer');
+                let person2 = new Person('Jane', 25, 'Designer');
+                
+                output += 'person1: ' + JSON.stringify(person1) + '\n';
+                output += 'person2: ' + JSON.stringify(person2) + '\n';
+                output += 'person1.greet(): ' + person1.greet() + '\n';
+                output += 'person2.greet(): ' + person2.greet() + '\n';
+                output += 'person1是否是Person的实例: ' + (person1 instanceof Person) + '\n';
+                output += 'person2是否是Person的实例: ' + (person2 instanceof Person) + '\n';
+                
+                // 构造函数的问题：每个实例都会创建相同的方法副本
+                output += 'person1.greet === person2.greet: ' + (person1.greet === person2.greet) + '\n';
+            } catch (error) {
+                output += '错误: ' + error.message;
+            }
+            displayResult('constructorFunctionResult', output);
+        }
+        
+        // 4. 原型示例
+        function runPrototypeExample() {
+            let output = '';
+            try {
+                // 定义构造函数
+                function Person(name, age) {
+                    this.name = name;
+                    this.age = age;
+                }
+                
+                // 将方法添加到原型上，所有实例共享
+                Person.prototype.greet = function() {
+                    return `Hello, my name is ${this.name}`;
+                };
+                
+                Person.prototype.isAdult = function() {
+                    return this.age >= 18;
+                };
+                
+                // 创建实例
+                let person1 = new Person('John', 30);
+                let person2 = new Person('Jane', 17);
+                
+                output += 'person1: ' + JSON.stringify(person1) + '\n';
+                output += 'person2: ' + JSON.stringify(person2) + '\n';
+                output += 'person1.greet(): ' + person1.greet() + '\n';
+                output += 'person2.greet(): ' + person2.greet() + '\n';
+                output += 'person1.isAdult(): ' + person1.isAdult() + '\n';
+                output += 'person2.isAdult(): ' + person2.isAdult() + '\n';
+                
+                // 现在方法是共享的
+                output += 'person1.greet === person2.greet: ' + (person1.greet === person2.greet) + '\n';
+                
+                // 查看原型链
+                output += '\n原型链信息:\n';
+                output += 'person1.__proto__ === Person.prototype: ' + (person1.__proto__ === Person.prototype) + '\n';
+                output += 'Person.prototype.__proto__ === Object.prototype: ' + (Person.prototype.__proto__ === Object.prototype) + '\n';
+                output += 'Object.prototype.__proto__: ' + Object.prototype.__proto__ + '\n';
+            } catch (error) {
+                output += '错误: ' + error.message;
+            }
+            displayResult('prototypeResult', output);
+        }
+        
+        // 5. ES6类示例
+        function runES6ClassExample() {
+            let output = '';
+            try {
+                // 使用class关键字定义类
+                class Person {
+                    // 构造函数
+                    constructor(name, age) {
+                        this.name = name;
+                        this.age = age;
+                    }
+                    
+                    // 实例方法
+                    greet() {
+                        return `Hello, my name is ${this.name}`;
+                    }
+                    
+                    isAdult() {
+                        return this.age >= 18;
+                    }
+                    
+                    // 静态方法
+                    static createPerson(name, age) {
+                        return new Person(name, age);
+                    }
+                }
+                
+                // 创建实例
+                let person1 = new Person('John', 30);
+                let person2 = Person.createPerson('Jane', 25); // 使用静态方法创建
+                
+                output += 'person1: ' + JSON.stringify(person1) + '\n';
+                output += 'person2: ' + JSON.stringify(person2) + '\n';
+                output += 'person1.greet(): ' + person1.greet() + '\n';
+                output += 'person1.isAdult(): ' + person1.isAdult() + '\n';
+                output += 'person2.isAdult(): ' + person2.isAdult() + '\n';
+                
+                // ES6类本质上是原型的语法糖
+                output += '\n类与原型关系:\n';
+                output += 'person1 instanceof Person: ' + (person1 instanceof Person) + '\n';
+                output += 'person1.__proto__ === Person.prototype: ' + (person1.__proto__ === Person.prototype) + '\n';
+                
+                // 尝试直接调用类（不使用new）会报错
+                try {
+                    let person3 = Person('Bob', 40);
+                } catch (error) {
+                    output += '错误捕获: ' + error.message + '\n';
+                }
+            } catch (error) {
+                output += '错误: ' + error.message;
+            }
+            displayResult('es6ClassResult', output);
+        }
+        
+        // 6. 属性访问示例
+        function runPropertyAccessExample() {
+            let output = '';
+            try {
+                let person = {
+                    name: 'John Doe',
+                    age: 30,
+                    'job-title': 'Developer' // 带连字符的属性名必须用引号
+                };
+                
+                // 点表示法访问属性
+                output += '点表示法访问name: ' + person.name + '\n';
+                
+                // 方括号表示法访问属性（适用于特殊字符或动态属性名）
+                output += '方括号表示法访问name: ' + person['name'] + '\n';
+                output += '访问带连字符的属性: ' + person['job-title'] + '\n';
+                
+                // 动态属性名访问
+                let propName = 'age';
+                output += '动态访问age属性: ' + person[propName] + '\n';
+                
+                // 设置属性值
+                person.email = 'john@example.com'; // 添加新属性
+                person['phone'] = '123-456-7890'; // 使用方括号添加
+                output += '添加属性后的对象: ' + JSON.stringify(person) + '\n';
+                
+                // 修改现有属性
+                person.age = 31;
+                output += '修改后的age: ' + person.age + '\n';
+                
+                // 删除属性
+                delete person.phone;
+                output += '删除phone后的对象: ' + JSON.stringify(person) + '\n';
+            } catch (error) {
+                output += '错误: ' + error.message;
+            }
+            displayResult('propertyAccessResult', output);
+        }
+        
+        // 7. 属性描述符示例
+        function runPropertyDescriptorExample() {
+            let output = '';
+            try {
+                let person = {};
+                
+                // 使用Object.defineProperty添加属性
+                Object.defineProperty(person, 'name', {
+                    value: 'John',
+                    writable: false, // 不可写
+                    enumerable: true, // 可枚举
+                    configurable: true // 可配置
+                });
+                
+                Object.defineProperty(person, 'age', {
+                    value: 30,
+                    writable: true,
+                    enumerable: false, // 不可枚举
+                    configurable: false
+                });
+                
+                // 尝试修改不可写属性
+                output += '原始name: ' + person.name + '\n';
+                person.name = 'Jane'; // 严格模式下会抛出错误
+                output += '尝试修改后的name: ' + person.name + '\n';
+                
+                // 尝试修改可写属性
+                output += '原始age: ' + person.age + '\n';
+                person.age = 31;
+                output += '修改后的age: ' + person.age + '\n';
+                
+                // 枚举属性
+                output += '\n枚举属性:\n';
+                for (let key in person) {
+                    output += key + ': ' + person[key] + '\n';
+                }
+                
+                output += '\nObject.keys(): ' + JSON.stringify(Object.keys(person)) + '\n';
+                
+                // 尝试删除不可配置属性
+                try {
+                    delete person.age;
+                } catch (error) {
+                    output += '删除不可配置属性的错误: ' + error.message + '\n';
+                }
+                output += '尝试删除后的age是否存在: ' + ('age' in person) + '\n';
+                
+                // 获取属性描述符
+                output += '\nname的描述符: ' + JSON.stringify(Object.getOwnPropertyDescriptor(person, 'name')) + '\n';
+                output += 'age的描述符: ' + JSON.stringify(Object.getOwnPropertyDescriptor(person, 'age')) + '\n';
+                
+                // 使用Object.defineProperties同时定义多个属性
+                Object.defineProperties(person, {
+                    job: {
+                        value: 'Developer',
+                        writable: true,
+                        enumerable: true
+                    },
+                    skills: {
+                        value: ['JavaScript', 'HTML', 'CSS'],
+                        writable: false,
+                        enumerable: true
+                    }
+                });
+                
+                output += '\n添加多个属性后的对象: ' + JSON.stringify(person) + '\n';
+                
+                // 虽然skills属性不可写，但数组本身仍然可以修改（因为引用没变）
+                person.skills.push('React');
+                output += '修改后的skills数组: ' + JSON.stringify(person.skills) + '\n';
+            } catch (error) {
+                output += '错误: ' + error.message;
+            }
+            displayResult('propertyDescriptorResult', output);
+        }
+        
+        // 8. getter和setter示例
+        function runGetterSetterExample() {
+            let output = '';
+            try {
+                // 方法1：对象字面量中的getter和setter
+                let person1 = {
+                    firstName: 'John',
+                    lastName: 'Doe',
+                    
+                    // getter
+                    get fullName() {
+                        return `${this.firstName} ${this.lastName}`;
+                    },
+                    
+                    // setter
+                    set fullName(value) {
+                        let parts = value.split(' ');
+                        this.firstName = parts[0];
+                        this.lastName = parts[1];
+                    }
+                };
+                
+                output += 'person1的全名: ' + person1.fullName + '\n';
+                person1.fullName = 'Jane Smith';
+                output += '修改后的person1: ' + JSON.stringify(person1) + '\n';
+                output += '修改后的全名: ' + person1.fullName + '\n';
+                
+                // 方法2：使用Object.defineProperty定义getter和setter
+                let person2 = {
+                    _age: 0, // 下划线表示私有属性（惯例）
+                    
+                    // 私有属性的getter
+                    get age() {
+                        return this._age;
+                    },
+                    
+                    // 私有属性的setter（带验证）
+                    set age(value) {
+                        if (typeof value !== 'number' || value < 0) {
+                            throw new Error('年龄必须是非负数');
+                        }
+                        this._age = value;
+                    }
+                };
+                
+                output += '\n设置有效年龄:\n';
+                person2.age = 30;
+                output += 'person2的年龄: ' + person2.age + '\n';
+                
+                output += '\n尝试设置无效年龄:\n';
+                try {
+                    person2.age = -5;
+                } catch (error) {
+                    output += '错误捕获: ' + error.message + '\n';
+                }
+                
+                // 方法3：ES6类中的getter和setter
+                class Rectangle {
+                    constructor(width, height) {
+                        this._width = width;
+                        this._height = height;
+                    }
+                    
+                    // getter方法
+                    get area() {
+                        return this._width * this._height;
+                    }
+                    
+                    // setter方法
+                    set width(value) {
+                        if (value > 0) {
+                            this._width = value;
+                        } else {
+                            throw new Error('宽度必须大于0');
+                        }
+                    }
+                    
+                    set height(value) {
+                        if (value > 0) {
+                            this._height = value;
+                        } else {
+                            throw new Error('高度必须大于0');
+                        }
+                    }
+                    
+                    get width() {
+                        return this._width;
+                    }
+                    
+                    get height() {
+                        return this._height;
+                    }
+                }
+                
+                output += '\nES6类的getter和setter:\n';
+                let rect = new Rectangle(5, 10);
+                output += '矩形面积: ' + rect.area + '\n';
+                
+                rect.width = 8;
+                rect.height = 12;
+                output += '修改后的宽度: ' + rect.width + '\n';
+                output += '修改后的高度: ' + rect.height + '\n';
+                output += '修改后的面积: ' + rect.area + '\n';
+                
+                try {
+                    rect.width = -1;
+                } catch (error) {
+                    output += '错误捕获: ' + error.message + '\n';
+                }
+            } catch (error) {
+                output += '错误: ' + error.message;
+            }
+            displayResult('getterSetterResult', output);
+        }
+        
+        // 9. 对象遍历示例
+        function runObjectIterationExample() {
+            let output = '';
+            try {
+                let person = {
+                    name: 'John Doe',

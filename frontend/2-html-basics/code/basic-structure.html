@@ -1,0 +1,111 @@
+\u003c!DOCTYPE html\u003e
+\u003chtml lang="zh-CN"\u003e
+\u003chead\u003e
+    \u003cmeta charset="UTF-8"\u003e
+    \u003cmeta name="viewport" content="width=device-width, initial-scale=1.0"\u003e
+    \u003ctitle\u003eHTML基础结构示例\u003c/title\u003e
+    \u003cstyle\u003e
+        /* 简单的CSS样式，让页面更易读 */
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .code-block {
+            background-color: #f4f4f4;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-family: monospace;
+            white-space: pre;
+        }
+        .highlight {
+            background-color: #fffacd;
+            padding: 10px;
+            border-left: 4px solid #ffd700;
+            margin: 15px 0;
+        }
+    \u003c/style\u003e
+\u003c/head\u003e
+\u003cbody\u003e
+    \u003ch1\u003eHTML基础结构示例\u003c/h1\u003e
+    \u003cp\u003e这个页面展示了HTML文档的基本结构和各个部分的作用。\u003c/p\u003e
+    
+    \u003ch2\u003eHTML文档结构解析\u003c/h2\u003e
+    
+    \u003cp\u003e一个标准的HTML文档包含以下主要部分：\u003c/p\u003e
+    
+    \u003cul\u003e
+        \u003cli\u003e\u003cstrong\u003e\u003c!DOCTYPE html\u003e\u003c/strong\u003e - 文档类型声明，告诉浏览器这是HTML5文档\u003c/li\u003e
+        \u003cli\u003e\u003cstrong\u003e\u003chtml\u003e\u003c/strong\u003e - HTML文档的根元素，所有其他元素都嵌套在其中\u003c/li\u003e
+        \u003cli\u003e\u003cstrong\u003e\u003chead\u003e\u003c/strong\u003e - 包含文档的元数据，如标题、字符集、样式等\u003c/li\u003e
+        \u003cli\u003e\u003cstrong\u003e\u003cbody\u003e\u003c/strong\u003e - 包含网页的可见内容，如文本、图片、链接等\u003c/li\u003e
+    \u003c/ul\u003e
+    
+    \u003ch2\u003eHTML结构代码示例\u003c/h2\u003e
+    
+    \u003cdiv class="code-block"\u003e
+&lt;!DOCTYPE html&gt;
+&lt;html lang="zh-CN"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;页面标题&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;!-- 页面内容 --&gt;
+    &lt;h1&gt;这是一个标题&lt;/h1&gt;
+    &lt;p&gt;这是一个段落。&lt;/p&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+    \u003c/div\u003e
+    
+    \u003ch2\u003e\html\u003e元素详解\u003c/h2\u003e
+    \u003cp\u003e\u003chtml\u003e元素是整个HTML文档的根元素，所有其他元素都必须是它的后代。它通常包含一个lang属性，指定页面的主要语言。\u003c/p\u003e
+    
+    \u003ch3\u003ehead部分详解\u003c/h3\u003e
+    \u003cp\u003e\u003chead\u003e部分包含了文档的元数据，这些信息不会直接显示在页面上，但对浏览器和搜索引擎很重要。常见的元素有：\u003c/p\u003e
+    
+    \u003cul\u003e
+        \u003cli\u003e\u003cstrong\u003e\u003cmeta charset="UTF-8"\u003e\u003c/strong\u003e - 指定文档使用的字符编码，UTF-8支持几乎所有语言\u003c/li\u003e
+        \u003cli\u003e\u003cstrong\u003e\u003cmeta name="viewport" content="width=device-width, initial-scale=1.0"\u003e\u003c/strong\u003e - 设置视口，确保页面在移动设备上正确显示\u003c/li\u003e
+        \u003cli\u003e\u003cstrong\u003e\u003ctitle\u003e\u003c/strong\u003e - 定义页面的标题，显示在浏览器标签栏和搜索结果中\u003c/li\u003e
+        \u003cli\u003e\u003cstrong\u003e\u003clink\u003e\u003c/strong\u003e - 链接外部资源，如CSS文件或图标\u003c/li\u003e
+        \u003cli\u003e\u003cstrong\u003e\u003cstyle\u003e\u003c/strong\u003e - 包含内联CSS样式\u003c/li\u003e
+        \u003cli\u003e\u003cstrong\u003e\u003cscript\u003e\u003c/strong\u003e - 包含JavaScript代码或链接外部JavaScript文件\u003c/li\u003e
+    \u003c/ul\u003e
+    
+    \u003ch3\u003eBody部分详解\u003c/h3\u003e
+    \u003cp\u003e\u003cbody\u003e部分包含了页面的所有可见内容。这是用户在浏览器中看到的部分。常见的元素有：\u003c/p\u003e
+    
+    \u003cul\u003e
+        \u003cli\u003e标题元素（\u003ch1\u003e到\u003ch6\u003e）\u003c/li\u003e
+        \u003cli\u003e段落元素（\u003cp\u003e）\u003c/li\u003e
+        \u003cli\u003e链接元素（\u003ca\u003e）\u003c/li\u003e
+        \u003cli\u003e图像元素（\u003cimg\u003e）\u003c/li\u003e
+        \u003cli\u003e列表元素（\u003cul\u003e、\u003col\u003e、\u003cli\u003e）\u003c/li\u003e
+        \u003cli\u003e表格元素（\u003ctable\u003e、\u003ctr\u003e、\u003ctd\u003e）\u003c/li\u003e
+        \u003cli\u003e表单元素（\u003cform\u003e、\u003cinput\u003e、\u003cbutton\u003e）\u003c/li\u003e
+        \u003cli\u003eHTML5语义化元素（\u003cheader\u003e、\u003cnav\u003e、\u003cmain\u003e等）\u003c/li\u003e
+    \u003c/ul\u003e
+    
+    \u003cdiv class="highlight"\u003e
+        \u003ch3\u003e重要提示：\u003c/h3\u003e
+        \u003cp\u003eHTML文档的结构应该清晰且有意义。良好的HTML结构不仅有助于浏览器正确渲染页面，还能提高页面的可访问性和SEO性能。\u003c/p\u003e
+    \u003c/div\u003e
+    
+    \u003ch2\u003e练习时间！\u003c/h2\u003e
+    \u003cp\u003e尝试修改这个HTML文件，添加你自己的内容，比如：\u003c/p\u003e
+    \u003col\u003e
+        \u003cli\u003e更改页面标题\u003c/li\u003e
+        \u003cli\u003e添加更多的标题和段落\u003c/li\u003e
+        \u003cli\u003e添加一个列表，列出你学习HTML的原因\u003c/li\u003e
+    \u003c/ol\u003e
+    \u003cp\u003e保存文件后，在浏览器中刷新页面查看更改。\u003c/p\u003e
+    \u003cp style="text-align: center; margin-top: 40px; color: #666;"\u003e— HTML基础结构示例 —\u003c/p\u003e
+\u003c/body\u003e
+\u003c/html\u003e

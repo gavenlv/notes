@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JavaScript控制流程 - 条件语句与循环</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f5f5;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 30px;
+            text-align: center;
+            font-size: 2.2em;
+        }
+        
+        h2 {
+            color: #3498db;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e0e0e0;
+            font-size: 1.8em;
+        }
+        
+        h3 {
+            color: #2980b9;
+            margin-top: 25px;
+            margin-bottom: 15px;
+            font-size: 1.4em;
+        }
+        
+        p {
+            margin-bottom: 15px;
+            font-size: 1.05em;
+        }
+        
+        .example-box {
+            background-color: #f8f9fa;
+            border-left: 4px solid #3498db;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        
+        .code-block {
+            background-color: #f0f0f0;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            margin: 15px 0;
+        }
+        
+        .result-box {
+            background-color: #e8f4f8;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 10px;
+            border: 1px solid #b8e0ea;
+        }
+        
+        .btn {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 0;
+            transition: background-color 0.3s;
+        }
+        
+        .btn:hover {
+            background-color: #2980b9;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        th {
+            background-color: #3498db;
+            color: white;
+            font-weight: bold;
+        }
+        
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+        
+        .highlight {
+            background-color: #fff3cd;
+            padding: 15px;
+            border-radius: 4px;
+            border-left: 4px solid #ffc107;
+            margin: 15px 0;
+        }
+        
+        .warning {
+            background-color: #f8d7da;
+            padding: 15px;
+            border-radius: 4px;
+            border-left: 4px solid #dc3545;
+            margin: 15px 0;
+        }
+        
+        ul, ol {
+            margin-left: 20px;
+            margin-bottom: 15px;
+        }
+        
+        li {
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>JavaScript控制流程 - 条件语句与循环</h1>
+        
+        <h2>1. 条件语句</h2>
+        <p>条件语句允许我们根据不同的条件执行不同的代码块。JavaScript提供了多种条件语句，包括if、else if、else和switch。</p>
+        
+        <h3>1.1 if语句</h3>
+        <p>if语句用于在条件为true时执行代码块。</p>
+        
+        <div class="example-box">
+            <h4>示例：基本的if语句</h4>
+            <div class="code-block">
+                // 基本if语句
+                let age = 20;
+                if (age >= 18) {
+                    console.log('成年人');
+                }
+            </div>
+            <button class="btn" onclick="runIfExample()">运行示例</button>
+            <div class="result-box" id="ifResult"></div>
+        </div>
+        
+        <h3>1.2 if...else语句</h3>
+        <p>if...else语句允许我们在条件为true时执行一个代码块，在条件为false时执行另一个代码块。</p>
+        
+        <div class="example-box">
+            <h4>示例：if...else语句</h4>
+            <div class="code-block">
+                // if...else语句
+                let temperature = 25;
+                if (temperature > 30) {
+                    console.log('天气炎热');
+                } else {
+                    console.log('天气凉爽');
+                }
+            </div>
+            <button class="btn" onclick="runIfElseExample()">运行示例</button>
+            <div class="result-box" id="ifElseResult"></div>
+        </div>
+        
+        <h3>1.3 if...else if...else语句</h3>
+        <p>if...else if...else语句允许我们测试多个条件。</p>
+        
+        <div class="example-box">
+            <h4>示例：if...else if...else语句</h4>
+            <div class="code-block">
+                // if...else if...else语句
+                let score = 85;
+                if (score >= 90) {
+                    console.log('A级');
+                } else if (score >= 80) {
+                    console.log('B级');
+                } else if (score >= 70) {
+                    console.log('C级');
+                } else if (score >= 60) {
+                    console.log('D级');
+                } else {
+                    console.log('不及格');
+                }
+            </div>
+            <button class="btn" onclick="runIfElseIfExample()">运行示例</button>
+            <div class="result-box" id="ifElseIfResult"></div>
+        </div>
+        
+        <h3>1.4 switch语句</h3>
+        <p>switch语句用于基于不同的情况执行不同的代码块。当我们有多个条件需要判断时，switch语句通常比if...else if...else更简洁。</p>
+        
+        <div class="example-box">
+            <h4>示例：switch语句</h4>
+            <div class="code-block">
+                // switch语句
+                let day = 'Monday';
+                let dayType;
+                
+                switch (day) {
+                    case 'Monday':
+                    case 'Tuesday':
+                    case 'Wednesday':
+                    case 'Thursday':
+                    case 'Friday':
+                        dayType = '工作日';
+                        break;
+                    case 'Saturday':
+                    case 'Sunday':
+                        dayType = '周末';
+                        break;
+                    default:
+                        dayType = '无效的日期';
+                }
+                
+                console.log(`今天是${dayType}`);
+            </div>
+            <button class="btn" onclick="runSwitchExample()">运行示例</button>
+            <div class="result-box" id="switchResult"></div>
+        </div>
+        
+        <div class="warning">
+            <strong>注意：</strong>在switch语句中，不要忘记使用break语句，否则代码会继续执行到下一个case，这称为"穿透"现象。在某些情况下，穿透可能是有用的，但大多数情况下我们需要避免它。
+        </div>
+        
+        <h2>2. 循环结构</h2>
+        <p>循环允许我们重复执行代码块，直到满足特定条件。JavaScript提供了多种循环语句，包括for、while、do...while和for...in、for...of。</p>
+        
+        <h3>2.1 for循环</h3>
+        <p>for循环是最常用的循环结构，适用于已知循环次数的情况。</p>
+        
+        <div class="example-box">
+            <h4>示例：基本的for循环</h4>
+            <div class="code-block">
+                // 基本的for循环
+                for (let i = 0; i < 5; i++) {
+                    console.log(`循环第${i + 1}次`);
+                }
+            </div>
+            <button class="btn" onclick="runForExample()">运行示例</button>
+            <div class="result-box" id="forResult"></div>
+        </div>
+        
+        <div class="example-box">
+            <h4>示例：使用for循环遍历数组</h4>
+            <div class="code-block">
+                // 使用for循环遍历数组
+                let fruits = ['苹果', '香蕉', '橙子', '葡萄'];
+                for (let i = 0; i < fruits.length; i++) {
+                    console.log(`第${i + 1}个水果是${fruits[i]}`);
+                }
+            </div>
+            <button class="btn" onclick="runForArrayExample()">运行示例</button>
+            <div class="result-box" id="forArrayResult"></div>
+        </div>
+        
+        <h3>2.2 while循环</h3>
+        <p>while循环在条件为true时重复执行代码块。适用于未知循环次数的情况。</p>
+        
+        <div class="example-box">
+            <h4>示例：while循环</h4>
+            <div class="code-block">
+                // while循环
+                let count = 0;
+                while (count < 5) {
+                    console.log(`计数: ${count}`);
+                    count++;
+                }
+            </div>
+            <button class="btn" onclick="runWhileExample()">运行示例</button>
+            <div class="result-box" id="whileResult"></div>
+        </div>
+        
+        <div class="warning">
+            <strong>警告：</strong>使用while循环时，务必确保循环条件最终会变为false，否则循环将永远执行，导致无限循环。
+        </div>
+        
+        <h3>2.3 do...while循环</h3>
+        <p>do...while循环类似于while循环，但它会先执行一次代码块，然后再检查条件。这意味着do...while循环至少会执行一次。</p>
+        
+        <div class="example-box">
+            <h4>示例：do...while循环</h4>
+            <div class="code-block">
+                // do...while循环
+                let number = 0;
+                do {
+                    console.log(`数字: ${number}`);
+                    number++;
+                } while (number < 5);
+            </div>
+            <button class="btn" onclick="runDoWhileExample()">运行示例</button>
+            <div class="result-box" id="doWhileResult"></div>
+        </div>
+        
+        <h3>2.4 for...in循环</h3>
+        <p>for...in循环用于遍历对象的可枚举属性。</p>
+        
+        <div class="example-box">
+            <h4>示例：for...in循环遍历对象</h4>
+            <div class="code-block">
+                // for...in循环遍历对象
+                let person = {
+                    name: '张三',
+                    age: 25,
+                    job: '工程师',
+                    city: '北京'
+                };
+                
+                for (let key in person) {
+                    console.log(`${key}: ${person[key]}`);
+                }
+            </div>
+            <button class="btn" onclick="runForInExample()">运行示例</button>
+            <div class="result-box" id="forInResult"></div>
+        </div>
+        
+        <div class="highlight">
+            <strong>注意：</strong>for...in循环会遍历对象原型链上的属性，通常我们使用hasOwnProperty()方法来过滤这些属性。
+        </div>
+        
+        <h3>2.5 for...of循环 (ES6)</h3>
+        <p>for...of循环用于遍历可迭代对象（如数组、字符串、Map、Set等）的值。</p>
+        
+        <div class="example-box">
+            <h4>示例：for...of循环遍历数组</h4>
+            <div class="code-block">
+                // for...of循环遍历数组
+                let colors = ['红色', '绿色', '蓝色', '黄色'];
+                for (let color of colors) {
+                    console.log(`颜色: ${color}`);
+                }
+            </div>
+            <button class="btn" onclick="runForOfExample()">运行示例</button>
+            <div class="result-box" id="forOfResult"></div>
+        </div>
+        
+        <h2>3. 循环控制语句</h2>
+        <p>JavaScript提供了两个主要的循环控制语句：break和continue。</p>
+        
+        <h3>3.1 break语句</h3>
+        <p>break语句用于立即退出循环，不再执行循环中剩余的代码。</p>
+        
+        <div class="example-box">
+            <h4>示例：break语句</h4>
+            <div class="code-block">
+                // break语句示例
+                for (let i = 0; i < 10; i++) {
+                    if (i === 5) {
+                        break; // 当i等于5时退出循环
+                    }
+                    console.log(`i = ${i}`);
+                }
+            </div>
+            <button class="btn" onclick="runBreakExample()">运行示例</button>
+            <div class="result-box" id="breakResult"></div>
+        </div>
+        
+        <h3>3.2 continue语句</h3>
+        <p>continue语句用于跳过当前循环的剩余代码，并继续执行下一次循环。</p>
+        
+        <div class="example-box">
+            <h4>示例：continue语句</h4>
+            <div class="code-block">
+                // continue语句示例
+                for (let i = 0; i < 10; i++) {
+                    if (i % 2 === 0) {
+                        continue; // 跳过偶数
+                    }
+                    console.log(`奇数: ${i}`);
+                }
+            </div>
+            <button class="btn" onclick="runContinueExample()">运行示例</button>
+            <div class="result-box" id="continueResult"></div>
+        </div>
+        
+        <h2>4. 嵌套循环</h2>
+        <p>在循环内部再放置一个循环，称为嵌套循环。嵌套循环常用于处理二维数据结构，如表格、矩阵等。</p>
+        
+        <div class="example-box">
+            <h4>示例：嵌套循环 - 乘法表</h4>
+            <div class="code-block">
+                // 嵌套循环 - 乘法表
+                for (let i = 1; i <= 9; i++) {
+                    let row = '';
+                    for (let j = 1; j <= i; j++) {
+                        row += `${j} × ${i} = ${i * j}\t`;
+                    }
+                    console.log(row);
+                }
+            </div>
+            <button class="btn" onclick="runNestedLoopExample()">运行示例</button>
+            <div class="result-box" id="nestedLoopResult"></div>
+        </div>
+        
+        <h2>5. 实际应用案例</h2>
+        
+        <h3>5.1 素数判断</h3>
+        <div class="example-box">
+            <h4>示例：判断一个数是否为素数</h4>
+            <div class="code-block">
+                // 判断一个数是否为素数
+                function isPrime(num) {
+                    if (num <= 1) return false;
+                    if (num <= 3) return true;
+                    if (num % 2 === 0 || num % 3 === 0) return false;
+                    
+                    let sqrtNum = Math.sqrt(num);
+                    for (let i = 5; i <= sqrtNum; i += 6) {
+                        if (num % i === 0 || num % (i + 2) === 0) return false;
+                    }
+                    
+                    return true;
+                }
+                
+                // 测试
+                let testNumber = 17;
+                console.log(`${testNumber} ${isPrime(testNumber) ? '是' : '不是'}素数`);
+            </div>
+            <button class="btn" onclick="runPrimeExample()">运行示例</button>
+            <div class="result-box" id="primeResult"></div>
+        </div>
+        
+        <h3>5.2 数组去重</h3>
+        <div class="example-box">
+            <h4>示例：数组去重</h4>
+            <div class="code-block">
+                // 使用循环实现数组去重
+                function removeDuplicates(arr) {
+                    let uniqueArr = [];
+                    
+                    for (let i = 0; i < arr.length; i++) {
+                        let isDuplicate = false;
+                        
+                        // 检查当前元素是否已经在uniqueArr中
+                        for (let j = 0; j < uniqueArr.length; j++) {
+                            if (arr[i] === uniqueArr[j]) {
+                                isDuplicate = true;
+                                break;
+                            }
+                        }
+                        
+                        if (!isDuplicate) {
+                            uniqueArr.push(arr[i]);
+                        }
+                    }
+                    
+                    return uniqueArr;
+                }
+                
+                // 测试
+                let numbers = [1, 2, 3, 4, 3, 2, 1, 5];
+                console.log('原始数组:', numbers);
+                console.log('去重后:', removeDuplicates(numbers));
+            </div>
+            <button class="btn" onclick="runRemoveDuplicatesExample()">运行示例</button>
+            <div class="result-box" id="removeDuplicatesResult"></div>
+        </div>
+        
+        <h2>6. 总结</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>语句类型</th>
+                    <th>描述</th>
+                    <th>适用场景</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>if</td>
+                    <td>基本条件判断</td>
+                    <td>单一条件判断</td>
+                </tr>
+                <tr>
+                    <td>if...else</td>
+                    <td>二选一条件判断</td>
+                    <td>两种情况的判断</td>
+                </tr>
+                <tr>
+                    <td>if...else if...else</td>
+                    <td>多条件判断</td>
+                    <td>多种情况的判断</td>
+                </tr>
+                <tr>
+                    <td>switch</td>
+                    <td>多情况选择</td>
+                    <td>基于单一表达式的多值判断</td>
+                </tr>
+                <tr>
+                    <td>for</td>
+                    <td>计数循环</td>
+                    <td>已知循环次数</td>
+                </tr>
+                <tr>
+                    <td>while</td>
+                    <td>条件循环</td>
+                    <td>未知循环次数，先判断后执行</td>
+                </tr>
+                <tr>
+                    <td>do...while</td>
+                    <td>后条件循环</td>
+                    <td>未知循环次数，至少执行一次</td>
+                </tr>
+                <tr>
+                    <td>for...in</td>
+                    <td>对象属性遍历</td>
+                    <td>遍历对象的可枚举属性</td>
+                </tr>
+                <tr>
+                    <td>for...of</td>
+                    <td>值遍历</td>
+                    <td>遍历可迭代对象的值</td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <div class="highlight">
+            <strong>最佳实践：</strong><br>
+            1. 当有多个条件需要判断时，使用switch语句通常比if...else if...else更清晰<br>
+            2. 避免深度嵌套循环，这会降低代码可读性<br>
+            3. 始终确保循环有终止条件，避免无限循环<br>
+            4. 使用break和continue时要谨慎，确保它们不会导致代码逻辑混乱<br>
+            5. 在遍历对象时，优先使用for...in并配合hasOwnProperty()，或使用Object.keys()等方法
+        </div>
+    </div>
+    
+    <script>
+        // 1. if语句示例
+        function runIfExample() {
+            let results = [];
+            
+            let age = 20;
+            if (age >= 18) {
+                results.push(`age = ${age}, 条件判断: age >= 18 为 true`);
+                results.push(`结果: 成年人`);
+            }
+            
+            age = 16;
+            if (age >= 18) {
+                results.push(`结果: 成年人`);
+            }
+            results.push(`\nage = ${age}, 条件判断: age >= 18 为 false`);
+            results.push(`结果: 无输出（条件为false时不执行代码块）`);
+            
+            document.getElementById('ifResult').innerHTML = results.join('<br>');
+        }
+        
+        // 2. if...else语句示例
+        function runIfElseExample() {
+            let results = [];
+            
+            let temperature = 25;
+            if (temperature > 30) {
+                results.push(`temperature = ${temperature}, 条件判断: temperature > 30 为 false`);
+            } else {
+                results.push(`temperature = ${temperature}, 条件判断: temperature > 30 为 false`);
+                results.push(`结果: 天气凉爽`);
+            }
+            
+            temperature = 35;
+            results.push(`\ntemperature = ${temperature}, 条件判断: temperature > 30 为 true`);
+            if (temperature > 30) {
+                results.push(`结果: 天气炎热`);
+            } else {
+                results.push(`结果: 天气凉爽`);
+            }
+            
+            document.getElementById('ifElseResult').innerHTML = results.join('<br>');
+        }
+        
+        // 3. if...else if...else语句示例
+        function runIfElseIfExample() {
+            let results = [];
+            let scores = [95, 85, 75, 65, 55];
+            
+            scores.forEach(score => {
+                results.push(`\nscore = ${score}`);
+                if (score >= 90) {
+                    results.push(`结果: A级`);
+                } else if (score >= 80) {
+                    results.push(`结果: B级`);
+                } else if (score >= 70) {
+                    results.push(`结果: C级`);
+                } else if (score >= 60) {
+                    results.push(`结果: D级`);
+                } else {
+                    results.push(`结果: 不及格`);
+                }
+            });
+            
+            document.getElementById('ifElseIfResult').innerHTML = results.join('<br>');
+        }
+        
+        // 4. switch语句示例
+        function runSwitchExample() {
+            let results = [];
+            let days = ['Monday', 'Wednesday', 'Saturday', 'InvalidDay'];
+            
+            days.forEach(day => {
+                results.push(`\nday = ${day}`);
+                let dayType;
+                
+                switch (day) {
+                    case 'Monday':
+                    case 'Tuesday':
+                    case 'Wednesday':
+                    case 'Thursday':
+                    case 'Friday':
+                        dayType = '工作日';
+                        break;
+                    case 'Saturday':
+                    case 'Sunday':
+                        dayType = '周末';
+                        break;
+                    default:
+                        dayType = '无效的日期';
+                }
+                
+                results.push(`结果: 今天是${dayType}`);
+            });
+            
+            document.getElementById('switchResult').innerHTML = results.join('<br>');
+        }
+        
+        // 5. for循环示例
+        function runForExample() {
+            let results = [];
+            
+            results.push('基本的for循环输出:');
+            for (let i = 0; i < 5; i++) {
+                results.push(`循环第${i + 1}次, i = ${i}`);
+            }
+            
+            document.getElementById('forResult').innerHTML = results.join('<br>');
+        }
+        
+        // 6. 使用for循环遍历数组示例
+        function runForArrayExample() {
+            let results = [];
+            
+            let fruits = ['苹果', '香蕉', '橙子', '葡萄'];
+            results.push('使用for循环遍历数组:');
+            for (let i = 0; i < fruits.length; i++) {
+                results.push(`第${i + 1}个水果是${fruits[i]}`);
+            }
+            
+            document.getElementById('forArrayResult').innerHTML = results.join('<br>');
+        }
+        
+        // 7. while循环示例
+        function runWhileExample() {
+            let results = [];
+            
+            let count = 0;
+            results.push('while循环输出:');
+            while (count < 5) {
+                results.push(`计数: ${count}`);
+                count++;
+            }
+            
+            document.getElementById('whileResult').innerHTML = results.join('<br>');
+        }
+        
+        // 8. do...while循环示例
+        function runDoWhileExample() {
+            let results = [];
+            
+            let number = 0;
+            results.push('do...while循环输出:');
+            do {
+                results.push(`数字: ${number}`);
+                number++;
+            } while (number < 5);
+            
+            // 演示do...while至少执行一次
+            results.push('\ndo...while至少执行一次:');
+            let x = 5;
+            do {
+                results.push(`x = ${x} (即使条件不满足也会执行一次)`);
+                x++;
+            } while (x < 5);
+            
+            document.getElementById('doWhileResult').innerHTML = results.join('<br>');
+        }
+        
+        // 9. for...in循环示例
+        function runForInExample() {
+            let results = [];
+            
+            let person = {
+                name: '张三',
+                age: 25,
+                job: '工程师',
+                city: '北京'
+            };
+            
+            results.push('使用for...in循环遍历对象:');
+            for (let key in person) {
+                results.push(`${key}: ${person[key]}`);
+            }
+            
+            // 演示hasOwnProperty
+            results.push('\n使用hasOwnProperty过滤原型链属性:');
+            for (let key in person) {
+                if (person.hasOwnProperty(key)) {
+                    results.push(`${key}: ${person[key]}`);
+                }
+            }
+            
+            document.getElementById('forInResult').innerHTML = results.join('<br>');
+        }
+        
+        // 10. for...of循环示例
+        function runForOfExample() {
+            let results = [];
+            
+            // 遍历数组
+            let colors = ['红色', '绿色', '蓝色', '黄色'];
+            results.push('使用for...of循环遍历数组:');
+            for (let color of colors) {
+                results.push(`颜色: ${color}`);
+            }
+            
+            // 遍历字符串
+            let str = 'JavaScript';
+            results.push('\n使用for...of循环遍历字符串:');
+            for (let char of str) {
+                results.push(char);
+            }
+            
+            document.getElementById('forOfResult').innerHTML = results.join('<br>');
+        }
+        
+        // 11. break语句示例
+        function runBreakExample() {
+            let results = [];
+            
+            results.push('使用break语句:');
+            for (let i = 0; i < 10; i++) {
+                if (i === 5) {
+                    results.push(`i = ${i}, 触发break语句，退出循环`);
+                    break; // 当i等于5时退出循环
+                }
+                results.push(`i = ${i}`);
+            }
+            
+            document.getElementById('breakResult').innerHTML = results.join('<br>');
+        }
+        
+        // 12. continue语句示例
+        function runContinueExample() {
+            let results = [];
+            
+            results.push('使用continue语句跳过偶数:');
+            for (let i = 0; i < 10; i++) {
+                if (i % 2 === 0) {
+                    results.push(`i = ${i} 是偶数，跳过当前循环`);
+                    continue; // 跳过偶数
+                }
+                results.push(`奇数: ${i}`);
+            }
+            
+            document.getElementById('continueResult').innerHTML = results.join('<br>');
+        }
+        
+        // 13. 嵌套循环示例
+        function runNestedLoopExample() {
+            let results = [];
+            
+            results.push('99乘法表:');
+            for (let i = 1; i <= 9; i++) {
+                let row = '';
+                for (let j = 1; j <= i; j++) {
+                    row += `${j} × ${i} = ${i * j}\t`;
+                }
+                results.push(row);
+            }
+            
+            document.getElementById('nestedLoopResult').innerHTML = results.join('<br>');
+        }
+        
+        // 14. 素数判断示例
+        function runPrimeExample() {
+            let results = [];
+            
+            function isPrime(num) {
+                if (num <= 1) return false;
+                if (num <= 3) return true;
+                if (num % 2 === 0 || num % 3 === 0) return false;
+                
+                let sqrtNum = Math.sqrt(num);
+                for (let i = 5; i <= sqrtNum; i += 6) {
+                    if (num % i === 0 || num % (i + 2) === 0) return false;
+                }
+                
+                return true;
+            }
+            
+            // 测试几个数
+            let testNumbers = [1, 2, 3, 4, 7, 9, 17, 20];
+            testNumbers.forEach(num => {
+                results.push(`${num} ${isPrime(num) ? '是' : '不是'}素数`);
+            });
+            
+            document.getElementById('primeResult').innerHTML = results.join('<br>');
+        }
+        
+        // 15. 数组去重示例
+        function runRemoveDuplicatesExample() {
+            let results = [];
+            
+            function removeDuplicates(arr) {
+                let uniqueArr = [];
+                
+                for (let i = 0; i < arr.length; i++) {
+                    let isDuplicate = false;
+                    
+                    // 检查当前元素是否已经在uniqueArr中
+                    for (let j = 0; j < uniqueArr.length; j++) {
+                        if (arr[i] === uniqueArr[j]) {
+                            isDuplicate = true;
+                            break;
+                        }
+                    }
+                    
+                    if (!isDuplicate) {
+                        uniqueArr.push(arr[i]);
+                    }
+                }
+                
+                return uniqueArr;
+            }
+            
+            // 测试
+            let numbers = [1, 2, 3, 4, 3, 2, 1, 5];
+            results.push('原始数组: [' + numbers.join(', ') + ']');
+            results.push('去重后: [' + removeDuplicates(numbers).join(', ') + ']');
+            
+            // 测试字符串数组
+            let fruits = ['苹果', '香蕉', '苹果', '橙子', '香蕉', '葡萄'];
+            results.push('\n原始字符串数组: [' + fruits.join(', ') + ']');
+            results.push('去重后: [' + removeDuplicates(fruits).join(', ') + ']');
+            
+            document.getElementById('removeDuplicatesResult').innerHTML = results.join('<br>');
+        }
+    </script>
+</body>
+</html>

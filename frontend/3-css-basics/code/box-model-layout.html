@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSS盒模型与布局</title>
+    <style>
+        /* 基础样式重置 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f5f5;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        header {
+            background-color: #3498db;
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        h1 {
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+        
+        .subtitle {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        section {
+            margin-bottom: 40px;
+        }
+        
+        h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #3498db;
+        }
+        
+        h3 {
+            color: #7f8c8d;
+            margin: 20px 0 15px;
+        }
+        
+        p {
+            margin-bottom: 15px;
+        }
+        
+        .code-block {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            margin: 15px 0;
+            border-left: 4px solid #3498db;
+        }
+        
+        .demo-box {
+            background-color: #f0f8ff;
+            padding: 20px;
+            border-radius: 5px;
+            margin: 15px 0;
+            border: 1px solid #ddd;
+        }
+        
+        /* 盒模型演示 */
+        .box-model-demo {
+            margin: 30px 0;
+        }
+        
+        .box {
+            width: 200px;
+            height: 150px;
+            margin: 20px;
+            padding: 20px;
+            background-color: #e74c3c;
+            color: white;
+            border: 5px solid #2c3e50;
+            display: inline-block;
+            text-align: center;
+            line-height: 150px;
+            box-sizing: border-box;
+        }
+        
+        .box-content {
+            box-sizing: content-box;
+        }
+        
+        .box-border {
+            box-sizing: border-box;
+        }
+        
+        .box-visualization {
+            position: relative;
+            width: 400px;
+            height: 300px;
+            margin: 30px auto;
+        }
+        
+        .margin-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #3498db;
+            opacity: 0.2;
+        }
+        
+        .border-layer {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            bottom: 20px;
+            background-color: #e74c3c;
+            border: 3px solid #2c3e50;
+        }
+        
+        .padding-layer {
+            position: absolute;
+            top: 40px;
+            left: 40px;
+            right: 40px;
+            bottom: 40px;
+            background-color: #2ecc71;
+            opacity: 0.7;
+        }
+        
+        .content-layer {
+            position: absolute;
+            top: 60px;
+            left: 60px;
+            right: 60px;
+            bottom: 60px;
+            background-color: #9b59b6;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        
+        .layer-label {
+            position: absolute;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        
+        .margin-label { top: 10px; left: 50%; transform: translateX(-50%); color: #3498db; }
+        .border-label { top: 30px; left: 50%; transform: translateX(-50%); color: #2c3e50; }
+        .padding-label { top: 50px; left: 50%; transform: translateX(-50%); color: #2ecc71; }
+        .content-label { top: 130px; left: 50%; transform: translateX(-50%); color: white; }
+        
+        /* 布局技术演示 */
+        .layout-demo {
+            margin: 30px 0;
+        }
+        
+        /* 流动布局 */
+        .flow-layout {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 5px;
+        }
+        
+        .flow-item {
+            background-color: #3498db;
+            color: white;
+            padding: 15px;
+            margin: 10px;
+            display: inline-block;
+            border-radius: 5px;
+        }
+        
+        /* 浮动布局 */
+        .float-layout {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 5px;
+            overflow: auto;
+        }
+        
+        .float-left {
+            float: left;
+            width: 45%;
+            background-color: #e74c3c;
+            color: white;
+            padding: 20px;
+            margin: 10px;
+            border-radius: 5px;
+        }
+        
+        .float-right {
+            float: right;
+            width: 45%;
+            background-color: #2ecc71;
+            color: white;
+            padding: 20px;
+            margin: 10px;
+            border-radius: 5px;
+        }
+        
+        .clear-float {
+            clear: both;
+            margin-top: 20px;
+        }
+        
+        /* Flexbox布局 */
+        .flexbox-layout {
+            display: flex;
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        
+        .flex-item {
+            background-color: #9b59b6;
+            color: white;
+            padding: 20px;
+            margin: 10px;
+            border-radius: 5px;
+            flex: 1;
+            text-align: center;
+        }
+        
+        .flexbox-center {
+            justify-content: center;
+            align-items: center;
+            height: 200px;
+        }
+        
+        .flexbox-wrap {
+            flex-wrap: wrap;
+        }
+        
+        /* Grid布局 */
+        .grid-layout {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        
+        .grid-item {
+            background-color: #f39c12;
+            color: white;
+            padding: 20px;
+            border-radius: 5px;
+            text-align: center;
+        }
+        
+        /* 响应式设计演示 */
+        .responsive-demo {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        
+        .responsive-box {
+            background-color: #34495e;
+            color: white;
+            padding: 30px;
+            text-align: center;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        
+        @media (max-width: 768px) {
+            .responsive-box {
+                background-color: #e74c3c;
+                padding: 20px;
+            }
+            
+            .grid-layout {
+                grid-template-columns: 1fr;
+            }
+            
+            .flexbox-layout {
+                flex-direction: column;
+            }
+        }
+        
+        /* 表格样式 */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        th {
+            background-color: #3498db;
+            color: white;
+            font-weight: bold;
+        }
+        
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+        
+        /* 提示框 */
+        .note {
+            background-color: #fff3cd;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+            border-left: 4px solid #ffc107;
+        }
+        
+        .important {
+            background-color: #f8d7da;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+            border-left: 4px solid #dc3545;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>CSS盒模型与布局详解</h1>
+            <p class="subtitle">深入理解CSS盒模型及现代布局技术</p>
+        </header>
+        
+        <div class="content">
+            <section id="box-model">
+                <h2>一、CSS盒模型</h2>
+                <p>CSS盒模型是CSS布局的基础，它将每个HTML元素表示为一个矩形盒子，包含内容(content)、内边距(padding)、边框(border)和外边距(margin)四个部分。</p>
+                
+                <div class="box-visualization">
+                    <div class="margin-layer"></div>
+                    <div class="border-layer"></div>
+                    <div class="padding-layer"></div>
+                    <div class="content-layer">内容区域</div>
+                    <div class="layer-label margin-label">外边距 (Margin)</div>
+                    <div class="layer-label border-label">边框 (Border)</div>
+                    <div class="layer-label padding-label">内边距 (Padding)</div>
+                    <div class="layer-label content-label">内容区域 (Content)</div>
+                </div>
+                
+                <h3>1.1 盒模型的组成</h3>
+                <table>
+                    <tr>
+                        <th>组成部分</th>
+                        <th>描述</th>
+                        <th>特性</th>
+                    </tr>
+                    <tr>
+                        <td>内容区域 (Content)</td>
+                        <td>元素实际内容的区域，显示文本和图像</td>
+                        <td>由width和height属性控制</td>
+                    </tr>
+                    <tr>
+                        <td>内边距 (Padding)</td>
+                        <td>内容与边框之间的空间</td>
+                        <td>背景色会延伸到内边距区域</td>
+                    </tr>
+                    <tr>
+                        <td>边框 (Border)</td>
+                        <td>围绕内边距的边界线</td>
+                        <td>可设置样式、宽度和颜色</td>
+                    </tr>
+                    <tr>
+                        <td>外边距 (Margin)</td>
+                        <td>边框外的空白区域，用于元素间的分隔</td>
+                        <td>默认情况下不会应用背景色</td>
+                    </tr>
+                </table>
+                
+                <h3>1.2 盒模型的两种模式</h3>
+                <p>CSS有两种盒模型模式，它们的区别在于如何计算元素的总宽度和高度：</p>
+                
+                <div class="box-model-demo">
+                    <div class="demo-box">
+                        <h4>content-box（标准盒模型）</h4>
+                        <p>元素的width/height仅包括内容区域，不包括padding和border。</p>
+                        <div class="code-block">
+                            box-sizing: content-box;<br>
+                            /* 元素总宽度 = width + padding-left + padding-right + border-left + border-right */<br>
+                            /* 元素总高度 = height + padding-top + padding-bottom + border-top + border-bottom */
+                        </div>
+                        <div class="box box-content">content-box</div>
+                    </div>
+                    
+                    <div class="demo-box">
+                        <h4>border-box（IE盒模型）</h4>
+                        <p>元素的width/height包括内容区域、padding和border。</p>
+                        <div class="code-block">
+                            box-sizing: border-box;<br>
+                            /* 内容区域宽度 = width - padding-left - padding-right - border-left - border-right */<br>
+                            /* 内容区域高度 = height - padding-top - padding-bottom - border-top - border-bottom */
+                        </div>
+                        <div class="box box-border">border-box</div>
+                    </div>
+                </div>
+                
+                <div class="note">
+                    <strong>提示：</strong>在现代前端开发中，通常推荐使用 <code>box-sizing: border-box;</code>，因为它使元素尺寸的计算更加直观和可预测，特别是在响应式设计中。
+                </div>
+            </section>
+            
+            <section id="layout-techniques">
+                <h2>二、CSS布局技术</h2>
+                <p>CSS提供了多种布局方法，从传统的流动布局到现代的Flexbox和Grid布局，每种方法都有其适用场景。</p>
+                
+                <h3>2.1 流动布局 (Flow Layout)</h3>
+                <p>流动布局是CSS的默认布局模式，元素会按照文档流的顺序排列。块级元素垂直堆叠，内联元素水平排列。</p>
+                
+                <div class="demo-box">
+                    <h4>流动布局示例</h4>
+                    <div class="flow-layout">
+                        <div class="flow-item">项目 1</div>
+                        <div class="flow-item">项目 2</div>
+                        <div class="flow-item">项目 3</div>
+                        <div class="flow-item">项目 4</div>
+                    </div>
+                </div>
+                
+                <h3>2.2 浮动布局 (Float Layout)</h3>
+                <p>浮动布局用于使元素脱离正常文档流，漂浮在容器的左侧或右侧。它曾被广泛用于创建多列布局。</p>
+                
+                <div class="demo-box">
+                    <h4>浮动布局示例</h4>
+                    <div class="float-layout">
+                        <div class="float-left">左侧内容区域，宽度45%</div>
+                        <div class="float-right">右侧内容区域，宽度45%</div>
+                        <div class="clear-float">清除浮动，确保后续内容正常显示</div>
+                    </div>
+                </div>
+                
+                <div class="important">
+                    <strong>注意：</strong>使用浮动布局时，需要注意清除浮动以避免布局问题。常用的清除浮动方法包括：使用clear属性、添加空的清除元素或使用伪元素清除。
+                </div>
+                
+                <h3>2.3 Flexbox布局</h3>
+                <p>Flexbox（弹性盒子）是一种一维布局方法，设计用于在不同屏幕尺寸下提供灵活的布局能力。它特别适合于组件和小范围布局。</p>
+                
+                <div class="demo-box">
+                    <h4>基本Flexbox布局</h4>
+                    <div class="flexbox-layout">
+                        <div class="flex-item">弹性项目 1</div>
+                        <div class="flex-item">弹性项目 2</div>
+                        <div class="flex-item">弹性项目 3</div>
+                    </div>
+                </div>
+                
+                <div class="demo-box">
+                    <h4>居中对齐的Flexbox</h4>
+                    <div class="flexbox-layout flexbox-center">
+                        <div class="flex-item">居中对齐</div>
+                    </div>
+                </div>
+                
+                <div class="demo-box">
+                    <h4>自动换行的Flexbox</h4>
+                    <div class="flexbox-layout flexbox-wrap">
+                        <div class="flex-item">项目 1</div>
+                        <div class="flex-item">项目 2</div>
+                        <div class="flex-item">项目 3</div>
+                        <div class="flex-item">项目 4</div>
+                        <div class="flex-item">项目 5</div>
+                        <div class="flex-item">项目 6</div>
+                    </div>
+                </div>
+                
+                <div class="code-block">
+                    /* Flexbox常用属性 */<br>
+                    .container {
+                        display: flex;            /* 创建弹性容器 */
+                        flex-direction: row;      /* 主轴方向（row/column/row-reverse/column-reverse） */
+                        justify-content: space-between; /* 主轴对齐方式 */
+                        align-items: center;      /* 交叉轴对齐方式 */
+                        flex-wrap: wrap;          /* 是否换行 */
+                        gap: 20px;               /* 项目间距 */
+                    }
+                </div>
+                
+                <h3>2.4 Grid布局</h3>
+                <p>Grid（网格）布局是一种二维布局方法，允许同时处理行和列，非常适合复杂的页面布局。</p>
+                
+                <div class="demo-box">
+                    <h4>Grid布局示例</h4>
+                    <div class="grid-layout">
+                        <div class="grid-item">网格项目 1</div>
+                        <div class="grid-item">网格项目 2</div>
+                        <div class="grid-item">网格项目 3</div>
+                        <div class="grid-item">网格项目 4</div>
+                        <div class="grid-item">网格项目 5</div>
+                    </div>
+                </div>
+                
+                <div class="code-block">
+                    /* Grid常用属性 */<br>
+                    .container {
+                        display: grid;                 /* 创建网格容器 */
+                        grid-template-columns: repeat(3, 1fr); /* 定义列 */
+                        grid-template-rows: 100px auto; /* 定义行 */
+                        gap: 20px;                     /* 行和列间距 */
+                        grid-template-areas:           /* 定义区域 */
+                            "header header header"
+                            "sidebar main main";
+                    }
+                </div>
+            </section>
+            
+            <section id="responsive-design">
+                <h2>三、响应式设计基础</h2>
+                <p>响应式设计使网页能够适应不同的屏幕尺寸，提供良好的用户体验。媒体查询是实现响应式设计的核心技术。</p>
+                
+                <div class="demo-box">
+                    <h4>响应式设计示例</h4>
+                    <p>尝试调整浏览器窗口大小，观察下方元素的变化：</p>
+                    <div class="responsive-box">
+                        响应式内容区域
+                    </div>
+                </div>
+                
+                <div class="code-block">
+                    /* 媒体查询示例 */<br>
+                    @media (max-width: 768px) {
+                        /* 当屏幕宽度小于等于768px时应用的样式 */
+                        .container {
+                            width: 100%;
+                            padding: 10px;
+                        }
+                    }
+                    <br>
+                    @media (min-width: 1200px) {
+                        /* 当屏幕宽度大于等于1200px时应用的样式 */
+                        .container {
+                            width: 1140px;
+                            margin: 0 auto;
+                        }
+                    }
+                </div>
+                
+                <h3>3.1 常见的响应式断点</h3>
+                <table>
+                    <tr>
+                        <th>设备类型</th>
+                        <th>屏幕宽度</th>
+                        <th>断点范围</th>
+                    </tr>
+                    <tr>
+                        <td>移动设备（竖屏）</td>
+                        <td>小于768px</td>
+                        <td>@media (max-width: 767px)</td>
+                    </tr>
+                    <tr>
+                        <td>平板设备</td>
+                        <td>768px - 991px</td>
+                        <td>@media (min-width: 768px) and (max-width: 991px)</td>
+                    </tr>
+                    <tr>
+                        <td>桌面设备</td>
+                        <td>992px - 1199px</td>
+                        <td>@media (min-width: 992px) and (max-width: 1199px)</td>
+                    </tr>
+                    <tr>
+                        <td>大屏幕设备</td>
+                        <td>1200px及以上</td>
+                        <td>@media (min-width: 1200px)</td>
+                    </tr>
+                </table>
+                
+                <div class="note">
+                    <strong>提示：</strong>响应式设计不仅仅是调整布局，还应该考虑图片尺寸、字体大小和交互元素的可访问性等方面。使用相对单位（如em、rem、%）而不是固定像素值，可以使设计更加灵活。
+                </div>
+            </section>
+            
+            <section id="best-practices">
+                <h2>四、布局最佳实践</h2>
+                
+                <h3>4.1 盒模型使用建议</h3>
+                <ul>
+                    <li>全局设置 <code>box-sizing: border-box;</code> 以获得一致的尺寸计算行为</li>
+                    <li>使用 <code>margin: 0 auto;</code> 对块级元素进行水平居中</li>
+                    <li>避免使用过多的嵌套盒子，以减少复杂度和提高性能</li>
+                    <li>合理使用内边距和外边距，保持一致的间距系统</li>
+                </ul>
+                
+                <h3>4.2 现代布局选择指南</h3>
+                <div class="important">
+                    <ul>
+                        <li><strong>简单的线性布局：</strong>使用Flexbox</li>
+                        <li><strong>复杂的二维布局：</strong>使用Grid</li>
+                        <li><strong>图文混排：</strong>可以考虑使用浮动（但需要注意清除浮动）</li>
+                        <li><strong>响应式页面：</strong>结合媒体查询和Flexbox/Grid</li>
+                    </ul>
+                </div>
+                
+                <h3>4.3 性能优化建议</h3>
+                <ul>
+                    <li>避免过度使用复杂的选择器，优先使用类选择器</li>
+                    <li>合理使用CSS变量，便于主题定制和维护</li>
+                    <li>最小化重排（reflow）和重绘（repaint）</li>
+                    <li>考虑使用CSS预处理器（如Sass、Less）提高开发效率</li>
+                </ul>
+            </section>
+        </div>
+    </div>
+</body>
+</html>
