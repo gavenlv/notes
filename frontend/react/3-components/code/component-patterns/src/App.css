@@ -1,0 +1,35 @@
+.App {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.App h1 {
+  text-align: center;
+  margin-bottom: 2rem;
+  color: #646cff;
+}
+
+section {
+  margin-bottom: 2.5rem;
+}
+
+/* Additional styles for better UI */
+button {
+  margin-top: 0.5rem;
+}
+
+input[type="text"] {
+  width: 100%;
+  max-width: 400px;
+}
+
+@media (max-width: 768px) {
+  .App {
+    padding: 1rem;
+  }
+  
+  .pattern-section {
+    padding: 1rem;
+  }
+}

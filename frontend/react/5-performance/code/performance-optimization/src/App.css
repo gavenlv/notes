@@ -1,0 +1,261 @@
+.optimization-demo {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.optimization-demo h1 {
+  text-align: center;
+  color: #646cff;
+  margin-bottom: 2rem;
+}
+
+.demo-section {
+  margin-bottom: 3rem;
+  padding: 2rem;
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.demo-section:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.demo-section h2 {
+  color: #646cff;
+  margin-bottom: 1.5rem;
+  border-bottom: 2px solid #646cff;
+  padding-bottom: 0.5rem;
+}
+
+.controls {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+.controls button {
+  min-width: 150px;
+}
+
+.memo-visual {
+  display: flex;
+  justify-content: space-around;
+  gap: 2rem;
+  margin: 2rem 0;
+}
+
+.memo-box {
+  flex: 1;
+  padding: 1.5rem;
+  background-color: rgba(100, 108, 255, 0.1);
+  border-radius: 8px;
+  border: 2px solid #646cff;
+  text-align: center;
+  min-height: 150px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.render-info {
+  font-size: 0.9rem;
+  color: #888;
+  margin-top: 1rem;
+}
+
+.explanation {
+  background-color: rgba(255, 215, 0, 0.1);
+  padding: 1rem;
+  border-radius: 8px;
+  border-left: 4px solid #ffd700;
+  margin-top: 1.5rem;
+  font-style: italic;
+  text-align: left;
+}
+
+/* useCallback 示例样式 */
+.callback-demo {
+  display: flex;
+  gap: 1rem;
+  margin: 1.5rem 0;
+  flex-wrap: wrap;
+}
+
+.child-button {
+  padding: 0.8rem 1.5rem;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.child-button.optimized {
+  background-color: #4caf50;
+  color: white;
+}
+
+.child-button.optimized:hover {
+  background-color: #45a049;
+  border-color: #45a049;
+}
+
+input[type="text"] {
+  padding: 0.8rem;
+  font-size: 1rem;
+  border-radius: 8px;
+  border: 1px solid #646cff;
+  background-color: rgba(0, 0, 0, 0.2);
+  color: white;
+  width: 100%;
+  max-width: 400px;
+  margin-bottom: 1rem;
+}
+
+input[type="text"]:focus {
+  outline: none;
+  border-color: #535bf2;
+  box-shadow: 0 0 0 3px rgba(100, 108, 255, 0.2);
+}
+
+.expensive-result {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #4caf50;
+  margin: 1.5rem 0;
+  padding: 1rem;
+  background-color: rgba(76, 175, 80, 0.1);
+  border-radius: 8px;
+}
+
+/* 虚拟化列表示例样式 */
+.virtualized-list {
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.list-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background-color: rgba(0, 0, 0, 0.2);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.list-container {
+  max-height: 400px;
+  overflow: auto;
+}
+
+.list-item {
+  padding: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  transition: background-color 0.2s ease;
+  display: flex;
+  align-items: center;
+}
+
+.list-item:hover {
+  background-color: rgba(100, 108, 255, 0.1);
+}
+
+.item-index {
+  font-weight: bold;
+  color: #646cff;
+  margin-right: 1rem;
+  min-width: 40px;
+}
+
+.item-content {
+  flex: 1;
+}
+
+/* 最佳实践样式 */
+.best-practices {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.practice-item {
+  background-color: rgba(255, 255, 255, 0.05);
+  padding: 1.5rem;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.practice-item:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.practice-item h3 {
+  color: #4caf50;
+  margin-bottom: 0.5rem;
+}
+
+.practice-item p {
+  font-size: 0.95rem;
+  color: #ccc;
+}
+
+/* 性能统计样式 */
+.performance-stats {
+  background-color: rgba(255, 68, 0, 0.1);
+  padding: 1.5rem;
+  border-radius: 8px;
+  border-left: 4px solid #ff4400;
+  margin-bottom: 2rem;
+  text-align: left;
+}
+
+.performance-stats h3 {
+  color: #ff4400;
+  margin-bottom: 1rem;
+}
+
+.performance-stats p {
+  margin: 0.5rem 0;
+  font-weight: 500;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .optimization-demo {
+    padding: 1rem;
+  }
+  
+  .demo-section {
+    padding: 1.5rem;
+  }
+  
+  .memo-visual {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .controls {
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .controls button {
+    width: 100%;
+    min-width: auto;
+  }
+  
+  .best-practices {
+    grid-template-columns: 1fr;
+  }
+  
+  .list-controls {
+    flex-direction: column;
+    gap: 1rem;
+  }
+}

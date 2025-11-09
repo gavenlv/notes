@@ -1,0 +1,181 @@
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: light dark;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #242424;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  font-weight: 500;
+  color: #646cff;
+  text-decoration: inherit;
+}
+a:hover {
+  color: #535bf2;
+}
+
+body {
+  margin: 0;
+  display: flex;
+  place-items: center;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+h1 {
+  font-size: 3.2em;
+  line-height: 1.1;
+}
+
+button {
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: #1a1a1a;
+  cursor: pointer;
+  transition: border-color 0.25s;
+}
+button:hover {
+  border-color: #646cff;
+}
+button:focus,
+button:focus-visible {
+  outline: 4px auto -webkit-focus-ring-color;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    color: #213547;
+    background-color: #ffffff;
+  }
+  a:hover {
+    color: #747bff;
+  }
+  button {
+    background-color: #f9f9f9;
+  }
+}
+
+/* Component patterns demo styles */
+.pattern-section {
+  margin: 2rem 0;
+  padding: 1.5rem;
+  border: 1px solid #333;
+  border-radius: 8px;
+}
+
+.pattern-title {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  color: #646cff;
+}
+
+/* For container-presenter pattern */
+.user-profile {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  padding: 1rem;
+  background: #333;
+  border-radius: 8px;
+}
+
+.user-avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: #646cff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.user-info h3 {
+  margin: 0;
+}
+
+.user-info p {
+  margin: 0.25rem 0 0 0;
+  opacity: 0.8;
+}
+
+/* For render props pattern */
+.mouse-tracker {
+  height: 200px;
+  border: 2px dashed #646cff;
+  margin: 1rem 0;
+  position: relative;
+}
+
+.tracker-dot {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background: #ff4444;
+  border-radius: 50%;
+}
+
+/* For HOC pattern */
+.with-tooltip {
+  position: relative;
+  cursor: help;
+  border-bottom: 1px dotted #646cff;
+}
+
+.tooltip {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.9);
+  color: white;
+  padding: 0.5rem;
+  border-radius: 4px;
+  white-space: nowrap;
+  margin-bottom: 0.5rem;
+  font-size: 0.875rem;
+}
+
+/* For compound components */
+.tabs {
+  border: 1px solid #444;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.tabs-header {
+  display: flex;
+  background: #333;
+}
+
+.tab-button {
+  flex: 1;
+  border: none;
+  padding: 0.75rem;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.tab-button.active {
+  background: #646cff;
+  color: white;
+}
+
+.tabs-content {
+  padding: 1.5rem;
+}

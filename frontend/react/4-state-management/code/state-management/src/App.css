@@ -1,0 +1,115 @@
+.App {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.App h1 {
+  text-align: center;
+  margin-bottom: 1rem;
+  color: #646cff;
+}
+
+.App h2 {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+/* Todo app styles */
+.todo-input-container {
+  display: flex;
+  margin-bottom: 1.5rem;
+}
+
+.todo-input-container input {
+  flex: 1;
+  margin-right: 0.5rem;
+}
+
+.todo-list {
+  margin-top: 1rem;
+}
+
+/* User info styles */
+.user-info {
+  background-color: #333;
+  padding: 1rem;
+  border-radius: 8px;
+  margin: 1rem 0;
+}
+
+.login-form {
+  display: flex;
+  margin: 1rem 0;
+}
+
+.login-form input {
+  flex: 1;
+  margin-right: 0.5rem;
+}
+
+/* Product list styles */
+.product-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Cart styles */
+.cart-form {
+  display: flex;
+  gap: 0.5rem;
+  margin: 1rem 0;
+}
+
+.cart-form input {
+  flex: 1;
+}
+
+.cart-summary {
+  margin-top: 1.5rem;
+  text-align: right;
+}
+
+.cart-summary button {
+  margin-top: 1rem;
+}
+
+/* Comparison section */
+.comparison-section {
+  margin-top: 3rem;
+  padding: 1.5rem;
+  background-color: rgba(100, 108, 255, 0.1);
+  border-radius: 8px;
+  border: 1px solid #646cff;
+}
+
+.comparison-list li {
+  margin: 0.75rem 0;
+  padding: 0.75rem;
+  background-color: rgba(30, 30, 30, 0.3);
+  border-radius: 4px;
+}
+
+@media (max-width: 768px) {
+  .App {
+    padding: 1rem;
+  }
+  
+  .demo-tabs {
+    flex-wrap: wrap;
+  }
+  
+  .todo-input-container,
+  .login-form,
+  .cart-form {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  
+  .todo-input-container input,
+  .login-form input,
+  .cart-form input {
+    margin-right: 0;
+  }
+}
