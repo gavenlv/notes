@@ -10,8 +10,248 @@
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
 
-# Package Files #
+# Node.js specific
+node_modules/
+.npm
+.npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.lock-wscript
+package-lock.json
+yarn.lock
+.npmrc
+*.tgz
+
+# Java specific
+*.class
 *.jar
+*.war
+*.ear
+*.zip
+*.tar.gz
+*.rar
+hs_err_pid*
+replay_pid*
+.mtj.tmp/
+*.ctxt
+.apt_generated/
+.factorypath
+.springBeans
+.project
+.classpath
+.settings/
+bin/
+target/
+build/
+dist/
+out/
+
+# Python specific
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+pip-log.txt
+pip-delete-this-directory.txt
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Desktop.ini
+
+# Logs and temporary files
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.tmp
+*.temp
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Build and dependency files
+dist/
+build/
+out/
+.cache/
+.parcel-cache/
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Documentation generated files
+docs/_build/
+
+# Testing coverage reports
+coverage/
+.nyc_output/
+
+# Package manager specific
+.pnp
+.pnp.js
+.yarn/unplugged
+.yarn/build-state.yml
+.yarn/install-state.gz
+.pnpm-store/
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# TypeScript specific
+*.tsbuildinfo
+
+# Next.js specific
+.next/
+out/
+
+# Nuxt.js specific
+.nuxt/
+dist/
+
+# Gatsby specific
+.cache/
+public
+
+# Vue.js specific
+dist/
+
+# Svelte specific
+.svelte-kit/
+build/
+
+# React specific
+build/
+
+# Angular specific
+build/
+dist/
+
+# Gradle specific
+.gradle/
+build/
+
+# Maven specific
+target/
+
+# SBT specific
+target/
+project/target
+project/project
+
+# Scala specific
+*.class
+.metals/
+.bloop/
+
+# Go specific
+bin/
+pkg/
+
+# Rust specific
+target/
+Cargo.lock
+
+# Ruby specific
+*.gem
+.bundle/
+.ruby-version
+
+# PHP specific
+vendor/
+composer.lock
+
+# .NET specific
+bin/
+obj/
+*.user
+*.suo
+*.cache
+
+# Docker specific
+.dockerignore
+
+# Kubernetes specific
+kubeconfig
+
+# Terraform specific
+.terraform/
+*.tfstate
+*.tfstate.backup
+
+# Ansible specific
+*.retry
+
+# Packer specific
+packer_cache/
+
+# Vagrant specific
+.vagrant/
+
+# Virtual Environment specific
+.virtualenvs/
+
+# Jupyter Notebook specific
+.ipynb_checkpoints/
+
+# R specific
+.Rhistory
+.RData
+
+# MATLAB specific
+*.asv
+
+# LaTeX specific
+*.aux
+*.log
+*.out
+*.toc
+
+# Temporary files created by editors
+*~
+*.swp
+*.swo
+
+# Backup files created by editors
+*.bak
+*.backup*.jar
 *.war
 *.nar
 *.ear
@@ -22,3 +262,8 @@
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 replay_pid*
+
+*/node_modules/
+**/node_modules/
+
+# 

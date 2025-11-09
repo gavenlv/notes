@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>前端性能优化深入 - 高级开发指南</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f5f5;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 0;
+            text-align: center;
+            margin-bottom: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        h2 {
+            color: #4a5568;
+            margin: 30px 0 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        
+        h3 {
+            color: #2d3748;
+            margin: 25px 0 15px;
+        }
+        
+        p {
+            margin-bottom: 16px;
+            font-size: 1.05em;
+        }
+        
+        .section {
+            background: white;
+            padding: 30px;
+            margin-bottom: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        pre {
+            background-color: #282c34;
+            color: #abb2bf;
+            padding: 20px;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-family: 'Courier New', Courier, monospace;
+            margin: 20px 0;
+        }
+        
+        code {
+            font-family: 'Courier New', Courier, monospace;
+            background-color: #f1f1f1;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+        
+        .demo-area {
+            background-color: #f7fafc;
+            padding: 20px;
+            border-left: 4px solid #667eea;
+            margin: 20px 0;
+            border-radius: 0 6px 6px 0;
+        }
+        
+        button {
+            background-color: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: #5a67d8;
+        }
+        
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #e6fffa;
+            border: 1px solid #b2f5ea;
+            border-radius: 4px;
+            min-height: 50px;
+        }
+        
+        ul, ol {
+            margin-left: 20px;
+            margin-bottom: 16px;
+        }
+        
+        li {
+            margin-bottom: 8px;
+        }
+        
+        .highlight {
+            background-color: #fffaf0;
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-weight: 500;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        th {
+            background-color: #f7fafc;
+            font-weight: 600;
+        }
+        
+        tr:hover {
+            background-color: #f7fafc;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>前端性能优化深入</h1>
+            <p>构建高性能、流畅的Web应用体验</p>
+        </header>
+        
+        <div class="section">
+            <h2>1. 关键渲染路径优化</h2>
+            
+            <h3>1.1 渲染性能基础</h3>
+            <p>关键渲染路径是指浏览器从获取HTML、CSS、JavaScript资源到最终将像素绘制到屏幕上的一系列步骤。优化这个过程可以显著提升首屏加载速度和用户体验。</p>
+            
+            <div class="demo-area">
+                <h4>渲染流程演示</h4>
+                <button id="renderDemoBtn">运行渲染流程演示</button>
+                <div id="renderResult" class="result"></div>
+            </div>
+            
+            <h3>1.2 CSS优化策略</h3>
+            <p>CSS会阻塞渲染，合理组织CSS可以减少阻塞时间：</p>
+            
+            <pre>// 优化前：单一大CSS文件
+<link rel="stylesheet" href="all-styles.css">
+
+// 优化后：关键CSS内联 + 延迟加载非关键CSS
+<style>
+  /* 关键CSS内联 */
+  .header { ... }
+  .hero-section { ... }
+</style>
+<link rel="preload" href="non-critical.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="non-critical.css"></noscript></pre>
+            
+            <h3>1.3 JavaScript执行优化</h3>
+            <p>JavaScript可以阻塞DOM解析和渲染，合理使用async/defer属性：</p>
+            
+            <pre>// 阻塞渲染
+<script src="app.js"></script>
+
+// 不阻塞DOM解析，但会阻塞渲染
+<script async src="analytics.js"></script>
+
+// 不阻塞DOM解析，在DOMContentLoaded前执行
+<script defer src="app.js"></script></pre>
+        </div>
+        
+        <div class="section">
+            <h2>2. 资源加载优化</h2>
+            
+            <h3>2.1 资源预加载策略</h3>
+            <p>使用资源提示来优化资源加载顺序：</p>
+            
+            <pre>// 预加载关键资源
+<link rel="preload" href="critical-image.jpg" as="image">
+
+// 预连接到重要域名
+<link rel="preconnect" href="https://api.example.com">
+
+// 预获取可能需要的资源
+<link rel="prefetch" href="next-page.js"></pre>
+            
+            <div class="demo-area">
+                <h4>资源加载优化演示</h4>
+                <button id="resourceDemoBtn">运行资源加载演示</button>
+                <div id="resourceResult" class="result"></div>
+            </div>
+            
+            <h3>2.2 代码分割与懒加载</h3>
+            <p>将代码分割为更小的块，按需加载：</p>
+            
+            <pre>// Webpack动态导入示例
+function handleClick() {
+  import('./heavy-module.js')
+    .then(module => {
+      module.init();
+    })
+    .catch(error => {
+      console.error('模块加载失败:', error);
+    });
+}
+
+// React中的路由懒加载
+const ProductPage = React.lazy(() => import('./ProductPage'));
+
+<Suspense fallback={<LoadingSpinner />}>
+  <Route path="/product/:id" component={ProductPage} />
+</Suspense></pre>
+        </div>
+        
+        <div class="section">
+            <h2>3. 运行时性能优化</h2>
+            
+            <h3>3.1 渲染性能监控</h3>
+            <p>使用Performance API监控页面性能：</p>
+            
+            <div class="demo-area">
+                <h4>性能监控演示</h4>
+                <button id="performanceDemoBtn">运行性能监控</button>
+                <div id="performanceResult" class="result"></div>
+            </div>
+            
+            <h3>3.2 避免重排与重绘</h3>
+            <p>优化DOM操作以减少重排和重绘：</p>
+            
+            <pre>// 优化前：多次DOM操作导致多次重排
+for (let i = 0; i < 1000; i++) {
+  const div = document.createElement('div');
+  div.textContent = `Item ${i}`;
+  container.appendChild(div);
+}
+
+// 优化后：使用DocumentFragment减少重排次数
+const fragment = document.createDocumentFragment();
+for (let i = 0; i < 1000; i++) {
+  const div = document.createElement('div');
+  div.textContent = `Item ${i}`;
+  fragment.appendChild(div);
+}
+container.appendChild(fragment);</pre>
+            
+            <h3>3.3 使用Web Worker进行后台计算</h3>
+            <p>将复杂计算转移到后台线程：</p>
+            
+            <pre>// 主线程代码
+const worker = new Worker('calculation-worker.js');
+
+worker.postMessage({data: largeArray});
+
+worker.onmessage = function(e) {
+  console.log('计算结果:', e.data.result);
+  updateUI(e.data.result);
+};
+
+// calculation-worker.js
+self.onmessage = function(e) {
+  const data = e.data.data;
+  const result = performHeavyCalculation(data);
+  self.postMessage({result: result});
+};
+
+function performHeavyCalculation(data) {
+  // 执行复杂计算
+  return data.map(item => complexOperation(item));
+}</pre>
+        </div>
+        
+        <div class="section">
+            <h2>4. 内存管理与优化</h2>
+            
+            <h3>4.1 避免内存泄漏</h3>
+            <p>常见的内存泄漏原因及解决方案：</p>
+            
+            <table>
+                <tr>
+                    <th>泄漏类型</th>
+                    <th>原因</th>
+                    <th>解决方案</th>
+                </tr>
+                <tr>
+                    <td>事件监听器未移除</td>
+                    <td>组件销毁时未清理事件绑定</td>
+                    <td>使用removeEventListener或事件委托</td>
+                </tr>
+                <tr>
+                    <td>定时器未清理</td>
+                    <td>setInterval未被clearInterval</td>
+                    <td>组件卸载时清理定时器</td>
+                </tr>
+                <tr>
+                    <td>闭包引用</td>
+                    <td>闭包持有不再需要的大对象</td>
+                    <td>及时释放引用，设为null</td>
+                </tr>
+                <tr>
+                    <td>缓存过大</td>
+                    <td>无限增长的缓存对象</td>
+                    <td>实现LRU等缓存策略</td>
+                </tr>
+            </table>
+            
+            <div class="demo-area">
+                <h4>内存泄漏检测演示</h4>
+                <button id="memoryDemoBtn">运行内存泄漏模拟</button>
+                <button id="fixLeakBtn" disabled>修复内存泄漏</button>
+                <div id="memoryResult" class="result"></div>
+            </div>
+            
+            <h3>4.2 垃圾回收优化</h3>
+            <p>帮助JavaScript引擎更高效地进行垃圾回收：</p>
+            
+            <pre>// 优化前：大型对象长时间占用内存
+let largeData = getLargeDataSet();
+processData(largeData);
+// 后续不再使用largeData，但仍占用内存
+
+// 优化后：及时释放大型对象引用
+let largeData = getLargeDataSet();
+processData(largeData);
+largeData = null; // 明确释放引用，帮助垃圾回收</pre>
+        </div>
+        
+        <div class="section">
+            <h2>5. 网络优化策略</h2>
+            
+            <h3>5.1 HTTP/2 与 HTTP/3</h3>
+            <p>利用现代HTTP协议提升性能：</p>
+            
+            <ul>
+                <li><strong>多路复用</strong>：在单个连接上并行传输多个请求/响应</li>
+                <li><strong>头部压缩</strong>：减少传输的数据量</li>
+                <li><strong>服务器推送</strong>：主动推送可能需要的资源</li>
+            </ul>
+            
+            <h3>5.2 缓存策略优化</h3>
+            <p>合理设置缓存头提升性能：</p>
+            
+            <pre>// 长期缓存（文件名包含哈希）
+Cache-Control: public, max-age=31536000, immutable
+
+// 需要验证的缓存
+Cache-Control: public, max-age=0, must-revalidate
+ETag: "abc123"
+
+// 协商缓存
+Last-Modified: Wed, 21 Oct 2020 07:28:00 GMT</pre>
+            
+            <h3>5.3 内容分发网络(CDN)</h3>
+            <p>使用CDN加速静态资源加载：</p>
+            
+            <ul>
+                <li>地理分布式节点减少延迟</li>
+                <li>缓存静态资源减少源服务器负载</li>
+                <li>提供自动压缩和HTTP/2支持</li>
+            </ul>
+        </div>
+    </div>
+    
+    <script>
+        // 辅助函数：代码高亮
+        function highlightCode() {
+            document.querySelectorAll('pre code').forEach((block) => {
+                // 简单的语法高亮模拟
+                block.innerHTML = block.innerHTML
+                    .replace(/&lt;!--[\s\S]*?--&gt;/g, '<span style="color: #6a9955">$&</span>')
+                    .replace(/(&lt;[^&]*?&gt;)/g, '<span style="color: #569cd6">$1</span>')
+                    .replace(/(\b\w+\b)\s*\(/g, '<span style="color: #dcdcaa">$1</span>(')
+                    .replace(/(\bconst\b|\blet\b|\bvar\b|\bfunction\b)/g, '<span style="color: #569cd6">$1</span>');
+            });
+        }
+        
+        // 渲染流程演示
+        document.getElementById('renderDemoBtn').addEventListener('click', function() {
+            const result = document.getElementById('renderResult');
+            result.innerHTML = '开始模拟渲染流程...<br>';
+            
+            const steps = [
+                '1. 解析HTML，构建DOM树',
+                '2. 解析CSS，构建CSSOM树',
+                '3. 结合DOM和CSSOM，生成渲染树',
+                '4. 计算元素位置和大小（布局/重排）',
+                '5. 将元素绘制到屏幕上（绘制/重绘）'
+            ];
+            
+            let index = 0;
+            const interval = setInterval(() => {
+                if (index < steps.length) {
+                    result.innerHTML += steps[index] + '<br>';
+                    index++;
+                } else {
+                    clearInterval(interval);
+                    result.innerHTML += '<strong>渲染流程完成！</strong>';
+                }
+            }, 800);
+        });
+        
+        // 资源加载优化演示
+        document.getElementById('resourceDemoBtn').addEventListener('click', function() {
+            const result = document.getElementById('resourceResult');
+            result.innerHTML = '模拟资源加载优化策略...<br>';
+            
+            // 模拟资源加载时间
+            setTimeout(() => {
+                result.innerHTML += '✓ 关键CSS已内联并加载完成<br>';
+                
+                setTimeout(() => {
+                    result.innerHTML += '✓ 关键JavaScript使用defer加载完成<br>';
+                    
+                    setTimeout(() => {
+                        result.innerHTML += '✓ 关键图片已预加载<br>';
+                        
+                        setTimeout(() => {
+                            result.innerHTML += '✓ 非关键资源异步加载完成<br>';
+                            result.innerHTML += '<strong>资源加载优化完成！页面已准备就绪。</strong>';
+                        }, 600);
+                    }, 500);
+                }, 800);
+            }, 1000);
+        });
+        
+        // 性能监控演示
+        document.getElementById('performanceDemoBtn').addEventListener('click', function() {
+            const result = document.getElementById('performanceResult');
+            result.innerHTML = '收集性能指标...<br>';
+            
+            // 使用Performance API获取性能数据
+            if (window.performance) {
+                const timing = performance.timing;
+                
+                const loadTime = timing.loadEventEnd - timing.navigationStart;
+                const domReadyTime = timing.domContentLoadedEventEnd - timing.navigationStart;
+                const ttfb = timing.responseStart - timing.navigationStart;
+                
+                setTimeout(() => {
+                    result.innerHTML += `页面加载时间: ${loadTime}ms<br>`;
+                    result.innerHTML += `DOM就绪时间: ${domReadyTime}ms<br>`;
+                    result.innerHTML += `首字节时间(TTFB): ${ttfb}ms<br>`;
+                    
+                    // 模拟性能评分
+                    let score = '优秀';
+                    if (loadTime > 3000) score = '需要优化';
+                    else if (loadTime > 2000) score = '良好';
+                    
+                    result.innerHTML += `<strong>性能评分: ${score}</strong>`;
+                }, 1000);
+            } else {
+                result.innerHTML = '您的浏览器不支持Performance API';
+            }
+        });
+        
+        // 内存泄漏演示
+        let eventListeners = [];
+        let intervals = [];
+        let largeObjects = [];
+        
+        document.getElementById('memoryDemoBtn').addEventListener('click', function() {
+            const result = document.getElementById('memoryResult');
+            result.innerHTML = '模拟内存泄漏场景...<br>';
+            
+            // 模拟添加事件监听器但不清理
+            for (let i = 0; i < 100; i++) {
+                const element = document.createElement('div');
+                const listener = function() { console.log('Leaky event'); };
+                element.addEventListener('click', listener);
+                eventListeners.push({ element, listener });
+            }
+            
+            // 模拟未清理的定时器
+            for (let i = 0; i < 5; i++) {
+                const interval = setInterval(() => {
+                    // 空操作但保持定时器运行
+                }, 1000);
+                intervals.push(interval);
+            }
+            
+            // 模拟大对象引用
+            for (let i = 0; i < 10; i++) {
+                const largeObj = new Array(1000000).fill(0);
+                largeObjects.push(largeObj);
+            }
+            
+            result.innerHTML += '✓ 添加了100个未清理的事件监听器<br>';
+            result.innerHTML += '✓ 创建了5个未清理的定时器<br>';
+            result.innerHTML += '✓ 持有了10个大型数组对象<br>';
+            result.innerHTML += '<strong>内存泄漏条件已创建！</strong><br>';
+            
+            // 启用修复按钮
+            document.getElementById('fixLeakBtn').disabled = false;
+        });
+        
+        document.getElementById('fixLeakBtn').addEventListener('click', function() {
+            const result = document.getElementById('memoryResult');
+            result.innerHTML += '<br>开始修复内存泄漏...<br>';
+            
+            // 清理事件监听器
+            eventListeners.forEach(item => {
+                item.element.removeEventListener('click', item.listener);
+            });
+            eventListeners = [];
+            
+            // 清理定时器
+            intervals.forEach(interval => {
+                clearInterval(interval);
+            });
+            intervals = [];
+            
+            // 释放大对象引用
+            largeObjects = null;
+            
+            result.innerHTML += '✓ 所有事件监听器已清理<br>';
+            result.innerHTML += '✓ 所有定时器已清理<br>';
+            result.innerHTML += '✓ 大型对象引用已释放<br>';
+            result.innerHTML += '<strong>内存泄漏已修复！</strong>';
+            
+            // 禁用修复按钮
+            this.disabled = true;
+        });
+        
+        // 页面加载时初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            highlightCode();
+        });
+    </script>
+</body>
+</html>

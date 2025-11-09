@@ -1,0 +1,320 @@
+/* 基础样式重置 */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #f5f5f5;
+  color: #333;
+  line-height: 1.6;
+}
+
+/* 应用容器 */
+.app-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* 应用头部 */
+.app-header {
+  text-align: center;
+  padding: 40px 20px;
+  margin-bottom: 30px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.app-header h1 {
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+}
+
+.app-header p {
+  font-size: 1.1rem;
+  opacity: 0.9;
+}
+
+/* 主内容区域 */
+.app-main {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 30px;
+  margin-bottom: 40px;
+}
+
+/* 通用section样式 */
+section {
+  background: white;
+  padding: 25px;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+section h2 {
+  color: #2c3e50;
+  margin-bottom: 20px;
+  font-size: 1.8rem;
+  border-bottom: 2px solid #667eea;
+  padding-bottom: 10px;
+}
+
+/* 计数器样式 */
+.counter-section {
+  text-align: center;
+}
+
+.count-display {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #667eea;
+  margin-bottom: 20px;
+}
+
+.button-group {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+}
+
+/* 按钮通用样式 */
+.btn {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  outline: none;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.btn:active {
+  transform: translateY(0);
+}
+
+.increment-btn {
+  background-color: #667eea;
+  color: white;
+}
+
+.increment-btn:hover {
+  background-color: #5a67d8;
+}
+
+.reset-btn {
+  background-color: #e53e3e;
+  color: white;
+}
+
+.reset-btn:hover {
+  background-color: #c53030;
+}
+
+/* 问候组件样式 */
+.greeting-container {
+  background-color: #f7fafc;
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 15px;
+  border-left: 4px solid #667eea;
+}
+
+.greeting-text {
+  color: #4a5568;
+  font-size: 1.2rem;
+}
+
+/* 用户资料组件样式 */
+.user-profile {
+  background-color: #f7fafc;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
+}
+
+.profile-header {
+  display: flex;
+  align-items: center;
+  padding: 20px;
+  background-color: #667eea;
+  color: white;
+}
+
+.profile-avatar {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.8rem;
+  font-weight: bold;
+  margin-right: 20px;
+}
+
+.profile-name {
+  font-size: 1.5rem;
+  margin: 0;
+}
+
+.profile-details {
+  padding: 20px;
+}
+
+.detail-item {
+  display: flex;
+  margin-bottom: 15px;
+}
+
+.detail-item:last-child {
+  margin-bottom: 0;
+}
+
+.detail-label {
+  font-weight: 600;
+  width: 80px;
+  color: #4a5568;
+}
+
+.detail-value {
+  color: #2d3748;
+}
+
+.email-link {
+  color: #667eea;
+  text-decoration: none;
+}
+
+.email-link:hover {
+  text-decoration: underline;
+}
+
+/* 产品列表样式 */
+.product-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.product-item {
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.product-item:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+.product-header {
+  background-color: #f7fafc;
+  padding: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.product-name {
+  margin: 0;
+  color: #2d3748;
+  font-size: 1.2rem;
+}
+
+.product-price {
+  font-weight: bold;
+  color: #667eea;
+  font-size: 1.2rem;
+}
+
+.product-body {
+  padding: 15px;
+}
+
+.product-description {
+  color: #4a5568;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.product-footer {
+  padding: 15px;
+  background-color: #f7fafc;
+  border-top: 1px solid #e2e8f0;
+  text-align: center;
+}
+
+.add-to-cart-btn {
+  background-color: #48bb78;
+  color: white;
+  width: 100%;
+}
+
+.add-to-cart-btn:hover {
+  background-color: #38a169;
+}
+
+.no-products {
+  text-align: center;
+  padding: 40px;
+  color: #718096;
+  font-style: italic;
+}
+
+/* 应用页脚 */
+.app-footer {
+  text-align: center;
+  padding: 20px;
+  background-color: #2d3748;
+  color: white;
+  border-radius: 10px;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .app-header h1 {
+    font-size: 2rem;
+  }
+  
+  .app-header p {
+    font-size: 1rem;
+  }
+  
+  section {
+    padding: 20px;
+  }
+  
+  section h2 {
+    font-size: 1.5rem;
+  }
+  
+  .count-display {
+    font-size: 1.8rem;
+  }
+  
+  .button-group {
+    flex-direction: column;
+  }
+  
+  .product-list {
+    grid-template-columns: 1fr;
+  }
+}

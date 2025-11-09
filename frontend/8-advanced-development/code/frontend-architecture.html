@@ -1,0 +1,1306 @@
+\u003c!DOCTYPE html\u003e
+\u003chtml lang="zh-CN"\u003e
+\u003chead\u003e
+    \u003cmeta charset="UTF-8"\u003e
+    \u003cmeta name="viewport" content="width=device-width, initial-scale=1.0"\u003e
+    \u003ctitle\u003e前端高级架构模式 - 高级开发指南\u003c/title\u003e
+    \u003cstyle\u003e
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f8f9fa;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #43cea2 0%, #185a9d 100%);
+            color: white;
+            padding: 40px 0;
+            text-align: center;
+            margin-bottom: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        h2 {
+            color: #185a9d;
+            margin: 30px 0 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #43cea2;
+        }
+        
+        h3 {
+            color: #2c7ad6;
+            margin: 25px 0 15px;
+        }
+        
+        h4 {
+            color: #3b82f6;
+            margin: 20px 0 10px;
+        }
+        
+        p {
+            margin-bottom: 16px;
+            font-size: 1.05em;
+        }
+        
+        .section {
+            background: white;
+            padding: 30px;
+            margin-bottom: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        pre {
+            background-color: #1e293b;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-family: 'Courier New', Courier, monospace;
+            margin: 20px 0;
+        }
+        
+        code {
+            font-family: 'Courier New', Courier, monospace;
+            background-color: #e2e8f0;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+        
+        .demo-area {
+            background-color: #f0f9ff;
+            padding: 20px;
+            border-left: 4px solid #43cea2;
+            margin: 20px 0;
+            border-radius: 0 6px 6px 0;
+        }
+        
+        .architecture-diagram {
+            background-color: #f8fafc;
+            padding: 25px;
+            border-radius: 6px;
+            margin: 20px 0;
+            text-align: center;
+            font-family: monospace;
+            line-height: 1.8;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .pattern-card {
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .pros-cons {
+            display: flex;
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .pros, .cons {
+            flex: 1;
+            padding: 20px;
+            border-radius: 6px;
+        }
+        
+        .pros {
+            background-color: #e6f7ef;
+            border: 1px solid #b7eb8f;
+        }
+        
+        .cons {
+            background-color: #fff1f0;
+            border: 1px solid #ffccc7;
+        }
+        
+        ul, ol {
+            margin-left: 20px;
+            margin-bottom: 16px;
+        }
+        
+        li {
+            margin-bottom: 8px;
+        }
+        
+        button {
+            background-color: #43cea2;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px 10px 0;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: #36b395;
+        }
+        
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #e6f7ff;
+            border: 1px solid #91d5ff;
+            border-radius: 4px;
+            min-height: 50px;
+            font-family: 'Courier New', Courier, monospace;
+        }
+        
+        .highlight {
+            background-color: #fff7e6;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        th {
+            background-color: #43cea2;
+            color: white;
+        }
+        
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+        
+        .warning {
+            background-color: #fff7e6;
+            border: 1px solid #ffd591;
+            border-radius: 6px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        
+        .tip {
+            background-color: #f6ffed;
+            border: 1px solid #b7eb8f;
+            border-radius: 6px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        
+        .flow-chart {
+            background-color: #f0f9ff;
+            padding: 20px;
+            border-radius: 6px;
+            margin: 20px 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .flow-step {
+            background-color: white;
+            border: 1px solid #91d5ff;
+            border-radius: 4px;
+            padding: 10px 20px;
+            width: 80%;
+            text-align: center;
+        }
+        
+        .flow-arrow {
+            font-size: 20px;
+            color: #43cea2;
+        }
+    \u003c/style\u003e
+\u003c/head\u003e
+\u003cbody\u003e
+    \u003cdiv class="container"\u003e
+        \u003cheader\u003e
+            \u003ch1\u003e前端高级架构模式\u003c/h1\u003e
+            \u003cp\u003e构建可扩展、可维护的现代前端应用架构\u003c/p\u003e
+        \u003c/header\u003e
+        
+        \u003cdiv class="section"\u003e
+            \u003ch2\u003e1. 前端架构演进概述\u003c/h2\u003e
+            \u003cp\u003e前端架构随着Web技术的发展而不断演进，从简单的静态页面到复杂的单页应用，架构模式也随之变得更加成熟和多样化。理解这些演进有助于我们选择最适合当前项目的架构方案。\u003c/p\u003e
+            
+            \u003cdiv class="flow-chart"\u003e
+                \u003cdiv class="flow-step"\u003e静态页面架构 (HTML + CSS)\u003c/div\u003e
+                \u003cdiv class="flow-arrow"\u003e↓\u003c/div\u003e
+                \u003cdiv class="flow-step"\u003ejQuery时代 (DOM操作为主)\u003c/div\u003e
+                \u003cdiv class="flow-arrow"\u003e↓\u003c/div\u003e
+                \u003cdiv class="flow-step"\u003eMVC/MVP框架 (AngularJS等)\u003c/div\u003e
+                \u003cdiv class="flow-arrow"\u003e↓\u003c/div\u003e
+                \u003cdiv class="flow-step"\u003e组件化架构 (React, Vue, Angular)\u003c/div\u003e
+                \u003cdiv class="flow-arrow"\u003e↓\u003c/div\u003e
+                \u003cdiv class="flow-step"\u003e微前端架构\u003c/div\u003e
+            \u003c/flow-chart\u003e
+            
+            \u003ch3\u003e1.1 现代前端架构的核心关注点\u003c/h3\u003e
+            \u003cul\u003e
+                \u003cli\u003e\u003cstrong\u003e可维护性\u003c/strong\u003e：代码组织清晰，便于理解和修改\u003c/li\u003e
+                \u003cli\u003e\u003cstrong\u003e可扩展性\u003c/strong\u003e：能够轻松添加新功能而不破坏现有功能\u003c/li\u003e
+                \u003cli\u003e\u003cstrong\u003e可测试性\u003c/strong\u003e：组件和功能易于单元测试和集成测试\u003c/li\u003e
+                \u003cli\u003e\u003cstrong\u003e性能优化\u003c/strong\u003e：代码分割、懒加载、缓存策略等\u003c/li\u003e
+                \u003cli\u003e\u003cstrong\u003e团队协作\u003c/strong\u003e：适合多人同时开发的工作流程\u003c/li\u003e
+            \u003c/ul\u003e
+        \u003c/div\u003e
+        
+        \u003cdiv class="section"\u003e
+            \u003ch2\u003e2. 组件化架构模式\u003c/h2\u003e
+            
+            \u003ch3\u003e2.1 组件设计原则\u003c/h3\u003e
+            \u003cp\u003e组件化架构是现代前端开发的基础，良好的组件设计可以大幅提高代码的复用性和可维护性。\u003c/p\u003e
+            
+            \u003cdiv class="pattern-card"\u003e
+                \u003ch4\u003e单一职责原则\u003c/h4\u003e
+                \u003cpre\u003e// 不好的做法：一个组件负责太多功能
+function UserProfileAndSettings({ user, onUpdate, onDelete }) {
+  const [settings, setSettings] = useState({ theme: 'light', notifications: true });
+  
+  // 处理用户信息显示
+  // 处理设置表单
+  // 处理API调用
+  // ...
+  
+  return (
+    \u003cdiv\u003e
+      \u003c!-- 用户信息展示 --\u003e
+      \u003c!-- 设置表单 --\u003e
+      \u003c!-- 操作按钮 --\u003e
+    \u003c/div\u003e
+  );
+}
+
+// 好的做法：职责分离的组件
+function UserProfile({ user }) {
+  return \u003cdiv\u003e{/* 只显示用户信息 */}\u003c/div\u003e;
+}
+
+function UserSettings({ settings, onChange }) {
+  return \u003cform\u003e{/* 只处理设置 */}\u003c/form\u003e;
+}
+
+function UserActions({ onUpdate, onDelete }) {
+  return \u003cdiv\u003e{/* 只包含操作按钮 */}\u003c/div\u003e;
+}
+
+// 组合使用
+function UserPage({ user, settings, onSettingsChange, onUpdate, onDelete }) {
+  return (
+    \u003cdiv\u003e
+      \u003cUserProfile user={user} /\u003e
+      \u003cUserSettings settings={settings} onChange={onSettingsChange} /\u003e
+      \u003cUserActions onUpdate={onUpdate} onDelete={onDelete} /\u003e
+    \u003c/div\u003e
+  );
+}
+\u003c/pre\u003e
+            \u003c/div\u003e
+            
+            \u003cdiv class="pattern-card"\u003e
+                \u003ch4\u003e组件分类与层级设计\u003c/h4\u003e
+                \u003cpre\u003e// 1. 原子组件 (Atoms)
+function Button({ children, variant = 'primary', onClick }) {
+  return (
+    \u003cbutton 
+      className={`btn btn-${variant}`}
+      onClick={onClick}
+    \u003e
+      {children}
+    \u003c/button\u003e
+  );
+}
+
+function Input({ type, value, onChange, placeholder }) {
+  return (
+    \u003cinput 
+      type={type}
+      value={value}
+      onChange={onChange}
+      placeholder={placeholder}
+      className="input"
+    /
+  );
+}
+
+// 2. 分子组件 (Molecules)
+function SearchBar({ onSearch, placeholder }) {
+  const [query, setQuery] = useState('');
+  
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    onSearch(query);
+  };
+  
+  return (
+    \u003cform onSubmit={handleSubmit} className="search-bar"\u003e
+      \u003cInput 
+        type="text" 
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+        placeholder={placeholder}
+      /
+      \u003cButton type="submit">搜索</Button>
+    \u003c/form\u003e
+  );
+}
+
+// 3. 生物体组件 (Organisms)
+function Header({ user, onSearch, onLogout }) {
+  return (
+    \u003cheader className="app-header"\u003e
+      \u003cdiv className="logo"\u003eMyApp\u003c/div\u003e
+      \u003cSearchBar onSearch={onSearch} placeholder="搜索..." /\u003e
+      \u003cdiv className="user-menu"\u003e
+        \u003cUserAvatar user={user} /\u003e
+        \u003cDropdownMenu items={[{ label: '退出', onClick: onLogout }]} /\u003e
+      \u003c/div\u003e
+    \u003c/header\u003e
+  );
+}
+
+// 4. 模板组件 (Templates)
+function PageTemplate({ header, sidebar, children, footer }) {
+  return (
+    \u003cdiv className="page-template"\u003e
+      {header}
+      \u003cdiv className="main-content"\u003e
+        {sidebar}
+        \u003cmain className="content"\u003e{children}\u003c/main\u003e
+      \u003c/div\u003e
+      {footer}
+    \u003c/div\u003e
+  );
+}
+
+// 5. 页面组件 (Pages)
+function DashboardPage({ user, metrics, onSearch, onLogout }) {
+  return (
+    \u003cPageTemplate
+      header={\u003cHeader user={user} onSearch={onSearch} onLogout={onLogout} /\u003e}
+      sidebar={\u003cSidebar activeItem="dashboard" /\u003e}
+      footer={\u003cFooter /\u003e}
+    \u003e
+      \u003cDashboardContent metrics={metrics} /\u003e
+    \u003c/PageTemplate\u003e
+  );
+}
+\u003c/pre\u003e
+            \u003c/div\u003e
+            
+            \u003ch3\u003e2.2 组件通信模式\u003c/h3\u003e
+            \u003cpre\u003e// 1. Props 向下传递
+function ParentComponent() {
+  const [value, setValue] = useState('Hello');
+  
+  return (
+    \u003cdiv\u003e
+      \u003cChildComponent message={value} onChange={setValue} /\u003e
+    \u003c/div\u003e
+  );
+}
+
+function ChildComponent({ message, onChange }) {
+  return (
+    \u003cdiv\u003e
+      \u003cp\u003e{message}\u003c/p\u003e
+      \u003cbutton onClick={() => onChange('Updated Hello')}>更新消息</button\u003e
+    \u003c/div\u003e
+  );
+}
+
+// 2. Context API (跨层级通信)
+const ThemeContext = React.createContext();
+
+function ThemeProvider({ children }) {
+  const [theme, setTheme] = useState('light');
+  
+  return (
+    \u003cThemeContext.Provider value={{ theme, setTheme }}\u003e
+      {children}
+    \u003c/ThemeContext.Provider\u003e
+  );
+}
+
+function ThemeToggle() {
+  const { theme, setTheme } = useContext(ThemeContext);
+  
+  return (
+    \u003cbutton onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}>
+      切换到{theme === 'light' ? '深色' : '浅色'}主题
+    \u003c/button\u003e
+  );
+}
+
+// 3. 自定义Hook (逻辑复用)
+function useLocalStorage(key, initialValue) {
+  const [storedValue, setStoredValue] = useState(() => {
+    try {
+      const item = window.localStorage.getItem(key);
+      return item ? JSON.parse(item) : initialValue;
+    } catch (error) {
+      console.error(error);
+      return initialValue;
+    }
+  });
+  
+  const setValue = (value) => {
+    try {
+      const valueToStore = value instanceof Function ? value(storedValue) : value;
+      setStoredValue(valueToStore);
+      window.localStorage.setItem(key, JSON.stringify(valueToStore));
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  
+  return [storedValue, setValue];
+}
+
+// 使用自定义Hook
+function UserSettings() {
+  const [settings, setSettings] = useLocalStorage('userSettings', {
+    notifications: true,
+    language: 'zh-CN'
+  });
+  
+  return (
+    \u003cdiv\u003e
+      \u003c!-- 设置表单 --\u003e
+    \u003c/div\u003e
+  );
+}
+\u003c/pre\u003e
+        \u003c/div\u003e
+        
+        \u003cdiv class="section"\u003e
+            \u003ch2\u003e3. 状态管理架构模式\u003c/h2\u003e
+            
+            \u003ch3\u003e3.1 状态分层架构\u003c/h3\u003e
+            \u003cp\u003e现代应用状态可以分为多个层次，不同层次的状态需要不同的管理策略。</p\u003e
+            
+            \u003cdiv class="architecture-diagram"\u003e
+                全局状态 (Redux/Context) ← 页面状态 (React Component State) ← 组件内部状态 (useState)
+            \u003c/architecture-diagram\u003e
+            
+            \u003cdiv class="pattern-card"\u003e
+                \u003ch4\u003eRedux Toolkit 架构示例\u003c/h4\u003e
+                \u003cpre\u003e// 1. 定义slice (功能模块)
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+
+// 异步action
+export const fetchUsers = createAsyncThunk(
+  'users/fetchUsers',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await fetch('/api/users');
+      if (!response.ok) {
+        throw new Error('Failed to fetch users');
+      }
+      return await response.json();
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+// Slice定义
+const usersSlice = createSlice({
+  name: 'users',
+  initialState: {
+    items: [],
+    status: 'idle', // 'idle' | 'loading' | 'succeeded' | 'failed'
+    error: null
+  },
+  reducers: {
+    addUser: (state, action) => {
+      state.items.push(action.payload);
+    },
+    updateUser: (state, action) => {
+      const index = state.items.findIndex(user => user.id === action.payload.id);
+      if (index !== -1) {
+        state.items[index] = action.payload;
+      }
+    },
+    deleteUser: (state, action) => {
+      state.items = state.items.filter(user => user.id !== action.payload);
+    }
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchUsers.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(fetchUsers.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        state.items = action.payload;
+      })
+      .addCase(fetchUsers.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.payload || 'Failed to fetch users';
+      });
+  }
+});
+
+export const { addUser, updateUser, deleteUser } = usersSlice.actions;
+export default usersSlice.reducer;
+
+// 2. 配置store
+import { configureStore } from '@reduxjs/toolkit';
+import usersReducer from './features/users/usersSlice';
+import productsReducer from './features/products/productsSlice';
+import cartReducer from './features/cart/cartSlice';
+
+export const store = configureStore({
+  reducer: {
+    users: usersReducer,
+    products: productsReducer,
+    cart: cartReducer,
+  },
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: false // 禁用序列化检查（如果需要）
+    }),
+});
+
+// 3. 在组件中使用
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchUsers, deleteUser } from './features/users/usersSlice';
+
+function UsersList() {
+  const dispatch = useDispatch();
+  const { users, status, error } = useSelector((state) => state.users);
+  
+  useEffect(() => {
+    if (status === 'idle') {
+      dispatch(fetchUsers());
+    }
+  }, [status, dispatch]);
+  
+  const handleDelete = (id) => {
+    dispatch(deleteUser(id));
+  };
+  
+  if (status === 'loading') {
+    return \u003cdiv\u003e加载中...\u003c/div\u003e;
+  }
+  
+  if (status === 'failed') {
+    return \u003cdiv\u003e错误: {error}\u003c/div\u003e;
+  }
+  
+  return (
+    \u003cul\u003e
+      {users.map(user => (
+        \u003cli key={user.id}\u003e
+          {user.name}
+          \u003cbutton onClick={() => handleDelete(user.id)}\u003e删除\u003c/button\u003e
+        \u003c/li\u003e
+      ))}
+    \u003c/ul\u003e
+  );
+}
+\u003c/pre\u003e
+            \u003c/div\u003e
+            
+            \u003ch3\u003e3.2 React Query 数据获取架构\u003c/h3\u003e
+            \u003cpre\u003e// 1. 配置 React Query Client
+import { QueryClient, QueryClientProvider } from 'react-query';
+import { ReactQueryDevtools } from 'react-query/devtools';
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 2,
+      staleTime: 5 * 60 * 1000, // 5分钟
+      cacheTime: 10 * 60 * 1000, // 10分钟
+    },
+  },
+});
+
+function App() {
+  return (
+    \u003cQueryClientProvider client={queryClient}\u003e
+      \u003c!-- 应用组件 --\u003e
+      \u003cReactQueryDevtools initialIsOpen={false} /\u003e
+    \u003c/QueryClientProvider\u003e
+  );
+}
+
+// 2. 数据获取 hooks
+function useUsers() {
+  return useQuery('users', fetchUsers, {
+    select: (data) => data.sort((a, b) => a.name.localeCompare(b.name)),
+    onError: (error) => {
+      console.error('Failed to fetch users:', error);
+    },
+  });
+}
+
+function useUser(id) {
+  return useQuery(['user', id], () => fetchUser(id), {
+    enabled: !!id, // 只有当id存在时才执行查询
+  });
+}
+
+// 3. 数据更新 mutations
+function useCreateUser() {
+  const queryClient = useQueryClient();
+  
+  return useMutation(createUser, {
+    onSuccess: () => {
+      // 使users查询失效，触发重新获取
+      queryClient.invalidateQueries('users');
+    },
+    onError: (error) => {
+      console.error('Failed to create user:', error);
+    },
+  });
+}
+
+// 4. 在组件中使用
+function UsersManagement() {
+  const { data: users, isLoading, error, refetch } = useUsers();
+  const [createUser] = useCreateUser();
+  
+  const handleSubmit = async (userData) => {
+    try {
+      await createUser.mutateAsync(userData);
+    } catch (error) {
+      // 错误处理已在mutation中处理
+    }
+  };
+  
+  if (isLoading) return \u003cdiv\u003e加载中...\u003c/div\u003e;
+  if (error) return \u003cdiv\u003e错误: {error.message}\u003c/div\u003e;
+  
+  return (
+    \u003cdiv\u003e
+      \u003cUserForm onSubmit={handleSubmit} /\u003e
+      \u003cUserList users={users} /\u003e
+      \u003cbutton onClick={refetch}\u003e刷新数据\u003c/button\u003e
+    \u003c/div\u003e
+  );
+}
+\u003c/pre\u003e
+            
+            \u003ch3\u003e3.3 状态管理最佳实践\u003c/h3\u003e
+            \u003cul\u003e
+                \u003cli\u003e只将需要跨组件共享的状态提升到全局状态管理库中\u003c/li\u003e
+                \u003cli\u003e避免状态重复，确保单一数据源\u003c/li\u003e
+                \u003cli\u003e使用选择器(selectors)从全局状态中派生数据\u003c/li\u003e
+                \u003cli\u003e合理设计状态结构，按功能模块划分\u003c/li\u003e
+                \u003cli\u003e处理好异步状态，包括加载中、成功、失败等状态\u003c/li\u003e
+                \u003cli\u003e考虑使用持久化存储保存关键状态\u003c/li\u003e
+            \u003c/ul\u003e
+        \u003c/div\u003e
+        
+        \u003cdiv class="section"\u003e
+            \u003ch2\u003e4. 领域驱动设计 (DDD) 在前端的应用\u003c/h2\u003e
+            
+            \u003ch3\u003e4.1 前端领域模型设计\u003c/h3\u003e
+            \u003cp\u003e领域驱动设计帮助我们更好地组织前端代码，使其与业务领域保持一致，提高可维护性和可理解性。\u003c/p\u003e
+            
+            \u003cdiv class="pattern-card"\u003e
+                \u003ch4\u003e领域模型示例 - 电商应用\u003c/h4\u003e
+                \u003cpre\u003e// 1. 实体 (Entity) - 具有唯一标识的对象
+class Product {
+  constructor(id, name, price, description, category) {
+    this.id = id;
+    this.name = name;
+    this.price = price;
+    this.description = description;
+    this.category = category;
+    this.createdAt = new Date();
+  }
+  
+  updatePrice(newPrice) {
+    if (newPrice < 0) throw new Error('价格不能为负数');
+    this.price = newPrice;
+    this.updatedAt = new Date();
+  }
+  
+  // 业务方法
+  isInCategory(targetCategory) {
+    return this.category === targetCategory;
+  }
+  
+  toDTO() {
+    return {
+      id: this.id,
+      name: this.name,
+      price: this.price,
+      description: this.description,
+      category: this.category
+    };
+  }
+}
+
+// 2. 值对象 (Value Object) - 不依赖标识的对象
+class Money {
+  constructor(amount, currency = 'CNY') {
+    if (typeof amount !== 'number' || amount < 0) {
+      throw new Error('无效的金额');
+    }
+    this.amount = amount;
+    this.currency = currency;
+  }
+  
+  add(other) {
+    if (other.currency !== this.currency) {
+      throw new Error('货币类型不匹配');
+    }
+    return new Money(this.amount + other.amount, this.currency);
+  }
+  
+  subtract(other) {
+    if (other.currency !== this.currency) {
+      throw new Error('货币类型不匹配');
+    }
+    if (this.amount < other.amount) {
+      throw new Error('余额不足');
+    }
+    return new Money(this.amount - other.amount, this.currency);
+  }
+}
+
+// 3. 聚合 (Aggregate) - 相关实体和值对象的组合
+class Cart {
+  constructor(cartId, userId) {
+    this.id = cartId;
+    this.userId = userId;
+    this.items = [];
+    this.createdAt = new Date();
+  }
+  
+  addItem(product, quantity = 1) {
+    const existingItem = this.items.find(item => item.product.id === product.id);
+    
+    if (existingItem) {
+      existingItem.quantity += quantity;
+    } else {
+      this.items.push({
+        product,
+        quantity,
+        addedAt: new Date()
+      });
+    }
+    
+    this.updatedAt = new Date();
+  }
+  
+  removeItem(productId) {
+    this.items = this.items.filter(item => item.product.id !== productId);
+    this.updatedAt = new Date();
+  }
+  
+  calculateTotal() {
+    return this.items.reduce((total, item) => {
+      const itemPrice = new Money(item.product.price * item.quantity);
+      return total.add(itemPrice);
+    }, new Money(0));
+  }
+  
+  getItemsCount() {
+    return this.items.reduce((count, item) => count + item.quantity, 0);
+  }
+}
+
+// 4. 领域服务 (Domain Service) - 处理跨实体的业务逻辑
+class OrderService {
+  constructor(paymentGateway, inventoryService) {
+    this.paymentGateway = paymentGateway;
+    this.inventoryService = inventoryService;
+  }
+  
+  async createOrder(cart, shippingAddress, paymentMethod) {
+    // 检查库存
+    for (const item of cart.items) {
+      const inStock = await this.inventoryService.checkInventory(item.product.id, item.quantity);
+      if (!inStock) {
+        throw new Error(`商品 ${item.product.name} 库存不足`);
+      }
+    }
+    
+    // 计算订单总额
+    const total = cart.calculateTotal();
+    
+    // 创建订单
+    const order = new Order(
+      generateOrderId(),
+      cart.userId,
+      cart.items,
+      total,
+      shippingAddress,
+      paymentMethod,
+      'pending'
+    );
+    
+    // 处理支付
+    const paymentResult = await this.paymentGateway.processPayment({
+      amount: total.amount,
+      currency: total.currency,
+      method: paymentMethod
+    });
+    
+    if (paymentResult.success) {
+      order.confirmPayment(paymentResult.transactionId);
+      
+      // 扣除库存
+      await Promise.all(cart.items.map(item => 
+        this.inventoryService.reduceStock(item.product.id, item.quantity)
+      ));
+      
+      return order;
+    } else {
+      throw new Error('支付失败: ' + paymentResult.message);
+    }
+  }
+}
+\u003c/pre\u003e
+            \u003c/div\u003e
+            
+            \u003ch3\u003e4.2 前端项目结构组织\u003c/h3\u003e
+            \u003cpre\u003e// 按领域组织的项目结构示例
+/src
+  /domains                # 领域层
+    /product
+      /entities
+        Product.js
+        ProductCategory.js
+      /services
+        ProductService.js
+      /repositories
+        ProductRepository.js
+      /hooks
+        useProducts.js
+    /order
+      /entities
+        Order.js
+        OrderItem.js
+      /services
+        OrderService.js
+      /repositories
+        OrderRepository.js
+    /cart
+      /entities
+        Cart.js
+        CartItem.js
+      /services
+        CartService.js
+    /user
+      /entities
+        User.js
+        Address.js
+      /services
+        UserService.js
+  
+  /app                    # 应用层
+    /router
+      index.js
+      routes.js
+    /store
+      index.js
+      slices/
+        productSlice.js
+        orderSlice.js
+        cartSlice.js
+        userSlice.js
+  
+  /presentation           # 表示层
+    /components
+      /common             # 通用组件
+        Button.js
+        Input.js
+        Modal.js
+      /product            # 产品领域组件
+        ProductCard.js
+        ProductList.js
+        ProductDetail.js
+      /order              # 订单领域组件
+        OrderSummary.js
+        OrderHistory.js
+      /cart               # 购物车领域组件
+        CartItem.js
+        CartSummary.js
+    /pages
+      HomePage.js
+      ProductPage.js
+      CartPage.js
+      CheckoutPage.js
+      OrderHistoryPage.js
+    /layouts
+      MainLayout.js
+      DashboardLayout.js
+  
+  /shared                 # 共享基础设施
+    /api
+      apiClient.js
+    /utils
+      formatters.js
+      validators.js
+    /hooks
+      useLocalStorage.js
+      useForm.js
+  
+  App.js
+  index.js
+\u003c/pre\u003e
+            
+            \u003cdiv class="tip"\u003e
+                \u003ch4\u003e💡 提示</h4\u003e
+                \u003cp\u003e领域驱动设计特别适合复杂业务逻辑的应用。对于简单应用，过度的DDD可能会增加不必要的复杂性。应根据项目规模和复杂度选择合适的架构深度。</p\u003e
+            \u003c/div\u003e
+        \u003c/div\u003e
+        
+        \u003cdiv class="section"\u003e
+            \u003ch2\u003e5. 前沿架构模式探索\u003c/h2\u003e
+            
+            \u003ch3\u003e5.1 基于原子设计的组件系统\u003c/h3\u003e
+            \u003cdiv class="pros-cons"\u003e
+                \u003cdiv class="pros"\u003e
+                    \u003ch4\u003e✅ 优势</h4\u003e
+                    \u003cul>
+                        \u003cli>建立一致的设计系统和组件库</li>
+                        \u003cli>组件复用率高，减少重复代码</li>
+                        \u003cli>设计和开发之间的协作更加顺畅</li>
+                        \u003cli>维护成本降低，样式变更只需在一处修改</li>
+                    \u003c/ul>
+                \u003c/div\u003e
+                \u003cdiv class="cons"\u003e
+                    \u003ch4\u003e❌ 挑战</h4\u003e
+                    \u003cul>
+                        \u003cli>初始设置成本较高</li>
+                        \u003cli>需要团队统一理解和遵循设计规范</li>
+                        \u003cli>过度设计可能导致灵活性不足</li>
+                        \u003cli>组件层级过多可能影响性能</li>
+                    \u003c/ul>
+                \u003c/div\u003e
+            \u003c/div\u003e
+            
+            \u003ch3\u003e5.2 基于微前端的微服务架构\u003c/h3\u003e
+            \u003cpre\u003e// 微前端架构示例 - 使用Module Federation
+// webpack.config.js (容器应用)
+const { ModuleFederationPlugin } = require('webpack').container;
+
+module.exports = {
+  plugins: [
+    new ModuleFederationPlugin({
+      name: 'container',
+      filename: 'remoteEntry.js',
+      remotes: {
+        productApp: 'productApp@http://localhost:3001/remoteEntry.js',
+        cartApp: 'cartApp@http://localhost:3002/remoteEntry.js',
+        userApp: 'userApp@http://localhost:3003/remoteEntry.js',
+      },
+      shared: {
+        react: {
+          singleton: true,
+          requiredVersion: '^17.0.2',
+        },
+        'react-dom': {
+          singleton: true,
+          requiredVersion: '^17.0.2',
+        },
+      },
+    }),
+  ],
+};
+
+// 远程应用配置 (如productApp)
+module.exports = {
+  plugins: [
+    new ModuleFederationPlugin({
+      name: 'productApp',
+      filename: 'remoteEntry.js',
+      exposes: {
+        './ProductsList': './src/ProductsList',
+        './ProductDetail': './src/ProductDetail',
+        './ProductStore': './src/store',
+      },
+      shared: {
+        react: {
+          singleton: true,
+          requiredVersion: '^17.0.2',
+        },
+        'react-dom': {
+          singleton: true,
+          requiredVersion: '^17.0.2',
+        },
+      },
+    }),
+  ],
+};
+
+// 容器应用中使用远程模块
+import React, { lazy, Suspense } from 'react';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+
+const ProductsList = lazy(() => import('productApp/ProductsList'));
+const ProductDetail = lazy(() => import('productApp/ProductDetail'));
+const Cart = lazy(() => import('cartApp/Cart'));
+const UserProfile = lazy(() => import('userApp/UserProfile'));
+
+function App() {
+  return (
+    \u003cBrowserRouter\u003e
+      \u003cSuspense fallback={\u003cdiv\u003e加载中...\u003c/div\u003e}\u003e
+        \u003cRoutes\u003e
+          \u003cRoute path="/" element={\u003cHomePage /\u003e} /\u003e
+          \u003cRoute path="/products" element={\u003cProductsList /\u003e} /\u003e
+          \u003cRoute path="/products/:id" element={\u003cProductDetail /\u003e} /\u003e
+          \u003cRoute path="/cart" element={\u003cCart /\u003e} /\u003e
+          \u003cRoute path="/profile" element={\u003cUserProfile /\u003e} /\u003e
+        \u003c/Routes\u003e
+      \u003c/Suspense\u003e
+    \u003c/BrowserRouter\u003e
+  );
+}
+\u003c/pre\u003e
+            
+            \u003ch3\u003e5.3 函数式前端架构\u003c/h3\u003e
+            \u003cpre\u003e// 使用函数式编程范式构建前端应用
+import React from 'react';
+import { pipe, map, filter, reduce } from 'ramda';
+
+// 纯函数 - 数据转换
+const formatPrice = (price, currency = '¥') => `${currency}${price.toFixed(2)}`;
+
+const calculateTotal = items => 
+  reduce((total, item) => total + item.price * item.quantity, 0, items);
+
+const filterInStock = filter(item => item.inStock);
+
+const sortByPrice = items => 
+  [...items].sort((a, b) => a.price - b.price);
+
+// 组合函数
+const processProducts = pipe(
+  filterInStock,
+  sortByPrice,
+  map(item => ({ ...item, formattedPrice: formatPrice(item.price) }))
+);
+
+// 函数式组件
+function ProductsList({ products }) {
+  // 处理产品数据
+  const processedProducts = processProducts(products);
+  
+  // 函数式渲染
+  return (
+    \u003cul className="products-list"\u003e
+      {processedProducts.map(product => (
+        \u003cli key={product.id} className="product-item"\u003e
+          \u003ch3\u003e{product.name}\u003c/h3\u003e
+          \u003cspan className="price"\u003e{product.formattedPrice}\u003c/span\u003e
+        \u003c/li\u003e
+      ))}
+    \u003c/ul\u003e
+  );
+}
+
+// 使用自定义Hook进行状态管理 (函数式方式)
+function useCart() {
+  const [items, setItems] = React.useState([]);
+  
+  // 纯函数式更新
+  const addItem = React.useCallback((product, quantity = 1) => {
+    setItems(prevItems => {
+      const existingItem = prevItems.find(item => item.product.id === product.id);
+      
+      if (existingItem) {
+        return prevItems.map(item => 
+          item.product.id === product.id 
+            ? { ...item, quantity: item.quantity + quantity }
+            : item
+        );
+      }
+      
+      return [...prevItems, { product, quantity }];
+    });
+  }, []);
+  
+  // 派生状态 - 计算属性
+  const totalItems = React.useMemo(() => 
+    reduce((count, item) => count + item.quantity, 0, items),
+    [items]
+  );
+  
+  const totalAmount = React.useMemo(() => 
+    calculateTotal(items),
+    [items]
+  );
+  
+  return {
+    items,
+    addItem,
+    removeItem: React.useCallback((productId) => {
+      setItems(prevItems => 
+        prevItems.filter(item => item.product.id !== productId)
+      );
+    }, []),
+    totalItems,
+    totalAmount: formatPrice(totalAmount),
+    isEmpty: items.length === 0
+  };
+}
+\u003c/pre\u003e
+        \u003c/div\u003e
+        
+        \u003cdiv class="section"\u003e
+            \u003ch2\u003e6. 架构选择与演进策略\u003c/h2\u003e
+            
+            \u003ch3\u003e6.1 架构选择考虑因素\u003c/h3\u003e
+            \u003ctable\u003e
+                \u003ctr\u003e
+                    \u003cth\u003e考虑因素\u003c/th\u003e
+                    \u003cth\u003e小型应用\u003c/th\u003e
+                    \u003cth\u003e中型应用\u003c/th\u003e
+                    \u003cth\u003e大型应用\u003c/th\u003e
+                \u003c/tr\u003e
+                \u003ctr\u003e
+                    \u003ctd\u003e团队规模\u003c/td\u003e
+                    \u003ctd\u003e1-3人\u003c/td\u003e
+                    \u003ctd\u003e4-10人\u003c/td\u003e
+                    \u003ctd\u003e10+人\u003c/td\u003e
+                \u003c/tr\u003e
+                \u003ctr\u003e
+                    \u003ctd\u003e推荐架构\u003c/td\u003e
+                    \u003ctd\u003e简单组件化\u003c/td\u003e
+                    \u003ctd\u003e组件系统 + 状态管理\u003c/td\u003e
+                    \u003ctd\u003eDDD + 微前端\u003c/td\u003e
+                \u003c/tr\u003e
+                \u003ctr\u003e
+                    \u003ctd\u003e状态管理\u003c/td\u003e
+                    \u003ctd\u003eReact Context\u003c/td\u003e
+                    \u003ctd\u003eRedux Toolkit/Recoil\u003c/td\u003e
+                    \u003ctd\u003e领域状态 + 全局状态\u003c/td\u003e
+                \u003c/tr\u003e
+                \u003ctr\u003e
+                    \u003ctd\u003e数据获取\u003c/td\u003e
+                    \u003ctd\u003e直接fetch\u003c/td\u003e
+                    \u003ctd\u003eReact Query/SWR\u003c/td\u003e
+                    \u003ctd\u003e领域服务 + 缓存策略\u003c/td\u003e
+                \u003c/tr\u003e
+            \u003c/table\u003e
+            
+            \u003ch3\u003e6.2 架构演进策略\u003c/h3\u003e
+            \u003col\u003e
+                \u003cli\u003e\u003cstrong\u003e渐进式采用\u003c/strong\u003e：不要试图一次性重构整个应用，采用增量方式改进架构\u003c/li\u003e
+                \u003cli\u003e\u003cstrong\u003e保持核心稳定\u003c/strong\u003e：核心架构决策应保持相对稳定，避免频繁变更\u003c/li\u003e
+                \u003cli\u003e\u003cstrong\u003e建立架构治理\u003c/strong\u003e：制定架构设计决策记录(ADR)和代码审查标准\u003c/li\u003e
+                \u003cli\u003e\u003cstrong\u003e持续学习与改进\u003c/strong\u003e：定期评估架构的有效性，引入新的最佳实践\u003c/li\u003e
+                \u003cli\u003e\u003cstrong\u003e自动化保障\u003c/strong\u003e：通过自动化测试、静态代码分析等工具确保架构合规性\u003c/li\u003e
+            \u003c/ol\u003e
+            
+            \u003cdiv class="demo-area"\u003e
+                \u003ch4\u003e架构评估工具\u003c/h4\u003e
+                \u003cbutton id="architectureAssessBtn"\u003e运行架构评估检查清单\u003c/button\u003e
+                \u003cdiv id="architectureAssessResult" class="result"\u003e\u003c/div\u003e
+            \u003c/div\u003e
+        \u003c/div\u003e
+    \u003c/div\u003e
+    
+    \u003cscript\u003e
+        // 架构评估工具演示
+        document.getElementById('architectureAssessBtn').addEventListener('click', function() {
+            const result = document.getElementById('architectureAssessResult');
+            result.innerHTML = '开始架构评估...\n\n';
+            
+            // 模拟评估过程
+            setTimeout(() => {
+                result.innerHTML += '🔍 检查代码组织结构\n';
+                
+                setTimeout(() => {
+                    result.innerHTML += '✅ 代码组织结构清晰，按功能模块划分\n';
+                    result.innerHTML += '🔍 评估组件设计模式\n';
+                    
+                    setTimeout(() => {
+                        result.innerHTML += '✅ 组件遵循单一职责原则\n';
+                        result.innerHTML += '✅ 组件复用率高\n';
+                        result.innerHTML += '⚠️ 建议改进：部分组件耦合度较高\n';
+                        result.innerHTML += '🔍 评估状态管理策略\n';
+                        
+                        setTimeout(() => {
+                            result.innerHTML += '✅ 状态分层合理\n';
+                            result.innerHTML += '✅ 使用了选择器派生数据\n';
+                            result.innerHTML += '⚠️ 建议改进：全局状态过多，考虑将部分状态下沉\n';
+                            result.innerHTML += '🔍 评估数据获取策略\n';
+                            
+                            setTimeout(() => {
+                                result.innerHTML += '✅ 实现了数据缓存机制\n';
+                                result.innerHTML += '✅ 错误处理完善\n';
+                                result.innerHTML += '✅ 加载状态管理合理\n';
+                                result.innerHTML += '🔍 评估代码可测试性\n';
+                                
+                                setTimeout(() => {
+                                    result.innerHTML += '✅ 业务逻辑与UI分离\n';
+                                    result.innerHTML += '⚠️ 建议改进：增加单元测试覆盖率\n';
+                                    result.innerHTML += '🔍 评估性能优化措施\n';
+                                    
+                                    setTimeout(() => {
+                                        result.innerHTML += '✅ 实现了代码分割\n';
+                                        result.innerHTML += '✅ 使用了懒加载\n';
+                                        result.innerHTML += '✅ 组件优化良好\n';
+                                        
+                                        // 最终评分
+                                        setTimeout(() => {
+                                            result.innerHTML += '\n📊 架构评估完成\n';
+                                            result.innerHTML += '总体评分: 85/100\n\n';
+                                            
+                                            result.innerHTML += '📈 优势：\n';
+                                            result.innerHTML += '• 清晰的代码组织结构\n';
+                                            result.innerHTML += '• 良好的组件设计原则\n';
+                                            result.innerHTML += '• 完善的数据管理策略\n';
+                                            result.innerHTML += '• 有效的性能优化措施\n\n';
+                                            
+                                            result.innerHTML += '📉 改进建议：\n';
+                                            result.innerHTML += '1. 降低组件间耦合度\n';
+                                            result.innerHTML += '2. 优化全局状态管理\n';
+                                            result.innerHTML += '3. 提高单元测试覆盖率\n';
+                                            result.innerHTML += '4. 建立架构设计决策文档\n';
+                                            result.innerHTML += '5. 考虑引入更多领域驱动设计思想\n\n';
+                                            
+                                            result.innerHTML += '💡 架构演进路线建议：\n';
+                                            result.innerHTML += '• 短期：重构高耦合组件，优化状态管理\n';
+                                            result.innerHTML += '• 中期：增加自动化测试，建立架构规范\n';
+                                            result.innerHTML += '• 长期：探索微前端架构，进一步领域化改造';
+                                        }, 1000);
+                                    }, 1000);
+                                }, 1000);
+                            }, 1000);
+                        }, 1000);
+                    }, 1000);
+                }, 1000);
+            }, 800);
+        });
+    \u003c/script\u003e
+\u003c/body\u003e
+\u003c/html\u003e

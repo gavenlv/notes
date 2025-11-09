@@ -1,0 +1,149 @@
+pipeline {
+    // 指定运行环境
+    agent any
+    
+    // 环境变量配置
+    environment {
+        APP_NAME = 'hello-world'
+        VERSION = '1.0.0'
+        BUILD_NUMBER = "${env.BUILD_NUMBER}"
+    }
+    
+    // 阶段定义
+    stages {
+        // 准备阶段
+        stage('Preparation') {
+            steps {
+                echo '=== 准备阶段开始 ==='
+                echo "应用名称: ${APP_NAME}"
+                echo "版本号: ${VERSION}"
+                echo "构建编号: ${BUILD_NUMBER}"
+                
+                // 检查环境
+                sh 'java -version'
+                sh 'mvn --version'
+                echo '=== 准备阶段完成 ==='
+            }
+        }
+        
+        // 检出代码阶段
+        stage('Checkout') {
+            steps {
+                echo '=== 检出代码阶段开始 ==='
+                
+                // 检出源代码
+                checkout([
+                    $class: 'GitSCM',
+                    branches: [[name: '*/main']],
+                    extensions: [[$class: 'LocalBranch']],
+                    userRemoteConfigs: [[url: 'https://github.com/your-org/hello-world.git']]
+                ])
+                
+                // 显示检出结果
+                sh 'ls -la'
+                echo '=== 检出代码阶段完成 ==='
+            }
+        }
+        
+        // 构建阶段
+        stage('Build') {
+            steps {
+                echo '=== 构建阶段开始 ==='
+                
+                // 使用Maven构建
+                sh 'mvn clean compile'
+                
+                // 检查构建结果
+                sh 'ls -la target/'
+                echo '=== 构建阶段完成 ==='
+            }
+        }
+        
+        // 测试阶段
+        stage('Test') {
+            steps {
+                echo '=== 测试阶段开始 ==='
+                
+                // 运行单元测试
+                sh 'mvn test'
+                
+                // 生成测试报告
+                junit 'target/surefire-reports/*.xml'
+                
+                echo '=== 测试阶段完成 ==='
+            }
+            
+            // 测试阶段后处理
+            post {
+                always {
+                    echo '测试阶段执行完成'
+                    // 可以在这里添加测试报告发布等操作
+                }
+                success {
+                    echo '所有测试通过！'
+                }
+                failure {
+                    echo '有测试失败！'
+                }
+            }
+        }
+        
+        // 打包阶段
+        stage('Package') {
+            steps {
+                echo '=== 打包阶段开始 ==='
+                
+                // 打包应用
+                sh 'mvn package -DskipTests'
+                
+                // 存档构建产物
+                archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
+                
+                echo '=== 打包阶段完成 ==='
+            }
+        }
+    }
+    
+    // 整个Pipeline的后处理
+    post {
+        // 总是执行
+        always {
+            echo '=== Pipeline执行完成 ==='
+            echo "构建状态: ${currentBuild.result ?: 'SUCCESS'}"
+            echo "构建URL: ${env.BUILD_URL}"
+            
+            // 清理工作空间
+            cleanWs()
+        }
+        
+        // 构建成功时执行
+        success {
+            echo '🎉 Pipeline执行成功！'
+            
+            // 发送成功通知（示例）
+            // mail to: 'team@company.com',
+            //      subject: "构建成功: ${APP_NAME} ${VERSION}",
+            //      body: "构建 ${BUILD_NUMBER} 成功完成。"
+        }
+        
+        // 构建失败时执行
+        failure {
+            echo '❌ Pipeline执行失败！'
+            
+            // 发送失败通知（示例）
+            // mail to: 'devops@company.com',
+            //      subject: "构建失败: ${APP_NAME} ${VERSION}",
+            //      body: "构建 ${BUILD_NUMBER} 失败。请检查日志: ${env.BUILD_URL}"
+        }
+        
+        // 构建不稳定时执行
+        unstable {
+            echo '⚠️ Pipeline执行不稳定'
+        }
+        
+        // 构建被中止时执行
+        aborted {
+            echo '⏹️ Pipeline执行被中止'
+        }
+    }
+}

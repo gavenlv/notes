@@ -1,0 +1,2498 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>前端框架性能优化与监控指南</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            line-height: 1.8;
+            color: #333;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            margin-bottom: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+        
+        .header h1 {
+            font-size: 2.8rem;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-weight: 700;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .header p {
+            font-size: 1.2rem;
+            color: #7f8c8d;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .content {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+        
+        h2 {
+            font-size: 2.2rem;
+            color: #2c3e50;
+            margin: 40px 0 25px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid #3498db;
+            font-weight: 600;
+        }
+        
+        h2:first-of-type {
+            margin-top: 0;
+        }
+        
+        h3 {
+            font-size: 1.6rem;
+            color: #34495e;
+            margin: 30px 0 20px;
+            font-weight: 600;
+        }
+        
+        h4 {
+            font-size: 1.3rem;
+            color: #34495e;
+            margin: 20px 0 15px;
+            font-weight: 600;
+        }
+        
+        h5 {
+            font-size: 1.1rem;
+            color: #555;
+            margin: 15px 0 10px;
+            font-weight: 600;
+        }
+        
+        p {
+            margin-bottom: 20px;
+            font-size: 1.05rem;
+            color: #555;
+        }
+        
+        ul, ol {
+            margin-bottom: 25px;
+            padding-left: 25px;
+        }
+        
+        li {
+            margin-bottom: 10px;
+            font-size: 1.05rem;
+            color: #555;
+        }
+        
+        li strong {
+            color: #2c3e50;
+        }
+        
+        .card {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 30px;
+            border-left: 5px solid #3498db;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+        }
+        
+        .performance-card {
+            background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
+            border-left: 5px solid #673ab7;
+        }
+        
+        .optimization-card {
+            background: linear-gradient(135deg, #e8f5e9 0%, #f1f8e9 100%);
+            border-left: 5px solid #4caf50;
+        }
+        
+        .monitoring-card {
+            background: linear-gradient(135deg, #fff3e0 0%, #fffde7 100%);
+            border-left: 5px solid #ff9800;
+        }
+        
+        .danger-card {
+            background: linear-gradient(135deg, #ffebee 0%, #fce4ec 100%);
+            border-left: 5px solid #f44336;
+        }
+        
+        code {
+            background: #282c34;
+            color: #abb2bf;
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-family: 'Fira Code', 'Consolas', Monaco, 'Courier New', monospace;
+            font-size: 0.9em;
+            white-space: nowrap;
+        }
+        
+        pre {
+            background: #282c34;
+            color: #abb2bf;
+            padding: 20px;
+            border-radius: 12px;
+            overflow-x: auto;
+            margin-bottom: 25px;
+            font-family: 'Fira Code', 'Consolas', Monaco, 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+        }
+        
+        pre code {
+            background: none;
+            padding: 0;
+            color: inherit;
+            white-space: pre;
+        }
+        
+        .code-title {
+            background: #34495e;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 12px 12px 0 0;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 0;
+        }
+        
+        .code-title + pre {
+            border-radius: 0 0 12px 12px;
+            margin-top: 0;
+        }
+        
+        .demo-section {
+            margin: 35px 0;
+            padding: 30px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 15px;
+            border: 2px solid #e9ecef;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .demo-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #667eea, #764ba2, #f093fb, #4facfe, #00f2fe);
+        }
+        
+        .demo-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 14px 30px;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 10px 15px 10px 0;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .demo-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6);
+        }
+        
+        .demo-button:active {
+            transform: translateY(-1px);
+        }
+        
+        .demo-result {
+            margin-top: 25px;
+            padding: 20px;
+            background: #282c34;
+            color: #abb2bf;
+            border-radius: 12px;
+            min-height: 120px;
+            font-family: 'Fira Code', 'Consolas', Monaco, 'Courier New', monospace;
+            overflow-x: auto;
+            position: relative;
+        }
+        
+        .demo-result::before {
+            content: '执行结果';
+            position: absolute;
+            top: -10px;
+            left: 20px;
+            background: #34495e;
+            color: white;
+            padding: 2px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 25px 0;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        th, td {
+            padding: 15px 20px;
+            text-align: left;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-weight: 600;
+            font-size: 15px;
+        }
+        
+        tr:last-child td {
+            border-bottom: none;
+        }
+        
+        tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .highlight {
+            background: linear-gradient(120deg, #a8edea 0%, #fed6e3 100%);
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .metric-card {
+            display: inline-block;
+            background: white;
+            border-radius: 12px;
+            padding: 20px 30px;
+            margin: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            min-width: 200px;
+            transition: transform 0.3s ease;
+        }
+        
+        .metric-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .metric-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #667eea;
+            margin: 10px 0;
+        }
+        
+        .metric-label {
+            color: #7f8c8d;
+            font-size: 1rem;
+            font-weight: 500;
+        }
+        
+        .chart-placeholder {
+            width: 100%;
+            height: 300px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 12px;
+            margin: 20px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #7f8c8d;
+            font-size: 18px;
+            font-weight: 500;
+            border: 2px dashed #bdc3c7;
+        }
+        
+        .timeline {
+            position: relative;
+            max-width: 900px;
+            margin: 30px auto;
+        }
+        
+        .timeline::after {
+            content: '';
+            position: absolute;
+            width: 6px;
+            background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+            top: 0;
+            bottom: 0;
+            left: 50%;
+            margin-left: -3px;
+            border-radius: 10px;
+        }
+        
+        .timeline-item {
+            padding: 20px 40px;
+            position: relative;
+            width: 50%;
+            box-sizing: border-box;
+        }
+        
+        .timeline-item::after {
+            content: '';
+            position: absolute;
+            width: 25px;
+            height: 25px;
+            right: -12px;
+            background: white;
+            border: 5px solid #667eea;
+            top: 25px;
+            border-radius: 50%;
+            z-index: 1;
+        }
+        
+        .left {
+            left: 0;
+        }
+        
+        .right {
+            left: 50%;
+        }
+        
+        .right::after {
+            left: -12px;
+        }
+        
+        .timeline-content {
+            padding: 25px;
+            background: white;
+            position: relative;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+        
+        .timeline-content:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+        
+        .timeline-content h4 {
+            margin-top: 0;
+            color: #667eea;
+            font-size: 1.4rem;
+        }
+        
+        .badge {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .badge.primary { background: #667eea; }
+        .badge.success { background: #2ecc71; }
+        .badge.warning { background: #f39c12; }
+        .badge.danger { background: #e74c3c; }
+        .badge.info { background: #3498db; }
+        
+        @media screen and (max-width: 768px) {
+            .timeline::after {
+                left: 31px;
+            }
+            
+            .timeline-item {
+                width: 100%;
+                padding-left: 70px;
+                padding-right: 25px;
+            }
+            
+            .timeline-item::after {
+                left: 19px;
+                right: auto;
+            }
+            
+            .right {
+                left: 0%;
+            }
+            
+            .header h1 {
+                font-size: 2.2rem;
+            }
+            
+            h2 {
+                font-size: 1.8rem;
+            }
+            
+            h3 {
+                font-size: 1.4rem;
+            }
+            
+            .container {
+                padding: 15px;
+            }
+            
+            .content {
+                padding: 25px;
+            }
+            
+            .metric-card {
+                margin: 10px 0;
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>前端框架性能优化与监控指南</h1>
+            <p>深入探讨现代前端框架的性能优化策略、监控技术和最佳实践，构建高性能Web应用</p>
+        </div>
+        
+        <div class="content">
+            <section id="performance-overview">
+                <h2>1. 性能优化概述</h2>
+                
+                <div class="card performance-card">
+                    <h3>1.1 为什么前端性能重要</h3>
+                    <p>在现代Web应用中，性能已经成为用户体验的关键因素。研究表明，性能直接影响用户留存率、转化率和整体业务指标。</p>
+                    
+                    <div style="text-align: center; margin: 30px 0;">
+                        <div class="metric-card">
+                            <div class="metric-label">页面加载延迟增加1秒</div>
+                            <div class="metric-value">7%</div>
+                            <div class="metric-label">转化率下降</div>
+                        </div>
+                        
+                        <div class="metric-card">
+                            <div class="metric-label">移动页面加载时间</div>
+                            <div class="metric-value">3秒</div>
+                            <div class="metric-label">最佳加载时间</div>
+                        </div>
+                        
+                        <div class="metric-card">
+                            <div class="metric-label">性能提升</div>
+                            <div class="metric-value">40%</div>
+                            <div class="metric-label">用户留存率增长</div>
+                        </div>
+                    </div>
+                    
+                    <h4>性能指标与业务价值：</h4>
+                    <ul>
+                        <li><strong>用户体验</strong>：流畅的交互和快速的响应时间提升用户满意度</li>
+                        <li><strong>搜索引擎排名</strong>：Google将页面性能作为搜索排名的重要因素</li>
+                        <li><strong>资源消耗</strong>：优化的应用减少带宽使用和服务器负载</li>
+                        <li><strong>转化率</strong>：性能优化直接影响电商网站的销售转化率</li>
+                    </ul>
+                </div>
+                
+                <div class="card">
+                    <h3>1.2 核心Web性能指标</h3>
+                    <p>现代浏览器提供了一系列性能指标来衡量Web应用的用户体验：</p>
+                    
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>指标名称</th>
+                                <th>描述</th>
+                                <th>目标值</th>
+                                <th>重要性</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>LCP (Largest Contentful Paint)</td>
+                                <td>最大内容绘制时间，衡量页面主要内容加载速度</td>
+                                <td>&lt; 2.5秒</td>
+                                <td>高</td>
+                            </tr>
+                            <tr>
+                                <td>FID (First Input Delay)</td>
+                                <td>首次输入延迟，衡量响应性</td>
+                                <td>&lt; 100毫秒</td>
+                                <td>高</td>
+                            </tr>
+                            <tr>
+                                <td>CLS (Cumulative Layout Shift)</td>
+                                <td>累积布局偏移，衡量视觉稳定性</td>
+                                <td>&lt; 0.1</td>
+                                <td>高</td>
+                            </tr>
+                            <tr>
+                                <td>FCP (First Contentful Paint)</td>
+                                <td>首次内容绘制，衡量页面初次渲染</td>
+                                <td>&lt; 1.8秒</td>
+                                <td>中</td>
+                            </tr>
+                            <tr>
+                                <td>TTI (Time to Interactive)</td>
+                                <td>可交互时间，衡量页面完全可交互时间</td>
+                                <td>&lt; 3.8秒</td>
+                                <td>中</td>
+                            </tr>
+                            <tr>
+                                <td>TBT (Total Blocking Time)</td>
+                                <td>总阻塞时间，衡量主线程阻塞情况</td>
+                                <td>&lt; 200毫秒</td>
+                                <td>中</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    
+                    <div class="demo-section">
+                        <h4>性能指标可视化</h4>
+                        <div class="chart-placeholder">
+                            Web Vitals 性能指标示意图表
+                        </div>
+                        <button class="demo-button" onclick="showPerformanceMetricsDemo()">显示性能指标演示</button>
+                        <div id="performanceMetricsResult" class="demo-result"></div>
+                    </div>
+                </div>
+            </section>
+            
+            <section id="framework-optimization">
+                <h2>2. 前端框架性能优化策略</h2>
+                
+                <div class="card optimization-card">
+                    <h3>2.1 React 性能优化</h3>
+                    
+                    <h4>2.1.1 组件渲染优化</h4>
+                    
+                    <span class="badge primary">useMemo</span>
+                    <span class="badge primary">useCallback</span>
+                    <span class="badge primary">React.memo</span>
+                    
+                    <div class="code-title">使用 useMemo 和 useCallback 优化渲染</div>
+                    <pre><code>import React, { useState, useMemo, useCallback } from 'react';
+
+function ExpensiveComponent({ data, onUpdate }) {
+  // 使用 useMemo 缓存计算结果
+  const processedData = useMemo(() => {
+    console.log('执行昂贵的计算...');
+    // 模拟耗时操作
+    return data.map(item => ({ ...item, value: item.value * 2 })).filter(item => item.value > 10);
+  }, [data]); // 仅当 data 改变时重新计算
+  
+  // 使用 useCallback 缓存回调函数
+  const handleClick = useCallback((id) => {
+    console.log('点击项目:', id);
+    onUpdate(id);
+  }, [onUpdate]); // 仅当 onUpdate 改变时重新创建
+  
+  return (
+    &lt;div&gt;
+      &lt;h3&gt;处理后的数据 ({processedData.length})&lt;/h3&gt;
+      {processedData.map(item => (
+        &lt;div key={item.id} onClick={() => handleClick(item.id)}&gt;
+          {item.name}: {item.value}
+        &lt;/div&gt;
+      ))}
+    &lt;/div&gt;
+  );
+}
+
+// 使用 React.memo 避免不必要的重渲染
+const MemoizedExpensiveComponent = React.memo(ExpensiveComponent);</code></pre>
+                    
+                    <h4>2.1.2 虚拟化长列表</h4>
+                    <p>对于包含大量数据的列表，使用虚拟化技术只渲染可视区域内的元素：</p>
+                    
+                    <div class="code-title">使用 react-window 实现虚拟列表</div>
+                    <pre><code>import React from 'react';
+import { FixedSizeList as List } from 'react-window';
+
+const VirtualizedList = ({ items, itemHeight = 35 }) => {
+  const Row = ({ index, style }) => {
+    const item = items[index];
+    return (
+      &lt;div style={style} className="list-item"&gt;
+        {item.id}: {item.name}
+      &lt;/div&gt;
+    );
+  };
+
+  return (
+    &lt;List
+      height={400}
+      width="100%"
+      itemCount={items.length}
+      itemSize={itemHeight}
+      overscanCount={5} // 预渲染额外的项目以平滑滚动
+    &gt;
+      {Row}
+    &lt;/List&gt;
+  );
+};</code></pre>
+                    
+                    <h4>2.1.3 状态管理优化</h4>
+                    
+                    <div class="code-title">Redux 状态优化策略</div>
+                    <pre><code>// 1. 使用选择器避免不必要的重渲染
+import { createSelector } from 'reselect';
+
+// 基础选择器
+const selectUsers = state => state.users;
+const selectFilter = state => state.filter;
+
+// 记忆化选择器 - 只有当依赖项变化时才重新计算
+const selectFilteredUsers = createSelector(
+  [selectUsers, selectFilter],
+  (users, filter) => {
+    console.log('过滤用户列表...');
+    return users.filter(user => 
+      user.name.toLowerCase().includes(filter.toLowerCase())
+    );
+  }
+);
+
+// 2. Redux Toolkit 中的状态切片
+import { createSlice } from '@reduxjs/toolkit';
+
+const userSlice = createSlice({
+  name: 'users',
+  initialState: {
+    data: [],
+    loading: false,
+    error: null
+  },
+  reducers: {
+    // Redux Toolkit 自动使用 Immer 简化状态更新
+    setUsers: (state, action) => {
+      state.data = action.payload;
+    },
+    setLoading: (state, action) => {
+      state.loading = action.payload;
+    }
+  }
+});</code></pre>
+                </div>
+                
+                <div class="card optimization-card">
+                    <h3>2.2 Vue 性能优化</h3>
+                    
+                    <h4>2.2.1 响应式数据优化</h4>
+                    
+                    <div class="code-title">Vue 响应式系统优化</div>
+                    <pre><code>// 1. 冻结不需要响应式的数据
+const staticData = Object.freeze({
+  configOptions: ['选项1', '选项2', '选项3']
+});
+
+export default {
+  data() {
+    return {
+      // 只有动态数据需要是响应式的
+      dynamicData: [],
+      // 静态数据使用 Object.freeze 提高性能
+      staticConfig: staticData
+    };
+  }
+};
+
+// 2. 避免不必要的响应式数据
+// 对于大型数据，考虑使用非响应式存储
+export default {
+  data() {
+    return {
+      // 小型频繁更新的数据保持响应式
+      userPreferences: { theme: 'light' }
+    };
+  },
+  created() {
+    // 大型数据使用非响应式存储
+    this._largeDataset = [];
+  },
+  methods: {
+    loadLargeData() {
+      // 直接操作非响应式数据
+      this._largeDataset = fetchHugeDataset();
+      // 只在需要时更新响应式数据
+      this.updateDisplayData();
+    }
+  }
+};
+
+// 3. 使用 v-once 和 v-memo 指令
+// template
+// &lt;div v-once&gt;这部分内容只渲染一次&lt;/div&gt;
+// &lt;div v-memo="[item.id, item.name]"&gt;只有当指定依赖变化时才重新渲染&lt;/div&gt;</code></pre>
+                    
+                    <h4>2.2.2 Vue 组件优化</h4>
+                    
+                    <div class="code-title">Vue 组件懒加载与缓存</div>
+                    <pre><code>// 1. 路由组件懒加载
+const router = new VueRouter({
+  routes: [
+    {
+      path: '/dashboard',
+      // 懒加载 - 只有在访问路由时才会加载组件
+      component: () => import('./views/Dashboard.vue')
+    },
+    {
+      path: '/user/:id',
+      component: () => import('./views/UserProfile.vue')
+    }
+  ]
+});
+
+// 2. 组件缓存 - 使用 keep-alive
+// App.vue 或父组件
+// &lt;template&gt;
+//   &lt;div&gt;
+//     &lt;keep-alive :include="['Dashboard', 'UserList']"&gt;
+//       &lt;router-view /&gt;
+//     &lt;/keep-alive&gt;
+//   &lt;/div&gt;
+// &lt;/template&gt;
+
+// 3. 计算属性优化
+export default {
+  computed: {
+    // 缓存的计算属性 - 只有当依赖变化时才重新计算
+    filteredItems() {
+      console.log('过滤项目...');
+      return this.items.filter(item => item.status === this.filterStatus);
+    }
+  }
+};</code></pre>
+                </div>
+                
+                <div class="card optimization-card">
+                    <h3>2.3 通用优化策略</h3>
+                    
+                    <h4>2.3.1 代码分割与懒加载</h4>
+                    
+                    <div class="code-title">动态导入实现代码分割</div>
+                    <pre><code>// 1. 基于路由的代码分割
+const routes = [
+  {
+    path: '/',
+    component: Home
+  },
+  {
+    path: '/dashboard',
+    // 动态导入，生成单独的代码块
+    component: () => import(/* webpackChunkName: "dashboard" */ './Dashboard.vue')
+  },
+  {
+    path: '/settings',
+    component: () => import(/* webpackChunkName: "settings" */ './Settings.js')
+  }
+];
+
+// 2. 组件级别的代码分割
+function App() {
+  const [showChart, setShowChart] = useState(false);
+  const [ChartComponent, setChartComponent] = useState(null);
+  
+  // 按需加载重量级组件
+  const loadChart = async () => {
+    setShowChart(true);
+    const { default: Chart } = await import('./Chart');
+    setChartComponent(() => Chart);
+  };
+  
+  return (
+    &lt;div&gt;
+      &lt;h1&gt;数据分析面板&lt;/h1&gt;
+      &lt;button onClick={loadChart}&gt;显示详细图表&lt;/button&gt;
+      
+      {showChart && ChartComponent && &lt;ChartComponent /&gt;}
+    &lt;/div&gt;
+  );
+}
+
+// 3. 库的动态导入
+async function initializeEditor() {
+  try {
+    // 按需导入大型编辑器库
+    const { Editor } = await import('monaco-editor');
+    const editor = Editor.create(document.getElementById('editor'), {
+      value: '// 编辑器内容',
+      language: 'javascript'
+    });
+    return editor;
+  } catch (error) {
+    console.error('编辑器加载失败:', error);
+  }
+}</code></pre>
+                    
+                    <h4>2.3.2 资源优化</h4>
+                    
+                    <div class="card">
+                        <h5>图片优化策略：</h5>
+                        <ul>
+                            <li><strong>懒加载</strong>：仅当图片进入视口时才加载</li>
+                            <li><strong>响应式图片</strong>：根据设备提供不同分辨率的图片</li>
+                            <li><strong>现代图片格式</strong>：使用 WebP、AVIF 等高效格式</li>
+                            <li><strong>图片压缩</strong>：使用工具如 ImageOptim、Squoosh 进行压缩</li>
+                        </ul>
+                        
+                        <div class="code-title">现代图片加载实践</div>
+                        <pre><code>// 1. 原生懒加载
+&lt;img src="image.jpg" loading="lazy" alt="懒加载图片" /&gt;
+
+// 2. 响应式图片
+&lt;picture&gt;
+  &lt;source srcset="image-2000w.avif 2000w, image-1000w.avif 1000w" type="image/avif" /&gt;
+  &lt;source srcset="image-2000w.webp 2000w, image-1000w.webp 1000w" type="image/webp" /&gt;
+  &lt;source srcset="image-2000w.jpg 2000w, image-1000w.jpg 1000w" type="image/jpeg" /&gt;
+  &lt;img 
+    src="image-1000w.jpg" 
+    alt="响应式图片" 
+    loading="lazy"
+    sizes="(max-width: 600px) 100vw, 50vw"
+  /&gt;
+&lt;/picture&gt;
+
+// 3. 占位图方案
+function LazyImage({ src, alt, placeholderSrc }) {
+  const [loaded, setLoaded] = useState(false);
+  
+  return (
+    &lt;div className="image-container"&gt;
+      {/* 占位图始终显示 */}
+      &lt;img 
+        src={placeholderSrc} 
+        alt={alt} 
+        className={`placeholder ${loaded ? 'hidden' : ''}`} 
+      /&gt;
+      
+      {/* 实际图片加载完成后显示 */}
+      &lt;img 
+        src={src} 
+        alt={alt} 
+        className={`actual-image ${loaded ? 'visible' : 'transparent'}`}
+        loading="lazy"
+        onLoad={() => setLoaded(true)}
+      /&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>
+                    </div>
+                    
+                    <h4>2.3.3 Webpack/Vite 构建优化</h4>
+                    
+                    <div class="card">
+                        <h5>Webpack 优化配置：</h5>
+                        
+                        <div class="code-title">webpack.config.js 性能优化配置</div>
+                        <pre><code>module.exports = {
+  // ...
+  optimization: {
+    // 分割代码块
+    splitChunks: {
+      chunks: 'all',
+      maxInitialRequests: 10,
+      minSize: 0,
+      cacheGroups: {
+        vendor: {
+          test: /[\\/]node_modules[\\/]/,
+          name(module) {
+            // 获取包名称
+            const packageName = module.context.match(/[\\/]node_modules[\\/](.*?)([\\/]|$)/)[1];
+            // 处理作用域包
+            return `npm.${packageName.replace('@', '')}`;
+          }
+        },
+        common: {
+          minChunks: 2,
+          priority: -20,
+          reuseExistingChunk: true
+        }
+      }
+    },
+    // 运行时代码分割
+    runtimeChunk: 'single',
+    // 使用 TerserPlugin 压缩 JS
+    minimize: true,
+    minimizer: [
+      new TerserPlugin({
+        terserOptions: {
+          compress: {
+            drop_console: process.env.NODE_ENV === 'production',
+            drop_debugger: true
+          }
+        }
+      })
+    ]
+  },
+  // 使用缓存
+  cache: {
+    type: 'filesystem',
+    buildDependencies: {
+      config: [__filename]
+    }
+  }
+};</code></pre>
+                        
+                        <h5>Vite 优化配置：</h5>
+                        
+                        <div class="code-title">vite.config.js 性能优化配置</div>
+                        <pre><code>import { defineConfig } from 'vite';
+import vue from '@vitejs/plugin-vue';
+import { visualizer } from 'rollup-plugin-visualizer';
+
+export default defineConfig({
+  plugins: [
+    vue(),
+    // 构建分析插件
+    process.env.NODE_ENV === 'production' && visualizer()
+  ],
+  // 优化依赖预构建
+  optimizeDeps: {
+    include: [
+      'vue',
+      'vue-router',
+      'pinia',
+      // 预构建大型依赖
+      'echarts',
+      'lodash-es'
+    ],
+    exclude: ['your-local-package']
+  },
+  // 构建配置
+  build: {
+    // 启用 CSS 代码分割
+    cssCodeSplit: true,
+    // 代码压缩选项
+    minify: 'terser',
+    terserOptions: {
+      compress: {
+        drop_console: true,
+        drop_debugger: true
+      }
+    },
+    // 分块策略
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          // 将大型依赖拆分为单独的块
+          'vue-vendor': ['vue', 'vue-router', 'pinia'],
+          'echarts': ['echarts'],
+          'lodash': ['lodash-es'],
+          // 页面级别的代码分割
+          'home': ['@/views/Home.vue'],
+          'dashboard': ['@/views/Dashboard.vue']
+        }
+      }
+    },
+    // 启用 brotli 压缩
+    brotliSize: true,
+    // 生成 sourcemap
+    sourcemap: process.env.NODE_ENV !== 'production'
+  },
+  // 服务器配置
+  server: {
+    // 启用 HMR
+    hmr: true,
+    // 配置代理
+    proxy: {
+      '/api': {
+        target: 'http://localhost:3000',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, '')
+      }
+    }
+  }
+});</code></pre>
+                    </div>
+                </div>
+            </section>
+            
+            <section id="runtime-optimization">
+                <h2>3. 运行时性能优化</h2>
+                
+                <div class="card performance-card">
+                    <h3>3.1 主线程优化</h3>
+                    
+                    <h4>3.1.1 避免阻塞主线程</h4>
+                    
+                    <div class="code-title">使用 Web Workers 处理耗时任务</div>
+                    <pre><code>// 主线程代码
+document.getElementById('process-btn').addEventListener('click', async () => {
+  const data = getDataToProcess();
+  const resultElement = document.getElementById('result');
+  
+  try {
+    // 创建 Worker
+    const worker = new Worker('/js/data-processor.js');
+    
+    // 设置结果处理回调
+    worker.onmessage = (event) => {
+      if (event.data.type === 'progress') {
+        // 更新进度条
+        updateProgressBar(event.data.progress);
+      } else if (event.data.type === 'result') {
+        // 显示处理结果
+        resultElement.textContent = `处理完成: ${event.data.result}`;
+        worker.terminate(); // 完成后终止 Worker
+      }
+    };
+    
+    // 发送数据到 Worker
+    worker.postMessage({ data });
+    
+  } catch (error) {
+    console.error('处理失败:', error);
+    resultElement.textContent = '处理失败';
+  }
+});
+
+// /js/data-processor.js - Worker 线程代码
+self.onmessage = function(event) {
+  const { data } = event.data;
+  
+  try {
+    console.log('开始在 Worker 中处理数据...');
+    
+    // 模拟耗时处理
+    let result = 0;
+    const totalItems = data.length;
+    
+    for (let i = 0; i < totalItems; i++) {
+      // 执行计算密集型任务
+      result += performHeavyCalculation(data[i]);
+      
+      // 每处理 10% 的数据发送一次进度更新
+      if (i % Math.ceil(totalItems / 10) === 0) {
+        const progress = Math.round((i / totalItems) * 100);
+        self.postMessage({ type: 'progress', progress });
+      }
+    }
+    
+    // 发送最终结果
+    self.postMessage({ type: 'result', result });
+    
+  } catch (error) {
+    self.postMessage({ type: 'error', error: error.message });
+  }
+};
+
+// 使用 requestIdleCallback 延迟非关键任务
+scheduleNonCriticalWork() {
+  if ('requestIdleCallback' in window) {
+    requestIdleCallback(() => {
+      performNonCriticalTask();
+    }, {
+      timeout: 2000 // 确保即使浏览器一直忙碌，任务也会在 2 秒内执行
+    });
+  } else {
+    // 降级方案
+    setTimeout(performNonCriticalTask, 0);
+  }
+}</code></pre>
+                    
+                    <h4>3.1.2 定时器优化</h4>
+                    
+                    <div class="code-title">优化定时器使用</div>
+                    <pre><code>// 问题：setInterval 可能导致主线程阻塞
+// 不推荐的做法
+const badInterval = setInterval(() => {
+  // 执行可能耗时的操作
+  heavyComputation();
+  updateUI();
+}, 100);
+
+// 推荐：使用 requestAnimationFrame 实现更平滑的动画和更新
+let startTime;
+let lastUpdateTime = 0;
+
+function update(timestamp) {
+  if (!startTime) startTime = timestamp;
+  
+  // 计算时间差
+  const elapsed = timestamp - startTime;
+  
+  // 控制更新频率（例如每 100ms 更新一次）
+  if (timestamp - lastUpdateTime >= 100) {
+    lastUpdateTime = timestamp;
+    
+    // 执行更新操作
+    updateProgress(elapsed);
+    
+    // 检查是否需要继续
+    if (elapsed < 10000) { // 运行 10 秒
+      requestAnimationFrame(update);
+    }
+  } else {
+    // 继续请求动画帧
+    requestAnimationFrame(update);
+  }
+}
+
+// 启动动画循环
+requestAnimationFrame(update);
+
+// 智能节流函数
+function throttle(fn, delay) {
+  let lastCall = 0;
+  return function(...args) {
+    const now = Date.now();
+    if (now - lastCall >= delay) {
+      lastCall = now;
+      return fn.apply(this, args);
+    }
+  };
+}
+
+// 智能防抖函数
+function debounce(fn, delay) {
+  let timeoutId;
+  return function(...args) {
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => {
+      fn.apply(this, args);
+    }, delay);
+  };
+}
+
+// 使用示例
+const throttledSearch = throttle(searchFunction, 300);
+const debouncedResize = debounce(handleResize, 250);</code></pre>
+                </div>
+                
+                <div class="card performance-card">
+                    <h3>3.2 内存优化与垃圾回收</h3>
+                    
+                    <h4>3.2.1 内存泄漏检测与修复</h4>
+                    
+                    <div class="code-title">常见内存泄漏场景与解决方案</div>
+                    <pre><code>// 场景 1: 事件监听器未正确移除
+function setupEventListeners() {
+  // 问题：组件卸载时未移除事件监听器
+  window.addEventListener('resize', handleResize);
+  document.addEventListener('click', handleClick);
+}
+
+// 解决方案：在适当的时机清理事件监听器
+function cleanupEventListeners() {
+  window.removeEventListener('resize', handleResize);
+  document.removeEventListener('click', handleClick);
+}
+
+// React 组件中使用 useEffect
+function MyComponent() {
+  useEffect(() => {
+    window.addEventListener('resize', handleResize);
+    
+    // 返回清理函数
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []); // 空依赖数组确保只在挂载和卸载时执行
+}
+
+// 场景 2: 闭包导致的内存泄漏
+function createHandler() {
+  const largeData = new Array(1000000).fill(0); // 大型数组
+  
+  return function handler() {
+    // 即使只使用 smallValue，largeData 也被保留在内存中
+    const smallValue = largeData.length;
+    return smallValue;
+  };
+}
+
+// 解决方案：避免不必要的闭包捕获
+function createBetterHandler() {
+  const largeData = new Array(1000000).fill(0);
+  const smallValue = largeData.length; // 提前提取需要的值
+  
+  return function betterHandler() {
+    return smallValue; // 只引用需要的值
+  };
+}
+
+// 场景 3: DOM 引用未正确清理
+function createElements() {
+  const container = document.getElementById('container');
+  const element = document.createElement('div');
+  container.appendChild(element);
+  
+  // 问题：即使从 DOM 移除元素，仍然保留引用
+  return {
+    element,
+    // ...其他方法
+  };
+}
+
+// 解决方案：确保清理所有引用
+function createAndCleanupElements() {
+  let element = document.createElement('div');
+  const container = document.getElementById('container');
+  container.appendChild(element);
+  
+  return {
+    element,
+    remove() {
+      container.removeChild(element);
+      element = null; // 释放引用，允许垃圾回收
+    }
+  };
+}
+
+// 场景 4: 定时器未清理
+function startPolling() {
+  // 问题：组件卸载时定时器仍在运行
+  const intervalId = setInterval(() => {
+    fetchData();
+  }, 5000);
+}
+
+// 解决方案：确保清理定时器
+function startAndCleanupPolling() {
+  const intervalId = setInterval(() => {
+    fetchData();
+  }, 5000);
+  
+  // 在适当的时机清除定时器
+  return () => clearInterval(intervalId);
+}</code></pre>
+                    
+                    <h4>3.2.2 WeakMap 和 WeakSet 的使用</h4>
+                    
+                    <div class="code-title">使用 WeakMap/WeakSet 优化内存使用</div>
+                    <pre><code>// 使用 WeakMap 存储与对象关联的数据，不会阻止垃圾回收
+const userCache = new WeakMap();
+
+function getUserData(user) {
+  // 检查缓存中是否已有数据
+  if (userCache.has(user)) {
+    console.log('从缓存获取数据');
+    return userCache.get(user);
+  }
+  
+  // 获取数据并缓存
+  const data = fetchUserData(user.id);
+  userCache.set(user, data); // 不会阻止 user 对象被垃圾回收
+  return data;
+}
+
+// 使用 WeakSet 存储 DOM 元素，不会阻止垃圾回收
+const processedElements = new WeakSet();
+
+function processElement(element) {
+  if (processedElements.has(element)) {
+    console.log('元素已处理');
+    return;
+  }
+  
+  // 处理元素
+  element.classList.add('processed');
+  // ...其他处理逻辑
+  
+  // 标记为已处理
+  processedElements.add(element); // 不会阻止元素被垃圾回收
+}
+
+// 实现自定义事件发射器，使用 WeakMap 存储事件监听器
+class EventEmitter {
+  constructor() {
+    this.listeners = new WeakMap();
+  }
+  
+  on(target, event, callback) {
+    if (!this.listeners.has(target)) {
+      this.listeners.set(target, new Map());
+    }
+    
+    const targetListeners = this.listeners.get(target);
+    if (!targetListeners.has(event)) {
+      targetListeners.set(event, new Set());
+    }
+    
+    targetListeners.get(event).add(callback);
+  }
+  
+  emit(target, event, ...args) {
+    if (!this.listeners.has(target)) return;
+    
+    const targetListeners = this.listeners.get(target);
+    if (!targetListeners.has(event)) return;
+    
+    targetListeners.get(event).forEach(callback => {
+      callback.apply(null, args);
+    });
+  }
+  
+  off(target, event, callback) {
+    if (!this.listeners.has(target)) return;
+    
+    const targetListeners = this.listeners.get(target);
+    if (!targetListeners.has(event)) return;
+    
+    if (callback) {
+      targetListeners.get(event).delete(callback);
+    } else {
+      targetListeners.delete(event);
+    }
+  }
+}</code></pre>
+                </div>
+                
+                <div class="card performance-card">
+                    <h3>3.3 网络请求优化</h3>
+                    
+                    <h4>3.3.1 HTTP 缓存策略</h4>
+                    
+                    <div class="card">
+                        <h5>缓存类型与优先级：</h5>
+                        <ul>
+                            <li><strong>Memory Cache</strong>：浏览器内存中的缓存，最快但生命周期短</li>
+                            <li><strong>Disk Cache</strong>：存储在硬盘上的缓存，持久但较慢</li>
+                            <li><strong>Service Worker Cache</strong>：可编程的缓存层，提供更多控制</li>
+                            <li><strong>Push Cache</strong>：HTTP/2 的推送缓存，优先级最低</li>
+                        </ul>
+                        
+                        <h5>Cache-Control 指令：</h5>
+                        <ul>
+                            <li><code>max-age=&lt;seconds&gt;</code>：资源的最大缓存时间</li>
+                            <li><code>public</code>/<code>private</code>：控制是否允许代理缓存</li>
+                            <li><code>no-store</code>：完全不缓存</li>
+                            <li><code>no-cache</code>：必须重新验证后使用</li>
+                            <li><code>immutable</code>：资源不会改变，无需重新验证</li>
+                        </ul>
+                    </div>
+                    
+                    <h4>3.3.2 智能请求管理</h4>
+                    
+                    <div class="code-title">实现请求防抖、节流和缓存</div>
+                    <pre><code>// 请求防抖 - 避免频繁触发相同请求
+function debounceRequest(fn, delay = 300) {
+  let timeoutId;
+  let lastPromise;
+  let lastArgs;
+  
+  return async function(...args) {
+    // 如果参数相同且有进行中的请求，复用该请求
+    if (JSON.stringify(args) === JSON.stringify(lastArgs) && lastPromise) {
+      console.log('复用进行中的请求');
+      return lastPromise;
+    }
+    
+    lastArgs = args;
+    
+    // 清除之前的定时器
+    clearTimeout(timeoutId);
+    
+    // 返回一个新的 Promise
+    lastPromise = new Promise((resolve, reject) => {
+      timeoutId = setTimeout(async () => {
+        try {
+          const result = await fn.apply(this, args);
+          resolve(result);
+        } catch (error) {
+          reject(error);
+        } finally {
+          // 请求完成后清除
+          if (lastPromise === thisPromise) {
+            lastPromise = null;
+          }
+        }
+      }, delay);
+    });
+    
+    const thisPromise = lastPromise;
+    return thisPromise;
+  };
+}
+
+// 请求缓存
+class RequestCache {
+  constructor(options = {}) {
+    this.cache = new Map();
+    this.defaultTTL = options.defaultTTL || 30000; // 默认 30 秒
+  }
+  
+  // 生成缓存键
+  generateKey(url, params = {}) {
+    const sortedParams = Object.keys(params).sort().map(key => 
+      `${key}=${encodeURIComponent(params[key])}`
+    ).join('&');
+    return `${url}?${sortedParams}`;
+  }
+  
+  // 检查缓存是否有效
+  isCacheValid(entry) {
+    return entry && (Date.now() - entry.timestamp) < entry.ttl;
+  }
+  
+  // 带缓存的请求方法
+  async fetchWithCache(url, options = {}) {
+    const { params = {}, ttl = this.defaultTTL, forceRefresh = false } = options;
+    const cacheKey = this.generateKey(url, params);
+    
+    // 检查缓存
+    if (!forceRefresh) {
+      const cachedEntry = this.cache.get(cacheKey);
+      if (this.isCacheValid(cachedEntry)) {
+        console.log('从缓存返回结果');
+        return cachedEntry.data;
+      }
+    }
+    
+    // 执行请求
+    try {
+      const queryString = Object.keys(params)
+        .map(key => `${encodeURIComponent(key)}=${encodeURIComponent(params[key])}`)
+        .join('&');
+      
+      const fullUrl = queryString ? `${url}?${queryString}` : url;
+      const response = await fetch(fullUrl);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      
+      // 更新缓存
+      this.cache.set(cacheKey, {
+        data,
+        timestamp: Date.now(),
+        ttl
+      });
+      
+      // 清理过期缓存 (可选)
+      this.cleanupExpiredCache();
+      
+      return data;
+    } catch (error) {
+      console.error('请求失败:', error);
+      throw error;
+    }
+  }
+  
+  // 清理过期缓存
+  cleanupExpiredCache() {
+    const now = Date.now();
+    for (const [key, entry] of this.cache.entries()) {
+      if (now - entry.timestamp > entry.ttl) {
+        this.cache.delete(key);
+      }
+    }
+  }
+  
+  // 手动清除缓存
+  clearCache(key) {
+    if (key) {
+      this.cache.delete(key);
+    } else {
+      this.cache.clear();
+    }
+  }
+}
+
+// 使用示例
+const apiCache = new RequestCache({ defaultTTL: 60000 }); // 1 分钟缓存
+const debouncedApiCall = debounceRequest(async (url, params) => {
+  return apiCache.fetchWithCache(url, { params });
+});
+
+// 使用方式
+async function searchProducts(query) {
+  return debouncedApiCall('/api/products', { search: query });
+}</code></pre>
+                </div>
+            </section>
+            
+            <section id="performance-monitoring">
+                <h2>4. 性能监控与分析</h2>
+                
+                <div class="card monitoring-card">
+                    <h3>4.1 实时性能监控</h3>
+                    
+                    <h4>4.1.1 Performance API 使用</h4>
+                    
+                    <div class="code-title">使用 Performance API 收集性能指标</div>
+                    <pre><code>// 收集核心 Web Vitals 指标
+class WebVitalsCollector {
+  constructor() {
+    this.metrics = {
+      lcp: null,
+      fid: null,
+      cls: null,
+      fcp: null,
+      tti: null
+    };
+    this.observers = [];
+  }
+  
+  // 初始化所有监控
+  init() {
+    this.monitorLCP();
+    this.monitorFID();
+    this.monitorCLS();
+    this.monitorFCP();
+    this.monitorTTI();
+    
+    // 页面卸载时清理
+    window.addEventListener('beforeunload', () => this.cleanup());
+  }
+  
+  // 监控 LCP (Largest Contentful Paint)
+  monitorLCP() {
+    const lcpObserver = new PerformanceObserver((entryList) => {
+      const entries = entryList.getEntries();
+      const lastEntry = entries[entries.length - 1];
+      
+      this.metrics.lcp = lastEntry.startTime;
+      console.log('LCP:', this.metrics.lcp);
+      
+      // 当 LCP 稳定后（2.5s 后或页面加载完成）上报
+      if (this.metrics.lcp) {
+        this.reportMetric('lcp', this.metrics.lcp);
+      }
+    });
+    
+    lcpObserver.observe({ type: 'largest-contentful-paint', buffered: true });
+    this.observers.push(lcpObserver);
+  }
+  
+  // 监控 FID (First Input Delay)
+  monitorFID() {
+    const fidObserver = new PerformanceObserver((entryList) => {
+      const entries = entryList.getEntries();
+      const firstInput = entries[0];
+      
+      this.metrics.fid = firstInput.processingStart - firstInput.startTime;
+      console.log('FID:', this.metrics.fid);
+      this.reportMetric('fid', this.metrics.fid);
+    });
+    
+    fidObserver.observe({ type: 'first-input', buffered: true });
+    this.observers.push(fidObserver);
+  }
+  
+  // 监控 CLS (Cumulative Layout Shift)
+  monitorCLS() {
+    let clsValue = 0;
+    let clsEntries = [];
+    
+    const clsObserver = new PerformanceObserver((entryList) => {
+      const entries = entryList.getEntries();
+      
+      entries.forEach(entry => {
+        // 只考虑不涉及用户交互的布局偏移
+        if (!entry.hadRecentInput) {
+          clsValue += entry.value;
+          clsEntries.push(entry);
+          
+          this.metrics.cls = clsValue;
+          console.log('CLS:', this.metrics.cls);
+        }
+      });
+    });
+    
+    clsObserver.observe({ type: 'layout-shift', buffered: true });
+    this.observers.push(clsObserver);
+    
+    // 页面卸载时上报最终 CLS
+    window.addEventListener('beforeunload', () => {
+      if (this.metrics.cls) {
+        this.reportMetric('cls', this.metrics.cls);
+      }
+    });
+  }
+  
+  // 监控 FCP (First Contentful Paint)
+  monitorFCP() {
+    const fcpObserver = new PerformanceObserver((entryList) => {
+      const entries = entryList.getEntriesByName('first-contentful-paint');
+      if (entries.length > 0) {
+        this.metrics.fcp = entries[0].startTime;
+        console.log('FCP:', this.metrics.fcp);
+        this.reportMetric('fcp', this.metrics.fcp);
+      }
+    });
+    
+    fcpObserver.observe({ type: 'paint', buffered: true });
+    this.observers.push(fcpObserver);
+  }
+  
+  // 简单的 TTI (Time to Interactive) 估算
+  monitorTTI() {
+    // 更准确的 TTI 计算需要更复杂的逻辑
+    // 这里使用简化版本
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        // 假设页面加载完成后 2 秒达到可交互状态
+        // 实际项目中应使用更精确的计算方法
+        const navigationEntry = performance.getEntriesByType('navigation')[0];
+        this.metrics.tti = navigationEntry.loadEventEnd + 2000;
+        console.log('TTI:', this.metrics.tti);
+        this.reportMetric('tti', this.metrics.tti);
+      }, 0);
+    });
+  }
+  
+  // 上报指标到服务器
+  reportMetric(name, value) {
+    // 实际项目中应替换为真实的上报端点
+    console.log(`上报指标: ${name} = ${value}`);
+    
+    // 异步上报，不阻塞主线程
+    navigator.sendBeacon('/api/performance', JSON.stringify({
+      metric: name,
+      value,
+      url: window.location.href,
+      timestamp: Date.now()
+    }));
+  }
+  
+  // 清理资源
+  cleanup() {
+    this.observers.forEach(observer => observer.disconnect());
+    this.observers = [];
+  }
+  
+  // 获取所有指标
+  getMetrics() {
+    return this.metrics;
+  }
+}
+
+// 使用性能监控器
+const vitalsCollector = new WebVitalsCollector();
+// 初始化监控
+// vitalsCollector.init();
+
+// 稍后获取指标
+setTimeout(() => {
+  const metrics = vitalsCollector.getMetrics();
+  console.log('收集的所有性能指标:', metrics);
+}, 5000);
+</code></pre>
+                    
+                    <h4>4.1.2 自定义性能标记</h4>
+                    
+                    <div class="code-title">使用 Performance Markers 测量关键操作</div>
+                    <pre><code>// 标记关键操作的开始和结束
+function measureCriticalOperation() {
+  // 开始标记
+  performance.mark('data-fetch-start');
+  
+  // 模拟数据获取
+  fetchData().then(() => {
+    // 结束标记
+    performance.mark('data-fetch-end');
+    
+    // 计算持续时间
+    performance.measure('data-fetch-duration', 'data-fetch-start', 'data-fetch-end');
+    
+    // 获取测量结果
+    const measures = performance.getEntriesByName('data-fetch-duration');
+    const duration = measures[0].duration;
+    
+    console.log(`数据获取耗时: ${duration.toFixed(2)}ms`);
+    
+    // 如果耗时过长，上报警告
+    if (duration > 1000) {
+      reportSlowOperation('data-fetch', duration);
+    }
+    
+    // 清理标记和测量结果以释放内存
+    performance.clearMarks('data-fetch-start');
+    performance.clearMarks('data-fetch-end');
+    performance.clearMeasures('data-fetch-duration');
+  });
+}
+
+// 组件生命周期性能监控
+class ComponentPerformanceMonitor {
+  constructor(componentName) {
+    this.componentName = componentName;
+    this.marks = {};
+  }
+  
+  // 记录生命周期开始
+  markStart(phase) {
+    const markName = `${this.componentName}-${phase}-start`;
+    performance.mark(markName);
+    this.marks[phase] = markName;
+  }
+  
+  // 记录生命周期结束并测量
+  markEnd(phase) {
+    const endMarkName = `${this.componentName}-${phase}-end`;
+    performance.mark(endMarkName);
+    
+    if (this.marks[phase]) {
+      const measureName = `${this.componentName}-${phase}-duration`;
+      performance.measure(measureName, this.marks[phase], endMarkName);
+      
+      // 获取测量结果
+      const measures = performance.getEntriesByName(measureName);
+      const duration = measures[0]?.duration || 0;
+      
+      console.log(`${this.componentName} ${phase} 耗时: ${duration.toFixed(2)}ms`);
+      
+      // 清理
+      performance.clearMarks(this.marks[phase]);
+      performance.clearMarks(endMarkName);
+      performance.clearMeasures(measureName);
+      
+      return duration;
+    }
+    
+    return 0;
+  }
+}
+    });
+    
+    fidObserver.observe({ type: 'first-input', buffered: true });
+    this.observers.push(fidObserver);
+  }
+  
+  // 监控 CLS (Cumulative Layout Shift)
+  monitorCLS() {
+    let clsValue = 0;
+    let clsEntries = [];
+    
+    const clsObserver = new PerformanceObserver((entryList) => {
+      const entries = entryList.getEntries();
+      
+      entries.forEach(entry => {
+        // 只考虑不涉及用户交互的布局偏移
+        if (!entry.hadRecentInput) {
+          clsValue += entry.value;
+          clsEntries.push(entry);
+          
+          this.metrics.cls = clsValue;
+          console.log('CLS:', this.metrics.cls);
+        }
+      });
+    });
+    
+    clsObserver.observe({ type: 'layout-shift', buffered: true });
+    this.observers.push(clsObserver);
+    
+    // 页面卸载时上报最终 CLS
+    window.addEventListener('beforeunload', () => {
+      if (this.metrics.cls) {
+        this.reportMetric('cls', this.metrics.cls);
+      }
+    });
+  }
+  
+  // 监控 FCP (First Contentful Paint)
+  monitorFCP() {
+    const fcpObserver = new PerformanceObserver((entryList) => {
+      const entries = entryList.getEntriesByName('first-contentful-paint');
+      if (entries.length > 0) {
+        this.metrics.fcp = entries[0].startTime;
+        console.log('FCP:', this.metrics.fcp);
+        this.reportMetric('fcp', this.metrics.fcp);
+      }
+    });
+    
+    fcpObserver.observe({ type: 'paint', buffered: true });
+    this.observers.push(fcpObserver);
+  }
+  
+  // 简单的 TTI (Time to Interactive) 估算
+  monitorTTI() {
+    // 更准确的 TTI 计算需要更复杂的逻辑
+    // 这里使用简化版本
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        // 假设页面加载完成后 2 秒达到可交互状态
+        // 实际项目中应使用更精确的计算方法
+        const navigationEntry = performance.getEntriesByType('navigation')[0];
+        this.metrics.tti = navigationEntry.loadEventEnd + 2000;
+        console.log('TTI:', this.metrics.tti);
+        this.reportMetric('tti', this.metrics.tti);
+      }, 0);
+    });
+  }
+  
+  // 上报指标到服务器
+  reportMetric(name, value) {
+    // 实际项目中应替换为真实的上报端点
+    console.log(`上报指标: ${name} = ${value}`);
+    
+    // 异步上报，不阻塞主线程
+    navigator.sendBeacon('/api/performance', JSON.stringify({
+      metric: name,
+      value,
+      url: window.location.href,
+      timestamp: Date.now()
+    }));
+  }
+  
+  // 清理资源
+  cleanup() {
+    this.observers.forEach(observer => observer.disconnect());
+    this.observers = [];
+  }
+  
+  // 获取所有指标
+  getMetrics() {
+    return this.metrics;
+  }
+}
+
+// 使用性能监控器
+const vitalsCollector = new WebVitalsCollector();
+// 初始化监控
+vitalsCollector.init();
+
+// 稍后获取指标
+setTimeout(() => {
+  const metrics = vitalsCollector.getMetrics();
+  console.log('收集的所有性能指标:', metrics);
+}, 5000);</code></pre>
+                    
+                    <h4>4.1.2 自定义性能标记</h4>
+                    
+                    <div class="code-title">使用 Performance Markers 测量关键操作</div>
+                    <pre><code>// 标记关键操作的开始和结束
+function measureCriticalOperation() {
+  // 开始标记
+  performance.mark('data-fetch-start');
+  
+  // 模拟数据获取
+  fetchData().then(() => {
+    // 结束标记
+    performance.mark('data-fetch-end');
+    
+    // 计算持续时间
+    performance.measure('data-fetch-duration', 'data-fetch-start', 'data-fetch-end');
+    
+    // 获取测量结果
+    const measures = performance.getEntriesByName('data-fetch-duration');
+    const duration = measures[0].duration;
+    
+    console.log(`数据获取耗时: ${duration.toFixed(2)}ms`);
+    
+    // 如果耗时过长，上报警告
+    if (duration > 1000) {
+      reportSlowOperation('data-fetch', duration);
+    }
+    
+    // 清理标记和测量结果以释放内存
+    performance.clearMarks('data-fetch-start');
+    performance.clearMarks('data-fetch-end');
+    performance.clearMeasures('data-fetch-duration');
+  });
+}
+
+// 组件生命周期性能监控
+class ComponentPerformanceMonitor {
+  constructor(componentName) {
+    this.componentName = componentName;
+    this.marks = {};
+  }
+  
+  // 记录生命周期开始
+  markStart(phase) {
+    const markName = `${this.componentName}-${phase}-start`;
+    performance.mark(markName);
+    this.marks[phase] = markName;
+  }
+  
+  // 记录生命周期结束并测量
+  markEnd(phase) {
+    const endMarkName = `${this.componentName}-${phase}-end`;
+    performance.mark(endMarkName);
+    
+    if (this.marks[phase]) {
+      const measureName = `${this.componentName}-${phase}-duration`;
+      performance.measure(measureName, this.marks[phase], endMarkName);
+      
+      // 获取测量结果
+      const measures = performance.getEntriesByName(measureName);
+      const duration = measures[0]?.duration || 0;
+      
+      console.log(`${this.componentName} ${phase} 耗时: ${duration.toFixed(2)}ms`);
+      
+      // 清理
+      performance.clearMarks(this.marks[phase]);
+      performance.clearMarks(endMarkName);
+      performance.clearMeasures(measureName);
+      
+      return duration;
+    }
+    
+    return 0;
+  }
+}
+
+// React 组件中使用
+function PerformanceMeasuredComponent() {
+  const perfMonitor = useRef(new ComponentPerformanceMonitor('MyComponent'));
+  
+  useEffect(() => {
+    perfMonitor.current.markStart('mount');
+    
+    return () => {
+      const unmountTime = perfMonitor.current.markEnd('unmount');
+      console.log(`组件卸载耗时: ${unmountTime.toFixed(2)}ms`);
+    };
+  }, []);
+  
+  useEffect(() => {
+    const mountTime = perfMonitor.current.markEnd('mount');
+    console.log(`组件挂载耗时: ${mountTime.toFixed(2)}ms`);
+  }, []);
+  
+  const handleAction = () => {
+    perfMonitor.current.markStart('action');
+    
+    // 执行操作
+    performAction().then(() => {
+      perfMonitor.current.markEnd('action');
+    });
+  };
+};
+</code></pre>
+                    
+                    <div class="demo-section">
+                        <h4>性能监控演示</h4>
+                        <button class="demo-button" onclick="runPerformanceDemo()">运行性能监控演示</button>
+                        <button class="demo-button" onclick="showWebVitalsDemo()">显示 Web Vitals 演示</button>
+                        <div id="performanceDemoResult" class="demo-result"></div>
+                    </div>
+                </div>
+                
+                <div class="card monitoring-card">
+                    <h3>4.2 性能分析工具与方法</h3>
+                    
+                    <h4>4.2.1 Chrome DevTools 性能分析器</h4>
+                    <p>Chrome DevTools 的性能面板是分析前端性能问题的强大工具，可以识别 CPU 瓶颈、内存问题和渲染阻塞。</p>
+                    
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>分析功能<th>用途</th>
+                                <th>关键指标</th>
+                                <th>优化建议</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>CPU 分析器</td>
+                                <td>识别 JavaScript 执行瓶颈</td>
+                                <td>火焰图、调用堆栈、执行时间</td>
+                                <td>优化循环、减少递归、使用 Web Workers</td>
+                            </tr>
+                            <tr>
+                                <td>网络面板</td>
+                                <td>分析资源加载性能</td>
+                                <td>TTFB、加载时间、阻塞资源</td>
+                                <td>启用压缩、缓存、使用 CDN、代码分割</td>
+                            </tr>
+                            <tr>
+                                <td>内存面板</td>
+                                <td>检测内存泄漏和垃圾回收问题</td>
+                                <td>内存使用曲线、堆快照、保留大小</td>
+                                <td>清理事件监听器、移除无用引用、优化闭包</td>
+                            </tr>
+                            <tr>
+                                <td>渲染面板</td>
+                                <td>分析布局和绘制性能</td>
+                                <td>布局时间、绘制时间、重排重绘次数</td>
+                                <td>减少布局抖动、使用 CSS 硬件加速、优化选择器</td>
+                            </tr>
+                            <tr>
+                                <td>Lighthouse 审计</td>
+                                <td>全面的性能和质量评估</td>
+                                <td>性能分数、PWA 支持、可访问性</td>
+                                <td>遵循 Lighthouse 建议、修复具体问题项</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    
+                    <h4>4.2.2 自动化性能测试与监控</h4>
+                    
+                    <div class="code-title">使用 Puppeteer 和 Lighthouse 进行自动化性能测试</div>
+                    <pre><code>const puppeteer = require('puppeteer');
+const lighthouse = require('lighthouse');
+const { writeFileSync } = require('fs');
+
+async function runPerformanceAudit(url) {
+  // 启动浏览器
+  const browser = await puppeteer.launch({
+    headless: true,
+    args: ['--no-sandbox', '--disable-setuid-sandbox']
+  });
+  
+  try {
+    // 获取浏览器页面
+    const page = await browser.newPage();
+    
+    // 运行 Lighthouse 审计
+    const { lhr } = await lighthouse(url, {
+      port: (new URL(browser.wsEndpoint())).port,
+      output: 'json',
+      logLevel: 'info',
+      onlyCategories: ['performance', 'accessibility', 'best-practices', 'seo']
+    });
+    
+    // 提取关键性能指标
+    const metrics = {
+      performanceScore: lhr.categories.performance.score * 100,
+      accessibilityScore: lhr.categories.accessibility.score * 100,
+      bestPracticesScore: lhr.categories['best-practices'].score * 100,
+      seoScore: lhr.categories.seo.score * 100,
+      coreWebVitals: {
+        lcp: lhr.audits['largest-contentful-paint']?.numericValue,
+        fid: lhr.audits['first-input-delay']?.numericValue,
+        cls: lhr.audits['cumulative-layout-shift']?.numericValue
+      }
+    };
+    
+    console.log('性能审计结果:', metrics);
+    
+    // 保存审计报告
+    writeFileSync('lighthouse-report.json', JSON.stringify(lhr, null, 2));
+    writeFileSync('performance-metrics.json', JSON.stringify(metrics, null, 2));
+    
+    return metrics;
+    
+  } catch (error) {
+    console.error('性能审计失败:', error);
+    throw error;
+  } finally {
+    // 关闭浏览器
+    await browser.close();
+  }
+}
+
+// 使用示例
+runPerformanceAudit('https://example.com').then(metrics => {
+  console.log(`性能得分: ${metrics.performanceScore.toFixed(1)}`);
+  console.log(`LCP: ${(metrics.coreWebVitals.lcp / 1000).toFixed(2)}s`);
+  console.log(`FID: ${metrics.coreWebVitals.fid.toFixed(2)}ms`);
+  console.log(`CLS: ${metrics.coreWebVitals.cls.toFixed(3)}`);
+});
+
+// 集成到 CI/CD 流程
+automatedPerformanceTesting() {
+  return {
+    // 在每次构建后运行性能测试
+    postBuild: async () => {
+      const metrics = await runPerformanceAudit('https://staging.example.com');
+      
+      // 设置性能预算门槛
+      const thresholds = {
+        performanceScore: 80,
+        lcp: 2500, // 毫秒
+        fid: 100,   // 毫秒
+        cls: 0.1
+      };
+      
+      // 检查是否符合性能预算
+      const violations = [];
+      
+      if (metrics.performanceScore < thresholds.performanceScore) {
+        violations.push(`性能得分低于阈值: ${metrics.performanceScore.toFixed(1)} \u003c ${thresholds.performanceScore}`);
+      }
+      
+      if (metrics.coreWebVitals.lcp > thresholds.lcp) {
+        violations.push(`LCP 超过阈值: ${(metrics.coreWebVitals.lcp / 1000).toFixed(2)}s \u003e ${(thresholds.lcp / 1000)}s`);
+      }
+      
+      // 如果有性能违规，报告或失败构建
+      if (violations.length > 0) {
+        console.error('性能预算违规:', violations);
+        // 根据 CI/CD 系统决定是警告还是失败构建
+        // process.exit(1); // 取消注释以在性能不达标时失败构建
+      } else {
+        console.log('✅ 性能符合预算要求');
+      }
+    }
+  };
+}
+</code></pre>
+                </div>
+            </section>
+            
+            <section id="best-practices">
+                <h2>5. 性能优化最佳实践总结</h2>
+                <div class="card optimization-card">
+                    <h3>5.1 前端框架性能优化清单</h3>
+                    
+                    <div class="card">
+                        <h4>React 优化最佳实践：</h4>
+                        <ul>
+                            <li>✅ 使用 <code>React.memo</code>、<code>useMemo</code>、<code>useCallback</code> 减少不必要的重渲染</li>
+                            <li>✅ 合理使用状态提升和上下文（Context），避免过度使用上下文导致的性能问题</li>
+                            <li>✅ 使用虚拟列表处理大型数据集，如 <code>react-window</code> 或 <code>react-virtualized</code></li>
+                            <li>✅ 实现代码分割，使用 <code>React.lazy()</code> 和 <code>Suspense</code> 进行组件懒加载</li>
+                            <li>✅ 避免在渲染过程中创建新对象和函数，使用缓存优化性能</li>
+                            <li>✅ 使用不可变数据结构管理复杂状态，如 <code>Immer</code> 或 <code>Immutable.js</code></li>
+                            <li>✅ 优化 Redux 状态管理，使用选择器和中间件提升性能</li>
+                            <li>✅ 使用 <code>key</code> 属性帮助 React 识别列表项的变更，优化渲染性能</li>
+                            <li>✅ 减少 DOM 操作，使用 React 的批处理更新特性</li>
+                            <li>✅ 使用性能分析工具如 <code>why-did-you-render</code> 识别不必要的重渲染</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="card">
+                        <h4>Vue 优化最佳实践：</h4>
+                        <ul>
+                            <li>✅ 使用 <code>v-once</code> 和 <code>v-memo</code> 指令缓存不常变化的内容</li>
+                            <li>✅ 对于静态数据使用 <code>Object.freeze()</code> 提高性能</li>
+                            <li>✅ 使用 <code>keep-alive</code> 组件缓存组件状态，避免重复创建和销毁</li>
+                            <li>✅ 优化计算属性和侦听器，避免不必要的响应式更新</li>
+                            <li>✅ 使用函数式组件和 Composition API 减少实例开销</li>
+                            <li>✅ 实现路由懒加载，减少初始加载时间</li>
+                            <li>✅ 避免在模板中使用复杂表达式和函数调用</li>
+                            <li>✅ 使用虚拟滚动处理大型列表</li>
+                            <li>✅ 优化 Vuex 状态管理，使用模块化和命名空间减少重渲染</li>
+                            <li>✅ 使用 Vue DevTools 性能面板分析组件渲染性能</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="card">
+                        <h4>通用前端优化最佳实践：</h4>
+                        <ul>
+                            <li>✅ 优化资源加载：压缩、缓存、代码分割、懒加载、预加载</li>
+                            <li>✅ 优化网络请求：减少请求数量、使用 HTTP/2、启用 Brotli/Gzip 压缩</li>
+                            <li>✅ 优化图片：使用现代格式、响应式图片、图片压缩、懒加载</li>
+                            <li>✅ 优化 CSS：减少重排重绘、使用 CSS 动画而非 JavaScript 动画、简化选择器</li>
+                            <li>✅ 优化 JavaScript：减少阻塞、使用 Web Workers、优化 DOM 操作、避免内存泄漏</li>
+                            <li>✅ 使用 Service Worker 实现离线缓存和快速加载</li>
+                            <li>✅ 优化关键渲染路径：内联关键 CSS、延迟加载非关键 JavaScript</li>
+                            <li>✅ 性能预算管理：设置明确的性能目标并持续监控</li>
+                            <li>✅ 使用 CDN 分发静态资源，减少延迟</li>
+                            <li>✅ 实施持续性能监控和自动化性能测试</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="card optimization-card">
+                    <h3>5.2 性能优化策略优先级框架</h3>
+                    <p>根据投资回报率（ROI）确定性能优化的优先级，以下是优化措施的优先级排序：</p>
+                    
+                    <div class="timeline">
+                        <div class="timeline-item left">
+                            <div class="timeline-content">
+                                <h4>高优先级 - 立竿见影</h4>
+                                <ul>
+                                    <li>启用 Gzip/Brotli 压缩
+                                    <li>实施浏览器缓存策略
+                                    <li>优化关键渲染路径
+                                    <li>减少阻塞资源
+                                    <li>优化大型图片
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="timeline-item right">
+                            <div class="timeline-content">
+                                <h4>中高优先级 - 显著提升</h4>
+                                <ul>
+                                    <li>代码分割与懒加载
+                                    <li>实现资源预加载
+                                    <li>优化组件渲染性能
+                                    <li>使用 CDN 分发静态资源
+                                    <li>减少第三方脚本影响
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="timeline-item left">
+                            <div class="timeline-content">
+                                <h4>中等优先级 - 持续改进
+                                <ul>
+                                    <li>优化 JavaScript 执行
+                                    <li>实现虚拟滚动
+                                    <li>优化状态管理
+                                    <li>使用 Web Workers
+                                    <li>实施 Service Worker
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="timeline-item right">
+                            <div class="timeline-content">
+                                <h4>低优先级 - 长期优化
+                                <ul>
+                                    <li>微优化渲染性能
+                                    <li>优化构建过程
+                                    <li>实施高级缓存策略
+                                    <li>优化内存使用
+                                    <li>实现渐进式 Web 应用
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <section id="conclusion">
+                <h2>6. 结论与未来趋势</h2>
+                <div class="card">
+                    <h3>6.1 性能优化的持续改进循环</h3>
+                    <p>前端性能优化不是一次性的工作，而是一个持续的过程。建立性能监控、分析、优化、验证的闭环系统，才能确保应用性能持续符合用户期望。</p>
+                    
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>阶段</th>
+                                <th>活动</th>
+                                <th>工具与方法</th>
+                                <th>输出物</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>监控</td>
+                                <td>收集真实用户性能数据
+                                <td>RUM 工具、Performance API、Web Vitals
+                                <td>性能指标看板、异常告警
+                            </tr>
+                            <tr>
+                                <td>分析
+                                <td>识别性能瓶颈和问题
+                                <td>Chrome DevTools、Lighthouse、性能剖析
+                                <td>性能分析报告、问题清单
+                            </tr>
+                            <tr>
+                                <td>优化
+                                <td>实施性能改进措施
+                                <td>代码重构、配置优化、架构调整
+                                <td>优化的代码、配置变更
+                            </tr>
+                            <tr>
+                                <td>验证
+                                <td>评估优化效果
+                                <td>自动化测试、A/B测试、性能对比
+                                <td>性能改进报告、ROI分析
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="card">
+                    <h3>6.2 前端性能优化发展趋势</h3>
+                    <p>未来前端性能优化将向更智能、更自动化、更注重用户体验的方向发展。以下是几个关键趋势：</p>
+                    <ul>
+                        <li><strong>智能性能优化工具</strong>：AI 辅助的性能优化建议和自动修复工具将越来越普及
+                        <li><strong>边缘计算与渲染</strong>：利用边缘节点进行内容渲染和数据处理，减少延迟
+                        <li><strong>WebAssembly 广泛应用</strong>：计算密集型任务将更多地转移到 WebAssembly，释放主线程
+                        <li><strong>预测性加载技术</strong>：基于用户行为和 AI 预测，主动加载可能需要的资源
+                        <li><strong>实时性能预算调整</strong>：根据设备和网络条件动态调整性能预算
+                        <li><strong>标准化性能指标</strong>：更多的 Web Vitals 指标将被标准化和广泛采用
+                        <li><strong>开发体验与性能平衡</strong>：构建工具将更智能地在开发体验和生产性能之间取得平衡
+                    </ul>
+                </div>
+            </section>
+        </div>
+    </div>
+    <script>
+        // 代码高亮辅助函数
+        function highlightCode() {
+            const codeBlocks = document.querySelectorAll('pre code');
+            codeBlocks.forEach(block => {
+                // 简化版代码高亮（实际项目中建议使用专业的语法高亮库）
+                const code = block.textContent;
+                const highlighted = code
+                    .replace(/\b(function|class|const|let|var|return|if|else|for|while|switch|case|default|break|continue|try|catch|finally)\b/g, '<span style="color: #61dafb">$1</span>')
+                    .replace(/\b(import|export|from|as|async|await|Promise)\b/g, '<span style="color: #4ec9b0">$1</span>')
+                    .replace(/\b(true|false|null|undefined)\b/g, '<span style="color: #569cd6">$1</span>')
+                    .replace(/\/\/.*$/gm, '<span style="color: #999999">$&</span>')
+                    .replace(/\/\*[\s\S]*?\*\//g, '<span style="color: #999999">$&</span>')
+                    .replace(/(['"])(.*?)\1/g, '<span style="color: #ce9178">$1$2$1</span>')
+                    .replace(/(\{.*?\})/g, '<span style="color: #dcdcaa">$1</span>');
+                block.innerHTML = highlighted;
+            });
+        }
+        
+        // 性能指标演示
+        function showPerformanceMetricsDemo() {
+            const resultElement = document.getElementById('performanceMetricsResult');
+            const metrics = {
+                lcp: Math.floor(Math.random() * 1500) + 800, // 800-2300ms
+                fid: Math.floor(Math.random() * 80) + 20,    // 20-100ms
+                cls: (Math.random() * 0.2).toFixed(3),       // 0-0.2
+                fcp: Math.floor(Math.random() * 1000) + 600, // 600-1600ms
+                tti: Math.floor(Math.random() * 1500) + 2000  // 2000-3500ms
+            };
+            
+            let html = '<h4>Web Vitals 性能指标模拟数据</h4><table style="width: 100%; background: transparent; box-shadow: none;">';
+            html += '<tr><th style="text-align: left; border-bottom: 1px solid #666;">指标</th><th style="text-align: left; border-bottom: 1px solid #666;">值</th><th style="text-align: left; border-bottom: 1px solid #666;">状态</th></tr>';
+            
+            // LCP
+            const lcpStatus = metrics.lcp < 2500 ? '良好 ✅' : '需要改进 ❌';
+            html += `<tr><td>LCP (最大内容绘制)</td><td>${metrics.lcp}ms</td><td>${lcpStatus}</td></tr>`;
+            
+            // FID
+            const fidStatus = metrics.fid < 100 ? '良好 ✅' : '需要改进 ❌';
+            html += `<tr><td>FID (首次输入延迟)</td><td>${metrics.fid}ms</td><td>${fidStatus}</td></tr>`;
+            
+            // CLS
+            const clsStatus = parseFloat(metrics.cls) < 0.1 ? '良好 ✅' : '需要改进 ❌';
+            html += `<tr><td>CLS (累积布局偏移)</td><td>${metrics.cls}</td><td>${clsStatus}</td></tr>`;
+            
+            // FCP
+            const fcpStatus = metrics.fcp < 1800 ? '良好 ✅' : '需要改进 ❌';
+            html += `<tr><td>FCP (首次内容绘制)</td><td>${metrics.fcp}ms</td><td>${fcpStatus}</td></tr>`;
+            
+            // TTI
+            const ttiStatus = metrics.tti < 3800 ? '良好 ✅' : '需要改进 ❌';
+            html += `<tr><td>TTI (可交互时间)</td><td>${metrics.tti}ms</td><td>${ttiStatus}</td></tr>`;
+            
+            html += '</table>';
+            resultElement.innerHTML = html;
+        }
+        
+        // 运行性能监控演示
+        function runPerformanceDemo() {
+            const resultElement = document.getElementById('performanceDemoResult');
+            resultElement.innerHTML = '正在执行性能监控演示...';
+            
+            // 模拟性能监控过程
+            setTimeout(() => {
+                let html = '<h4>性能监控演示结果</h4>';
+                html += '<p><strong>1. 组件渲染性能分析:</strong></p>';
+                html += '<ul>';
+                html += '<li>HomeComponent 渲染: 24ms</li>';
+                html += '<li>UserList 渲染: 56ms <span style="color: #ff6b6b;">⚠️ 性能警告</span></li>';
+                html += '<li>Dashboard 渲染: 18ms</li>';
+                html += '</ul>';
+                
+                html += '<p><strong>2. 网络请求性能:</strong></p>';
+                html += '<ul>';
+                html += '<li>API /users: 235ms (TTFB: 45ms)</li>';
+                html += '<li>API /dashboard: 187ms (TTFB: 32ms)</li>';
+                html += '<li>静态资源加载: 42ms (来自缓存)</li>';
+                html += '</ul>';
+                
+                html += '<p><strong>3. JavaScript 执行分析:</strong></p>';
+                html += '<ul>';
+                html += '<li>主脚本执行: 145ms</li>';
+                html += '<li>数据处理: 89ms <span style="color: #ff6b6b;">⚠️ 建议使用 Web Worker</span></li>';
+                html += '<li>动画帧处理: 12ms</li>';
+                html += '</ul>';
+                
+                html += '<p><strong>4. 优化建议:</strong></p>';
+                html += '<ul>';
+                html += '<li>✅ 为 UserList 组件实现虚拟滚动</li>';
+                html += '<li>✅ 将数据处理逻辑移至 Web Worker</li>';
+                html += '<li>✅ 优化 API 响应大小，实现数据分页</li>';
+                html += '<li>✅ 缓存不常变化的用户数据</li>';
+                html += '</ul>';
+                
+                resultElement.innerHTML = html;
+            }, 1000);
+        }
+        
+        // 显示 Web Vitals 演示
+        function showWebVitalsDemo() {
+            const resultElement = document.getElementById('performanceDemoResult');
+            resultElement.innerHTML = '正在模拟 Web Vitals 数据收集...';
+            
+            // 模拟 Web Vitals 收集过程
+            setTimeout(() => {
+                const webVitalsData = {
+                    lcp: 1.2,  // 秒
+                    fid: 45,   // 毫秒
+                    cls: 0.03, // 无量纲
+                    fid2: 32,  // 另一次交互的 FID
+                    cls2: 0.02, // 另一次布局偏移
+                    lcpResource: 'hero-image.jpg'
+                };
+                
+                let html = '<h4>Web Vitals 数据收集演示</h4>';
+                html += '<pre style="background: #282c34; color: #abb2bf; padding: 15px; border-radius: 8px; overflow-x: auto; font-size: 14px;">';
+                html += `// 核心 Web Vitals 数据\n`;
+                html += `const webVitalsData = {\n`;
+                html += `  // LCP (Largest Contentful Paint) - 主要内容加载时间\n`;
+                html += `  lcp: ${webVitalsData.lcp}s,\n`;
+                html += `  lcpResource: "${webVitalsData.lcpResource}",\n`;
+                html += `  \n`;
+                html += `  // FID (First Input Delay) - 首次输入延迟\n`;
+                html += `  fid: ${webVitalsData.fid}ms,\n`;
+                html += `  fid2: ${webVitalsData.fid2}ms,  // 后续交互\n`;
+                html += `  \n`;
+                html += `  // CLS (Cumulative Layout Shift) - 累积布局偏移\n`;
+                html += `  cls: ${webVitalsData.cls},\n`;
+                html += `  cls2: ${webVitalsData.cls2}  // 后续布局变化\n`;
+                html += `};\n`;
+                html += `\n`;
+                html += `// 性能评估\n`;
+                html += `const performanceAssessment = {\n`;
+                html += `  overall: "良好",\n`;
+                html += `  lcp: "良好 (目标 &lt; 2.5s)",\n`;
+                html += `  fid: "良好 (目标 &lt; 100ms)",\n`;
+                html += `  cls: "优秀 (目标 &lt; 0.1)"\n`;
+                html += `};`;
+                html += '</pre>';
+                
+                resultElement.innerHTML = html;
+            }, 1000);
+        }
+        
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            // 高亮代码
+            highlightCode();
+            
+            // 显示页面加载性能信息
+            setTimeout(() => {
+                const navigationEntry = performance.getEntriesByType('navigation')[0];
+                if (navigationEntry) {
+                    const loadTime = navigationEntry.loadEventEnd - navigationEntry.startTime;
+                    console.log(`页面加载时间: ${loadTime.toFixed(2)}ms`);
+                }
+            }, 1000);
+        });
+        
+        // 模拟函数，用于代码演示
+        function fetchData() {
+            return new Promise(resolve => {
+                setTimeout(() => resolve([1, 2, 3, 4, 5]), 100);
+            });
+        }
+        
+        function performAction() {
+            return new Promise(resolve => {
+                setTimeout(resolve, 200);
+            });
+        }
+        
+        function reportSlowOperation(operation, duration) {
+            console.warn(`操作 ${operation} 执行缓慢: ${duration.toFixed(2)}ms`);
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,2450 @@
+\u003c!DOCTYPE html\u003e
+\u003chtml lang="zh-CN"\u003e
+\u003chead\u003e
+    \u003cmeta charset="UTF-8"\u003e
+    \u003cmeta name="viewport" content="width=device-width, initial-scale=1.0"\u003e
+    \u003ctitle\u003e高级UI/UX开发实践 - 现代前端设计指南\u003c/title\u003e
+    \u003cstyle\u003e
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f5f7;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 120px 0 80px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                </div>
+                <pre>/* 高级动画效果CSS */
+
+/* 1. 弹跳动画 */
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-30px);
+  }
+  60% {
+    transform: translateY(-15px);
+  }
+}
+
+.bounce {
+  animation: bounce 1s ease;
+}
+
+/* 2. 脉冲动画 */
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(102, 126, 234, 0.7);
+  }
+  70% {
+    transform: scale(1.05);
+    box-shadow: 0 0 0 15px rgba(102, 126, 234, 0);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(102, 126, 234, 0);
+  }
+}
+
+.pulse {
+  animation: pulse 1.5s ease;
+}
+
+/* 3. 翻转动画 */
+@keyframes flip {
+  0% {
+    transform: perspective(400px) rotateY(0);
+  }
+  40% {
+    transform: perspective(400px) rotateY(150deg);
+  }
+  80% {
+    transform: perspective(400px) rotateY(170deg);
+  }
+  100% {
+    transform: perspective(400px) rotateY(360deg);
+  }
+}
+
+.flip {
+  animation: flip 2s ease;
+  backface-visibility: visible;
+}
+
+/* 4. 滑动动画 */
+@keyframes slide {
+  0% {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  50% {
+    transform: translateX(20%);
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.slide {
+  animation: slide 1s ease;
+}
+
+/* 性能优化的动画实践 */
+.performance-optimized {
+  /* 仅使用 transform 和 opacity 进行动画 */
+  transform: translateZ(0); /* 触发硬件加速 */
+  will-change: transform, opacity; /* 提前通知浏览器 */
+  animation: smoothMove 1s ease-in-out;
+}
+
+@keyframes smoothMove {
+  0% {
+    transform: translateX(0) scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: translateX(100px) scale(1.1);
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateX(200px) scale(1);
+    opacity: 1;
+  }
+}
+\u003c/pre>
+            \u003c/div>
+            
+            <h3>3.3 性能优化的动画策略</h3>
+            <p>高效的动画对用户体验至关重要。使用硬件加速、减少重排重绘、合理使用动画库可以创建流畅且性能良好的动画效果。</p>
+            
+            <div class="highlight-box">
+                <h4>动画性能优化关键点</h4>
+                <ul>
+                    <li>使用 CSS transforms 和 opacity 进行动画，这些属性可以在合成线程上执行，不触发重排重绘</li>
+                    <li>使用 <code>will-change</code> 属性提前告知浏览器即将变化的属性，做好渲染准备</li>
+                    <li>避免在动画期间修改宽度、高度、位置等会导致重排的属性</li>
+                    <li>使用 requestAnimationFrame 进行 JavaScript 动画，确保与浏览器渲染周期同步</li>
+                    <li>适当使用 CSS 变量动态控制动画参数，避免频繁修改内联样式</li>
+                    <li>对复杂动画，考虑使用 Web Animations API 获得更好的性能和控制能力</li>
+                    <li>在移动设备上简化动画或降低帧率，节省电池消耗</li>
+                </ul>
+            </div>
+            
+            <div class="demo-area">
+                <div class="demo-title">基于 Web Animations API 的高级动画演示</div>
+                <div class="demo-controls">
+                    <button id="playWAAPIDemo">运行 Web Animations API 演示</button>
+                    <button id="pauseWAAPIDemo" class="btn-secondary">暂停动画</button>
+                    <button id="resetWAAPIDemo" class="btn-outline">重置动画</button>
+                </div>
+                <div id="waapiDemoArea" style="
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    height: 200px;
+                    margin-top: 20px;
+                ">
+                    <div id="waapiAnimatedElement" style="
+                        width: 80px;
+                        height: 80px;
+                        background: linear-gradient(135deg, #f5576c 0%, #f093fb 100%);
+                        border-radius: 50%;
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        color: white;
+                        font-weight: bold;
+                    ">
+                        WAPI
+                    </div>
+                </div>
+                <pre>// Web Animations API 示例
+
+// 获取动画元素
+const element = document.getElementById('waapiAnimatedElement');
+
+// 定义关键帧序列
+const keyframes = [
+  {
+    transform: 'scale(1) rotate(0deg)',
+    opacity: 1,
+    backgroundColor: '#f5576c'
+  },
+  {
+    transform: 'scale(1.3) rotate(45deg)',
+    opacity: 0.8,
+    backgroundColor: '#f093fb',
+    offset: 0.3 // 自定义关键帧位置
+  },
+  {
+    transform: 'scale(0.8) rotate(90deg)',
+    opacity: 0.9,
+    backgroundColor: '#4facfe',
+    offset: 0.7
+  },
+  {
+    transform: 'scale(1) rotate(0deg)',
+    opacity: 1,
+    backgroundColor: '#f5576c'
+  }
+];
+
+// 定义动画选项
+const options = {
+  duration: 3000,              // 动画持续时间（毫秒）
+  easing: 'ease-in-out',       // 缓动函数
+  iterations: Infinity,        // 无限次循环
+  direction: 'alternate',      // 来回播放
+  delay: 1000,                 // 延迟开始（毫秒）
+  fill: 'both'                 // 填充模式，保持开始和结束状态
+};
+
+// 创建并存储动画实例
+let animation;
+
+function playWAAPIDemo() {
+  // 取消可能存在的动画
+  if (animation) {
+    animation.cancel();
+  }
+  
+  // 创建并播放动画
+  animation = element.animate(keyframes, options);
+  
+  // 监听动画事件
+  animation.onfinish = () => {
+    console.log('动画完成');
+  };
+  
+  animation.oncancel = () => {
+    console.log('动画取消');
+  };
+}
+
+function pauseWAAPIDemo() {
+  if (animation) {
+    if (animation.playState === 'running') {
+      animation.pause();
+    } else {
+      animation.play();
+    }
+  }
+}
+
+function resetWAAPIDemo() {
+  if (animation) {
+    animation.cancel();
+  }
+}
+
+// 动画控制API使用示例
+function controlAnimation() {
+  if (animation) {
+    // 动画控制方法
+    animation.play();      // 播放动画
+    animation.pause();     // 暂停动画
+    animation.reverse();   // 反向播放
+    animation.finish();    // 立即完成动画
+    animation.cancel();    // 取消动画
+    
+    // 动画属性操作
+    animation.currentTime = 1000;  // 设置动画时间位置（毫秒）
+    animation.playbackRate = 2;    // 设置播放速率
+    
+    // 获取动画状态
+    console.log(animation.playState);   // 动画状态：'running', 'paused', 'finished'
+    console.log(animation.currentTime); // 当前时间位置
+    console.log(animation.effect);      // 动画效果
+  }
+}
+\u003c/pre>
+            \u003c/div>
+        \u003c/div>
+        
+        \u003cdiv class="section">
+            \u003ch2>4. 响应式与自适应设计技术</h2>
+            
+            <h3>4.1 现代响应式设计策略</h3>
+            <p>响应式设计是创建在所有设备上都能提供良好用户体验的网站和应用的核心方法。现代响应式设计结合了流体网格、弹性图片和媒体查询，以及更高级的布局技术。</p>
+            
+            <div class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>设计策略</th>
+                        <th>优点</th>
+                        <th>使用场景</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>移动优先设计</strong></td>
+                        <td>性能更好，代码更简洁，专注核心功能，渐进增强</td>
+                        <td>移动流量占主导的网站，需要快速加载的应用</td>
+                    </tr>
+                    <tr>
+                        <td><strong>桌面优先设计</strong></td>
+                        <td>适合复杂桌面应用，功能丰富的管理系统</td>
+                        <td>传统桌面应用迁移，需要复杂交互的场景</td>
+                    </tr>
+                    <tr>
+                        <td><strong>组件响应式设计</strong></td>
+                        <td>组件级别的响应式，提高复用性和维护性</td>
+                        <td>设计系统和组件库，大型应用程序开发</td>
+                    </tr>
+                    <tr>
+                        <td><strong>容器查询（Container Queries）</strong></td>
+                        <td>基于父容器而非视口响应，更灵活的组件设计</td>
+                        <td>复杂布局中的可重用组件，网格系统中的卡片设计</td>
+                    </tr>
+                </tbody>
+            </div>
+            
+            <h3>4.2 CSS Grid 和 Flexbox 高级布局技巧</h3>
+            <p>CSS Grid 和 Flexbox 是现代布局的两大核心技术，它们可以结合使用创建复杂且灵活的响应式布局。</p>
+            
+            <div class="demo-area">
+                <div class="demo-title">高级网格布局示例 - 智能仪表板布局</div>
+                <div class="demo-controls">
+                    <button id="showGridLayout">查看网格布局代码</button>
+                    <button id="showResponsiveLayout" class="btn-secondary">查看响应式变化</button>
+                </div>
+                <div id="gridLayoutDemo" style="
+                    margin-top: 20px;
+                    padding: 10px;
+                    background: #f8fafc;
+                    border-radius: 8px;
+                    min-height: 300px;
+                ">
+                    <div style="
+                        display: grid;
+                        grid-template-columns: repeat(12, 1fr);
+                        grid-template-rows: auto auto 1fr 1fr;
+                        gap: 20px;
+                        height: 400px;
+                    ">
+                        <div style="
+                            grid-column: 1 / -1;
+                            background: #667eea;
+                            color: white;
+                            padding: 20px;
+                            border-radius: 8px;
+                            display: flex;
+                            align-items: center;
+                            justify-content: space-between;
+                        ">
+                            <h3 style="margin: 0;">智能仪表板标题区域</h3>
+                            <div>用户菜单 / 控制选项</div>
+                        </div>
+                        <div style="
+                            grid-column: span 3;
+                            background: white;
+                            padding: 20px;
+                            border-radius: 8px;
+                            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+                        ">
+                            <h4 style="margin-top: 0;">数据卡片 1</h4>
+                            <p>指标数据可视化组件示例</p>
+                        </div>
+                        <div style="
+                            grid-column: span 3;
+                            background: white;
+                            padding: 20px;
+                            border-radius: 8px;
+                            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+                        ">
+                            <h4 style="margin-top: 0;">数据卡片 2</h4>
+                            <p>指标数据可视化组件示例</p>
+                        </div>
+                        <div style="
+                            grid-column: span 3;
+                            background: white;
+                            padding: 20px;
+                            border-radius: 8px;
+                            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+                        ">
+                            <h4 style="margin-top: 0;">数据卡片 3</h4>
+                            <p>指标数据可视化组件示例</p>
+                        </div>
+                        <div style="
+                            grid-column: span 3;
+                            background: white;
+                            padding: 20px;
+                            border-radius: 8px;
+                            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+                        ">
+                            <h4 style="margin-top: 0;">数据卡片 4</h4>
+                            <p>指标数据可视化组件示例</p>
+                        </div>
+                        <div style="
+                            grid-column: span 8;
+                            grid-row: 3 / 5;
+                            background: white;
+                            padding: 20px;
+                            border-radius: 8px;
+                            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+                            overflow: hidden;
+                        ">
+                            <h4 style="margin-top: 0;">主图表区域</h4>
+                            <p>大型数据可视化图表，展示趋势和关键指标</p>
+                        </div>
+                        <div style="
+                            grid-column: span 4;
+                            background: white;
+                            padding: 20px;
+                            border-radius: 8px;
+                            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+                        ">
+                            <h4 style="margin-top: 0;">活动日志</h4>
+                            <p>最近操作和事件列表</p>
+                        </div>
+                        <div style="
+                            grid-column: span 4;
+                            background: white;
+                            padding: 20px;
+                            border-radius: 8px;
+                            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+                        ">
+                            <h4 style="margin-top: 0;">用户统计</h4>
+                            <p>用户活动和参与度数据</p>
+                        </div>
+                    </div>
+                </div>
+                <pre id="gridLayoutCode" style="display: none;">/* 高级网格布局 - 智能仪表板设计 */
+
+.dashboard-grid {
+  /* 定义12列网格系统 */
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  /* 定义行模板 */
+  grid-template-rows: auto auto 1fr 1fr;
+  /* 定义网格间距 */
+  gap: 20px;
+  /* 设置高度 */
+  height: 400px;
+}
+
+/* 标题区域 - 跨越所有列 */
+.dashboard-header {
+  grid-column: 1 / -1; /* 从第一列到最后一列 */
+  background: #667eea;
+  color: white;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+/* 数据卡片 - 每个占3列 */
+.data-card {
+  grid-column: span 3; /* 跨越3列 */
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+/* 主图表区域 - 跨越8列，占据2行 */
+.main-chart {
+  grid-column: span 8;
+  grid-row: 3 / 5; /* 从第3行到第5行 */
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+/* 辅助信息卡片 - 每个占4列 */
+.sidebar-card {
+  grid-column: span 4;
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+/* 响应式设计 - 平板视图 */
+@media (max-width: 1024px) {
+  .data-card {
+    grid-column: span 6; /* 平板上每个卡片占6列 */
+  }
+  
+  .main-chart {
+    grid-column: 1 / -1; /* 主图表占据整行 */
+    grid-row: auto; /* 重置行位置 */
+  }
+  
+  .sidebar-card {
+    grid-column: span 6; /* 辅助卡片占6列 */
+  }
+}
+
+/* 响应式设计 - 移动视图 */
+@media (max-width: 768px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr; /* 单列布局 */
+    height: auto;
+  }
+  
+  .data-card,
+  .main-chart,
+  .sidebar-card {
+    grid-column: 1 / -1; /* 所有卡片占据整行 */
+    grid-row: auto;
+  }
+}
+
+/* 高级响应式技术 - 使用容器查询 */
+@container (min-width: 500px) {
+  .card-content {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+  }
+  
+  .card-icon {
+    flex-shrink: 0;
+  }
+}
+
+/* 使用CSS变量实现响应式间距 */
+:root {
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+}
+
+@media (max-width: 768px) {
+  :root {
+    --spacing-lg: 1rem;
+    --spacing-xl: 1.5rem;
+  }
+}
+\u003c/pre>
+            \u003c/div>
+            
+            <h3>4.3 响应式图像和媒体策略</h3>
+            <p>响应式图像是优化网站性能和用户体验的重要部分。使用现代技术如 srcset、sizes 和 picture 元素可以根据设备特性提供合适尺寸和格式的图像。</p>
+            
+            <div class="demo-area">
+                <div class="demo-title">响应式图像技术示例</div>
+                <pre><!-- 1. 使用 srcset 和 sizes 提供多尺寸图像 -->
+\u003cimg 
+  src="hero-small.jpg" 
+  srcset="
+    hero-small.jpg 480w,
+    hero-medium.jpg 768w,
+    hero-large.jpg 1200w,
+    hero-xlarge.jpg 2000w
+  " 
+  sizes="(max-width: 600px) 480px, (max-width: 1200px) 768px, 1200px" 
+  alt="响应式英雄图像" 
+  loading="lazy"
+/&gt;
+
+<!-- 2. 使用 picture 元素提供不同格式和裁剪的图像 -->
+\u003cpicture>
+  <!-- WebP 格式支持 -->
+  \u003csource 
+    srcset="
+      product-small.webp 400w,
+      product-medium.webp 800w,
+      product-large.webp 1200w
+    " 
+    type="image/webp"
+    sizes="(max-width: 600px) 400px, (max-width: 1200px) 800px, 1200px"
+  />
+  <!-- AVIF 格式支持（现代浏览器） -->
+  \u003csource 
+    srcset="
+      product-small.avif 400w,
+      product-medium.avif 800w,
+      product-large.avif 1200w
+    " 
+    type="image/avif"
+    sizes="(max-width: 600px) 400px, (max-width: 1200px) 800px, 1200px"
+  />
+  <!-- 回退 JPEG 格式 -->
+  \u003csource 
+    srcset="
+      product-small.jpg 400w,
+      product-medium.jpg 800w,
+      product-large.jpg 1200w
+    " 
+    type="image/jpeg"
+    sizes="(max-width: 600px) 400px, (max-width: 1200px) 800px, 1200px"
+  />
+  <!-- 最终回退图像 -->
+  \u003cimg 
+    src="product-medium.jpg" 
+    alt="产品展示图像" 
+    loading="lazy"
+    width="800" 
+    height="600"
+    decoding="async"
+  />
+\u003c/picture>
+
+<!-- 3. 艺术方向 - 不同设备使用不同裁剪的图像 -->
+\u003cpicture>
+  <!-- 移动设备竖屏 -->
+  \u003csource 
+    media="(max-width: 600px) and (orientation: portrait)" 
+    srcset="banner-mobile-portrait.jpg"
+  />
+  <!-- 移动设备横屏 -->
+  \u003csource 
+    media="(max-width: 600px) and (orientation: landscape)" 
+    srcset="banner-mobile-landscape.jpg"
+  />
+  <!-- 平板设备 -->
+  \u003csource 
+    media="(max-width: 1024px)" 
+    srcset="banner-tablet.jpg"
+  />
+  <!-- 桌面设备 -->
+  \u003cimg 
+    src="banner-desktop.jpg" 
+    alt="自适应横幅图像" 
+    loading="eager" // 关键图像立即加载
+  />
+\u003c/picture>
+
+/* 4. CSS 响应式背景图像 */
+.responsive-background {
+  background-image: url('bg-mobile.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+@media (min-width: 768px) {
+  .responsive-background {
+    background-image: url('bg-tablet.jpg');
+  }
+}
+
+@media (min-width: 1200px) {
+  .responsive-background {
+    background-image: url('bg-desktop.jpg');
+  }
+}
+
+/* 5. 现代图像格式与性能优化 */
+.image-optimization {
+  /* 图像容器样式 */
+  aspect-ratio: 16/9; /* 保持固定宽高比 */
+  overflow: hidden;
+  position: relative;
+}
+
+.image-optimization img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* 保持宽高比裁剪 */
+  transition: transform 0.3s ease;
+}
+
+.image-optimization:hover img {
+  transform: scale(1.05); /* 悬停缩放效果 */
+}
+
+/* 6. 渐进式图像加载 */
+.progressive-image {
+  position: relative;
+  overflow: hidden;
+}
+
+.progressive-image::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(45deg, transparent 48%, rgba(255,255,255,0.1) 50%, transparent 52%);
+  background-size: 10px 10px;
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.progressive-image.loaded::after {
+  display: none;
+}
+\u003c/pre>
+            \u003c/div>
+        \u003c/div>
+        
+        \u003cdiv class="section">
+            \u003ch2>5. 高级表单设计与用户体验优化</h2>
+            
+            <h3>5.1 无障碍表单设计原则</h3>
+            <p>良好的表单设计对用户完成任务至关重要。无障碍表单设计确保所有用户（包括使用辅助技术的用户）都能轻松填写和提交表单。</p>
+            
+            <div class="highlight-box">
+                <h4>无障碍表单核心要素</h4>
+                <ul>
+                    <li>为每个表单控件提供清晰的标签，使用 <code>for</code> 属性关联标签和输入字段</li>
+                    <li>使用语义化HTML元素（<code>form</code>, <code>input</code>, <code>select</code>等）</li>
+                    <li>对必填字段使用 <code>required</code> 属性和视觉提示</li>
+                    <li>提供即时验证和明确的错误信息，确保错误消息与相关字段关联</li>
+                    <li>使用适当的输入类型（<code>email</code>, <code>tel</code>, <code>number</code>等）获取合适的虚拟键盘</li>
+                    <li>添加清晰的帮助文本，为复杂输入提供指导</li>
+                    <li>确保表单可以通过键盘操作和提交</li>
+                </ul>
+            </div>
+            
+            <h3>5.2 表单验证与用户反馈优化</h3>
+            <p>有效的表单验证和即时反馈可以帮助用户快速识别和纠正错误，提高表单完成率。现代浏览器提供了内置验证功能，我们可以在此基础上增强用户体验。</p>
+            
+            <div class="demo-area">
+                <div class="demo-title">高级表单验证示例 - 实时验证与反馈</div>
+                <form id="advancedForm" style="max-width: 600px; margin: 0 auto;">
+                    <div class="form-group" style="margin-bottom: 20px;">
+                        <label for="username" style="display: block; margin-bottom: 8px; font-weight: 500;">用户名 *</label>
+                        <input 
+                            type="text" 
+                            id="username" 
+                            name="username" 
+                            required 
+                            aria-required="true"
+                            aria-describedby="username-hint username-error"
+                            style="
+                                width: 100%;
+                                padding: 12px 16px;
+                                border: 2px solid #e2e8f0;
+                                border-radius: 8px;
+                                font-size: 1rem;
+                                transition: border-color 0.3s ease, box-shadow 0.3s ease;
+                            "
+                            oninput="validateField(this)"
+                        >
+                        <p id="username-hint" style="margin-top: 5px; font-size: 0.9rem; color: #718096;">用户名至少3个字符，只能包含字母、数字和下划线。</p>
+                        <p id="username-error" role="alert" style="margin-top: 5px; font-size: 0.9rem; color: #e53e3e; display: none;">用户名格式不正确，请检查后重试。</p>
+                    </div>
+                    
+                    <div class="form-group" style="margin-bottom: 20px;">
+                        <label for="email" style="display: block; margin-bottom: 8px; font-weight: 500;">电子邮箱 *</label>
+                        <input 
+                            type="email" 
+                            id="email" 
+                            name="email" 
+                            required 
+                            aria-required="true"
+                            aria-describedby="email-hint email-error"
+                            style="
+                                width: 100%;
+                                padding: 12px 16px;
+                                border: 2px solid #e2e8f0;
+                                border-radius: 8px;
+                                font-size: 1rem;
+                                transition: border-color 0.3s ease, box-shadow 0.3s ease;
+                            "
+                            oninput="validateField(this)"
+                        >
+                        <p id="email-hint" style="margin-top: 5px; font-size: 0.9rem; color: #718096;">请输入有效的电子邮箱地址。</p>
+                        <p id="email-error" role="alert" style="margin-top: 5px; font-size: 0.9rem; color: #e53e3e; display: none;">请输入有效的电子邮箱地址。</p>
+                    </div>
+                    
+                    <div class="form-group" style="margin-bottom: 20px;">
+                        <label for="password" style="display: block; margin-bottom: 8px; font-weight: 500;">密码 *</label>
+                        <input 
+                            type="password" 
+                            id="password" 
+                            name="password" 
+                            required 
+                            aria-required="true"
+                            aria-describedby="password-hint password-error"
+                            style="
+                                width: 100%;
+                                padding: 12px 16px;
+                                border: 2px solid #e2e8f0;
+                                border-radius: 8px;
+                                font-size: 1rem;
+                                transition: border-color 0.3s ease, box-shadow 0.3s ease;
+                            "
+                            oninput="validateField(this)"
+                        >
+                        <p id="password-hint" style="margin-top: 5px; font-size: 0.9rem; color: #718096;">密码至少8个字符，包含大小写字母、数字和特殊字符。</p>
+                        <p id="password-error" role="alert" style="margin-top: 5px; font-size: 0.9rem; color: #e53e3e; display: none;">密码不符合安全要求。</p>
+                    </div>
+                    
+                    <div class="form-group" style="margin-bottom: 20px;">
+                        <label for="confirmPassword" style="display: block; margin-bottom: 8px; font-weight: 500;">确认密码 *</label>
+                        <input 
+                            type="password" 
+                            id="confirmPassword" 
+                            name="confirmPassword" 
+                            required 
+                            aria-required="true"
+                            aria-describedby="confirmPassword-hint confirmPassword-error"
+                            style="
+                                width: 100%;
+                                padding: 12px 16px;
+                                border: 2px solid #e2e8f0;
+                                border-radius: 8px;
+                                font-size: 1rem;
+                                transition: border-color 0.3s ease, box-shadow 0.3s ease;
+                            "
+                            oninput="validateField(this)"
+                        >
+                        <p id="confirmPassword-hint" style="margin-top: 5px; font-size: 0.9rem; color: #718096;">请再次输入密码以确认。</p>
+                        <p id="confirmPassword-error" role="alert" style="margin-top: 5px; font-size: 0.9rem; color: #e53e3e; display: none;">两次输入的密码不一致。</p>
+                    </div>
+                    
+                    <div class="form-actions" style="margin-top: 30px; display: flex; gap: 15px; justify-content: flex-end;">
+                        <button type="reset" class="btn-secondary">重置表单</button>
+                        <button type="submit" id="submitButton" disabled style="opacity: 0.6; cursor: not-allowed;">提交表单</button>
+                    </div>
+                </form>
+                <pre style="margin-top: 30px;">// 高级表单验证 JavaScript
+
+// 表单字段验证规则
+const validationRules = {
+  username: {
+    pattern: /^[a-zA-Z0-9_]{3,}$/,
+    errorMessage: '用户名至少3个字符，只能包含字母、数字和下划线。'
+  },
+  email: {
+    pattern: /^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$/,
+    errorMessage: '请输入有效的电子邮箱地址。'
+  },
+  password: {
+    pattern: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
+    errorMessage: '密码至少8个字符，包含大小写字母、数字和特殊字符。'
+  },
+  confirmPassword: {
+    validate: (value) => {
+      return value === document.getElementById('password').value;
+    },
+    errorMessage: '两次输入的密码不一致。'
+  }
+};
+
+// 验证单个字段
+function validateField(field) {
+  const fieldName = field.name;
+  const fieldValue = field.value.trim();
+  const errorElement = document.getElementById(`${fieldName}-error`);
+  const rule = validationRules[fieldName];
+  let isValid = true;
+  
+  // 检查必填字段
+  if (field.hasAttribute('required') && !fieldValue) {
+    isValid = false;
+    errorElement.textContent = '此字段为必填项。';
+  } 
+  // 验证字段规则
+  else if (fieldValue && rule) {
+    if (rule.pattern) {
+      isValid = rule.pattern.test(fieldValue);
+      errorElement.textContent = rule.errorMessage;
+    } else if (rule.validate) {
+      isValid = rule.validate(fieldValue);
+      errorElement.textContent = rule.errorMessage;
+    }
+  }
+  
+  // 更新字段视觉状态
+  if (!isValid) {
+    field.classList.remove('is-valid');
+    field.classList.add('is-invalid');
+    errorElement.style.display = 'block';
+  } else {
+    field.classList.remove('is-invalid');
+    field.classList.add('is-valid');
+    errorElement.style.display = 'none';
+  }
+  
+  // 更新提交按钮状态
+  updateSubmitButtonState();
+  
+  return isValid;
+}
+
+// 更新提交按钮状态
+function updateSubmitButtonState() {
+  const submitButton = document.getElementById('submitButton');
+  const allFields = document.querySelectorAll('#advancedForm input[required]');
+  let allValid = true;
+  
+  allFields.forEach(field => {
+    if (!field.classList.contains('is-valid')) {
+      allValid = false;
+    }
+  });
+  
+  submitButton.disabled = !allValid;
+  submitButton.style.opacity = allValid ? '1' : '0.6';
+  submitButton.style.cursor = allValid ? 'pointer' : 'not-allowed';
+}
+
+// 表单提交处理
+const form = document.getElementById('advancedForm');
+form.addEventListener('submit', function(event) {
+  // 阻止默认提交
+  event.preventDefault();
+  
+  // 验证所有字段
+  let isValid = true;
+  const allFields = document.querySelectorAll('#advancedForm input');
+  allFields.forEach(field => {
+    if (!validateField(field)) {
+      isValid = false;
+    }
+  });
+  
+  if (isValid) {
+    // 表单验证通过，可以进行提交处理
+    alert('表单验证通过！准备提交...');
+    
+    // 这里可以添加AJAX提交或其他处理逻辑
+    // submitFormData();
+  } else {
+    // 滚动到第一个错误字段
+    const firstErrorField = document.querySelector('.is-invalid');
+    if (firstErrorField) {
+      firstErrorField.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      firstErrorField.focus();
+    }
+  }
+});
+
+// 添加CSS类动态样式
+const styleSheet = document.createElement('style');
+styleSheet.textContent = `
+  input.is-valid {
+    border-color: #48bb78 !important;
+    box-shadow: 0 0 0 3px rgba(72, 187, 120, 0.2) !important;
+  }
+  
+  input.is-invalid {
+    border-color: #e53e3e !important;
+    box-shadow: 0 0 0 3px rgba(229, 62, 62, 0.2) !important;
+  }
+  
+  input:focus {
+    outline: none;
+    border-color: #667eea !important;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.3) !important;
+  }
+  
+  button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+`;
+
+document.head.appendChild(styleSheet);
+\u003c/pre>
+            \u003c/div>
+        \u003c/div>
+    \u003c/div\u003e
+    
+    \u003cscript\u003e
+        // 页面加载完成后初始化演示
+        document.addEventListener('DOMContentLoaded', function() {
+            // 1. 动画演示功能
+            const animatedElement = document.getElementById('animatedElement');
+            
+            document.getElementById('playBounceAnimation').addEventListener('click', function() {
+                resetAnimation();
+                setTimeout(() => {
+                    animatedElement.classList.add('bounce');
+                }, 10);
+            });
+            
+            document.getElementById('playPulseAnimation').addEventListener('click', function() {
+                resetAnimation();
+                setTimeout(() => {
+                    animatedElement.classList.add('pulse');
+                }, 10);
+            });
+            
+            document.getElementById('playFlipAnimation').addEventListener('click', function() {
+                resetAnimation();
+                setTimeout(() => {
+                    animatedElement.classList.add('flip');
+                }, 10);
+            });
+            
+            document.getElementById('playSlideAnimation').addEventListener('click', function() {
+                resetAnimation();
+                setTimeout(() => {
+                    animatedElement.classList.add('slide');
+                }, 10);
+            });
+            
+            function resetAnimation() {
+                animatedElement.className = '';
+                animatedElement.style.animation = 'none';
+                animatedElement.offsetHeight; // 触发重绘
+                animatedElement.style.animation = null;
+            }
+            
+            // 2. Web Animations API 演示
+            const waapiElement = document.getElementById('waapiAnimatedElement');
+            let waapiAnimation;
+            
+            document.getElementById('playWAAPIDemo').addEventListener('click', function() {
+                // 取消现有动画
+                if (waapiAnimation) {
+                    waapiAnimation.cancel();
+                }
+                
+                // 定义关键帧
+                const keyframes = [
+                    {
+                        transform: 'scale(1) rotate(0deg)',
+                        opacity: 1,
+                        backgroundColor: '#f5576c'
+                    },
+                    {
+                        transform: 'scale(1.3) rotate(45deg)',
+                        opacity: 0.8,
+                        backgroundColor: '#f093fb',
+                        offset: 0.3
+                    },
+                    {
+                        transform: 'scale(0.8) rotate(90deg)',
+                        opacity: 0.9,
+                        backgroundColor: '#4facfe',
+                        offset: 0.7
+                    },
+                    {
+                        transform: 'scale(1) rotate(0deg)',
+                        opacity: 1,
+                        backgroundColor: '#f5576c'
+                    }
+                ];
+                
+                // 定义选项
+                const options = {
+                    duration: 3000,
+                    easing: 'ease-in-out',
+                    iterations: Infinity,
+                    direction: 'alternate',
+                    fill: 'both'
+                };
+                
+                // 创建并播放动画
+                waapiAnimation = waapiElement.animate(keyframes, options);
+            });
+            
+            document.getElementById('pauseWAAPIDemo').addEventListener('click', function() {
+                if (waapiAnimation) {
+                    if (waapiAnimation.playState === 'running') {
+                        waapiAnimation.pause();
+                        this.textContent = '继续动画';
+                    } else {
+                        waapiAnimation.play();
+                        this.textContent = '暂停动画';
+                    }
+                }
+            });
+            
+            document.getElementById('resetWAAPIDemo').addEventListener('click', function() {
+                if (waapiAnimation) {
+                    waapiAnimation.cancel();
+                    document.getElementById('pauseWAAPIDemo').textContent = '暂停动画';
+                }
+            });
+            
+            // 3. 网格布局演示
+            document.getElementById('showGridLayout').addEventListener('click', function() {
+                const codeBlock = document.getElementById('gridLayoutCode');
+                if (codeBlock.style.display === 'none') {
+                    codeBlock.style.display = 'block';
+                    this.textContent = '隐藏网格布局代码';
+                } else {
+                    codeBlock.style.display = 'none';
+                    this.textContent = '查看网格布局代码';
+                }
+            });
+            
+            document.getElementById('showResponsiveLayout').addEventListener('click', function() {
+                alert('在实际应用中，此按钮会模拟不同设备宽度下的布局变化。请尝试调整浏览器窗口大小以查看响应式效果。');
+            });
+            
+            // 4. 高级表单验证
+            // 为表单字段添加验证事件
+            const formFields = document.querySelectorAll('#advancedForm input');
+            formFields.forEach(field => {
+                field.addEventListener('input', function() {
+                    validateField(this);
+                });
+            });
+            
+            // 表单重置处理
+            document.getElementById('advancedForm').addEventListener('reset', function() {
+                setTimeout(() => {
+                    formFields.forEach(field => {
+                        field.classList.remove('is-valid', 'is-invalid');
+                        const errorId = `${field.name}-error`;
+                        const errorElement = document.getElementById(errorId);
+                        if (errorElement) {
+                            errorElement.style.display = 'none';
+                        }
+                    });
+                    updateSubmitButtonState();
+                }, 10);
+            });
+        });
+        
+        // 表单验证相关函数
+        function validateField(field) {
+            const fieldName = field.name;
+            const fieldValue = field.value.trim();
+            const errorElement = document.getElementById(`${fieldName}-error`);
+            let isValid = true;
+            
+            // 简单验证逻辑
+            switch(fieldName) {
+                case 'username':
+                    isValid = /^[a-zA-Z0-9_]{3,}$/.test(fieldValue);
+                    if (!isValid && fieldValue) {
+                        errorElement.textContent = '用户名至少3个字符，只能包含字母、数字和下划线。';
+                    }
+                    break;
+                case 'email':
+                    isValid = /^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$/.test(fieldValue);
+                    if (!isValid && fieldValue) {
+                        errorElement.textContent = '请输入有效的电子邮箱地址。';
+                    }
+                    break;
+                case 'password':
+                    isValid = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(fieldValue);
+                    if (!isValid && fieldValue) {
+                        errorElement.textContent = '密码至少8个字符，包含大小写字母、数字和特殊字符。';
+                    }
+                    break;
+                case 'confirmPassword':
+                    const password = document.getElementById('password').value;
+                    isValid = fieldValue === password;
+                    if (!isValid && fieldValue) {
+                        errorElement.textContent = '两次输入的密码不一致。';
+                    }
+                    break;
+            }
+            
+            // 必填字段验证
+            if (field.hasAttribute('required') && !fieldValue) {
+                isValid = false;
+                errorElement.textContent = '此字段为必填项。';
+            }
+            
+            // 更新样式
+            if (!isValid && fieldValue) {
+                field.classList.add('is-invalid');
+                field.classList.remove('is-valid');
+                errorElement.style.display = 'block';
+            } else if (field.hasAttribute('required') && fieldValue) {
+                field.classList.add('is-valid');
+                field.classList.remove('is-invalid');
+                errorElement.style.display = 'none';
+            } else {
+                field.classList.remove('is-valid', 'is-invalid');
+                errorElement.style.display = 'none';
+            }
+            
+            updateSubmitButtonState();
+            return isValid;
+        }
+        
+        function updateSubmitButtonState() {
+            const submitButton = document.getElementById('submitButton');
+            const requiredFields = document.querySelectorAll('#advancedForm input[required]');
+            let allValid = true;
+            
+            requiredFields.forEach(field => {
+                if (!field.value.trim() || !field.classList.contains('is-valid')) {
+                    allValid = false;
+                }
+            });
+            
+            submitButton.disabled = !allValid;
+            submitButton.style.opacity = allValid ? '1' : '0.6';
+            submitButton.style.cursor = allValid ? 'pointer' : 'not-allowed';
+        }
+        
+        // 添加动态样式
+        function addDynamicStyles() {
+            const styleSheet = document.createElement('style');
+            styleSheet.textContent = `
+                /* 动画样式 */
+                @keyframes bounce {
+                    0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+                    40% { transform: translateY(-30px); }
+                    60% { transform: translateY(-15px); }
+                }
+                .bounce { animation: bounce 1s ease; }
+                
+                @keyframes pulse {
+                    0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(102, 126, 234, 0.7); }
+                    70% { transform: scale(1.05); box-shadow: 0 0 0 15px rgba(102, 126, 234, 0); }
+                    100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(102, 126, 234, 0); }
+                }
+                .pulse { animation: pulse 1.5s ease; }
+                
+                @keyframes flip {
+                    0% { transform: perspective(400px) rotateY(0); }
+                    40% { transform: perspective(400px) rotateY(150deg); }
+                    80% { transform: perspective(400px) rotateY(170deg); }
+                    100% { transform: perspective(400px) rotateY(360deg); }
+                }
+                .flip { animation: flip 2s ease; backface-visibility: visible; }
+                
+                @keyframes slide {
+                    0% { transform: translateX(-100%); opacity: 0; }
+                    50% { transform: translateX(20%); }
+                    100% { transform: translateX(0); opacity: 1; }
+                }
+                .slide { animation: slide 1s ease; }
+                
+                /* 表单验证样式 */
+                input.is-valid { border-color: #48bb78 !important; box-shadow: 0 0 0 3px rgba(72, 187, 120, 0.2) !important; }
+                input.is-invalid { border-color: #e53e3e !important; box-shadow: 0 0 0 3px rgba(229, 62, 62, 0.2) !important; }
+                input:focus { outline: none; border-color: #667eea !important; box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.3) !important; }
+            `;
+            document.head.appendChild(styleSheet);
+        }
+        
+        // 添加动态样式
+        addDynamicStyles();
+        
+        // 键盘可访问性演示
+        const keyboardDemoButtons = [
+            document.getElementById('focusButton1'),
+            document.getElementById('focusButton2'),
+            document.getElementById('focusButton3'),
+            document.getElementById('skipToContent')
+        ];
+        
+        keyboardDemoButtons.forEach(button => {
+            if (button) {
+                button.addEventListener('focus', function() {
+                    this.style.outline = '3px solid #667eea';
+                    this.style.outlineOffset = '2px';
+                });
+                
+                button.addEventListener('blur', function() {
+                    this.style.outline = 'none';
+                    this.style.outlineOffset = '0';
+                });
+                
+                button.addEventListener('click', function() {
+                    const output = document.getElementById('keyboardDemoOutput');
+                    if (output) {
+                        output.innerHTML += `\u003cp\u003e按钮 "${this.textContent}" 被点击。\u003c/p\u003e`;
+                        output.scrollTop = output.scrollHeight;
+                    }
+                });
+            }
+        });
+    \u003c/script\u003e
+\u003c/body\u003e
+\u003c/html\u003e
+        }
+        
+        .section {
+            background: white;
+            border-radius: 16px;
+            padding: 60px;
+            margin: 60px 0;
+            box-shadow: 0 5px 30px rgba(0,0,0,0.03);
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+        
+        h2 {
+            color: #2d3748;
+            margin: 0 0 40px;
+            font-size: 2.2rem;
+            font-weight: 700;
+            position: relative;
+            padding-bottom: 15px;
+        }
+        
+        h2::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 60px;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 2px;
+        }
+        
+        h3 {
+            color: #4a5568;
+            margin: 30px 0 20px;
+            font-size: 1.6rem;
+            font-weight: 600;
+        }
+        
+        h4 {
+            color: #667eea;
+            margin: 25px 0 15px;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+        
+        p {
+            margin-bottom: 20px;
+            font-size: 1.05rem;
+            color: #4a5568;
+        }
+        
+        ul, ol {
+            margin-left: 25px;
+            margin-bottom: 20px;
+        }
+        
+        li {
+            margin-bottom: 10px;
+            color: #4a5568;
+        }
+        
+        pre {
+            background-color: #2d3748;
+            color: #e2e8f0;
+            padding: 25px;
+            border-radius: 12px;
+            overflow-x: auto;
+            margin: 25px 0;
+            font-family: 'Fira Code', 'Courier New', Courier, monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        code {
+            font-family: 'Fira Code', 'Courier New', Courier, monospace;
+            background-color: #edf2f7;
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-size: 0.9em;
+            color: #e53e3e;
+        }
+        
+        pre code {
+            background: transparent;
+            color: inherit;
+            padding: 0;
+        }
+        
+        .demo-area {
+            background: linear-gradient(135deg, #f0f4ff 0%, #e9e4ff 100%);
+            padding: 30px;
+            border-radius: 12px;
+            margin: 30px 0;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .demo-area::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 200px;
+            height: 200px;
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: 50%;
+            transform: translate(50%, -50%);
+        }
+        
+        .demo-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #667eea;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .demo-controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 25px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+        
+        button:hover::before {
+            left: 100%;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        .btn-secondary {
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+            box-shadow: none;
+        }
+        
+        .btn-secondary:hover {
+            background: #667eea;
+            color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        .btn-outline {
+            background: transparent;
+            color: #667eea;
+            border: 2px solid #667eea;
+            box-shadow: none;
+        }
+        
+        .btn-outline:hover {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-small {
+            padding: 8px 16px;
+            font-size: 0.9rem;
+        }
+        
+        .demo-output {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            min-height: 100px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            position: relative;
+            z-index: 1;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.9rem;
+            color: #4a5568;
+        }
+        
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin: 30px 0;
+        }
+        
+        .feature-card {
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9ff 100%);
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            border: 1px solid rgba(102, 126, 234, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+        }
+        
+        .feature-card h4 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+        
+        .feature-card p {
+            color: #666;
+            font-size: 0.95rem;
+        }
+        
+        .highlight-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin: 30px 0;
+        }
+        
+        .highlight-box h4 {
+            color: white;
+            margin-bottom: 15px;
+        }
+        
+        .highlight-box p {
+            color: rgba(255,255,255,0.9);
+        }
+        
+        .warning-box {
+            background: #fffaf0;
+            border: 2px solid #ed8936;
+            border-radius: 12px;
+            padding: 25px;
+            margin: 30px 0;
+        }
+        
+        .warning-box h4 {
+            color: #d97706;
+            margin-bottom: 15px;
+        }
+        
+        .success-box {
+            background: #f0fff4;
+            border: 2px solid #48bb78;
+            border-radius: 12px;
+            padding: 25px;
+            margin: 30px 0;
+        }
+        
+        .success-box h4 {
+            color: #2f855a;
+            margin-bottom: 15px;
+        }
+        
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 30px 0;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+        
+        .comparison-table th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 20px;
+            text-align: left;
+            font-weight: 600;
+        }
+        
+        .comparison-table td {
+            padding: 15px 20px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .comparison-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .comparison-table tr:nth-child(even) {
+            background-color: #f8fafc;
+        }
+        
+        .comparison-table tr:hover {
+            background-color: #f1f5f9;
+        }
+        
+        .ui-preview {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 30px;
+            margin: 30px 0;
+            position: relative;
+            overflow: hidden;
+            box-shadow: inset 0 0 30px rgba(0,0,0,0.03);
+        }
+        
+        .component-showcase {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin: 30px 0;
+        }
+        
+        .component {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+            border: 1px solid rgba(0,0,0,0.05);
+            transition: transform 0.3s ease;
+        }
+        
+        .component:hover {
+            transform: translateY(-5px);
+        }
+        
+        .component-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #4a5568;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .component-preview {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100px;
+            margin-bottom: 15px;
+        }
+        
+        .tab-container {
+            margin: 30px 0;
+        }
+        
+        .tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        
+        .tab {
+            padding: 12px 24px;
+            cursor: pointer;
+            background: white;
+            border: none;
+            border-bottom: 3px solid transparent;
+            font-size: 1rem;
+            font-weight: 500;
+            color: #718096;
+            transition: all 0.3s ease;
+            border-radius: 8px 8px 0 0;
+            box-shadow: none;
+            background: none;
+        }
+        
+        .tab:hover {
+            color: #667eea;
+            background: #f8fafc;
+            transform: none;
+        }
+        
+        .tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+            background: white;
+        }
+        
+        .tab-content {
+            display: none;
+            padding: 30px;
+            background: white;
+            border-radius: 0 0 12px 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+        
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .accessibility-checklist {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 25px;
+            margin: 30px 0;
+        }
+        
+        .checklist-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+        
+        .checklist-item input[type="checkbox"] {
+            margin-top: 5px;
+            margin-right: 15px;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        
+        .checklist-item .item-content {
+            flex: 1;
+        }
+        
+        .checklist-item h5 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #4a5568;
+            margin-bottom: 5px;
+        }
+        
+        .checklist-item p {
+            font-size: 0.95rem;
+            color: #718096;
+            margin-bottom: 0;
+        }
+        
+        .scrollbar-custom::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        
+        .scrollbar-custom::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 4px;
+        }
+        
+        .scrollbar-custom::-webkit-scrollbar-thumb {
+            background: #cbd5e0;
+            border-radius: 4px;
+        }
+        
+        .scrollbar-custom::-webkit-scrollbar-thumb:hover {
+            background: #a0aec0;
+        }
+        
+        .color-palette {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+            margin: 25px 0;
+        }
+        
+        .color-swatch {
+            height: 120px;
+            border-radius: 8px;
+            display: flex;
+            align-items: flex-end;
+            padding: 15px;
+            color: white;
+            font-weight: 600;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+            transition: transform 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .color-swatch:hover {
+            transform: translateY(-5px);
+        }
+        
+        .dark-theme {
+            background-color: #0f172a;
+            color: #f1f5f9;
+        }
+        
+        .dark-theme .section {
+            background: #1e293b;
+            color: #f1f5f9;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        
+        .dark-theme h2, .dark-theme h3, .dark-theme h4 {
+            color: #f8fafc;
+        }
+        
+        .dark-theme p, .dark-theme li {
+            color: #cbd5e0;
+        }
+        
+        .dark-theme code {
+            background-color: #334155;
+            color: #fca5a5;
+        }
+        
+        .dark-theme .demo-area {
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+        }
+        
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.5rem;
+            }
+            
+            h2 {
+                font-size: 1.8rem;
+            }
+            
+            .section {
+                padding: 40px 20px;
+            }
+            
+            .intro-cards {
+                grid-template-columns: 1fr;
+            }
+            
+            .demo-controls {
+                flex-direction: column;
+            }
+            
+            .feature-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 2rem;
+            }
+            
+            header {
+                padding: 80px 0 60px;
+            }
+            
+            .section {
+                padding: 30px 15px;
+            }
+            
+            .tabs {
+                flex-direction: column;
+            }
+            
+            .tab {
+                text-align: left;
+                border-radius: 8px;
+                margin-bottom: 5px;
+                border-bottom: 1px solid #e2e8f0;
+            }
+            
+            .tab-content {
+                padding: 20px 15px;
+            }
+        }
+    \u003c/style\u003e
+\u003c/head\u003e
+\u003cbody class="scrollbar-custom"\u003e
+    \u003cheader\u003e
+        \u003cdiv class="container"\u003e
+            \u003ch1\u003e高级UI/UX开发实践\u003c/h1\u003e
+            \u003cp\u003e构建引人入胜、无障碍且高性能的现代用户界面体验\u003c/p\u003e
+        \u003c/div\u003e
+    \u003c/header\u003e
+    
+    \u003cdiv class="container"\u003e
+        \u003cdiv class="intro-cards"\u003e
+            \u003cdiv class="intro-card"\u003e
+                \u003ch3\u003e设计系统与组件库\u003c/h3\u003e
+                \u003cp\u003e创建可复用、一致的UI组件，建立完整的设计语言系统，提升开发效率和用户体验一致性。\u003c/p\u003e
+            \u003c/div\u003e
+            \u003cdiv class="intro-card"\u003e
+                \u003ch3\u003e无障碍设计实践\u003c/h3\u003e
+                \u003cp\u003e实现符合WCAG标准的无障碍界面，确保所有用户（包括残障用户）都能有效使用产品。\u003c/p\u003e
+            \u003c/div\u003e
+            \u003cdiv class="intro-card"\u003e
+                \u003ch3\u003e微交互与动效设计\u003c/h3\u003e
+                \u003cp\u003e设计精细的微交互和流畅的动画效果，增强用户体验，提供即时反馈和视觉愉悦感。\u003c/p\u003e
+            \u003c/div\u003e
+            \u003cdiv class="intro-card"\u003e
+                \u003ch3\u003e响应式与自适应设计\u003c/h3\u003e
+                \u003cp\u003e构建在各种设备上都能完美展示的界面，使用先进的布局技术和媒体查询策略。\u003c/p\u003e
+            \u003c/div\u003e
+        \u003c/div\u003e
+        \u003cdiv class="section"\u003e
+            \u003ch2\u003e1. 现代UI设计原则与趋势\u003c/h2\u003e
+            \u003c
+            \u003ch3\u003e1.1 设计系统与组件库的构建\u003c/h3\u003e
+            \u003cp\u003e现代前端开发中，设计系统和组件库已经成为提升开发效率、确保设计一致性的关键工具。一个成熟的设计系统应包含设计令牌、组件库、使用指南和最佳实践。\u003c/p\u003e
+            \u003c
+            \u003cdiv class="highlight-box"\u003e
+                \u003ch4\u003e设计系统核心组成部分\u003c/h4\u003e
+                \u003cul\u003e
+                    \u003cli\u003e\u003cstrong\u003e设计令牌(Design Tokens)\u003c/strong\u003e：颜色、字体、间距、阴影等原子级设计元素\u003c/li\u003e
+                    \u003cli\u003e\u003cstrong\u003e组件库(Component Library)\u003c/strong\u003e：可复用的UI组件集合，包含变体和状态\u003c/li\u003e
+                    \u003cli\u003e\u003cstrong\u003e设计模式(Design Patterns)\u003c/strong\u003e：常见UI场景的标准解决方案\u003c/li\u003e
+                    \u003cli\u003e\u003cstrong\u003e使用指南(Usage Guidelines)\u003c/strong\u003e：组件和模式的正确使用方法\u003c/li\u003e
+                \u003c/ul\u003e
+            \u003c/div\u003e
+            \u003c
+            \u003cdiv class="demo-area"\u003e
+                \u003cdiv class="demo-title"\u003e设计令牌示例展示\u003c/div\u003e
+                \u003cdiv class="color-palette"\u003e
+                    \u003cdiv class="color-swatch" style="background-color: #667eea;"\u003eprimary\u003c/div\u003e
+                    \u003cdiv class="color-swatch" style="background-color: #764ba2;"\u003esecondary\u003c/div\u003e
+                    \u003cdiv class="color-swatch" style="background-color: #f093fb;"\u003eaccent1\u003c/div\u003e
+                    \u003cdiv class="color-swatch" style="background-color: #f5576c;"\u003eaccent2\u003c/div\u003e
+                    \u003cdiv class="color-swatch" style="background-color: #4facfe;"\u003eaccent3\u003c/div\u003e
+                    \u003cdiv class="color-swatch" style="background-color: #2d3748; color: #e2e8f0;"\u003etext-dark\u003c/div\u003e
+                    \u003cdiv class="color-swatch" style="background-color: #718096; color: white;"\u003etext-muted\u003c/div\u003e
+                    \u003cdiv class="color-swatch" style="background-color: #e2e8f0; color: #2d3748;"\u003ebg-light\u003c/div\u003e
+                \u003c/div\u003e
+                \u003cpre\u003e// 设计令牌实现示例 (JavaScript)
+const designTokens = {
+  colors: {
+    primary: {
+      50: '#edf2ff',
+      100: '#dbeafe',
+      200: '#bfdbfe',
+      300: '#93c5fd',
+      400: '#60a5fa',
+      500: '#3b82f6',
+      600: '#2563eb',
+      700: '#1d4ed8',
+      800: '#1e40af',
+      900: '#1e3a8a',
+    },
+    // 其他颜色系统...
+  },
+  spacing: {
+    xs: '0.25rem',
+    sm: '0.5rem',
+    md: '1rem',
+    lg: '1.5rem',
+    xl: '2rem',
+    '2xl': '3rem',
+    '3xl': '4rem',
+  },
+  typography: {
+    fontFamily: {
+      sans: '"Inter", -apple-system, BlinkMacSystemFont, sans-serif',
+      mono: '"Fira Code", monospace',
+    },
+    fontSize: {
+      xs: '0.75rem',
+      sm: '0.875rem',
+      base: '1rem',
+      lg: '1.125rem',
+      xl: '1.25rem',
+      '2xl': '1.5rem',
+      '3xl': '1.875rem',
+      '4xl': '2.25rem',
+    },
+    fontWeight: {
+      normal: 400,
+      medium: 500,
+      semibold: 600,
+      bold: 700,
+    },
+  },
+  shadows: {
+    sm: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
+    md: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+    lg: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+    xl: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+  },
+  borderRadius: {
+    sm: '0.125rem',
+    md: '0.25rem',
+    lg: '0.375rem',
+    xl: '0.5rem',
+    '2xl': '0.75rem',
+    full: '9999px',
+  },
+};
+
+// 使用示例
+const theme = {
+  button: {
+    primary: {
+      backgroundColor: designTokens.colors.primary[500],
+      color: 'white',
+      padding: `${designTokens.spacing.sm} ${designTokens.spacing.lg}`,
+      borderRadius: designTokens.borderRadius.md,
+      fontWeight: designTokens.typography.fontWeight.medium,
+      boxShadow: designTokens.shadows.sm,
+    },
+  },
+};
+\u003c/pre\u003e
+            \u003c/div\u003e
+            \u003c
+            \u003ch3\u003e1.2 现代UI趋势与设计理念\u003c/h3\u003e
+            \u003cp\u003e现代UI设计不断演变，当前主流趋势包括新拟物化(Neumorphism)、玻璃态(Glassmorphism)、暗黑模式、极简主义、微交互等。这些趋势不仅关注视觉美感，更强调用户体验和功能性。\u003c/p\u003e
+            \u003c
+            \u003cdiv class="feature-grid"\u003e
+                \u003cdiv class="feature-card"\u003e
+                    \u003ch4\u003e玻璃态设计 (Glassmorphism)\u003c/h4\u003e
+                    \u003cp\u003e使用半透明效果、模糊背景和细微边框，创造层次感和深度。特点是背景模糊、透明度和微妙的边框效果。\u003c/p\u003e
+                \u003c/div\u003e
+                \u003cdiv class="feature-card"\u003e
+                    \u003ch4\u003e暗黑模式 (Dark Mode)\u003c/h4\u003e
+                    \u003cp\u003e减少屏幕蓝光，降低视觉疲劳，延长电池寿命。需要精心设计的对比度和色彩系统确保可读性。\u003c/p\u003e
+                \u003c/div\u003e
+                \u003cdiv class="feature-card"\u003e
+                    \u003ch4\u003e微交互 (Micro-interactions)\u003c/h4\u003e
+                    \u003cp\u003e通过细微的动画和反馈增强用户体验，提供即时视觉确认，增强产品的人性化和愉悦感。\u003c/p\u003e
+                \u003c/div\u003e
+                \u003cdiv class="feature-card"\u003e
+                    \u003ch4\u003e数据可视化设计\u003c/h4\u003e
+                    \u003cp\u003e通过直观的图表和图形呈现复杂数据，帮助用户快速理解信息，做出明智决策。\u003c/p\u003e
+                \u003c/div\u003e
+            \u003c/div\u003e
+            \u003c
+            \u003cdiv class="demo-area"\u003e
+                \u003cdiv class="demo-title"\u003eUI模式演示 - 玻璃态设计效果\u003c/div\u003e
+                \u003cdiv style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; margin-bottom: 20px;"\u003e
+                    \u003cdiv style="
+                        background: rgba(255, 255, 255, 0.2);
+                        backdrop-filter: blur(10px);
+                        -webkit-backdrop-filter: blur(10px);
+                        border-radius: 16px;
+                        border: 1px solid rgba(255, 255, 255, 0.18);
+                        padding: 30px;
+                        width: 280px;
+                        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+                        text-align: center;
+                    "\u003e
+                        \u003ch3 style="margin-bottom: 15px; color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.3);"\u003e玻璃态卡片\u003c/h3\u003e
+                        \u003cp style="color: rgba(255, 255, 255, 0.8);"\u003e半透明效果与背景模糊创造现代感十足的界面元素，提供良好的视觉层次。\u003c/p\u003e
+                    \u003c/div\u003e
+                    \u003cdiv style="
+                        background: rgba(255, 255, 255, 0.1);
+                        backdrop-filter: blur(5px);
+                        -webkit-backdrop-filter: blur(5px);
+                        border-radius: 12px;
+                        border: 1px solid rgba(255, 255, 255, 0.1);
+                        padding: 25px;
+                        width: 280px;
+                        box-shadow: 0 4px 16px 0 rgba(31, 38, 135, 0.15);
+                        text-align: center;
+                    "\u003e
+                        \u003ch3 style="margin-bottom: 15px; color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.3);"\u003e轻量玻璃态\u003c/h3\u003e
+                        \u003cp style="color: rgba(255, 255, 255, 0.8);"\u003e减少模糊程度和透明度，适合内容较多的界面，保持可读性的同时提供现代美感。\u003c/p\u003e
+                    \u003c/div\u003e
+                \u003c/div\u003e
+                \u003cpre\u003e/* 玻璃态设计CSS实现 */
+.glassmorphism {
+  /* 半透明背景 */
+  background: rgba(255, 255, 255, 0.25);
+  
+  /* 背景模糊效果 */
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  
+  /* 细微边框增强层次感 */
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  
+  /* 柔和阴影 */
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+  
+  /* 圆润边角 */
+  border-radius: 16px;
+}
+
+/* 暗黑模式下的玻璃态变体 */
+.glassmorphism-dark {
+  background: rgba(23, 25, 35, 0.75);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+}
+
+/* 轻量级玻璃态 */
+.glassmorphism-light {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 16px 0 rgba(31, 38, 135, 0.15);
+}
+\u003c/pre\u003e
+            \u003c/div\u003e
+        \u003c/div\u003e
+        \u003c
+        \u003cdiv class="section"\u003e
+            \u003ch2\u003e2. 无障碍设计(Accessibility)实践\u003c/h2\u003e
+            \u003c
+            \u003ch3\u003e2.1 无障碍设计核心原则\u003c/h3\u003e
+            \u003cp\u003e无障碍设计(Accessibility)确保所有用户，包括残障用户都能使用网站和应用程序。WCAG 2.1标准定义了四个核心原则：可感知、可操作、可理解和稳健性。\u003c/p\u003e
+            \u003c
+            \u003cdiv class="comparison-table"\u003e
+                \u003cthead\u003e
+                    \u003ctr\u003e
+                        \u003cth\u003e原则\u003cth\u003e
+                        \u003cth\u003e描述\u003c/th\u003e
+                        \u003cth\u003e实施要点\u003c/th\u003e
+                    \u003c/tr\u003e
+                \u003c/thead\u003e
+                \u003ctbody\u003e
+                    \u003ctr\u003e
+                        \u003ctd\u003e\u003cstrong\u003e可感知(Perceivable)\u003c/strong\u003e\u003c/td\u003e
+                        \u003ctd\u003e信息和用户界面组件必须以可感知的方式呈现给用户\u003c/td\u003e
+                        \u003ctd\u003e提供替代文本、音频描述、字幕、足够的对比度\u003c/td\u003e
+                    \u003c/tr\u003e
+                    \u003ctr\u003e
+                        \u003ctd\u003e\u003cstrong\u003e可操作(Operable)\u003c/strong\u003e\u003c/td\u003e
+                        \u003ctd\u003e用户界面组件和导航必须可操作\u003c/td\u003e
+                        \u003ctd\u003e键盘可访问、足够的操作时间、可跳过导航、可聚焦元素\u003c/td\u003e
+                    \u003c/tr\u003e
+                    \u003ctr\u003e
+                        \u003ctd\u003e\u003cstrong\u003e可理解(Understandable)\u003c/strong\u003e\u003c/td\u003e
+                        \u003ctd\u003e信息和用户界面操作必须可理解\u003c/td\u003e
+                        \u003ctd\u003e可读文本、可预测操作、输入帮助、错误识别和帮助\u003c/td\u003e
+                    \u003c/tr\u003e
+                    \u003ctr\u003e
+                        \u003ctd\u003e\u003cstrong\u003e稳健性(Robust)\u003c/strong\u003e\u003c/td\u003e
+                        \u003ctd\u003e内容必须足够稳健，能被各种用户代理可靠地解释\u003c/td\u003e
+                        \u003ctd\u003e符合标准、兼容辅助技术、语义化HTML\u003c/td\u003e
+                    \u003c/tr\u003e
+                \u003c/tbody\u003e
+            \u003c/div\u003e
+            \u003c
+            \u003ch3\u003e2.2 无障碍HTML与语义化标记\u003c/h3\u003e
+            \u003cp\u003e使用正确的HTML语义元素是实现无障碍的基础。语义化HTML不仅帮助屏幕阅读器理解内容结构，也改善SEO和代码可维护性。\u003c/p\u003e
+            \u003c
+            \u003cdiv class="demo-area"\u003e
+                \u003cdiv class="demo-title"\u003e语义化HTML结构示例\u003c/div\u003e
+                \u003cpre\u003e<!-- 无障碍语义化HTML结构 -->
+\u003c!DOCTYPE html\u003e
+\u003chtml lang="zh-CN"\u003e
+\u003chead\u003e
+    \u003cmeta charset="UTF-8"\u003e
+    \u003cmeta name="viewport" content="width=device-width, initial-scale=1.0"\u003e
+    \u003ctitle\u003e无障碍页面示例\u003c/title\u003e
+    \u003clink rel="stylesheet" href="styles.css"\u003e
+\u003c/head\u003e
+\u003cbody\u003e
+    <!-- 跳过导航链接 - 帮助键盘用户快速访问主要内容 -->
+    \u003ca href="#main-content" class="skip-link"\u003e跳过导航到主要内容\u003c/a\u003e
+    
+    <!-- 页面头部 - 包含站点标识和导航 -->
+    \u003cheader aria-label="站点头部"\u003e
+        \u003cdiv class="container"\u003e
+            <!-- 站点标识 -->
+            \u003cdiv class="site-logo"\u003e
+                \u003ca href="/"\u003e
+                    \u003cimg src="logo.svg" alt="公司标识" width="120" height="40"\u003e
+                \u003c/a\u003e
+            \u003c/div\u003e
+            
+            <!-- 主导航 -->
+            \u003cnav aria-label="主导航"\u003e
+                \u003c!-- 移动端菜单按钮 -->
+                \u003cbutton 
+                    class="menu-toggle" 
+                    aria-expanded="false" 
+                    aria-controls="main-menu"
+                    aria-label="打开主菜单"
+                \u003e
+                    \u003cspan class="menu-icon"\u003e☰\u003c/span\u003e
+                \u003c/button\u003e
+                
+                <!-- 导航菜单 -->
+                \u003cul id="main-menu" class="nav-menu"\u003e
+                    \u003cli\u003e\u003ca href="/" aria-current="page"\u003e首页\u003c/a\u003e\u003c/li\u003e
+                    \u003cli\u003e\u003ca href="/products"\u003e产品\u003c/a\u003e\u003c/li\u003e
+                    \u003cli\u003e\u003ca href="/services"\u003e服务\u003c/a\u003e\u003c/li\u003e
+                    \u003cli\u003e\u003ca href="/about"\u003e关于我们\u003c/a\u003e\u003c/li\u003e
+                    \u003cli\u003e\u003ca href="/contact"\u003e联系我们\u003c/a\u003e\u003c/li\u003e
+                \u003c/ul\u003e
+            \u003c/nav\u003e
+            
+            <!-- 用户操作区域 -->
+            \u003cdiv class="user-actions"\u003e
+                \u003ca href="/search" aria-label="搜索"\u003e🔍\u003c/a\u003e
+                \u003ca href="/cart" aria-label="购物车" aria-live="polite"\u003e
+                    🛒 <span class="cart-count" aria-hidden="true">3</span>
+                \u003c/a\u003e
+                \u003ca href="/login" aria-label="登录"\u003e👤\u003c/a\u003e
+            \u003c/div\u003e
+        \u003c/div\u003e
+    \u003c/header\u003e
+    
+    <!-- 主要内容区域 -->
+    \u003cmain id="main-content" tabindex="-1"\u003e
+        <!-- 页面标题区域 -->
+        \u003csection class="hero" aria-labelledby="hero-title"\u003e
+            \u003ch1 id="hero-title"\u003e无障碍设计，人人可用的数字体验\u003c/h1\u003e
+            \u003cp class="hero-description"\u003e我们致力于创造所有人都能使用的数字产品，无论其能力如何。\u003c/p\u003e
+            \u003cdiv class="hero-cta"\u003e
+                \u003ca href="/learn-more" class="btn primary"\u003e了解更多\u003c/a\u003e
+                \u003ca href="/get-started" class="btn secondary"\u003e立即开始\u003c/a\u003e
+            \u003c/div\u003e
+        \u003c/section\u003e
+        
+        <!-- 功能区域 -->
+        \u003csection class="features" aria-labelledby="features-title"\u003e
+            \u003ch2 id="features-title"\u003e核心功能\u003c/h2\u003e
+            \u003cdiv class="feature-grid"\u003e
+                <!-- 功能项 -->
+                \u003cdiv class="feature-item"\u003e
+                    \u003cdiv class="feature-icon"\u003e🔍\u003c/div\u003e
+                    \u003ch3 class="feature-title"\u003e语义化HTML结构\u003c/h3\u003e
+                    \u003cp class="feature-description"\u003e使用正确的HTML元素，确保辅助技术能正确理解页面结构。\u003c/p\u003e
+                \u003c/div\u003e
+                
+                <!-- 更多功能项... -->
+            \u003c/div\u003e
+        \u003c/section\u003e
+        
+        <!-- 联系表单 -->
+        \u003csection class="contact" aria-labelledby="contact-title"\u003e
+            \u003ch2 id="contact-title"\u003e联系我们\u003c/h2\u003e
+            \u003cform id="contact-form" method="post" action="/submit-contact"\u003e
+                \u003cdiv class="form-group"\u003e
+                    \u003clabel for="name"\u003e姓名 *\u003c/label\u003e
+                    \u003cinput 
+                        type="text" 
+                        id="name" 
+                        name="name" 
+                        required 
+                        aria-required="true"
+                    \u003e
+                \u003c/div\u003e
+                
+                \u003cdiv class="form-group"\u003e
+                    \u003clabel for="email"\u003e电子邮箱 *\u003c/label\u003e
+                    \u003cinput 
+                        type="email" 
+                        id="email" 
+                        name="email" 
+                        required 
+                        aria-required="true"
+                    \u003e
+                \u003c/div\u003e
+                
+                \u003cdiv class="form-group"\u003e
+                    \u003clabel for="message"\u003e留言内容 *\u003c/label\u003e
+                    \u003ctextarea 
+                        id="message" 
+                        name="message" 
+                        rows="5" 
+                        required 
+                        aria-required="true"
+                    \u003e\u003c/textarea\u003e
+                \u003c/div\u003e
+                
+                \u003cdiv class="form-group"\u003e
+                    \u003cbutton type="submit" class="btn primary"\u003e提交留言\u003c/button\u003e
+                \u003c/div\u003e
+            \u003c/form\u003e
+        \u003c/section\u003e
+    \u003c/main\u003e
+    
+    <!-- 页面底部 -->
+    \u003cfooter\u003e
+        \u003cdiv class="container"\u003e
+            <div class="footer-content">
+                <!-- 页脚链接区域 -->
+                <div class="footer-links">
+                    <h3>快速链接</h3>
+                    <ul>
+                        <li><a href="/">首页</a></li>
+                        <li><a href="/about">关于我们</a></li>
+                        <li><a href="/privacy">隐私政策</a></li>
+                        <li><a href="/terms">使用条款</a></li>
+                        <li><a href="/accessibility">无障碍声明</a></li>
+                    </ul>
+                </div>
+                
+                <!-- 联系信息 -->
+                <div class="contact-info">
+                    <h3>联系我们</h3>
+                    <address>
+                        <p>北京市海淀区科技园区100号</p>
+                        <p><a href="tel:+8610123456789">+86 (10) 1234-5678</a></p>
+                        <p><a href="mailto:info@example.com">info@example.com</a></p>
+                    </address>
+                </div>
+            </div>
+            
+            <!-- 版权信息 -->
+            <div class="copyright">
+                <p>&copy; 2023 无障碍设计有限公司. 保留所有权利.</p>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- 必要的JavaScript -->
+    <script src="scripts.js"></script>
+</body>
+</html>
+</pre>
+            </div>
+            
+            <h3>2.3 键盘可访问性与焦点管理</h3>
+            <p>确保所有用户界面元素都可以通过键盘访问和操作，是无障碍设计的关键要求。合理的焦点管理和视觉反馈对键盘用户至关重要。</p>
+            
+            <div class="demo-area">
+                <div class="demo-title">键盘可访问性演示</div>
+                <div class="demo-controls">
+                    <button id="focusButton1">按钮 1</button>
+                    <button id="focusButton2">按钮 2</button>
+                    <button id="focusButton3">按钮 3</button>
+                    <button class="btn-secondary" id="skipToContent">跳转到内容区域</button>
+                </div>
+                <div id="keyboardDemoOutput" class="demo-output">
+                    <p>使用Tab键在按钮间导航，观察焦点样式和行为。</p>
+                    <p>焦点顺序: 按钮1 → 按钮2 → 按钮3 → 跳转到内容区域按钮</p>
+                    <p>按Enter或空格键激活按钮。</p>
+                </div>
+            </div>
+            
+            <div class="warning-box">
+                <h4>⚠️ 无障碍设计常见陷阱</h4>
+                <ul>
+                    <li>使用<span class="highlight">div或span</span>作为可点击元素而不添加键盘事件</li>
+                    <li>自定义控件缺少<span class="highlight">焦点状态样式</span></li>
+                    <li>依赖<span class="highlight">颜色 alone</span>传达信息</li>
+                    <li>表单缺少<span class="highlight">关联标签</span>或错误提示不可访问</li>
+                    <li>动态内容更新时没有<span class="highlight">屏幕阅读器通知</span></li>
+                </ul>
+            </div>
+            
+            <div class="accessibility-checklist">
+                <h4>无障碍设计检查清单</h4>
+                
+                <div class="checklist-item">
+                    <input type="checkbox">
+                    <div class="item-content">
+                        <h5>颜色对比度</h5>
+                        <p>确保文本与背景的对比度符合WCAG AA级别标准（普通文本4.5:1，大文本3:1）</p>
+                    </div>
+                </div>
+                
+                <div class="checklist-item">
+                    <input type="checkbox">
+                    <div class="item-content">
+                        <h5>替代文本</h5>
+                        <p>为所有图像提供有意义的alt属性，复杂图像提供详细描述</p>
+                    </div>
+                </div>
+                
+                <div class="checklist-item">
+                    <input type="checkbox">
+                    <div class="item-content">
+                        <h5>键盘操作</h5>
+                        <p>所有功能可通过键盘访问，焦点顺序合理，有明显的焦点指示器</p>
+                    </div>
+                </div>
+                
+                <div class="checklist-item">
+                    <input type="checkbox">
+                    <div class="item-content">
+                        <h5>ARIA属性</h5>
+                        <p>正确使用ARIA角色、状态和属性增强语义，避免过度使用</p>
+                    </div>
+                </div>
+                
+                <div class="checklist-item">
+                    <input type="checkbox">
+                    <div class="item-content">
+                        <h5>表单可访问性</h5>
+                        <p>所有输入字段有关联标签，错误信息清晰，提供帮助文本</p>
+                    </div>
+                </div>
+                
+                <div class="checklist-item">
+                    <input type="checkbox">
+                    <div class="item-content">
+                        <h5>动态内容更新</h5>
+                        <p>使用aria-live区域通知动态内容变化，避免页面突然跳变</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>3. 微交互与高级动画效果</h2>
+            
+            <h3>3.1 微交互设计原则</h3>
+            <p>微交互是用户与界面进行的小型、目标明确的互动，能为产品增添个性和愉悦感。有效的微交互应该是直观的、有目的性的，并且不会干扰用户体验。</p>
+            
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h4>反馈即时性</h4>
+                    <p>操作后立即提供视觉或触觉反馈，让用户知道系统正在响应其操作。</p>
+                </div>
+                <div class="feature-card">
+                    <h4>视觉一致性</h4>
+                    <p>所有微交互应遵循一致的视觉语言，包括动效、颜色和时间节奏。</p>
+                </div>
+                <div class="feature-card">
+                    <h4>适度与克制</h4>
+                    <p>微交互应增强而非干扰用户体验，避免过度使用导致视觉疲劳。</p>
+                </div>
+                <div class="feature-card">
+                    <h4>功能明确性</h4>
+                    <p>每个微交互都应有明确的功能目的，帮助用户理解操作结果。</p>
+                </div>
+            </div>
+            
+            <h3>3.2 现代CSS动画技术</h3>
+            <p>现代CSS提供了强大的动画功能，包括过渡(transition)、变换(transform)和关键帧动画(@keyframes)。结合CSS变量和JavaScript，可以创建复杂且性能优化的动画效果。</p>
+            
+            <div class="demo-area">
+                <div class="demo-title">高级动画效果演示</div>
+                <div class="demo-controls">
+                    <button id="playBounceAnimation">弹跳动画</button>
+                    <button id="playPulseAnimation">脉冲动画</button>
+                    <button id="playFlipAnimation">翻转动画</button>
+                    <button id="playSlideAnimation">滑动动画</button>
+                </div>
+                <div id="animationDemoArea" style="
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    height: 200px;
+                    margin-top: 20px;
+                ">
+                    <div id="animatedElement" style="
+                        width: 100px;
+                        height: 100px;
+                        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                        border-radius: 16px;
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        color: white;
+                        font-weight: bold;
+                        font-size: 1.2rem;
+                    ">
+                        动效
+                    </div>
+               

@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebAssembly 学习指南</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: #34495e;
+            margin-top: 40px;
+            border-left: 4px solid #3498db;
+            padding-left: 15px;
+        }
+        h3 {
+            color: #7f8c8d;
+            margin-top: 30px;
+        }
+        code {
+            background-color: #f1f1f1;
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .code-block {
+            background-color: #282c34;
+            color: #abb2bf;
+            padding: 20px;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        .demo-section {
+            margin: 30px 0;
+            padding: 20px;
+            border: 1px solid #e1e4e8;
+            border-radius: 6px;
+            background-color: #fafbfc;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 0;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        .result {
+            margin-top: 15px;
+            padding: 15px;
+            background-color: #e8f4f8;
+            border-radius: 4px;
+            min-height: 50px;
+            border-left: 3px solid #3498db;
+        }
+        ul {
+            padding-left: 20px;
+        }
+        li {
+            margin-bottom: 8px;
+        }
+        .comparison {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin: 20px 0;
+        }
+        .comparison-item {
+            flex: 1;
+            min-width: 300px;
+            padding: 15px;
+            background-color: #f5f5f5;
+            border-radius: 6px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>WebAssembly 学习指南</h1>
+        
+        <p>WebAssembly 是一种低级汇编语言，旨在提供比 JavaScript 更高的执行效率，同时保持与 Web 平台的兼容性。本指南将帮助你理解 WebAssembly 的核心概念、工作原理以及如何在实际项目中应用它。</p>
+        
+        <div class="demo-section">
+            <h2>1. WebAssembly 基础概念</h2>
+            
+            <h3>1.1 什么是 WebAssembly？</h3>
+            <p>WebAssembly（简称 WASM）是一种二进制指令格式，是一种低级编程语言，可作为编译目标，使高性能应用程序能够在 Web 平台上运行。</p>
+            
+            <h3>1.2 核心特性</h3>
+            <ul>
+                <li><strong>高性能：</strong>接近原生代码的执行速度，比 JavaScript 快数倍至数十倍</li>
+                <li><strong>内存安全：</strong>使用线性内存模型，提供内存隔离和安全边界</li>
+                <li><strong>跨平台：</strong>在所有现代浏览器中运行，不依赖特定硬件平台</li>
+                <li><strong>紧凑体积：</strong>二进制格式体积小，加载速度快</li>
+                <li><strong>多语言支持：</strong>可由 C/C++、Rust、AssemblyScript 等多种语言编译</li>
+                <li><strong>与 JavaScript 互操作：</strong>可以与 JavaScript 无缝集成，共享功能和数据</li>
+            </ul>
+            
+            <h3>1.3 应用场景</h3>
+            <ul>
+                <li>计算密集型应用：图像处理、视频编码解码、音频处理</li>
+                <li>游戏和 3D 应用：WebGL 游戏、3D 渲染引擎</li>
+                <li>科学计算：数据分析、数值模拟、物理引擎</li>
+                <li>密码学和安全应用：加密算法、数字签名</li>
+                <li>工具链移植：将桌面应用或库移植到 Web 平台</li>
+            </ul>
+            
+            <button onclick="runBasicConceptDemo()">运行基础概念演示</button>
+            <div id="basicConceptResult" class="result">点击按钮查看 WebAssembly 基础概念演示结果...</div>
+        </div>
+        
+        <div class="demo-section">
+            <h2>2. WebAssembly 工作原理</h2>
+            
+            <h3>2.1 执行模型</h3>
+            <p>WebAssembly 采用沙箱执行环境，通过线性内存模型和有限的指令集提供高性能和安全保障。</p>
+            
+            <div class="code-block">
+高级语言代码 → 编译器 → WebAssembly 二进制(.wasm) → 浏览器加载 → 编译为机器码 → 执行
+            </div>
+            
+            <h3>2.2 内存模型</h3>
+            <p>WebAssembly 使用线性内存（Linear Memory），这是一个连续的内存数组，可以被 JavaScript 和 WebAssembly 共同访问。</p>
+            
+            <div class="code-block">
+// JavaScript 中的 WebAssembly 内存操作示例
+
+// 创建 1 页（64KB）大小的内存
+const memory = new WebAssembly.Memory({
+  initial: 1,
+  maximum: 10 // 最多 10 页
+});
+
+// 创建视图以便访问内存
+const int32 = new Int32Array(memory.buffer);
+const float64 = new Float64Array(memory.buffer);
+
+// 写入数据
+int32[0] = 42;
+float64[1] = 3.14159;
+
+// 读取数据
+console.log(int32[0]); // 42
+console.log(float64[1]); // 3.14159
+            </div>
+            
+            <h3>2.3 模块与实例</h3>
+            <p>WebAssembly 代码被组织为模块（Module），模块可以被实例化（Instantiate）多次。实例化过程中可以提供导入对象（Import Object）。</p>
+            
+            <button onclick="runExecutionModelDemo()">运行执行模型演示</button>
+            <div id="executionModelResult" class="result">点击按钮查看 WebAssembly 执行模型演示结果...</div>
+        </div>
+        
+        <div class="demo-section">
+            <h2>3. WebAssembly 开发工具链</h2>
+            
+            <h3>3.1 主要开发工具</h3>
+            <div class="comparison">
+                <div class="comparison-item">
+                    <h4>Emscripten</h4>
+                    <p><strong>支持语言：</strong>C/C++</p>
+                    <p><strong>主要特点：</strong>完整的 libc 支持，成熟稳定</p>
+                    <div class="code-block">
+# 基本编译命令
+emcc source.c -o output.js -s WASM=1
+
+# 高级优化编译
+emcc source.cpp -O3 -s WASM=1 \
+  -s EXPORTED_FUNCTIONS="['_main']"
+                    </div>
+                </div>
+                <div class="comparison-item">
+                    <h4>Rust + wasm-pack</h4>
+                    <p><strong>支持语言：</strong>Rust</p>
+                    <p><strong>主要特点：</strong>内存安全，良好的 JS 互操作性</p>
+                    <div class="code-block">
+# 创建新项目
+wasm-pack new project-name
+
+# 构建为 Web 目标
+wasm-pack build --target web
+                    </div>
+                </div>
+                <div class="comparison-item">
+                    <h4>AssemblyScript</h4>
+                    <p><strong>支持语言：</strong>AssemblyScript (TypeScript 子集)</p>
+                    <p><strong>主要特点：</strong>TypeScript 开发者友好，易于上手</p>
+                    <div class="code-block">
+# 初始化项目
+npx asinit .
+
+# 编译
+npx asc assembly/index.ts -b build/module.wasm
+                    </div>
+                </div>
+            </div>
+            
+            <h3>3.2 浏览器支持与兼容性</h3>
+            <p>所有现代浏览器（Chrome、Firefox、Safari、Edge）均已原生支持 WebAssembly。对于不支持的旧浏览器，可以使用 polyfill 或保持 JavaScript 作为后备方案。</p>
+            
+            <button onclick="runToolchainDemo()">运行开发工具链演示</button>
+            <div id="toolchainResult" class="result">点击按钮查看 WebAssembly 开发工具链演示结果...</div>
+        </div>
+        
+        <div class="demo-section">
+            <h2>4. JavaScript 与 WebAssembly 互操作</h2>
+            
+            <h3>4.1 JavaScript 调用 WebAssembly</h3>
+            <div class="code-block">
+// 加载并实例化 WebAssembly 模块
+async function loadWasmModule() {
+  try {
+    // 方法 1: 使用 instantiateStreaming（推荐）
+    const { instance } = await WebAssembly.instantiateStreaming(
+      fetch('module.wasm'),
+      {
+        // 导入对象
+        env: {
+          // 提供给 WebAssembly 使用的函数
+          consoleLog: console.log
+        }
+      }
+    );
+    
+    // 调用 WebAssembly 导出的函数
+    const result = instance.exports.add(10, 20);
+    console.log('结果:', result);
+    
+    return instance.exports;
+  } catch (error) {
+    console.error('加载失败:', error);
+    
+    // 方法 2: 使用 fetch 和 instantiate（兼容性更好）
+    const response = await fetch('module.wasm');
+    const buffer = await response.arrayBuffer();
+    const { instance } = await WebAssembly.instantiate(buffer, {
+      env: {
+        consoleLog: console.log
+      }
+    });
+    
+    return instance.exports;
+  }
+}
+            </div>
+            
+            <h3>4.2 WebAssembly 调用 JavaScript</h3>
+            <p>WebAssembly 可以通过导入对象使用 JavaScript 提供的函数和值。</p>
+            
+            <h3>4.3 数据传递与内存共享</h3>
+            <p>WebAssembly 和 JavaScript 之间的数据传递主要通过以下方式：</p>
+            <ul>
+                <li>基本类型直接传递（数字、布尔值等）</li>
+                <li>共享线性内存（用于传递复杂数据）</li>
+                <li>使用 JavaScript API 进行内存管理</li>
+            </ul>
+            
+            <button onclick="runInteroperabilityDemo()">运行互操作演示</button>
+            <div id="interoperabilityResult" class="result">点击按钮查看 JavaScript 与 WebAssembly 互操作演示结果...</div>
+        </div>
+        
+        <div class="demo-section">
+            <h2>5. 实际应用案例</h2>
+            
+            <h3>5.1 性能对比：JavaScript vs WebAssembly</h3>
+            <p>对于计算密集型任务，WebAssembly 通常比 JavaScript 快数倍至数十倍。</p>
+            
+            <div class="code-block">
+// JavaScript 实现的斐波那契数列
+function fibonacciJS(n) {
+  if (n <= 1) return n;
+  return fibonacciJS(n - 1) + fibonacciJS(n - 2);
+}
+
+// WebAssembly 实现（通常会编译自 C/C++ 或 Rust）
+/*
+// Rust 代码示例
+#[wasm_bindgen]
+pub fn fibonacci_wasm(n: u32) -> u64 {
+    if n <= 1 {
+        return n as u64;
+    }
+    fibonacci_wasm(n - 1) + fibonacci_wasm(n - 2)
+}
+*/
+
+// 矩阵乘法示例
+function multiplyMatricesJS(matrixA, matrixB, resultMatrix, size) {
+  for (let i = 0; i < size; i++) {
+    for (let j = 0; j < size; j++) {
+      resultMatrix[i * size + j] = 0;
+      for (let k = 0; k < size; k++) {
+        resultMatrix[i * size + j] += 
+          matrixA[i * size + k] * matrixB[k * size + j];
+      }
+    }
+  }
+}
+
+// 计算 π 的近似值（蒙特卡洛方法）
+/*
+#[wasm_bindgen]
+pub fn calculate_pi_monte_carlo(iterations: u64) -> f64 {
+    let mut inside_circle = 0;
+    let mut rng = rand::thread_rng();
+    
+    for _ in 0..iterations {
+        let x: f64 = rng.gen_range(-1.0..1.0);
+        let y: f64 = rng.gen_range(-1.0..1.0);
+        
+        if x * x + y * y <= 1.0 {
+            inside_circle += 1;
+        }
+    }
+    
+    4.0 * (inside_circle as f64) / (iterations as f64)
+}
+*/
+            </div>
+            
+            <button onclick="runRealWorldDemo()">运行实际应用案例演示</button>
+            <div id="realWorldResult" class="result">点击按钮查看 WebAssembly 实际应用案例演示结果...</div>
+        </div>
+        
+        <div class="demo-section">
+            <h2>6. WebAssembly 最佳实践与优化技巧</h2>
+            
+            <h3>6.1 性能优化建议</h3>
+            <ul>
+                <li><strong>使用适当的优化级别：</strong>编译时启用高优化级别（如 -O3）</li>
+                <li><strong>减少内存复制：</strong>通过共享内存避免频繁的数据复制</li>
+                <li><strong>优化内存使用：</strong>合理设计数据结构，减少内存占用</li>
+                <li><strong>避免频繁的函数调用：</strong>减少 JavaScript 和 WebAssembly 之间的调用次数</li>
+                <li><strong>使用流式编译：</strong>使用 WebAssembly.instantiateStreaming 进行流式编译和实例化</li>
+                <li><strong>代码分割：</strong>将大型模块拆分为更小的功能模块</li>
+                <li><strong>异步加载：</strong>在不阻塞主线程的情况下加载 WebAssembly 模块</li>
+            </ul>
+            
+            <h3>6.2 安全性考虑</h3>
+            <ul>
+                <li><strong>内存安全：</strong>WebAssembly 提供了内存沙箱，无法直接访问系统内存</li>
+                <li><strong>权限控制：</strong>只能通过导入的 JavaScript 函数访问浏览器 API</li>
+                <li><strong>验证机制：</strong>所有 WebAssembly 模块在执行前都会经过严格的验证</li>
+                <li><strong>资源限制：</strong>可以通过内存和表格的最大限制防止资源耗尽攻击</li>
+                <li><strong>内容安全策略：</strong>使用 CSP 控制 WebAssembly 模块的加载来源</li>
+                <li><strong>数据验证：</strong>在 JavaScript 和 WebAssembly 边界进行严格的数据验证</li>
+            </ul>
+            
+            <h3>6.3 加载优化策略</h3>
+            <div class="code-block">
+// WebAssembly 模块加载优化示例
+
+// 1. 使用流式编译和实例化
+async function loadWasmOptimized(url) {
+  try {
+    // 流式编译 - 无需等待整个文件下载完成
+    const { instance } = await WebAssembly.instantiateStreaming(
+      fetch(url),
+      {
+        env: {
+          // 导入函数
+        }
+      }
+    );
+    
+    return instance.exports;
+  } catch (error) {
+    console.error('流式加载失败，回退到标准加载:', error);
+    // 回退策略
+    return loadWasmFallback(url);
+  }
+}
+
+// 2. 标准加载作为后备
+async function loadWasmFallback(url) {
+  const response = await fetch(url);
+  const buffer = await response.arrayBuffer();
+  const { instance } = await WebAssembly.instantiate(buffer);
+  return instance.exports;
+}
+
+// 3. 预加载和缓存策略
+class WasmModuleCache {
+  constructor() {
+    this.cache = new Map();
+    this.preloading = new Map();
+  }
+  
+  // 预加载模块
+  preload(url) {
+    if (this.cache.has(url) || this.preloading.has(url)) {
+      return;
+    }
+    
+    const promise = fetch(url)
+      .then(response => response.arrayBuffer())
+      .then(buffer => WebAssembly.compile(buffer));
+    
+    this.preloading.set(url, promise);
+    
+    promise.then(module => {
+      this.cache.set(url, module);
+      this.preloading.delete(url);
+    }).catch(error => {
+      console.error('预加载失败:', url, error);
+      this.preloading.delete(url);
+    });
+  }
+  
+  // 从缓存中加载实例
+  async instantiate(url, importObject = {}) {
+    // 如果已缓存，直接使用
+    if (this.cache.has(url)) {
+      const module = this.cache.get(url);
+      const instance = await WebAssembly.instantiate(module, importObject);
+      return instance.exports;
+    }
+    
+    // 如果正在预加载，等待完成
+    if (this.preloading.has(url)) {
+      const module = await this.preloading.get(url);
+      const instance = await WebAssembly.instantiate(module, importObject);
+      return instance.exports;
+    }
+    
+    // 否则直接加载
+    return loadWasmOptimized(url);
+  }
+}
+
+// 4. 使用 Service Worker 缓存
+/*
+// service-worker.js
+const CACHE_NAME = 'wasm-module-cache-v1';
+const WASM_MODULES = [
+  '/path/to/calculator.wasm',
+  '/path/to/image-processor.wasm'
+];
+
+self.addEventListener('install', event => {
+  event.waitUntil(
+    caches.open(CACHE_NAME)
+      .then(cache => cache.addAll(WASM_MODULES))
+  );
+});
+
+self.addEventListener('fetch', event => {
+  if (event.request.url.endsWith('.wasm')) {
+    event.respondWith(
+      caches.match(event.request)
+        .then(response => response || fetch(event.request))
+    );
+  }
+});
+*/
+            </div>
+            
+            <h3>6.4 调试技巧</h3>
+            <ul>
+                <li><strong>使用 WebAssembly 文本格式：</strong>使用 <code>wasm2wat</code> 工具查看模块的文本表示</li>
+                <li><strong>浏览器开发工具：</strong>现代浏览器提供了 WebAssembly 调试支持</li>
+                <li><strong>打印调试信息：</strong>在关键点通过导入的 JavaScript 函数输出调试信息</li>
+                <li><strong>性能分析：</strong>使用 <code>console.time</code> 和性能分析工具测量执行时间</li>
+                <li><strong>源码映射：</strong>某些工具（如 Emscripten）支持生成源码映射便于调试</li>
+            </ul>
+            
+            <button onclick="runOptimizationDemo()">运行优化实践演示</button>
+            <div id="optimizationResult" class="result">点击按钮查看 WebAssembly 最佳实践演示结果...</div>
+        </div>
+        
+        <div class="demo-section">
+            <h2>7. WebAssembly 未来发展</h2>
+            
+            <h3>7.1 WebAssembly 2.0 新特性</h3>
+            <ul>
+                <li><strong>异常处理：</strong>原生异常处理机制，支持 try/catch</li>
+                <li><strong>尾调用优化：</strong>支持尾递归优化，提高递归函数性能</li>
+                <li><strong>引用类型扩展：</strong>更灵活的对象引用处理</li>
+                <li><strong>SIMD 扩展：</strong>单指令多数据操作，加速并行计算</li>
+                <li><strong>垃圾回收集成：</strong>与 JavaScript GC 更好的集成</li>
+            </ul>
+            
+            <h3>7.2 非浏览器环境应用</h3>
+            <div class="comparison">
+                <div class="comparison-item">
+                    <h4>WebAssembly System Interface (WASI)</h4>
+                    <p>为 WebAssembly 提供系统接口，使 WebAssembly 可以在服务器端和边缘计算环境运行。</p>
+                    <ul>
+                        <li>文件系统访问</li>
+                        <li>网络操作</li>
+                        <li>环境变量访问</li>
+                        <li>命令行参数</li>
+                    </ul>
+                </div>
+                <div class="comparison-item">
+                    <h4>服务端应用场景</h4>
+                    <p>WebAssembly 在服务器端的应用正在快速发展。</p>
+                    <ul>
+                        <li>边缘计算函数</li>
+                        <li>无服务器架构</li>
+                        <li>插件系统</li>
+                        <li>跨平台服务</li>
+                        <li>沙箱执行环境</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <h3>7.3 生态系统发展</h3>
+            <ul>
+                <li><strong>更多编程语言支持：</strong>越来越多的语言添加了 WebAssembly 编译目标</li>
+                <li><strong>框架和工具成熟：</strong>开发工具链持续完善，提高开发体验</li>
+                <li><strong>标准库完善：</strong>更多功能被标准化，扩大应用范围</li>
+                <li><strong>社区驱动创新：</strong>活跃的开源社区推动技术发展</li>
+            </ul>
+            
+            <button onclick="runFutureDemo()">运行未来发展演示</button>
+            <div id="futureResult" class="result">点击按钮查看 WebAssembly 未来发展演示结果...</div>
+        </div>
+    </div>
+    
+    <script>
+        // 代码高亮辅助函数
+        function highlightCode() {
+            const codeBlocks = document.querySelectorAll('.code-block');
+            codeBlocks.forEach(block => {
+                // 简单的语法高亮模拟
+                let code = block.textContent;
+                // 关键字高亮
+                const keywords = ['function', 'async', 'await', 'const', 'let', 'var', 'if', 'else', 'for', 'while', 'return', 'try', 'catch', 'new', 'class', 'import', 'export', 'from'];
+                keywords.forEach(keyword => {
+                    const regex = new RegExp(`\\b${keyword}\\b`, 'g');
+                    code = code.replace(regex, `<span style="color: #c678dd">${keyword}</span>`);
+                });
+                // 字符串高亮
+                code = code.replace(/("[^"\\]*(\\.[^"\\]*)*")|('[^'\\]*(\\.[^'\\]*)*')/g, 
+                    '<span style="color: #98c379">$1$2</span>');
+                // 注释高亮
+                code = code.replace(/\/\/.*$/gm, '<span style="color: #5c6370">$&</span>');
+                code = code.replace(/\/\*[\s\S]*?\*\//g, '<span style="color: #5c6370">$&</span>');
+                // 数字高亮
+                code = code.replace(/\b\d+\.?\d*\b/g, '<span style="color: #d19a66">$&</span>');
+                block.innerHTML = code;
+            });
+        }
+        
+        // 1. 基础概念演示
+        function runBasicConceptDemo() {
+            const resultDiv = document.getElementById('basicConceptResult');
+            const wasmFeatures = {
+                高性能: 'WebAssembly 执行速度接近原生代码，比 JavaScript 快数倍至数十倍',
+                内存安全: '使用线性内存模型，提供内存隔离和安全边界',
+                跨平台: '在所有现代浏览器中运行，不依赖特定硬件平台',
+                紧凑体积: '二进制格式体积小，加载速度快',
+                多语言支持: '可由 C/C++、Rust、AssemblyScript 等多种语言编译',
+                与JS互操作: '可以与 JavaScript 无缝集成，共享功能和数据'
+            };
+            
+            let resultHtml = '<h4>WebAssembly 核心特性:</h4><ul>';
+            for (const [feature, description] of Object.entries(wasmFeatures)) {
+                resultHtml += `<li><strong>${feature}:</strong> ${description}</li>`;
+            }
+            resultHtml += '</ul>';
+            
+            resultHtml += '<h4>典型应用场景:</h4><ul>';
+            resultHtml += '<li>计算密集型应用: 图像处理、视频编码解码、音频处理</li>';
+            resultHtml += '<li>游戏和 3D 应用: WebGL 游戏、3D 渲染引擎</li>';
+            resultHtml += '<li>科学计算: 数据分析、数值模拟、物理引擎</li>';
+            resultHtml += '<li>密码学和安全应用: 加密算法、数字签名</li>';
+            resultHtml += '<li>工具链移植: 将桌面应用或库移植到 Web 平台</li>';
+            resultHtml += '</ul>';
+            
+            resultDiv.innerHTML = resultHtml;
+        }
+        
+        // 2. 执行模型演示
+        function runExecutionModelDemo() {
+            const resultDiv = document.getElementById('executionModelResult');
+            
+            // 模拟 WebAssembly 内存操作演示
+            function demonstrateMemory() {
+                // 创建内存视图模拟
+                const memoryBuffer = new ArrayBuffer(1024 * 64); // 64KB
+                const int32View = new Int32Array(memoryBuffer);
+                const float64View = new Float64Array(memoryBuffer);
+                
+                // 存储数据
+                int32View[0] = 42;
+                int32View[1] = 100;
+                float64View[0] = 3.14159;
+                
+                // 结果
+                return {
+                    memorySize: (memoryBuffer.byteLength / 1024) + ' KB',
+                    storedData: {
+                        integers: [int32View[0], int32View[1]],
+                        float: float64View[0]
+                    }
+                };
+            }
+            
+            const memoryResult = demonstrateMemory();
+            
+            let resultHtml = '<h4>WebAssembly 执行模型:</h4>';
+            resultHtml += '<div class="code-block" style="background-color: #f0f0f0; color: #333; padding: 10px; border-radius: 4px; margin: 10px 0;">';
+            resultHtml += '高级语言代码 → 编译器 → WebAssembly 二进制(.wasm) → 浏览器加载 → 编译为机器码 → 执行';
+            resultHtml += '</div>';
+            
+            resultHtml += '<h4>内存模型演示结果:</h4>';
+            resultHtml += `<p><strong>内存大小:</strong> ${memoryResult.memorySize}</p>`;
+            resultHtml += '<p><strong>存储的数据:</strong></p>';
+            resultHtml += `<ul><li>整数1: ${memoryResult.storedData.integers[0]}</li>`;
+            resultHtml += `<li>整数2: ${memoryResult.storedData.integers[1]}</li>`;
+            resultHtml += `<li>浮点数: ${memoryResult.storedData.float}</li></ul>`;
+            
+            resultHtml += '<p>WebAssembly 使用线性内存模型，通过 ArrayBuffer 在 JavaScript 和 WebAssembly 之间共享内存。</p>';
+            
+            resultDiv.innerHTML = resultHtml;
+        }
+        
+        // 3. 开发工具链演示
+        function runToolchainDemo() {
+            const resultDiv = document.getElementById('toolchainResult');
+            
+            const toolchains = [
+                {
+                    name: 'Emscripten',
+                    language: 'C/C++',
+                    commands: [
+                        'emcc source.c -o output.js -s WASM=1',
+                        'emcc source.cpp -O3 -s WASM=1 -s EXPORTED_FUNCTIONS="[\'_main\']"'
+                    ],
+                    features: '完整的 libc 支持，成熟稳定'
+                },
+                {
+                    name: 'Rust + wasm-pack',
+                    language: 'Rust',
+                    commands: [
+                        'wasm-pack new project-name',
+                        'wasm-pack build --target web'
+                    ],
+                    features: '内存安全，良好的 JS 互操作性'
+                },
+                {
+                    name: 'AssemblyScript',
+                    language: 'AssemblyScript (TypeScript 子集)',
+                    commands: [
+                        'npx asinit .',
+                        'npx asc assembly/index.ts -b build/module.wasm'
+                    ],
+                    features: 'TypeScript 开发者友好，易于上手'
+                }
+            ];
+            
+            let resultHtml = '<h4>WebAssembly 开发工具链:</h4>';
+            
+            toolchains.forEach(toolchain => {
+                resultHtml += `<div style="margin-bottom: 20px; padding: 15px; background-color: #f8f9fa; border-radius: 6px;">`;
+                resultHtml += `<h5>${toolchain.name}</h5>`;
+                resultHtml += `<p><strong>支持语言:</strong> ${toolchain.language}</p>`;
+                resultHtml += `<p><strong>主要特点:</strong> ${toolchain.features}</p>`;
+                resultHtml += `<p><strong>常用命令:</strong></p>`;
+                resultHtml += `<div class="code-block" style="background-color: #282c34; padding: 10px; font-size: 14px;">`;
+                resultHtml += toolchain.commands.join('\n');
+                resultHtml += `</div>`;
+                resultHtml += `</div>`;
+            });
+            
+            resultDiv.innerHTML = resultHtml;
+        }
+        
+        // 4. 互操作演示
+        function runInteroperabilityDemo() {
+            const resultDiv = document.getElementById('interoperabilityResult');
+            
+            // 模拟简单的 WebAssembly 计算
+            function simpleWasmSimulation(a, b) {
+                // 纯 JavaScript 模拟 WebAssembly 计算
+                return {
+                    add: a + b,
+                    subtract: a - b,
+                    multiply: a * b,
+                    divide: a / b
+                };
+            }
+            
+            const a = 10;
+            const b = 5;
+            const results = simpleWasmSimulation(a, b);
+            
+            let resultHtml = '<h4>JavaScript 与 WebAssembly 互操作演示:</h4>';
+            
+            resultHtml += '<h5>JavaScript 调用 WebAssembly:</h5>';
+            resultHtml += `<p>计算 ${a} 和 ${b} 的结果:</p>`;
+            resultHtml += `<ul>`;
+            resultHtml += `<li>${a} + ${b} = ${results.add}</li>`;
+            resultHtml += `<li>${a} - ${b} = ${results.subtract}</li>`;
+            resultHtml += `<li>${a} * ${b} = ${results.multiply}</li>`;
+            resultHtml += `<li>${a} / ${b} = ${results.divide}</li>`;
+            resultHtml += `</ul>`;
+            
+            resultHtml += '<h5>WebAssembly 调用 JavaScript:</h5>';
+            resultHtml += `<div class="code-block" style="background-color: #f0f0f0; color: #333; padding: 10px;">`;
+            resultHtml += `// JavaScript 定义函数供 WebAssembly 调用\n`;
+            resultHtml += `const importObject = {\n`;
+            resultHtml += `  js: {\n`;
+            resultHtml += `    consoleLog: (value) => console.log(value),\n`;
+            resultHtml += `    calculateSomething: (x) => x * x\n`;
+            resultHtml += `  }\n`;
+            resultHtml += `};\n\n`;
+            resultHtml += `// WebAssembly 模块中导入并调用这些函数`;
+            resultHtml += `</div>`;
+            
+            resultHtml += '<h5>内存共享示例:</h5>';
+            resultHtml += `<p>WebAssembly 使用线性内存，可以通过 ArrayBuffer 和 TypedArray 在 JavaScript 和 WebAssembly 之间共享数据。</p>`;
+            
+            resultDiv.innerHTML = resultHtml;
+        }
+        
+        // 5. 实际应用案例演示
+        function runRealWorldDemo() {
+            const resultDiv = document.getElementById('realWorldResult');
+            
+            // 模拟性能测试结果
+            const performanceData = {
+                fibonacci: {
+                    js: 1000,  // 模拟 JavaScript 执行时间 (ms)
+                    wasm: 150  // 模拟 WebAssembly 执行时间 (ms)
+                },
+                imageProcessing: {
+                    js: 2000,
+                    wasm: 250
+                }
+            };
+            
+            const fibonacciSpeedup = (performanceData.fibonacci.js / performanceData.fibonacci.wasm).toFixed(2);
+            const imageSpeedup = (performanceData.imageProcessing.js / performanceData.imageProcessing.wasm).toFixed(2);
+            
+            let resultHtml = '<h4>WebAssembly 实际应用案例演示:</h4>';
+            
+            resultHtml += '<h5>1. 性能对比模拟:</h5>';
+            resultHtml += `<table style="width: 100%; border-collapse: collapse; margin: 15px 0;">`;
+            resultHtml += `<tr style="background-color: #f2f2f2;">`;
+            resultHtml += `<th style="padding: 10px; text-align: left; border: 1px solid #ddd;">操作</th>`;
+            resultHtml += `<th style="padding: 10px; text-align: left; border: 1px solid #ddd;">JavaScript (ms)</th>`;
+            resultHtml += `<th style="padding: 10px; text-align: left; border: 1px solid #ddd;">WebAssembly (ms)</th>`;
+            resultHtml += `<th style="padding: 10px; text-align: left; border: 1px solid #ddd;">性能提升</th>`;
+            resultHtml += `</tr>`;
+            resultHtml += `<tr>`;
+            resultHtml += `<td style="padding: 10px; border: 1px solid #ddd;">斐波那契数列计算</td>`;
+            resultHtml += `<td style="padding: 10px; border: 1px solid #ddd;">${performanceData.fibonacci.js}</td>`;
+            resultHtml += `<td style="padding: 10px; border: 1px solid #ddd;">${performanceData.fibonacci.wasm}</td>`;
+            resultHtml += `<td style="padding: 10px; border: 1px solid #ddd;"><strong>${fibonacciSpeedup}x</strong></td>`;
+            resultHtml += `</tr>`;
+            resultHtml += `<tr>`;
+            resultHtml += `<td style="padding: 10px; border: 1px solid #ddd;">图像处理 (滤镜效果)</td>`;
+            resultHtml += `<td style="padding: 10px; border: 1px solid #ddd;">${performanceData.imageProcessing.js}</td>`;
+            resultHtml += `<td style="padding: 10px; border: 1px solid #ddd;">${performanceData.imageProcessing.wasm}</td>`;
+            resultHtml += `<td style="padding: 10px; border: 1px solid #ddd;"><strong>${imageSpeedup}x</strong></td>`;
+            resultHtml += `</tr>`;
+            resultHtml += `</table>`;
+            
+            resultHtml += '<h5>2. 典型应用场景:</h5>';
+            resultHtml += `<ul>`;
+            resultHtml += `<li><strong>图像处理:</strong> 滤镜应用、图像转换、实时编辑</li>`;
+            resultHtml += `<li><strong>视频处理:</strong> 编码解码、实时视频效果、流媒体处理</li>`;
+            resultHtml += `<li><strong>游戏开发:</strong> 物理引擎、3D 渲染、游戏逻辑</li>`;
+            resultHtml += `<li><strong>科学计算:</strong> 数值模拟、数据分析、可视化</li>`;
+            resultHtml += `<li><strong>加密应用:</strong> 密码学算法、安全通信、数据加密</li>`;
+            resultHtml += `</ul>`;
+            
+            resultDiv.innerHTML = resultHtml;
+        }
+        
+        // 6. 优化实践演示
+        function runOptimizationDemo() {
+            const resultDiv = document.getElementById('optimizationResult');
+            
+            const optimizationTips = [
+                {
+                    title: '编译优化',
+                    tips: [
+                        '使用 -O3 等高级优化选项',
+                        '启用 LTO (链接时优化)',
+                        '针对目标平台优化 (如 -mtune=native)'
+                    ]
+                },
+                {
+                    title: '内存优化',
+                    tips: [
+                        '避免频繁的内存分配和释放',
+                        '使用对象池管理重复使用的对象',
+                        '合理设计数据结构减少内存占用',
+                        '使用共享内存避免数据复制'
+                    ]
+                },
+                {
+                    title: '互操作优化',
+                    tips: [
+                        '减少 JavaScript 和 WebAssembly 之间的调用次数',
+                        '批量处理数据而非单次操作',
+                        '使用更高效的数据传递格式',
+                        '避免在热点路径上进行类型转换'
+                    ]
+                },
+                {
+                    title: '加载优化',
+                    tips: [
+                        '使用 WebAssembly.instantiateStreaming 进行流式编译',
+                        '实现模块缓存机制',
+                        '使用 Service Worker 缓存模块文件',
+                        '预加载关键模块'
+                    ]
+                }
+            ];
+            
+            let resultHtml = '<h4>WebAssembly 最佳实践与优化技巧:</h4>';
+            
+            optimizationTips.forEach(category => {
+                resultHtml += `<h5>${category.title}:</h5>`;
+                resultHtml += `<ul>`;
+                category.tips.forEach(tip => {
+                    resultHtml += `<li>${tip}</li>`;
+                });
+                resultHtml += `</ul>`;
+            });
+            
+            resultHtml += '<h5>安全性建议:</h5>';
+            resultHtml += `<ul>`;
+            resultHtml += `<li>验证所有输入数据，特别是从 JavaScript 传递到 WebAssembly 的数据</li>`;
+            resultHtml += `<li>限制内存使用大小防止资源耗尽攻击</li>`;
+            resultHtml += `<li>使用内容安全策略 (CSP) 控制 WebAssembly 模块的加载来源</li>`;
+            resultHtml += `<li>避免在 WebAssembly 中处理敏感数据，或将敏感操作保留在 JavaScript 中</li>`;
+            resultHtml += `</ul>`;
+            
+            resultDiv.innerHTML = resultHtml;
+        }
+        
+        // 7. 未来发展演示
+        function runFutureDemo() {
+            const resultDiv = document.getElementById('futureResult');
+            
+            const futureFeatures = {
+                'WebAssembly 2.0': [
+                    '异常处理机制 (try/catch)',
+                    '尾调用优化',
+                    '引用类型扩展',
+                    'SIMD 扩展 (单指令多数据)',
+                    '垃圾回收集成'
+                ],
+                'WASI (WebAssembly System Interface)': [
+                    '文件系统访问',
+                    '网络操作接口',
+                    '环境变量访问',
+                    '命令行参数处理',
+                    '跨平台系统调用'
+                ],
+                '非浏览器应用': [
+                    '服务器端 WebAssembly',
+                    '边缘计算函数',
+                    '无服务器架构',
+                    '插件系统',
+                    '跨平台桌面应用'
+                ]
+            };
+            
+            let resultHtml = '<h4>WebAssembly 未来发展趋势:</h4>';
+            
+            for (const [category, items] of Object.entries(futureFeatures)) {
+                resultHtml += `<h5>${category}:</h5>`;
+                resultHtml += `<ul>`;
+                items.forEach(item => {
+                    resultHtml += `<li>${item}</li>`;
+                });
+                resultHtml += `</ul>`;
+            }
+            
+            resultHtml += '<h5>行业应用前景:</h5>';
+            resultHtml += `<p>WebAssembly 正在从 Web 浏览器扩展到更广泛的应用场景，成为跨平台、高性能代码执行的标准解决方案。随着工具链的成熟和生态系统的发展，WebAssembly 将在云原生、边缘计算、物联网等领域发挥越来越重要的作用。</p>`;
+            
+            resultDiv.innerHTML = resultHtml;
+        }
+        
+        // 页面加载时执行代码高亮
+        document.addEventListener('DOMContentLoaded', function() {
+            highlightCode();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,859 @@
+\u003c!DOCTYPE html\u003e
+\u003chtml lang="zh-CN"\u003e
+\u003chead\u003e
+    \u003cmeta charset="UTF-8"\u003e
+    \u003cmeta name="viewport" content="width=device-width, initial-scale=1.0"\u003e
+    \u003ctitle\u003e前端工程化实践 - 高级开发指南\u003c/title\u003e
+    \u003cstyle\u003e
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f5f5;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 40px 0;
+            text-align: center;
+            margin-bottom: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        h2 {
+            color: #4a5568;
+            margin: 30px 0 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        
+        h3 {
+            color: #2d3748;
+            margin: 25px 0 15px;
+        }
+        
+        p {
+            margin-bottom: 16px;
+            font-size: 1.05em;
+        }
+        
+        .section {
+            background: white;
+            padding: 30px;
+            margin-bottom: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        pre {
+            background-color: #282c34;
+            color: #abb2bf;
+            padding: 20px;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-family: 'Courier New', Courier, monospace;
+            margin: 20px 0;
+        }
+        
+        code {
+            font-family: 'Courier New', Courier, monospace;
+            background-color: #f1f1f1;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+        
+        .demo-area {
+            background-color: #f7fafc;
+            padding: 20px;
+            border-left: 4px solid #1e3c72;
+            margin: 20px 0;
+            border-radius: 0 6px 6px 0;
+        }
+        
+        button {
+            background-color: #1e3c72;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: #2a5298;
+        }
+        
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #e6fffa;
+            border: 1px solid #b2f5ea;
+            border-radius: 4px;
+            min-height: 50px;
+        }
+        
+        ul, ol {
+            margin-left: 20px;
+            margin-bottom: 16px;
+        }
+        
+        li {
+            margin-bottom: 8px;
+        }
+        
+        .highlight {
+            background-color: #fffaf0;
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-weight: 500;
+        }
+        
+        .workflow-diagram {
+            background-color: #f7fafc;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        
+        .workflow-step {
+            display: inline-block;
+            background-color: #2a5298;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 4px;
+            margin: 0 10px;
+        }
+        
+        .workflow-arrow {
+            display: inline-block;
+            margin: 0 5px;
+            font-size: 20px;
+            color: #4a5568;
+        }
+    \u003c/style\u003e
+\u003c/head\u003e
+\u003cbody\u003e
+    \u003cdiv class="container"\u003e
+        \u003cheader\u003e
+            \u003ch1\u003e前端工程化实践\u003c/h1\u003e
+            \u003cp\u003e现代前端开发流程的标准化与自动化\u003c/p\u003e
+        \u003c/header\u003e
+        
+        \u003cdiv class="section"\u003e
+            \u003ch2\u003e1. 前端工程化概述\u003c/h2\u003e
+            \u003cp\u003e前端工程化是指将软件工程的方法和原则应用于前端开发，通过工具链、标准化流程和最佳实践，提升开发效率和代码质量。\u003c/p\u003e
+            
+            \u003cdiv class="workflow-diagram"\u003e
+                \u003cdiv class="workflow-step"\u003e需求分析\u003c/div\u003e
+                \u003cspan class="workflow-arrow"\u003e→\u003c/span\u003e
+                \u003cdiv class="workflow-step"\u003e开发环境搭建\u003c/div\u003e
+                \u003cspan class="workflow-arrow"\u003e→\u003c/span\u003e
+                \u003cdiv class="workflow-step"\u003e模块化开发\u003c/div\u003e
+                \u003cspan class="workflow-arrow"\u003e→\u003c/span\u003e
+                \u003cdiv class="workflow-step"\u003e构建打包\u003c/div\u003e
+                \u003cspan class="workflow-arrow"\u003e→\u003c/span\u003e
+                \u003cdiv class="workflow-step"\u003e自动化测试\u003c/div\u003e
+                \u003cspan class="workflow-arrow"\u003e→\u003c/span\u003e
+                \u003cdiv class="workflow-step"\u003e部署上线\u003c/div\u003e
+            \u003c/div\u003e
+            
+            \u003ch3\u003e1.1 核心要素\u003c/h3\u003e
+            \u003cul\u003e
+                \u003cli\u003e\u003cstrong\u003e模块化\u003c/strong\u003e：将代码拆分为独立的模块，便于维护和复用\u003c/li\u003e
+                \u003cli\u003e\u003cstrong\u003e组件化\u003c/strong\u003e：将UI拆分为可复用的组件\u003c/li\u003e
+                \u003cli\u003e\u003cstrong\u003e规范化\u003c/strong\u003e：统一代码规范、目录结构和命名约定\u003c/li\u003e
+                \u003cli\u003e\u003cstrong\u003e自动化\u003c/strong\u003e：自动化构建、测试、部署流程\u003c/li\u003e
+                \u003cli\u003e\u003cstrong\u003e性能优化\u003c/strong\u003e：代码压缩、按需加载、缓存策略等\u003c/li\u003e
+            \u003c/ul\u003e
+        \u003c/div\u003e
+        
+        \u003cdiv class="section"\u003e
+            \u003ch2\u003e2. 构建工具配置与优化\u003c/h2\u003e
+            \u003ch3\u003e2.1 Webpack 高级配置\u003c/h3\u003e
+            \u003cp\u003eWebpack是现代前端工程化中最流行的构建工具之一，以下是一些高级配置示例：\u003c/p\u003e
+            
+            \u003cpre\u003e// webpack.config.js
+const path = require('path');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+const TerserPlugin = require('terser-webpack-plugin');
+const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
+
+module.exports = {
+  mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',
+  entry: {
+    main: './src/index.js',
+    // 分离第三方库
+    vendor: ['react', 'react-dom']
+  },
+  output: {
+    path: path.resolve(__dirname, 'dist'),
+    // 使用内容哈希进行缓存优化
+    filename: '[name].[contenthash].js',
+    chunkFilename: '[name].[contenthash].chunk.js'
+  },
+  optimization: {
+    // 代码分割
+    splitChunks: {
+      chunks: 'all',
+      cacheGroups: {
+        vendor: {
+          test: /[\/]node_modules[\/]/,
+          name(module) {
+            const packageName = module.context.match(/[\/]node_modules[\/](.*?)([\/]|$)/)[1];
+            return `npm.${packageName.replace('@', '')}`;
+          }
+        },
+        styles: {
+          name: 'styles',
+          test: /\.css$/,
+          chunks: 'all',
+          enforce: true
+        }
+      }
+    },
+    // 运行时代码分割
+    runtimeChunk: 'single',
+    // 生产环境优化
+    minimizer: [
+      new TerserPlugin({
+        terserOptions: {
+          compress: {
+            drop_console: true
+          }
+        }
+      }),
+      new OptimizeCSSAssetsPlugin({})
+    ]
+  },
+  module: {
+    rules: [
+      {
+        test: /\.jsx?$/,
+        exclude: /node_modules/,
+        use: {
+          loader: 'babel-loader',
+          options: {
+            presets: ['@babel/preset-env', '@babel/preset-react'],
+            // 启用缓存
+            cacheDirectory: true
+          }
+        }
+      },
+      {
+        test: /\.css$/,
+        use: [
+          process.env.NODE_ENV === 'production' ?
+            MiniCssExtractPlugin.loader : 'style-loader',
+          'css-loader',
+          {
+            loader: 'postcss-loader',
+            options: {
+              plugins: [require('autoprefixer')]
+            }
+          }
+        ]
+      },
+      {
+        test: /\.(png|jpg|gif|svg)$/,
+        use: [
+          {
+            loader: 'url-loader',
+            options: {
+              limit: 8192,
+              name: 'assets/[name].[hash].[ext]'
+            }
+          }
+        ]
+      }
+    ]
+  },
+  plugins: [
+    // 清理构建目录
+    new CleanWebpackPlugin(),
+    // 生成HTML文件
+    new HtmlWebpackPlugin({
+      template: './public/index.html',
+      minify: {
+        collapseWhitespace: true,
+        removeComments: true
+      }
+    }),
+    // 提取CSS到单独文件
+    new MiniCssExtractPlugin({
+      filename: '[name].[contenthash].css'
+    })
+  ],
+  // 开发服务器配置
+  devServer: {
+    contentBase: './dist',
+    port: 3000,
+    hot: true,
+    proxy: {
+      '/api': {
+        target: 'http://localhost:8000',
+        changeOrigin: true
+      }
+    }
+  },
+  // 开发工具
+  devtool: process.env.NODE_ENV === 'production' ?
+    'source-map' : 'eval-cheap-module-source-map'
+};\u003c/pre\u003e
+            
+            \u003ch3\u003e2.2 Vite 配置与优势\u003c/h3\u003e
+            \u003cp\u003eVite是新一代前端构建工具，以其极速的开发服务器和优化的构建输出而受到欢迎：\u003c/p\u003e
+            
+            \u003cpre\u003e// vite.config.js
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+import { resolve } from 'path';
+
+export default defineConfig({
+  plugins: [react()],
+  resolve: {
+    alias: {
+      '@': resolve(__dirname, 'src')
+    }
+  },
+  css: {
+    preprocessorOptions: {
+      scss: {
+        additionalData: `@import "@/styles/variables.scss";`
+      }
+    }
+  },
+  server: {
+    port: 3000,
+    proxy: {
+      '/api': {
+        target: 'http://localhost:8000',
+        changeOrigin: true
+      }
+    }
+  },
+  build: {
+    outDir: 'dist',
+    assetsDir: 'assets',
+    sourcemap: false,
+    minify: 'terser',
+    terserOptions: {
+      compress: {
+        drop_console: true
+      }
+    },
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ['react', 'react-dom'],
+          utils: ['lodash-es', 'date-fns']
+        }
+      }
+    }
+  }
+});\u003c/pre\u003e
+            
+            \u003cdiv class="demo-area"\u003e
+                \u003ch4\u003e构建工具性能对比演示\u003c/h4\u003e
+                \u003cbutton id="buildToolDemoBtn"\u003e运行构建工具对比\u003c/button\u003e
+                \u003cdiv id="buildToolResult" class="result"\u003e\u003c/div\u003e
+            \u003c/div\u003e
+        \u003c/div\u003e
+        
+        \u003cdiv class="section"\u003e
+            \u003ch2\u003e3. 代码规范与质量保障\u003c/h2\u003e
+            \u003ch3\u003e3.1 ESLint 与 Prettier 配置\u003c/h3\u003e
+            \u003cp\u003e统一代码风格和质量规范：\u003c/p\u003e
+            
+            \u003cpre\u003e// .eslintrc.js
+module.exports = {
+  root: true,
+  env: {
+    browser: true,
+    node: true,
+    es2021: true,
+    jest: true
+  },
+  extends: [
+    'eslint:recommended',
+    'plugin:react/recommended',
+    'plugin:prettier/recommended'
+  ],
+  parserOptions: {
+    ecmaVersion: 12,
+    sourceType: 'module',
+    ecmaFeatures: {
+      jsx: true
+    }
+  },
+  plugins: ['react', 'prettier'],
+  rules: {
+    'prettier/prettier': 'error',
+    'react/react-in-jsx-scope': 'off',
+    'react/prop-types': 'warn',
+    'no-console': process.env.NODE_ENV === 'production' ? 'error' : 'warn',
+    'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'warn',
+    'no-unused-vars': ['warn', { argsIgnorePattern: '^_' }]
+  },
+  settings: {
+    react: {
+      version: 'detect'
+    }
+  }
+};
+
+// .prettierrc.js
+module.exports = {
+  printWidth: 100,
+  tabWidth: 2,
+  useTabs: false,
+  semi: true,
+  singleQuote: true,
+  trailingComma: 'es5',
+  bracketSpacing: true,
+  jsxBracketSameLine: false,
+  arrowParens: 'always'
+};\u003c/pre\u003e
+            \u003ch3\u003e3.2 Git Hooks 与自动化检查\u003c/h3\u003e
+            \u003cp\u003e使用husky和lint-staged在提交前自动检查代码：\u003c/p\u003e
+            \u003cpre\u003e// package.json (部分)
+{
+  "scripts": {
+    "lint": "eslint src --ext .js,.jsx",
+    "prettier": "prettier --write src/**/*.{js,jsx,css,scss}",
+    "test": "jest"
+  },
+  "lint-staged": {
+    "*.{js,jsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{css,scss}": [
+      "prettier --write"
+    ]
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged",
+      "pre-push": "npm test"
+    }
+  }
+}\u003c/pre\u003e
+            
+            \u003cdiv class="demo-area"\u003e
+                \u003ch4\u003e代码检查流程演示\u003c/h4\u003e
+                \u003cbutton id="lintDemoBtn"\u003e运行代码检查演示\u003c/button\u003e
+                \u003cdiv id="lintResult" class="result"\u003e\u003c/div\u003e
+            \u003c/div\u003e
+        \u003c/div\u003e
+        
+        \u003cdiv class="section"\u003e
+            \u003ch2\u003e4. 模块化与代码分割策略\u003c/h2\u003e
+            \u003ch3\u003e4.1 模块联邦实现微前端\u003c/h3\u003e
+            \u003cp\u003e使用Webpack 5的模块联邦功能实现微前端架构：\u003c/p\u003e
+            \u003cpre\u003e// 主应用 webpack.config.js
+const { ModuleFederationPlugin } = require('webpack').container;
+
+module.exports = {
+  // ...其他配置
+  plugins: [
+    new ModuleFederationPlugin({
+      name: 'mainApp',
+      remotes: {
+        authApp: 'authApp@http://localhost:3001/remoteEntry.js',
+        productApp: 'productApp@http://localhost:3002/remoteEntry.js'
+      },
+      shared: {
+        react: {\ singleton: true, requiredVersion: '^17.0.2' },
+        'react-dom': { singleton: true, requiredVersion: '^17.0.2' }
+      }
+    })
+  ]
+};
+
+// 子应用 webpack.config.js
+const { ModuleFederationPlugin } = require('webpack').container;
+
+module.exports = {
+  // ...其他配置
+  plugins: [
+    new ModuleFederationPlugin({
+      name: 'authApp',
+      filename: 'remoteEntry.js',
+      exposes: {
+        './AuthModule': './src/AuthModule',
+        './LoginComponent': './src/components/Login'
+      },
+      shared: {
+        react: { singleton: true, requiredVersion: '^17.0.2' },
+        'react-dom': { singleton: true, requiredVersion: '^17.0.2' }
+      }
+    })
+  ]
+};
+
+// 主应用中使用远程模块
+const loadRemoteModule = async () => {
+  try {
+    const { LoginComponent } = await import('authApp/LoginComponent');
+    // 使用LoginComponent
+  } catch (error) {
+    console.error('加载远程模块失败:', error);
+  }
+};\u003c/pre\u003e
+            \u003ch3\u003e4.2 动态导入与懒加载策略\u003c/h3\u003e
+            \u003cp\u003e实现代码的按需加载，减少初始加载体积：\u003c/p\u003e
+            \u003cpre\u003e// 路由级别懒加载 (React + React Router)
+import React, { lazy, Suspense } from 'react';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import LoadingSpinner from './components/LoadingSpinner';
+import ErrorBoundary from './components/ErrorBoundary';
+
+// 使用React.lazy进行组件懒加载
+const Home = lazy(() => import('./pages/Home'));
+const About = lazy(() => import('./pages/About'));
+const Dashboard = lazy(() => import('./pages/Dashboard'));
+const Settings = lazy(() => import('./pages/Settings'));
+const ProductDetail = lazy(() => import('./pages/ProductDetail'));
+
+function App() {
+  return (
+    \u003cBrowserRouter\u003e
+      \u003cErrorBoundary\u003e
+        \u003cSuspense fallback={\u003cLoadingSpinner /\u003e}\u003e
+          \u003cRoutes\u003e
+            \u003cRoute path="/" element={\u003cHome /\u003e} /\u003e
+            \u003cRoute path="/about" element={\u003cAbout /\u003e} /\u003e
+            \u003cRoute path="/dashboard" element={\u003cDashboard /\u003e} /\u003e
+            \u003cRoute path="/settings" element={\u003cSettings /\u003e} /\u003e
+            \u003cRoute path="/products/:id" element={\u003cProductDetail /\u003e} /\u003e
+          \u003c/Routes\u003e
+        \u003c/Suspense\u003e
+      \u003c/ErrorBoundary\u003e
+    \u003c/BrowserRouter\u003e
+  );
+}
+
+export default App;
+
+// 组件级别懒加载
+const loadHeavyComponent = () => {
+  // 仅在需要时加载
+  import('./HeavyComponent')
+    .then(module => {
+      const HeavyComponent = module.default;
+      // 渲染组件
+      renderHeavyComponent(HeavyComponent);
+    })
+    .catch(error => {
+      console.error('组件加载失败:', error);
+    });
+};\u003c/pre\u003e
+        \u003c/div\u003e
+        
+        \u003cdiv class="section"\u003e
+            \u003ch2\u003e5. 自动化测试与CI/CD集成\u003c/h2\u003e
+            \u003ch3\u003e5.1 Jest 单元测试配置\u003c/h3\u003e
+            \u003cp\u003e设置Jest进行组件和功能测试：\u003c/p\u003e
+            \u003cpre\u003e// jest.config.js
+module.exports = {
+  roots: ['\u003csrc'],
+  testMatch: [
+    '**/__tests__/**/*.+(js|jsx|ts|tsx)',
+    '**/?(*.)+(spec|test).+(js|jsx|ts|tsx)'
+  ],
+  transform: {
+    '^.+\.(js|jsx)$': 'babel-jest',
+    '\.(css|less|scss)$': 'jest-css-modules-transform'
+  },
+  moduleNameMapper: {
+    '^@/(.*)$': '\u003csrc/$1',
+    '\.(jpg|jpeg|png|gif|webp|svg)$': '\u003crootDir>/__mocks__/fileMock.js'
+  },
+  setupFilesAfterEnv: ['\u003csrc/setupTests.js'],
+  collectCoverage: true,
+  collectCoverageFrom: [
+    'src/**/*.{js,jsx}',
+    '!src/index.js',
+    '!src/serviceWorker.js'
+  ],
+  coverageThreshold: {
+    global: {
+      branches: 80,
+      functions: 80,
+      lines: 80,
+      statements: 80
+    }
+  }
+};
+
+// 组件测试示例
+import React from 'react';
+import { render, screen, fireEvent } from '@testing-library/react';
+import '@testing-library/jest-dom';
+import Counter from './Counter';
+
+describe('Counter Component', () => {
+  test('renders counter with initial value', () => {
+    render(\u003cCounter /\u003e);
+    expect(screen.getByText(/Count: 0/i)).toBeInTheDocument();
+  });
+
+  test('increments count when button is clicked', () => {
+    render(\u003cCounter /\u003e);
+    const incrementButton = screen.getByText(/Increment/i);
+    fireEvent.click(incrementButton);
+    expect(screen.getByText(/Count: 1/i)).toBeInTheDocument();
+  });
+
+  test('decrements count when button is clicked', () => {
+    render(\u003cCounter /\u003e);
+    const decrementButton = screen.getByText(/Decrement/i);
+    fireEvent.click(decrementButton);
+    expect(screen.getByText(/Count: -1/i)).toBeInTheDocument();
+  });
+});\u003c/pre\u003e
+            \u003ch3\u003e5.2 CI/CD 流水线配置\u003c/h3\u003e
+            \u003cp\u003e使用GitHub Actions配置自动化部署：\u003c/p\u003e
+            \u003cpre\u003e# .github/workflows/ci-cd.yml
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '16'
+        cache: 'npm'
+    - name: Install dependencies
+      run: npm ci
+    - name: Run linting
+      run: npm run lint
+    - name: Run tests
+      run: npm test
+      env:
+        CI: true
+    - name: Upload coverage reports
+      uses: actions/upload-artifact@v2
+      with:
+        name: coverage
+        path: coverage
+
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '16'
+        cache: 'npm'
+    - name: Install dependencies
+      run: npm ci
+    - name: Build application
+      run: npm run build
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: build
+        path: build
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop'
+    steps:
+    - name: Download build artifacts
+      uses: actions/download-artifact@v2
+      with:
+        name: build
+        path: build
+    - name: Deploy to production
+      if: github.ref == 'refs/heads/main'
+      uses: easingthemes/ssh-deploy@v2
+      env:
+        SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        ARGS: '-rltgoDzvO --delete'
+        SOURCE: 'build/'
+        REMOTE_HOST: ${{ secrets.PROD_HOST }}
+        REMOTE_USER: ${{ secrets.PROD_USER }}
+        TARGET: ${{ secrets.PROD_TARGET }}
+    - name: Deploy to staging
+      if: github.ref == 'refs/heads/develop'
+      uses: easingthemes/ssh-deploy@v2
+      env:
+        SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        ARGS: '-rltgoDzvO --delete'
+        SOURCE: 'build/'
+        REMOTE_HOST: ${{ secrets.STAGING_HOST }}
+        REMOTE_USER: ${{ secrets.STAGING_USER }}
+        TARGET: ${{ secrets.STAGING_TARGET }}\u003c/pre\u003e
+            
+            \u003cdiv class="demo-area"\u003e
+                \u003ch4\u003eCI/CD流程演示\u003c/h4\u003e
+                \u003cbutton id="cicdDemoBtn"\u003e运行CI/CD流程模拟\u003c/button\u003e
+                \u003cdiv id="cicdResult" class="result"\u003e\u003c/div\u003e
+            \u003c/div\u003e
+        \u003c/div\u003e
+    \u003c/div\u003e
+    
+    \u003cscript\u003e
+        // 辅助函数：代码高亮
+        function highlightCode() {
+            document.querySelectorAll('pre code').forEach((block) =\u003e {
+                // 简单的语法高亮模拟
+                block.innerHTML = block.innerHTML
+                    .replace(/\/\/.*$/gm, '\u003cspan style="color: #6a9955"\u003e$&\u003c/span\u003e')
+                    .replace(/("[^"]*"|'[^']*')/g, '\u003cspan style="color: #ce9178"\u003e$1\u003c/span\u003e')
+                    .replace(/(\bconst\b|\blet\b|\bvar\b|\bfunction\b|\bimport\b|\bexport\b|\bdefault\b)/g, '\u003cspan style="color: #569cd6"\u003e$1\u003c/span\u003e')
+                    .replace(/(\bmodule\.exports\b|\brequire\b)/g, '\u003cspan style="color: #c586c0"\u003e$1\u003c/span\u003e');
+            });
+        }
+        
+        // 构建工具对比演示
+        document.getElementById('buildToolDemoBtn').addEventListener('click', function() {
+            const result = document.getElementById('buildToolResult');
+            result.innerHTML = '开始模拟构建工具性能对比...\n';
+            
+            setTimeout(() =\u003e {
+                result.innerHTML += '✅ Webpack 构建时间: ~3.5 秒\n';
+                
+                setTimeout(() =\u003e {
+                    result.innerHTML += '✅ Vite 构建时间: ~0.8 秒\n';
+                    
+                    setTimeout(() =\u003e {
+                        result.innerHTML += '\n📊 开发服务器启动时间:\n';
+                        result.innerHTML += '  Webpack Dev Server: ~2.1 秒\n';
+                        result.innerHTML += '  Vite Dev Server: ~0.1 秒\n';
+                        
+                        setTimeout(() =\u003e {
+                            result.innerHTML += '\n📈 热模块替换(HMR)性能:\n';
+                            result.innerHTML += '  Webpack: ~500ms\n';
+                            result.innerHTML += '  Vite: ~100ms\n';
+                            
+                            result.innerHTML += '\n<strong>结论: Vite在开发体验方面显著优于Webpack，特别是在大型项目中。</strong>';
+                        }, 800);
+                    }, 800);
+                }, 1000);
+            }, 1000);
+        });
+        
+        // 代码检查流程演示
+        document.getElementById('lintDemoBtn').addEventListener('click', function() {
+            const result = document.getElementById('lintResult');
+            result.innerHTML = '开始模拟代码提交前检查流程...\n';
+            
+            setTimeout(() =\u003e {
+                result.innerHTML += '🔍 运行 ESLint 检查...\n';
+                
+                setTimeout(() =\u003e {
+                    result.innerHTML += '⚠️ 发现 2 个 ESLint 错误:\n';
+                    result.innerHTML += '  - 第15行: 未使用的变量 "unusedVar"\n';
+                    result.innerHTML += '  - 第42行: 缺少分号\n';
+                    
+                    setTimeout(() =\u003e {
+                        result.innerHTML += '🔧 自动修复 ESLint 错误...\n';
+                        
+                        setTimeout(() =\u003e {
+                            result.innerHTML += '✅ ESLint 错误修复完成\n';
+                            result.innerHTML += '🔍 运行 Prettier 格式化...\n';
+                            
+                            setTimeout(() =\u003e {
+                                result.innerHTML += '✅ 代码格式化完成\n';
+                                result.innerHTML += '🔍 运行单元测试...\n';
+                                
+                                setTimeout(() =\u003e {
+                                    result.innerHTML += '✅ 所有测试通过 (8/8 tests passed)\n';
+                                    result.innerHTML += '\n<strong>代码检查通过，准备提交到仓库...</strong>';
+                                }, 1000);
+                            }, 800);
+                        }, 800);
+                    }, 800);
+                }, 1000);
+            }, 800);
+        });
+        
+        // CI/CD流程演示
+        document.getElementById('cicdDemoBtn').addEventListener('click', function() {
+            const result = document.getElementById('cicdResult');
+            result.innerHTML = '开始模拟CI/CD流水线...\n';
+            
+            setTimeout(() =\u003e {
+                result.innerHTML += '🚀 触发 CI/CD 流水线...\n';
+                
+                setTimeout(() =\u003e {
+                    result.innerHTML += '📦 安装依赖...\n';
+                    
+                    setTimeout(() =\u003e {
+                        result.innerHTML += '✅ 依赖安装完成\n';
+                        result.innerHTML += '🔍 运行代码检查...\n';
+                        
+                        setTimeout(() =\u003e {
+                            result.innerHTML += '✅ 代码检查通过\n';
+                            result.innerHTML += '🧪 运行测试...\n';
+                            
+                            setTimeout(() =\u003e {
+                                result.innerHTML += '✅ 测试通过 (覆盖率: 85%)\n';
+                                result.innerHTML += '🏗️ 构建应用...\n';
+                                
+                                setTimeout(() =\u003e {
+                                    result.innerHTML += '✅ 应用构建完成\n';
+                                    result.innerHTML += '🚀 部署到目标环境...\n';
+                                    
+                                    setTimeout(() =\u003e {
+                                        result.innerHTML += '✅ 部署成功\n';
+                                        result.innerHTML += '📱 触发自动化测试...\n';
+                                        
+                                        setTimeout(() =\u003e {
+                                            result.innerHTML += '✅ 自动化测试通过\n';
+                                            result.innerHTML += '\n<strong>🎉 CI/CD 流水线执行完成！应用已成功部署并验证。</strong>';
+                                        }, 800);
+                                    }, 1000);
+                                }, 1200);
+                            }, 1000);
+                        }, 800);
+                    }, 1000);
+                }, 800);
+            }, 600);
+        });
+        
+        // 页面加载时初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            highlightCode();
+        });
+    \u003c/script\u003e
+\u003c/body\u003e
+\u003c/html\u003e

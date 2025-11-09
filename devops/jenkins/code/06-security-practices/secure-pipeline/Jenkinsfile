@@ -1,0 +1,465 @@
+// 安全加固Pipeline示例
+pipeline {
+    agent any
+    
+    options {
+        timestamps()
+        buildDiscarder(logRotator(numToKeepStr: '10'))
+        disableConcurrentBuilds()
+    }
+    
+    parameters {
+        choice(
+            name: 'ENVIRONMENT',
+            choices: ['dev', 'staging', 'production'],
+            description: '目标部署环境'
+        )
+        booleanParam(
+            name: 'ENABLE_SECURITY_SCAN',
+            defaultValue: true,
+            description: '是否启用安全扫描'
+        )
+        booleanParam(
+            name: 'ENABLE_AUDIT',
+            defaultValue: true,
+            description: '是否启用审计功能'
+        )
+    }
+    
+    environment {
+        // 安全相关环境变量
+        SECURITY_SCAN_LEVEL = 'strict'
+        AUDIT_LOG_LEVEL = 'INFO'
+        
+        // 凭据变量
+        DOCKER_REGISTRY = credentials('docker-registry')
+        KUBECONFIG = credentials('kubeconfig-prod')
+        
+        // 工具路径
+        TRIVY_PATH = '/usr/local/bin/trivy'
+        HELM_PATH = '/usr/local/bin/helm'
+    }
+    
+    stages {
+        stage('安全环境检查') {
+            steps {
+                script {
+                    // 检查当前环境安全状态
+                    def securityStatus = checkSecurityEnvironment()
+                    
+                    if (securityStatus.score < 80) {
+                        error("安全环境评分过低: ${securityStatus.score}/100")
+                    }
+                    
+                    // 记录安全检查
+                    auditSecurityCheck('环境检查', 'PASS')
+                }
+            }
+        }
+        
+        stage('代码安全检查') {
+            when {
+                expression { params.ENABLE_SECURITY_SCAN }
+            }
+            steps {
+                script {
+                    // 静态代码分析
+                    sh '''
+                        # 使用SonarQube进行代码质量检查
+                        sonar-scanner \
+                            -Dsonar.projectKey=myapp \
+                            -Dsonar.sources=src \
+                            -Dsonar.host.url=http://sonarqube.example.com \
+                            -Dsonar.login=${SONAR_TOKEN}
+                    '''
+                    
+                    // 依赖安全检查
+                    sh '''
+                        # 使用OWASP Dependency Check
+                        dependency-check.sh \
+                            --project "MyApp" \
+                            --scan "src" \
+                            --format "HTML" \
+                            --out "reports/"
+                    '''
+                    
+                    // 记录安全扫描
+                    auditSecurityCheck('代码安全扫描', 'PASS')
+                }
+            }
+            post {
+                always {
+                    // 发布安全报告
+                    publishHTML([
+                        allowMissing: false,
+                        alwaysLinkToLastBuild: true,
+                        keepAll: true,
+                        reportDir: 'reports',
+                        reportFiles: 'dependency-check-report.html',
+                        reportName: 'Dependency Check Report'
+                    ])
+                }
+            }
+        }
+        
+        stage('容器镜像构建') {
+            steps {
+                script {
+                    // 安全构建镜像
+                    withCredentials([usernamePassword(
+                        credentialsId: 'docker-registry',
+                        usernameVariable: 'REGISTRY_USER',
+                        passwordVariable: 'REGISTRY_PASSWORD'
+                    )]) {
+                        sh '''
+                            # 登录Docker Registry
+                            echo $REGISTRY_PASSWORD | docker login -u $REGISTRY_USER --password-stdin registry.example.com
+                            
+                            # 安全构建镜像
+                            docker build \
+                                --no-cache \
+                                --build-arg BUILDKIT_INLINE_CACHE=1 \
+                                -t registry.example.com/myapp:${BUILD_ID} \
+                                -f Dockerfile.security .
+                        '''
+                    }
+                    
+                    // 记录镜像构建
+                    auditSecurityCheck('镜像构建', 'PASS')
+                }
+            }
+        }
+        
+        stage('镜像安全扫描') {
+            when {
+                expression { params.ENABLE_SECURITY_SCAN }
+            }
+            steps {
+                script {
+                    // 使用Trivy进行漏洞扫描
+                    sh '''
+                        ${TRIVY_PATH} image \
+                            --exit-code 1 \
+                            --severity HIGH,CRITICAL \
+                            --format template \
+                            --template "@/contrib/html.tpl" \
+                            -o trivy-report.html \
+                            registry.example.com/myapp:${BUILD_ID}
+                    '''
+                    
+                    // 使用Clair进行深度扫描
+                    sh '''
+                        docker run --rm \
+                            -v /var/run/docker.sock:/var/run/docker.sock \
+                            -v $(pwd):/report \
+                            quay.io/clair-scanner \
+                            --ip $(hostname -i) \
+                            --report /report/clair-report.json \
+                            registry.example.com/myapp:${BUILD_ID}
+                    '''
+                    
+                    // 记录安全扫描
+                    auditSecurityCheck('镜像安全扫描', 'PASS')
+                }
+            }
+            post {
+                always {
+                    // 发布安全报告
+                    publishHTML([
+                        allowMissing: false,
+                        alwaysLinkToLastBuild: true,
+                        keepAll: true,
+                        reportDir: '.',
+                        reportFiles: 'trivy-report.html',
+                        reportName: 'Trivy Security Report'
+                    ])
+                }
+            }
+        }
+        
+        stage('镜像签名') {
+            steps {
+                script {
+                    // 使用Cosign进行镜像签名
+                    withCredentials([string(credentialsId: 'cosign-key', variable: 'COSIGN_KEY')]) {
+                        sh '''
+                            cosign sign \
+                                --key env://COSIGN_KEY \
+                                registry.example.com/myapp:${BUILD_ID}
+                        '''
+                    }
+                    
+                    // 记录签名操作
+                    auditSecurityCheck('镜像签名', 'PASS')
+                }
+            }
+        }
+        
+        stage('安全部署') {
+            steps {
+                script {
+                    // 根据环境选择不同的安全配置
+                    def securityConfig = getSecurityConfig(params.ENVIRONMENT)
+                    
+                    // 生成安全的Kubernetes清单
+                    def deploymentYaml = generateSecureDeployment(securityConfig)
+                    writeFile file: 'deployment-secure.yaml', text: deploymentYaml
+                    
+                    // 应用安全部署
+                    sh "kubectl apply -f deployment-secure.yaml --namespace=${params.ENVIRONMENT}"
+                    
+                    // 等待部署完成
+                    sh "kubectl rollout status deployment/myapp --namespace=${params.ENVIRONMENT} --timeout=300s"
+                    
+                    // 记录部署操作
+                    auditSecurityCheck('安全部署', 'PASS')
+                }
+            }
+        }
+        
+        stage('安全测试') {
+            steps {
+                script {
+                    // 运行安全测试
+                    sh '''
+                        # 使用OWASP ZAP进行安全测试
+                        zap-baseline.py \
+                            -t http://myapp.${params.ENVIRONMENT}.svc.cluster.local:8080 \
+                            -r zap-report.html
+                    '''
+                    
+                    // 运行渗透测试
+                    sh '''
+                        # 使用Nuclei进行漏洞扫描
+                        nuclei \
+                            -u http://myapp.${params.ENVIRONMENT}.svc.cluster.local:8080 \
+                            -o nuclei-report.json
+                    '''
+                    
+                    // 记录安全测试
+                    auditSecurityCheck('安全测试', 'PASS')
+                }
+            }
+            post {
+                always {
+                    // 发布安全测试报告
+                    publishHTML([
+                        allowMissing: false,
+                        alwaysLinkToLastBuild: true,
+                        keepAll: true,
+                        reportDir: '.',
+                        reportFiles: 'zap-report.html',
+                        reportName: 'OWASP ZAP Security Report'
+                    ])
+                }
+            }
+        }
+        
+        stage('合规性验证') {
+            steps {
+                script {
+                    // 运行CIS基准测试
+                    sh '''
+                        # Kubernetes CIS基准测试
+                        kube-bench \
+                            --version 1.6 \
+                            --check cis-1.6 \
+                            --json \
+                            --outputfile kube-bench-report.json
+                    '''
+                    
+                    // Docker安全基准测试
+                    sh '''
+                        docker run --rm --net host --pid host --userns host --cap-add audit_control \
+                            -e DOCKER_CONTENT_TRUST=$DOCKER_CONTENT_TRUST \
+                            -v /var/run/docker.sock:/var/run/docker.sock:ro \
+                            --label docker_bench_security \
+                            docker/docker-bench-security
+                    '''
+                    
+                    // 记录合规性检查
+                    auditSecurityCheck('合规性验证', 'PASS')
+                }
+            }
+        }
+    }
+    
+    post {
+        always {
+            script {
+                // 生成安全审计报告
+                generateSecurityAuditReport()
+                
+                // 发送安全通知
+                if (currentBuild.result == 'SUCCESS') {
+                    sendSecuritySuccessNotification()
+                } else {
+                    sendSecurityFailureAlert()
+                }
+            }
+        }
+        
+        success {
+            // 清理敏感数据
+            script {
+                cleanSensitiveData()
+                
+                // 记录构建成功
+                auditSecurityCheck('构建完成', 'SUCCESS')
+            }
+        }
+        
+        failure {
+            // 安全失败处理
+            script {
+                // 记录安全事件
+                auditSecurityCheck('构建失败', 'FAILURE')
+                
+                // 发送安全告警
+                sendSecurityIncidentAlert()
+                
+                // 保留证据用于调查
+                preserveEvidenceForInvestigation()
+            }
+        }
+        
+        cleanup {
+            // 安全清理
+            script {
+                // 清理临时文件
+                cleanTempFiles()
+                
+                // 清理敏感环境变量
+                cleanEnvVars()
+                
+                // 记录清理操作
+                auditSecurityCheck('环境清理', 'COMPLETE')
+            }
+        }
+    }
+}
+
+// 安全审计函数
+def auditSecurityCheck(String action, String status) {
+    def timestamp = new Date().format("yyyy-MM-dd HH:mm:ss")
+    def logEntry = "${timestamp} | User: ${env.USER} | Action: ${action} | Status: ${status} | Build: ${env.BUILD_ID}"
+    
+    // 写入审计日志
+    writeFile file: "audit-${env.BUILD_ID}.log", text: "${logEntry}\n", append: true
+    
+    // 发送到中央审计系统（如果启用）
+    if (params.ENABLE_AUDIT) {
+        sendToCentralAudit(logEntry)
+    }
+}
+
+// 安全检查函数
+def checkSecurityEnvironment() {
+    def score = 100
+    def issues = []
+    
+    // 检查Docker安全配置
+    def dockerSec = sh(script: 'docker info --format "{{.SecurityOptions}}"', returnStdout: true).trim()
+    if (!dockerSec.contains('seccomp')) {
+        score -= 10
+        issues.add('Docker缺少seccomp配置')
+    }
+    
+    // 检查Kubernetes安全配置
+    def kubeSec = sh(script: 'kubectl get pods --namespace=kube-system', returnStdout: true)
+    if (kubeSec.contains('Error')) {
+        score -= 20
+        issues.add('Kubernetes连接失败')
+    }
+    
+    return [score: score, issues: issues]
+}
+
+// 安全配置生成函数
+def getSecurityConfig(String environment) {
+    def config = [
+        securityContext: [
+            runAsNonRoot: true,
+            runAsUser: 1000,
+            allowPrivilegeEscalation: false,
+            capabilities: [drop: ['ALL']]
+        ],
+        podSecurityContext: [
+            runAsNonRoot: true,
+            runAsUser: 1000,
+            fsGroup: 2000
+        ]
+    ]
+    
+    // 根据环境调整安全配置
+    switch(environment) {
+        case 'production':
+            config.securityContext.readOnlyRootFilesystem = true
+            config.securityContext.seccompProfile = [type: 'RuntimeDefault']
+            config.podSecurityContext.seLinuxOptions = [level: 's0:c123,c456']
+            break
+        case 'staging':
+            config.securityContext.readOnlyRootFilesystem = false
+            break
+        default:
+            // 开发环境使用较宽松的配置
+            break
+    }
+    
+    return config
+}
+
+// 生成安全部署清单
+def generateSecureDeployment(Map securityConfig) {
+    return """
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: myapp-secure
+  labels:
+    app: myapp
+    security: enabled
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: myapp
+  template:
+    metadata:
+      labels:
+        app: myapp
+        security: enabled
+    spec:
+      securityContext:
+        ${securityConfig.podSecurityContext ? securityConfig.podSecurityContext.inject('') : ''}
+      containers:
+      - name: myapp
+        image: registry.example.com/myapp:${env.BUILD_ID}
+        securityContext:
+          ${securityConfig.securityContext ? securityConfig.securityContext.inject('') : ''}
+        ports:
+        - containerPort: 8080
+        env:
+        - name: APP_ENV
+          value: "${params.ENVIRONMENT}"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+"""
+}

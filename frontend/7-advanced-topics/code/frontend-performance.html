@@ -1,0 +1,1755 @@
+\u003c!DOCTYPE html\u003e
+\u003chtml lang="zh-CN"\u003e
+\u003chead\u003e
+    \u003cmeta charset="UTF-8"\u003e
+    \u003cmeta name="viewport" content="width=device-width, initial-scale=1.0"\u003e
+    \u003ctitle\u003e前端性能优化全面指南\u003c/title\u003e
+    \u003cstyle\u003e
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: #34495e;
+            margin-top: 40px;
+            border-left: 4px solid #3498db;
+            padding-left: 15px;
+        }
+        h3 {
+            color: #7f8c8d;
+            margin-top: 30px;
+        }
+        code {
+            background-color: #f1f1f1;
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .code-block {
+            background-color: #282c34;
+            color: #abb2bf;
+            padding: 20px;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 14px;
+            line-height: 1.5;
+            margin: 15px 0;
+        }
+        .tip {
+            background-color: #d1ecf1;
+            border: 1px solid #bee5eb;
+            border-left: 4px solid #17a2b8;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+        .warning {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-left: 4px solid #f39c12;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+        .success {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            border-left: 4px solid #28a745;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+        .demo-section {
+            margin: 30px 0;
+            padding: 20px;
+            border: 1px solid #e1e4e8;
+            border-radius: 6px;
+            background-color: #fafbfc;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 0;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        .result {
+            margin-top: 15px;
+            padding: 15px;
+            background-color: #e8f4f8;
+            border-radius: 4px;
+            min-height: 50px;
+            border-left: 3px solid #3498db;
+        }
+        ul {
+            padding-left: 20px;
+        }
+        li {
+            margin-bottom: 8px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .performance-metric {
+            display: inline-block;
+            padding: 10px 20px;
+            margin: 5px;
+            background-color: #3498db;
+            color: white;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .before-after {
+            display: flex;
+            gap: 20px;
+            margin: 20px 0;
+        }
+        .before, .after {
+            flex: 1;
+            padding: 15px;
+            border-radius: 6px;
+        }
+        .before {
+            background-color: #ffeaa7;
+            border: 1px solid #fdcb6e;
+        }
+        .after {
+            background-color: #55efc4;
+            border: 1px solid #00b894;
+        }
+    \u003c/style\u003e
+\u003c/head\u003e
+\u003cbody\u003e
+    \u003cdiv class="container"\u003e
+        \u003ch1\u003e前端性能优化全面指南\u003c/h1\u003e
+        \u003cp\u003e本指南全面介绍前端性能优化的关键技术和最佳实践，帮助开发者构建更快、更高效的 Web 应用程序。通过优化加载性能、渲染性能和运行时性能，提升用户体验和满意度。\u003c/p\u003e
+        
+        \u003cdiv class="demo-section"\u003e
+            \u003ch2\u003e1. 性能优化基础概念\u003c/h2\u003e
+            \u003ch3\u003e1.1 关键性能指标 (KPIs)\u003c/h3\u003e
+            \u003cdiv style="display: flex; flex-wrap: wrap; gap: 15px; margin: 20px 0;"\u003e
+                \u003cdiv class="performance-metric"\u003eFCP
+                    \u003cdiv style="font-size: 14px; font-weight: normal; opacity: 0.9;"\u003e首次内容绘制\u003c/div\u003e
+                \u003c/div\u003e
+                \u003cdiv class="performance-metric"\u003eLCP
+                    \u003cdiv style="font-size: 14px; font-weight: normal; opacity: 0.9;"\u003e最大内容绘制\u003c/div\u003e
+                \u003c/div\u003e
+                \u003cdiv class="performance-metric"\u003eFID
+                    \u003cdiv style="font-size: 14px; font-weight: normal; opacity: 0.9;"\u003e首次输入延迟\u003c/div\u003e
+                \u003c/div\u003e
+                \u003cdiv class="performance-metric"\u003eCLS
+                    \u003cdiv style="font-size: 14px; font-weight: normal; opacity: 0.9;"\u003e累积布局偏移\u003c/div\u003e
+                \u003c/div\u003e
+                \u003cdiv class="performance-metric"\u003eTTFB
+                    \u003cdiv style="font-size: 14px; font-weight: normal; opacity: 0.9;"\u003e首字节时间\u003c/div\u003e
+                \u003c/div\u003e
+                \u003cdiv class="performance-metric"\u003eTBT
+                    \u003cdiv style="font-size: 14px; font-weight: normal; opacity: 0.9;"\u003e总阻塞时间\u003c/div\u003e
+                \u003c/div\u003e
+            \u003c/div\u003e
+            
+            \u003ch3\u003e1.2 性能预算与监控\u003c/h3\u003e
+            \u003cdiv class="tip"\u003e
+                \u003cstrong\u003e提示：\u003c/strong\u003e设定性能预算并持续监控是确保应用性能的关键。常见的性能预算包括：页面加载时间、JavaScript 包大小、LCP 时间等。
+            \u003c/div\u003e
+            
+            \u003ch3\u003e1.3 性能测量工具\u003c/h3\u003e
+            \u003cul\u003e
+                \u003cli\u003e浏览器 DevTools (Performance, Network 面板)\u003c/li\u003e
+                \u003cli\u003eLighthouse (Web 性能、可访问性审计)\u003c/li\u003e
+                \u003cli\u003eWebPageTest (多地区、多设备测试)\u003c/li\u003e
+                \u003cli\u003eChrome User Experience Report (真实用户数据)\u003c/li\u003e
+                \u003cli\u003ePerformance API (自定义性能监控)\u003c/li\u003e
+            \u003c/ul\u003e
+            \u003cbutton onclick="runPerformanceMetricsDemo()"\u003e运行性能指标演示\u003c/button\u003e
+            \u003cdiv id="performanceMetricsResult" class="result"\u003e点击按钮查看关键性能指标演示...\u003c/div\u003e
+        \u003c/div\u003e
+        \u003cdiv class="demo-section"\u003e
+            \u003ch2\u003e2. 资源加载优化\u003c/h2\u003e
+            \u003ch3\u003e2.1 网络请求优化\u003c/h3\u003e
+            \u003cdiv class="code-block"\u003e
+// 预连接关键域
+\u003clink rel="preconnect" href="https://api.example.com"\u003e
+\u003clink rel="preconnect" href="https://cdn.example.com"\u003e
+
+// 预加载关键资源
+\u003clink rel="preload" href="critical-styles.css" as="style"\u003e
+\u003clink rel="preload" href="critical.js" as="script"\u003e
+\u003clink rel="preload" href="hero-image.jpg" as="image" type="image/jpeg"\u003e
+
+// 预取可能需要的资源
+\u003clink rel="prefetch" href="next-page.js"\u003e
+\u003clink rel="prefetch" href="secondary-image.jpg"\u003e
+            \u003c/div\u003e
+            \u003cdiv class="before-after"\u003e
+                \u003cdiv class="before"\u003e
+                    \u003ch4\u003e优化前:\u003c/h4\u003e
+                    \u003cul\u003e
+                        \u003cli\u003e未优化的资源加载顺序\u003c/li\u003e
+                        \u003cli\u003e延迟发现关键资源\u003c/li\u003e
+                        \u003cli\u003eTCP 连接建立延迟\u003c/li\u003e
+                        \u003cli\u003e不必要的请求阻塞渲染\u003c/li\u003e
+                    \u003c/ul\u003e
+                \u003c/div\u003e
+                \u003cdiv class="after"\u003e
+                    \u003ch4\u003e优化后:\u003c/h4\u003e
+                    \u003cul\u003e
+                        \u003cli\u003e提前建立连接，减少延迟\u003c/li\u003e
+                        \u003cli\u003e优先加载关键资源\u003c/li\u003e
+                        \u003cli\u003e预测并预加载可能需要的资源\u003c/li\u003e
+                        \u003cli\u003e优化渲染路径，加速首屏显示\u003c/li\u003e
+                    \u003c/ul\u003e
+                \u003c/div\u003e
+            \u003c/div\u003e
+            \u003ch3\u003e2.2 资源压缩与合并\u003c/h3\u003e
+            \u003cdiv class="code-block"\u003e
+// Webpack 压缩配置示例
+module.exports = {
+  // ...
+  optimization: {
+    minimize: true,
+    minimizer: [
+      new TerserPlugin({
+        terserOptions: {
+          compress: {
+            drop_console: true, // 生产环境移除 console
+            dead_code: true,    // 移除未使用的代码
+          },
+          format: {
+            comments: false,    // 移除注释
+          },
+        },
+        parallel: true,        // 并行压缩，加快构建
+      }),
+      new CssMinimizerPlugin(), // CSS 压缩
+    ],
+  },
+  // ...
+};
+
+// 图片压缩配置
+// 使用 imagemin、sharp 等工具自动压缩图片
+            \u003c/div\u003e
+            \u003ch3\u003e2.3 缓存策略优化\u003c/h3\u003e
+            \u003cdiv class="tip"\u003e
+                \u003cstrong\u003e最佳实践：\u003c/strong\u003e使用内容哈希文件名结合长期缓存，实现高效的缓存策略。
+            \u003c/div\u003e
+            \u003cdiv class="code-block"\u003e
+// HTTP 缓存头示例
+/*
+Cache-Control: public, max-age=31536000, immutable    // 静态资源长期缓存
+Cache-Control: no-cache                            // 需要重新验证的资源
+Cache-Control: private, no-store                   // 敏感信息不缓存
+*/
+
+// Service Worker 缓存策略
+self.addEventListener('fetch', (event) => {
+  // 缓存优先策略示例
+  event.respondWith(
+    caches.match(event.request).then((response) => {
+      return response || fetch(event.request).then((fetchResponse) => {
+        return caches.open('v1').then((cache) => {
+          cache.put(event.request, fetchResponse.clone());
+          return fetchResponse;
+        });
+      });
+    }).catch(() => {
+      // 离线回退
+      if (event.request.mode === 'navigate') {
+        return caches.match('/offline.html');
+      }
+    })
+  );
+});
+            \u003c/div\u003e
+            \u003cbutton onclick="runResourceOptimizationDemo()"\u003e运行资源加载优化演示\u003c/button\u003e
+            \u003cdiv id="resourceOptimizationResult" class="result"\u003e点击按钮查看资源加载优化演示...\u003c/div\u003e
+        \u003c/div\u003e
+        \u003cdiv class="demo-section"\u003e
+            \u003ch2\u003e3. JavaScript 性能优化\u003c/h2\u003e
+            \u003ch3\u003e3.1 代码分割与懒加载\u003c/h3\u003e
+            \u003cdiv class="code-block"\u003e
+// 动态导入实现代码分割
+const loadHeavyModule = async () => {
+  const { heavyFunction } = await import('./heavy-module.js');
+  heavyFunction();
+};
+
+// React 中的代码分割
+import React, { lazy, Suspense } from 'react';
+
+const HeavyComponent = lazy(() => import('./HeavyComponent'));
+
+function App() {
+  return (
+    \u003cSuspense fallback={\u003cdiv\u003eLoading...\u003c/div\u003e}\u003e
+      \u003cHeavyComponent /\u003e
+    \u003c/Suspense\u003e
+  );
+}
+
+// Vue 中的代码分割
+const Foo = () => import('./Foo.vue');
+
+const router = new VueRouter({
+  routes: [
+    {
+      path: '/foo',
+      component: Foo // 按需加载路由组件
+    }
+  ]
+});
+            \u003c/div\u003e
+            \u003ch3\u003e3.2 内存管理与垃圾回收优化\u003c/h3\u003e
+            \u003cdiv class="warning"\u003e
+                \u003cstrong\u003e警告：\u003c/strong\u003e避免内存泄漏，特别是在长时间运行的单页应用中。常见的内存泄漏来源包括：未清理的事件监听器、定时器、闭包引用等。
+            \u003c/div\u003e
+            \u003cdiv class="code-block"\u003e
+// 正确清理事件监听器
+function setupEventListener() {
+  const element = document.getElementById('myElement');
+  const handleClick = () => console.log('Clicked');
+  
+  element.addEventListener('click', handleClick);
+  
+  // 返回清理函数
+  return () => {
+    element.removeEventListener('click', handleClick);
+  };
+}
+
+// React 中使用 useEffect 清理副作用
+useEffect(() => {
+  const cleanup = setupEventListener();
+  
+  // 组件卸载时清理
+  return () => {
+    cleanup();
+  };
+}, []);
+
+// 避免创建不必要的闭包
+// 优化前
+function badExample() {
+  for (let i = 0; i \u003c 1000; i++) {
+    setTimeout(() => {
+      console.log(i);
+    }, 100);
+  }
+}
+
+// 优化后
+function goodExample() {
+  for (let i = 0; i \u003c 1000; i++) {
+    const logNumber = (num) => console.log(num);
+    setTimeout(logNumber.bind(null, i), 100);
+  }
+}
+            \u003c/div\u003e
+            \u003ch3\u003e3.3 执行效率优化
+            \u003c/div\u003e
+            \u003cdiv class="code-block"\u003e
+// 避免重复计算
+// 优化前
+function processArray(array) {
+  return array.map(item => {
+    const expensiveResult = expensiveCalculation(item);
+    return { item, processed: expensiveResult };
+  });
+}
+
+// 优化后 - 使用记忆化
+const memo = new Map();
+function memoizedProcess(array) {
+  return array.map(item => {
+    if (!memo.has(item)) {
+      memo.set(item, expensiveCalculation(item));
+    }
+    return { item, processed: memo.get(item) };
+  });
+}
+
+// 优化循环
+// 优化前
+for (let i = 0; i \u003c array.length; i++) {
+  // 每次循环都要计算 array.length
+}
+
+// 优化后
+const length = array.length;
+for (let i = 0; i \u003c length; i++) {
+  // 只计算一次数组长度
+}
+
+// 使用更高效的数据结构
+// 查找操作优化前 (O(n))
+function findItem(items, id) {
+  return items.find(item => item.id === id);
+}
+
+// 优化后 (O(1))
+const itemMap = new Map(items.map(item => [item.id, item]));
+function findItemOptimized(id) {
+  return itemMap.get(id);
+}
+            \u003c/div\u003e
+            \u003cbutton onclick="runJavaScriptOptimizationDemo()"\u003e运行 JavaScript 性能优化演示\u003c/button\u003e
+            \u003cdiv id="javascriptOptimizationResult" class="result"\u003e点击按钮查看 JavaScript 性能优化演示...\u003c/div\u003e
+        \u003c/div\u003e
+        \u003cdiv class="demo-section"\u003e
+            \u003ch2\u003e4. 渲染性能优化
+            \u003c/h2\u003e
+            \u003ch3\u003e4.1 CSS 优化
+            \u003c/h3\u003e
+            \u003cdiv class="code-block"\u003e
+// 避免阻塞渲染
+\u003clink rel="stylesheet" href="critical.css"\u003e
+\u003clink rel="preload" href="non-critical.css" as="style" onload="this.onload=null;this.rel='stylesheet'"\u003e
+
+// 优化选择器
+/* 避免 */
+ul li a span { color: red; }
+/* 推荐 */
+.nav-link { color: red; }
+
+/* 减少重排重绘 */
+/* 优化前 */
+element.style.width = '100px';
+element.style.height = '100px';
+element.style.backgroundColor = 'red';
+
+/* 优化后 - 使用 CSS 类 */
+.element-active { width: 100px; height: 100px; background-color: red; }
+element.classList.add('element-active');
+
+/* 优化后 - 使用 requestAnimationFrame */
+requestAnimationFrame(() => {
+  element.style.transform = 'translateX(100px)'; // 只触发合成层，不重排
+});
+            \u003c/div\u003e
+            \u003ch3\u003e4.2 DOM 操作优化
+            \u003c/h3\u003e
+            \u003cdiv class="code-block"\u003e
+// 使用 DocumentFragment 批量操作 DOM
+function appendItems(items) {
+  const fragment = document.createDocumentFragment();
+  
+  items.forEach(item => {
+    const div = document.createElement('div');
+    div.textContent = item;
+    fragment.appendChild(div);
+  });
+  
+  // 一次性插入 DOM
+  document.getElementById('container').appendChild(fragment);
+}
+
+// 使用虚拟滚动处理大量数据
+function VirtualList({ items, renderItem, itemHeight, containerHeight }) {
+  const visibleCount = Math.ceil(containerHeight / itemHeight);
+  const container = document.getElementById('virtual-list');
+  
+  // 只渲染可见区域的项目
+  function renderVisibleItems(startIndex) {
+    const endIndex = Math.min(startIndex + visibleCount + 1, items.length);
+    const visibleItems = items.slice(startIndex, endIndex);
+    
+    // 清空并重新渲染可见项目
+    container.innerHTML = '';
+    visibleItems.forEach((item, index) => {
+      const el = renderItem(item);
+      el.style.transform = `translateY(${(startIndex + index) * itemHeight}px)`;
+      container.appendChild(el);
+    });
+  }
+  
+  // 监听滚动事件
+  container.addEventListener('scroll', () => {
+    const scrollTop = container.scrollTop;
+    const startIndex = Math.floor(scrollTop / itemHeight);
+    renderVisibleItems(startIndex);
+  });
+}
+            \u003c/div\u003e
+            \u003ch3\u003e4.3 Web Workers 使用
+            \u003c/h3\u003e
+            \u003cdiv class="tip"\u003e
+                \u003cstrong\u003e提示：\u003c/strong\u003e将耗时计算移至 Web Worker 线程，避免阻塞主线程，提高 UI 响应性。
+            \u003c/div\u003e
+            \u003cdiv class="code-block"\u003e
+// 创建 Web Worker
+// worker.js
+self.addEventListener('message', (e) => {
+  const { data } = e;
+  // 执行耗时计算
+  const result = performHeavyCalculation(data);
+  // 将结果发送回主线程
+  self.postMessage(result);
+});
+
+// 主线程中使用
+const worker = new Worker('worker.js');
+
+worker.postMessage({
+  numbers: [1, 2, 3, 4, 5],
+  iterations: 1000000
+});
+
+worker.addEventListener('message', (e) => {
+  const result = e.data;
+  console.log('计算结果:', result);
+  updateUIWithResult(result);
+});
+
+// 使用 Promise 包装 Web Worker
+function runInWorker(worker, data) {
+  return new Promise((resolve, reject) => {
+    worker.postMessage(data);
+    
+    const handleMessage = (e) => {
+      worker.removeEventListener('message', handleMessage);
+      worker.removeEventListener('error', handleError);
+      resolve(e.data);
+    };
+    
+    const handleError = (error) => {
+      worker.removeEventListener('message', handleMessage);
+      worker.removeEventListener('error', handleError);
+      reject(error);
+    };
+    
+    worker.addEventListener('message', handleMessage);
+    worker.addEventListener('error', handleError);
+  });
+}
+            \u003c/div\u003e
+            \u003cbutton onclick="runRenderingOptimizationDemo()"\u003e运行渲染性能优化演示\u003c/button\u003e
+            \u003cdiv id="renderingOptimizationResult" class="result"\u003e点击按钮查看渲染性能优化演示...\u003c/div\u003e
+        \u003c/div\u003e
+        \u003cdiv class="demo-section"\u003e
+            \u003ch2\u003e5. 图像与媒体优化
+            \u003c/h2\u003e
+            \u003ch3\u003e5.1 响应式图像实现
+            \u003c/h3\u003e
+            \u003cdiv class="code-block"\u003e
+// 使用 srcset 和 sizes 实现响应式图像
+\u003cimg 
+  src="small.jpg" 
+  srcset="small.jpg 400w, medium.jpg 800w, large.jpg 1200w"
+  sizes="(max-width: 600px) 400px, (max-width: 1200px) 800px, 1200px"
+  alt="响应式图像示例"
+  loading="lazy"
+/\u003e
+
+// 使用 picture 元素提供不同格式和尺寸
+\u003cpicture\u003e
+  \u003c!-- WebP 格式（现代浏览器）--\u003e
+  \u003csource srcset="image.webp" type="image/webp"\u003e
+  \u003c!-- AVIF 格式（更新的浏览器）--\u003e
+  \u003csource srcset="image.avif" type="image/avif"\u003e
+  \u003c!-- 回退到 JPEG --\u003e
+  \u003cimg src="image.jpg" alt="优化的图像" loading="lazy"\u003e
+\u003c/picture\u003e
+
+// 低质量图像占位符 (LQIP) 技术
+function preloadImage(src, container) {
+  // 先显示低质量缩略图
+  const placeholder = new Image();
+  placeholder.src = 'low-quality-placeholder.jpg';
+  placeholder.onload = () => {
+    container.appendChild(placeholder);
+    
+    // 加载高质量图像
+    const highQuality = new Image();
+    highQuality.src = src;
+    highQuality.style.opacity = '0';
+    highQuality.style.transition = 'opacity 0.3s';
+    highQuality.onload = () => {
+      container.replaceChild(highQuality, placeholder);
+      highQuality.style.opacity = '1'; // 淡入效果
+    };
+  };
+}
+            \u003c/div\u003e
+            \u003ch3\u003e5.2 现代图像格式
+            \u003c/h3\u003e
+            \u003cdiv class="comparison"\u003e
+                \u003ctable style="width: 100%; margin-bottom: 20px;"\u003e
+                    \u003cthead\u003e
+                        \u003ctr style="background-color: #f2f2f2;"\u003e
+                            \u003cth style="padding: 12px; text-align: left; border: 1px solid #ddd;"\u003e格式
+                            \u003c/th\u003e
+                            \u003cth style="padding: 12px; text-align: left; border: 1px solid #ddd;"\u003e优点
+                            \u003c/th\u003e
+                            \u003cth style="padding: 12px; text-align: left; border: 1px solid #ddd;"\u003e浏览器支持
+                            \u003c/th\u003e
+                            \u003cth style="padding: 12px; text-align: left; border: 1px solid #ddd;"\u003e适用场景
+                            \u003c/th\u003e
+                        \u003c/tr\u003e
+                    \u003c/thead\u003e
+                    \u003ctbody\u003e
+                        \u003ctr\u003e
+                            \u003ctd style="padding: 12px; border: 1px solid #ddd;"\u003eWebP
+                            \u003c/td\u003e
+                            \u003ctd style="padding: 12px; border: 1px solid #ddd;"\u003e比 JPEG 小 25-35%，支持透明
+                            \u003c/td\u003e
+                            \u003ctd style="padding: 12px; border: 1px solid #ddd;"\u003eChrome, Firefox, Edge, Opera
+                            \u003c/td\u003e
+                            \u003ctd style="padding: 12px; border: 1px solid #ddd;"\u003e大多数 Web 图像
+                            \u003c/td\u003e
+                        \u003c/tr\u003e
+                        \u003ctr\u003e
+                            \u003ctd style="padding: 12px; border: 1px solid #ddd;"\u003eAVIF
+                            \u003c/td\u003e
+                            \u003ctd style="padding: 12px; border: 1px solid #ddd;"\u003e比 WebP 小 20%，更好的 HDR 支持
+                            \u003c/td\u003e
+                            \u003ctd style="padding: 12px; border: 1px solid #ddd;"\u003e较新的浏览器
+                            \u003c/td\u003e
+                            \u003ctd style="padding: 12px; border: 1px solid #ddd;"\u003e高质量图像，新应用
+                            \u003c/td\u003e
+                        \u003c/tr\u003e
+                        \u003ctr\u003e
+                            \u003ctd style="padding: 12px; border: 1px solid #ddd;"\u003eSVG
+                            \u003c/td\u003e
+                            \u003ctd style="padding: 12px; border: 1px solid #ddd;"\u003e矢量格式，缩放无失真
+                            \u003c/td\u003e
+                            \u003ctd style="padding: 12px; border: 1px solid #ddd;"\u003e所有现代浏览器
+                            \u003c/td\u003e
+                            \u003ctd style="padding: 12px; border: 1px solid #ddd;"\u003e图标、Logo、简单图形
+                            \u003c/td\u003e
+                        \u003c/tr\u003e
+                    \u003c/tbody\u003e
+                \u003c/table\u003e
+            \u003c/div\u003e
+            \u003ch3\u003e5.3 视频与音频优化
+            \u003c/h3\u003e
+            \u003cdiv class="code-block"\u003e
+// 视频优化示例
+\u003cvideo 
+  controls 
+  preload="metadata" 
+  poster="thumbnail.jpg"
+  width="640" 
+  height="360"
+\u003e
+  \u003csource src="video.webm" type="video/webm"\u003e
+  \u003csource src="video.mp4" type="video/mp4"\u003e
+  您的浏览器不支持视频标签。
+\u003c/video\u003e
+
+// 使用媒体源扩展 (MSE) 实现自适应流媒体
+const video = document.getElementById('adaptive-video');
+const mediaSource = new MediaSource();
+video.src = URL.createObjectURL(mediaSource);
+
+mediaSource.addEventListener('sourceopen', () => {
+  const sourceBuffer = mediaSource.addSourceBuffer('video/mp4; codecs="avc1.42E01E,mp4a.40.2"');
+  
+  // 根据网络状况加载不同质量的视频片段
+  function loadVideoSegment(quality) {
+    fetch(`video-segment-${quality}.m4s`)
+      .then(response => response.arrayBuffer())
+      .then(buffer => {
+        sourceBuffer.appendBuffer(buffer);
+      });
+  }
+  
+  // 检测网络状况
+  navigator.connection.addEventListener('change', () => {
+    const effectiveType = navigator.connection.effectiveType;
+    if (effectiveType === '4g') {
+      loadVideoSegment('high');
+    } else if (effectiveType === '3g') {
+      loadVideoSegment('medium');
+    } else {
+      loadVideoSegment('low');
+    }
+  });
+});
+            \u003c/div\u003e
+            \u003cbutton onclick="runMediaOptimizationDemo()"\u003e运行媒体优化演示\u003c/button\u003e
+            \u003cdiv id="mediaOptimizationResult" class="result"\u003e点击按钮查看图像与媒体优化演示...\u003c/div\u003e
+        \u003c/div\u003e
+        \u003cdiv class="demo-section"\u003e
+            \u003ch2\u003e6. 前端框架性能优化
+            \u003c/h2\u003e
+            \u003ch3\u003e6.1 React 性能优化
+            \u003c/h3\u003e
+            \u003cdiv class="code-block"\u003e
+// 使用 React.memo 避免不必要的重渲染
+const MemoizedComponent = React.memo(function MyComponent(props) {
+  // 只有当 props 改变时才会重新渲染
+  return \u003cdiv\u003e{props.name}\u003c/div\u003e;
+});
+
+// 使用 useMemo 和 useCallback 优化计算和函数引用
+function OptimizedComponent({ items, onItemClick }) {
+  // 记忆化计算结果
+  const processedItems = React.useMemo(() => {
+    return items.map(item => ({ ...item, processed: expensiveCalculation(item) }));
+  }, [items]); // 只有 items 改变时才重新计算
+  
+  // 记忆化事件处理函数
+  const handleItemClick = React.useCallback((id) => {
+    onItemClick(id);
+  }, [onItemClick]); // 只有 onItemClick 改变时才创建新函数
+  
+  return (
+    \u003cdiv\u003e
+      {processedItems.map(item => (
+        \u003cItem key={item.id} item={item} onClick={handleItemClick} /\u003e
+      ))}
+    \u003c/div\u003e
+  );
+}
+
+// 使用虚拟滚动处理长列表
+import { FixedSizeList } from 'react-window';
+
+function VirtualizedList({ items, height, itemHeight }) {
+  const Row = ({ index, style }) => (
+    \u003cdive style={style}\u003e{items[index].name}\u003c/div\u003e
+  );
+  
+  return (
+    \u003cFixedSizeList
+      height={height}
+      width="100%"
+      itemCount={items.length}
+      itemSize={itemHeight}
+    \u003e
+      {Row}
+    \u003c/FixedSizeList
+  );
+}
+            \u003c/div\u003e
+            \u003ch3\u003e6.2 Vue 性能优化
+            \u003c/h3\u003e
+            \u003cdiv class="code-block"\u003e
+// 使用 v-memo 避免不必要的重渲染
+\u003c!-- Vue 3 --\u003e
+\u003clist-item
+  v-for="item in items"
+  :key="item.id"
+  :item="item"
+  v-memo="[item.id, item.title]"
+/>
+
+// 计算属性缓存
+computed: {
+  // 只有当依赖项改变时才会重新计算
+  expensiveResult() {
+    return this.items.reduce((sum, item) => sum + item.value, 0);
+  }
+}
+
+// 优化大型列表
+// 1. 使用 v-for 时提供 key
+// 2. 使用虚拟滚动
+import { useVirtualList } from '@vueuse/core';
+
+export default {
+  setup() {
+    const items = ref([...]); // 大型数据集
+    const containerRef = ref(null);
+    
+    const {
+      list,
+      containerProps,
+      wrapperProps,
+    } = useVirtualList(items, {
+      itemHeight: 50,
+      overscan: 5,
+    });
+    
+    return {
+      list,
+      containerProps,
+      wrapperProps,
+      containerRef,
+    };
+  },
+};
+            \u003c/div\u003e
+            \u003ch3\u003e6.3 Angular 性能优化
+            \u003c/h3\u003e
+            \u003cdiv class="code-block"\u003e
+// 使用 OnPush 变更检测策略
+@Component({
+  selector: 'app-item',
+  template: '\u003cdiv\u003e{{ data.name }}\u003c/div\u003e',
+  changeDetection: ChangeDetectionStrategy.OnPush
+})
+export class ItemComponent {
+  @Input() data: any;
+  // 只有当输入属性发生引用变化时才会触发变更检测
+}
+
+// 使用 trackBy 优化 ngFor
+@Component({
+  template: `
+    \u003cdiv *ngFor="let item of items; trackBy: trackById"\u003e
+      {{ item.name }}
+    \u003c/div\u003e
+  `
+})
+export class ListComponent {
+  items: any[];
+  
+  trackById(index: number, item: any): number {
+    return item.id; // 返回唯一标识符
+  }
+}
+
+// 使用异步管道避免手动订阅
+@Component({
+  template: `
+    \u003cdiv *ngIf="data$ | async as data"\u003e
+      {{ data.name }}
+    \u003c/div\u003e
+  `
+})
+export class AsyncComponent {
+  data$ = this.service.getData();
+  
+  constructor(private service: DataService) {}
+  // 异步管道会自动处理订阅和取消订阅
+}
+            \u003c/div\u003e
+            \u003cbutton onclick="runFrameworkOptimizationDemo()"\u003e运行框架性能优化演示\u003c/button\u003e
+            \u003cdiv id="frameworkOptimizationResult" class="result"\u003e点击按钮查看前端框架性能优化演示...\u003c/div\u003e
+        \u003c/div\u003e
+        \u003cdiv class="demo-section"\u003e
+            \u003ch2\u003e7. 高级性能优化技术
+            \u003c/h2\u003e
+            \u003ch3\u003e7.1 预渲染与服务端渲染
+            \u003c/h3\u003e
+            \u003cdiv class="before-after"\u003e
+                \u003cdiv class="before"\u003e
+                    \u003ch4\u003e客户端渲染 (CSR):\u003c/h4\u003e
+                    \u003cul\u003e
+                        \u003cli\u003e初始加载空 HTML 页面
+                        \u003c/li\u003e
+                        \u003cli\u003e下载并执行 JavaScript
+                        \u003c/li\u003e
+                        \u003cli\u003e客户端获取数据
+                        \u003c/li\u003e
+                        \u003cli\u003e渲染页面内容
+                        \u003c/li\u003e
+                        \u003cli\u003eSEO 不友好
+                        \u003c/li\u003e
+                    \u003c/ul\u003e
+                \u003c/div\u003e
+                \u003cdiv class="after"\u003e
+                    \u003ch4\u003e服务端渲染 (SSR):\u003c/h4\u003e
+                    \u003cul\u003e
+                        \u003cli\u003e服务器获取数据并渲染完整 HTML
+                        \u003c/li\u003e
+                        \u003cli\u003e直接返回包含内容的 HTML
+                        \u003c/li\u003e
+                        \u003cli\u003e客户端激活（水合）
+                        \u003c/li\u003e
+                        \u003cli\u003e更快的首屏渲染
+                        \u003c/li\u003e
+                        \u003cli\u003e更好的 SEO 支持
+                        \u003c/li\u003e
+                    \u003c/ul\u003e
+                \u003c/div\u003e
+            \u003c/div\u003e
+            \u003cdiv class="code-block"\u003e
+// Next.js 中的 SSR 示例
+// pages/product/[id].js
+
+export default function Product({ product }) {
+  return (
+    \u003cdiv\u003e
+      \u003ch1\u003e{product.name}\u003c/h1\u003e
+      \u003cp\u003e{product.description}\u003c/p\u003e
+    \u003c/div\u003e
+  );
+}
+
+// 服务器端获取数据
+export async function getServerSideProps({ params }) {
+  const { id } = params;
+  const res = await fetch(`https://api.example.com/products/${id}`);
+  const product = await res.json();
+  
+  return {
+    props: { product }, // 传递给页面组件的 props
+  };
+}
+
+// Nuxt.js 中的 SSR 示例
+export default {
+  async asyncData({ params }) {
+    const { data } = await axios.get(`https://api.example.com/products/${params.id}`);
+    return { product: data };
+  }
+};
+            \u003c/div\u003e
+            \u003ch3\u003e7.2 边缘计算与 CDN 优化
+            \u003c/h3\u003e
+            \u003cdiv class="tip"\u003e
+                \u003cstrong\u003e提示：\u003c/strong\u003e利用 CDN 和边缘计算可以显著减少延迟，提高全球用户的访问速度。
+            \u003c/div\u003e
+            \u003cdiv class="code-block"\u003e
+// 配置 CDN 缓存策略示例（Nginx 配置）
+/*
+server {
+  listen 80;
+  
+  location ~* \.(jpg|jpeg|png|webp|gif|css|js|ico|svg)$ {
+    expires 1y;  # 静态资源长期缓存
+    add_header Cache-Control "public, max-age=31536000, immutable";
+    proxy_pass http://origin_server;
+    proxy_cache cdn_cache;
+    proxy_cache_valid 200 31d;
+  }
+  
+  location /api/ {
+    proxy_pass http://api_server;
+    # API 缓存配置
+    proxy_cache api_cache;
+    proxy_cache_valid 200 10m;
+  }
+}
+*/
+
+// 使用边缘函数处理请求
+// Cloudflare Workers 示例
+addEventListener('fetch', event =\u003e {
+  event.respondWith(handleRequest(event.request));
+});
+
+async function handleRequest(request) {
+  const url = new URL(request.url);
+  
+  // 边缘缓存检查
+  const cache = caches.default;
+  const cachedResponse = await cache.match(request);
+  
+  if (cachedResponse) {
+    return cachedResponse;
+  }
+  
+  // 动态内容处理
+  if (url.pathname.startsWith('/api/')) {
+    // 可以在这里添加认证、请求转换等逻辑
+    const response = await fetch(request);
+    
+    // 缓存 API 响应
+    const cacheResponse = new Response(response.body, response);
+    cacheResponse.headers.set('Cache-Control', 'public, max-age=600');
+    await cache.put(request, cacheResponse.clone());
+    
+    return cacheResponse;
+  }
+  
+  // 回源请求
+  return fetch(request);
+}
+            \u003c/div\u003e
+            \u003ch3\u003e7.3 WebAssembly 与性能加速
+            \u003c/h3\u003e
+            \u003cdiv class="code-block"\u003e
+// JavaScript 中使用 WebAssembly 的示例
+async function loadWebAssembly() {
+  // 加载 .wasm 文件
+  const response = await fetch('optimized-calculations.wasm');
+  const wasmModule = await WebAssembly.instantiateStreaming(response);
+  
+  // 获取导出的函数
+  const { fibonacci, matrixMultiply } = wasmModule.instance.exports;
+  
+  // 测量 JavaScript 性能
+  console.time('JS Fibonacci');
+  fibonacciJS(40);
+  console.timeEnd('JS Fibonacci');
+  
+  // 测量 WebAssembly 性能
+  console.time('WASM Fibonacci');
+  fibonacci(40);
+  console.timeEnd('WASM Fibonacci');
+  
+  // 使用 WebAssembly 函数
+  const result = matrixMultiply(100, 100); // 计算大型矩阵乘法
+  
+  return {
+    fibonacci, 
+    matrixMultiply,
+    performanceGain: '显著提升（通常 10-50x）'
+  };
+}
+
+// 启动时加载
+loadWebAssembly().then(wasm => {
+  // 性能关键操作使用 WebAssembly
+  document.getElementById('heavy-calculation').onclick = () => {
+    wasm.matrixMultiply(200, 200);
+  };
+});
+            \u003c/div\u003e
+            \u003cbutton onclick="runAdvancedOptimizationDemo()"\u003e运行高级性能优化技术演示\u003c/button\u003e
+            \u003cdiv id="advancedOptimizationResult" class="result"\u003e点击按钮查看高级性能优化技术演示...\u003c/div\u003e
+        \u003c/div\u003e
+        \u003cdiv class="demo-section"\u003e
+            \u003ch2\u003e8. 性能优化工作流程
+            \u003c/h2\u003e
+            \u003ch3\u003e8.1 性能审计与分析
+            \u003c/h3\u003e
+            \u003cdiv class="code-block"\u003e
+// 使用 Performance API 进行性能测量
+function measurePerformance() {
+  // 记录导航性能
+  const navEntries = performance.getEntriesByType('navigation');
+  if (navEntries.length \u003e 0) {
+    const nav = navEntries[0];
+    console.log('TTFB:', nav.responseStart, 'ms');
+    console.log('页面加载时间:', nav.loadEventEnd - nav.startTime, 'ms');
+  }
+  
+  // 自定义性能标记
+  performance.mark('start-task');
+  
+  // 执行一些操作
+  heavyOperation();
+  
+  performance.mark('end-task');
+  performance.measure('task-duration', 'start-task', 'end-task');
+  
+  // 获取测量结果
+  const measures = performance.getEntriesByName('task-duration');
+  if (measures.length \u003e 0) {
+    console.log('任务执行时间:', measures[0].duration, 'ms');
+  }
+  
+  // 清除标记和测量以释放内存
+  performance.clearMarks();
+  performance.clearMeasures();
+}
+
+// 使用 Lighthouse CI 集成到构建流程
+/*
+// package.json
+{
+  "scripts": {
+    "lighthouse": "lighthouse-ci https://example.com --budget-path=./budget.json"
+  }
+}
+
+// budget.json
+{
+  "categories": {
+    "performance": 90,
+    "accessibility": 90,
+    "best-practices": 90,
+    "seo": 90
+  },
+  "timings": {
+    "first-contentful-paint": 2000,
+    "largest-contentful-paint": 2500,
+    "cumulative-layout-shift": 0.1,
+    "total-blocking-time": 300
+  }
+}
+*/
+            \u003c/div\u003e
+            \u003ch3\u003e8.2 持续集成中的性能监控
+            \u003c/h3\u003e
+            \u003cul\u003e
+                \u003cli\u003e设置性能基准和预算
+                \u003c/li\u003e
+                \u003cli\u003e自动运行性能测试
+                \u003c/li\u003e
+                \u003cli\u003e生成性能报告并比较差异
+                \u003c/li\u003e
+                \u003cli\u003e性能退化时触发告警
+                \u003c/li\u003e
+                \u003cli\u003e收集真实用户监控数据 (RUM)
+                \u003c/li\u003e
+            \u003c/ul\u003e
+            \u003ch3\u003e8.3 性能优化的优先级策略
+            \u003c/h3\u003e
+            \u003cdiv class="success"\u003e
+                \u003cstrong\u003e性能优化优先级（ROI 从高到低）：\u003c/strong\u003e
+                \u003col\u003e
+                    \u003cli\u003e减少关键资源的大小和数量
+                    \u003c/li\u003e
+                    \u003cli\u003e优化关键渲染路径
+                    \u003c/li\u003e
+                    \u003cli\u003e实施有效的缓存策略
+                    \u003c/li\u003e
+                    \u003cli\u003e优化大型 JavaScript 包
+                    \u003c/li\u003e
+                    \u003cli\u003e优化图像和媒体资源
+                    \u003c/li\u003e
+                    \u003cli\u003e实施预加载和预连接
+                    \u003c/li\u003e
+                    \u003cli\u003e优化运行时性能
+                    \u003c/li\u003e
+                \u003c/ol\u003e
+            \u003c/div\u003e
+            \u003cbutton onclick="runWorkflowOptimizationDemo()"\u003e运行性能优化工作流程演示\u003c/button\u003e
+            \u003cdiv id="workflowOptimizationResult" class="result"\u003e点击按钮查看性能优化工作流程演示...\u003c/div\u003e
+        \u003c/div\u003e
+    \u003c/div\u003e
+    \u003cscript\u003e
+        // 代码高亮辅助函数
+        function highlightCode() {
+            const codeBlocks = document.querySelectorAll('.code-block');
+            codeBlocks.forEach(block =\u003e {
+                let code = block.textContent;
+                // 关键字高亮
+                const keywords = ['function', 'async', 'await', 'const', 'let', 'var', 'if', 'else', 'for', 'while', 'return', 'try', 'catch', 'import', 'export', 'from', 'class', 'extends', 'constructor', 'new', 'this', 'super', 'static'];
+                keywords.forEach(keyword =\u003e {
+                    const regex = new RegExp(`\\b${keyword}\\b`, 'g');
+                    code = code.replace(regex, `\u003cspan style="color: #c678dd"\u003e${keyword}\u003c/span\u003e`);
+                });
+                // 字符串高亮
+                code = code.replace(/("[^"\\]*(\\.[^"\\]*)*")|('[^'\\]*(\\.[^'\\]*)*')/g, 
+                    '\u003cspan style="color: #98c379"\u003e$1$2\u003c/span\u003e');
+                // 注释高亮
+                code = code.replace(/\/\/.*$/gm, '\u003cspan style="color: #5c6370"\u003e$\u0026\u003c/span\u003e');
+                code = code.replace(/\/\*[\s\S]*?\*\//g, '\u003cspan style="color: #5c6370"\u003e$\u0026\u003c/span\u003e');
+                // 数字高亮
+                code = code.replace(/\b\d+\.?\d*\b/g, '\u003cspan style="color: #d19a66"\u003e$\u0026\u003c/span\u003e');
+                block.innerHTML = code;
+            });
+        }
+        
+        // 1. 性能指标演示
+        function runPerformanceMetricsDemo() {
+            const resultDiv = document.getElementById('performanceMetricsResult');
+            
+            const metrics = [
+                {
+                    name: 'TTFB (Time To First Byte)',
+                    description: '从请求开始到收到第一个字节的时间',
+                    importance: '反映服务器响应速度和网络延迟',
+                    goodValue: '小于 200ms',
+                    impact: '影响用户感知的页面加载速度',
+                    measurement: '可通过 Performance API 或 WebPageTest 测量'
+                },
+                {
+                    name: 'FCP (First Contentful Paint)',
+                    description: '浏览器首次绘制任何内容（文本、图像、SVG）的时间',
+                    importance: '用户首次看到页面内容的时间点',
+                    goodValue: '小于 1.8 秒',
+                    impact: '影响用户对页面加载速度的第一印象',
+                    measurement: 'Lighthouse 核心 Web 指标之一'
+                },
+                {
+                    name: 'LCP (Largest Contentful Paint)',
+                    description: '视口中最大内容元素绘制完成的时间',
+                    importance: '反映主要内容加载完成的时间',
+                    goodValue: '小于 2.5 秒',
+                    impact: '直接影响用户感知的页面加载完成时间',
+                    measurement: 'Core Web Vitals 核心指标之一'
+                },
+                {
+                    name: 'FID (First Input Delay)',
+                    description: '用户首次与页面交互到浏览器响应的时间',
+                    importance: '反映页面的交互响应性',
+                    goodValue: '小于 100ms',
+                    impact: '影响用户对页面流畅度的感知',
+                    measurement: 'Core Web Vitals 核心指标之一（未来将被 INP 取代）'
+                },
+                {
+                    name: 'CLS (Cumulative Layout Shift)',
+                    description: '页面元素意外移动的累积分数',
+                    importance: '反映页面布局稳定性',
+                    goodValue: '小于 0.1',
+                    impact: '影响用户体验，特别是移动设备上的交互',
+                    measurement: 'Core Web Vitals 核心指标之一'
+                },
+                {
+                    name: 'TBT (Total Blocking Time)',
+                    description: '主线程被阻塞时间的总和',
+                    importance: '反映主线程空闲程度',
+                    goodValue: '小于 200ms',
+                    impact: '影响页面的交互流畅度',
+                    measurement: 'Lighthouse 性能评分的重要组成部分'
+                }
+            ];
+            
+            let resultHtml = '\u003ch4\u003e关键性能指标详解:\u003c/h4\u003e';
+            
+            metrics.forEach(metric =\u003e {
+                resultHtml += `\u003cdiv style="margin-bottom: 20px; padding: 15px; background-color: #f8f9fa; border-radius: 6px; border-left: 4px solid #3498db;"\u003e`;
+                resultHtml += `\u003ch5 style="margin-top: 0;"\u003e${metric.name}\u003c/h5\u003e`;
+                resultHtml += `\u003cp style="margin-bottom: 5px;"\u003e\u003cstrong\u003e描述:\u003c/strong\u003e ${metric.description}\u003c/p\u003e`;
+                resultHtml += `\u003cp style="margin-bottom: 5px;"\u003e\u003cstrong\u003e重要性:\u003c/strong\u003e ${metric.importance}\u003c/p\u003e`;
+                resultHtml += `\u003cp style="margin-bottom: 5px;"\u003e\u003cstrong\u003e良好值:\u003c/strong\u003e \u003cspan style="color: #27ae60; font-weight: bold;"\u003e${metric.goodValue}\u003c/span\u003e\u003c/p\u003e`;
+                resultHtml += `\u003cp style="margin-bottom: 5px;"\u003e\u003cstrong\u003e影响:\u003c/strong\u003e ${metric.impact}\u003c/p\u003e`;
+                resultHtml += `\u003cp style="margin-bottom: 0;"\u003e\u003cstrong\u003e测量方法:\u003c/strong\u003e ${metric.measurement}\u003c/p\u003e`;
+                resultHtml += `\u003c/div\u003e`;
+            });
+            
+            // 性能指标计算演示
+            function demonstrateMetricsCalculation() {
+                const html = `
+                    \u003ch4\u003ePerformance API 演示:\u003c/h4\u003e
+                    \u003cdiv style="background-color: #282c34; color: #abb2bf; padding: 15px; border-radius: 6px; font-family: monospace; font-size: 13px;"\u003e
+                    // 获取导航性能指标
+                    const navEntries = performance.getEntriesByType('navigation');
+                    if (navEntries.length \u003e 0) {
+                        console.log('导航时间:', navEntries[0].duration.toFixed(2), 'ms');
+                        console.log('TTFB:', navEntries[0].responseStart.toFixed(2), 'ms');
+                    }
+                    
+                    // 自定义性能测量
+                    performance.mark('start-calculation');
+                    
+                    // 执行一个简单的计算任务
+                    let sum = 0;
+                    for (let i = 0; i \u003c 1000000; i++) {
+                        sum += Math.random();
+                    }
+                    
+                    performance.mark('end-calculation');
+                    performance.measure('calculation-time', 'start-calculation', 'end-calculation');
+                    
+                    const measures = performance.getEntriesByName('calculation-time');
+                    console.log('计算耗时:', measures[0].duration.toFixed(2), 'ms');
+                    \u003c/div\u003e
+                `;
+                return html;
+            }
+            
+            resultDiv.innerHTML = resultHtml + demonstrateMetricsCalculation();
+        }
+        
+        // 2. 资源加载优化演示
+        function runResourceOptimizationDemo() {
+            const resultDiv = document.getElementById('resourceOptimizationResult');
+            
+            const optimizationTechniques = [
+                {
+                    name: '预连接 (preconnect)',
+                    description: '提前建立与第三方域的连接，减少DNS解析、TCP握手和TLS协商的延迟',
+                    code: '<link rel="preconnect" href="https://api.example.com">',
+                    benefit: '减少30-100ms的请求延迟',
+                    priority: '高'
+                },
+                {
+                    name: '预加载 (preload)',
+                    description: '提前加载关键资源，确保在需要时立即可用',
+                    code: '<link rel="preload" href="critical.css" as="style">',
+                    benefit: '减少关键资源加载延迟，加速渲染',
+                    priority: '高'
+                },
+                {
+                    name: '预取 (prefetch)',
+                    description: '在空闲时加载未来可能需要的资源',
+                    code: '<link rel="prefetch" href="next-page.js">',
+                    benefit: '提高后续页面的加载速度',
+                    priority: '中'
+                },
+                {
+                    name: '资源提示 (Resource Hints)',
+                    description: '提供额外的资源加载信息给浏览器',
+                    code: '<link rel="dns-prefetch" href="https://cdn.example.com">',
+                    benefit: '优化跨域资源加载',
+                    priority: '中'
+                }
+            ];
+            
+            let resultHtml = '\u003ch4\u003e资源加载优化技术:\u003c/h4\u003e';
+            
+            optimizationTechniques.forEach(technique =\u003e {
+                resultHtml += `\u003cdiv style="margin-bottom: 20px; padding: 15px; background-color: #e8f4f8; border-radius: 6px;"\u003e`;
+                resultHtml += `\u003ch5 style="margin-top: 0; color: #2c3e50;"\u003e${technique.name} \u003cspan style="font-size: 14px; color: #7f8c8d;"\u003e优先级: ${technique.priority}\u003c/span\u003e\u003c/h5\u003e`;
+                resultHtml += `\u003cp style="margin-bottom: 10px;"\u003e${technique.description}\u003c/p\u003e`;
+                resultHtml += `\u003cdiv style="background-color: #282c34; color: #abb2bf; padding: 10px; border-radius: 4px; font-family: monospace; margin-bottom: 10px;"\u003e${technique.code}\u003c/div\u003e`;
+                resultHtml += `\u003cp style="margin-bottom: 0;"\u003e\u003cstrong\u003e收益:\u003c/strong\u003e ${technique.benefit}\u003c/p\u003e`;
+                resultHtml += `\u003c/div\u003e`;
+            });
+            
+            // 缓存策略演示
+            resultHtml += '\u003ch4\u003e缓存策略示例:\u003c/h4\u003e';
+            resultHtml += `\u003cdiv style="background-color: #f8f9fa; padding: 15px; border-radius: 6px; margin-bottom: 20px;"\u003e`;
+            resultHtml += `\u003cstrong\u003e1. HTTP 缓存头:\u003c/strong\u003e\u003cbr\u003e`;
+            resultHtml += `\u003cdiv style="background-color: #282c34; color: #abb2bf; padding: 10px; border-radius: 4px; font-family: monospace; margin: 10px 0;"\u003e`;
+            resultHtml += `// 静态资源长期缓存\nCache-Control: public, max-age=31536000, immutable\n\n// API响应缓存\nCache-Control: public, max-age=300\n\n// 不缓存敏感信息\nCache-Control: private, no-store`;
+            resultHtml += `\u003c/div\u003e`;
+            resultHtml += `\u003c/div\u003e`;
+            
+            resultDiv.innerHTML = resultHtml;
+        }
+        
+        // 3. JavaScript 性能优化演示
+        function runJavaScriptOptimizationDemo() {
+            const resultDiv = document.getElementById('javascriptOptimizationResult');
+            
+            // 模拟性能测试
+            function runPerformanceTest() {
+                const results = [];
+                
+                // 测试1: 避免重复计算 vs 记忆化
+                function testMemoization() {
+                    const array = Array.from({length: 1000}, () =\u003e Math.floor(Math.random() * 100));
+                    
+                    // 优化前
+                    console.time('Without memoization');
+                    for (let i = 0; i \u003c array.length; i++) {
+                        expensiveCalculation(array[i]);
+                    }
+                    console.timeEnd('Without memoization');
+                    
+                    // 优化后 - 记忆化
+                    console.time('With memoization');
+                    const memo = new Map();
+                    for (let i = 0; i \u003c array.length; i++) {
+                        const num = array[i];
+                        if (!memo.has(num)) {
+                            memo.set(num, expensiveCalculation(num));
+                        }
+                    }
+                    console.timeEnd('With memoization');
+                    
+                    return '记忆化可显著提升重复计算场景的性能，特别是在大数据集上';
+                }
+                
+                // 测试2: 事件监听器清理
+                function testEventListenerCleanup() {
+                    const elements = [];
+                    for (let i = 0; i \u003c 100; i++) {
+                        const el = { id: i };
+                        elements.push(el);
+                    }
+                    
+                    return '正确清理事件监听器可以防止内存泄漏，特别是在SPA应用中';
+                }
+                
+                // 辅助函数
+                function expensiveCalculation(num) {
+                    let result = 0;
+                    for (let i = 0; i \u003c 1000; i++) {
+                        result += Math.sin(num) * Math.cos(num) * Math.tan(num);
+                    }
+                    return result;
+                }
+                
+                results.push({
+                    title: '记忆化优化',
+                    description: testMemoization()
+                });
+                
+                results.push({
+                    title: '事件监听器管理',
+                    description: testEventListenerCleanup()
+                });
+                
+                results.push({
+                    title: '代码分割与懒加载',
+                    description: '将大型应用拆分为更小的代码块，按需加载，可以显著减少初始加载时间和内存占用'
+                });
+                
+                return results;
+            }
+            
+            const testResults = runPerformanceTest();
+            
+            let resultHtml = '\u003ch4\u003eJavaScript 性能优化技术演示:\u003c/h4\u003e';
+            
+            testResults.forEach((result, index) =\u003e {
+                resultHtml += `\u003cdiv style="margin-bottom: 20px; padding: 15px; background-color: #f0f7ff; border-radius: 6px; border-left: 4px solid #3498db;"\u003e`;
+                resultHtml += `\u003ch5 style="margin-top: 0;"\u003e${index + 1}. ${result.title}\u003c/h5\u003e`;
+                resultHtml += `\u003cp style="margin-bottom: 0;"\u003e${result.description}\u003c/p\u003e`;
+                
+                if (result.title === '代码分割与懒加载') {
+                    resultHtml += `\u003cdiv style="background-color: #282c34; color: #abb2bf; padding: 10px; border-radius: 4px; font-family: monospace; margin-top: 10px; font-size: 13px;"\u003e`;
+                    resultHtml += `// 动态导入示例\nconst loadFeature = async () =\u003e {\n  const { feature } = await import('./feature.js');\n  feature.init();\n};\n\n// 点击时加载\ndocument.getElementById('load-feature').addEventListener('click', loadFeature);`;
+                    resultHtml += `\u003c/div\u003e`;
+                }
+                
+                resultHtml += `\u003c/div\u003e`;
+            });
+            
+            resultDiv.innerHTML = resultHtml;
+        }
+        
+        // 4. 渲染性能优化演示
+        function runRenderingOptimizationDemo() {
+            const resultDiv = document.getElementById('renderingOptimizationResult');
+            
+            let resultHtml = '\u003ch4\u003e渲染性能优化技术:\u003c/h4\u003e';
+            
+            // 重排重绘优化
+            resultHtml += `\u003cdiv style="margin-bottom: 20px; padding: 15px; background-color: #fff8e1; border-radius: 6px; border-left: 4px solid #ffc107;"\u003e`;
+            resultHtml += `\u003ch5 style="margin-top: 0;"\u003e避免重排重绘\u003c/h5\u003e`;
+            resultHtml += `\u003cp style="margin-bottom: 10px;"\u003e重排（Reflow）是布局计算过程，重绘（Repaint）是将像素绘制到屏幕的过程。重排会触发重绘，但重绘不一定触发重排。\u003c/p\u003e`;
+            
+            resultHtml += `\u003cdiv style="display: flex; gap: 20px;"\u003e`;
+            resultHtml += `\u003cdiv style="flex: 1; padding: 10px; background-color: #f8f9fa; border-radius: 4px;"\u003e`;
+            resultHtml += `\u003cstrong\u003e优化前:\u003c/strong\u003e\u003cbr\u003e`;
+            resultHtml += `\u003cdiv style="background-color: #282c34; color: #abb2bf; padding: 10px; border-radius: 4px; font-family: monospace; font-size: 12px; margin-top: 5px;"\u003e`;
+            resultHtml += `// 多次触发重排\nelement.style.width = '100px';\nelement.style.height = '100px';\nelement.style.margin = '10px';`;
+            resultHtml += `\u003c/div\u003e`;
+            resultHtml += `\u003c/div\u003e`;
+            
+            resultHtml += `\u003cdiv style="flex: 1; padding: 10px; background-color: #f8f9fa; border-radius: 4px;"\u003e`;
+            resultHtml += `\u003cstrong\u003e优化后:\u003c/strong\u003e\u003cbr\u003e`;
+            resultHtml += `\u003cdiv style="background-color: #282c34; color: #abb2bf; padding: 10px; border-radius: 4px; font-family: monospace; font-size: 12px; margin-top: 5px;"\u003e`;
+            resultHtml += `// 使用CSS类，一次触发重排\nelement.classList.add('optimized-size');\n\n// 或使用transform（仅触发合成）\nelement.style.transform = 'translateX(100px)';`;
+            resultHtml += `\u003c/div\u003e`;
+            resultHtml += `\u003c/div\u003e`;
+            resultHtml += `\u003c/div\u003e`;
+            resultHtml += `\u003c/div\u003e`;
+            
+            // DOM操作优化
+            resultHtml += `\u003cdiv style="margin-bottom: 20px; padding: 15px; background-color: #e8f5e8; border-radius: 6px; border-left: 4px solid #4caf50;"\u003e`;
+            resultHtml += `\u003ch5 style="margin-top: 0;"\u003eDOM 批量操作\u003c/h5\u003e`;
+            resultHtml += `\u003cp style="margin-bottom: 10px;"\u003e使用DocumentFragment进行批量DOM操作，减少渲染阻塞。\u003c/p\u003e`;
+            resultHtml += `\u003cdiv style="background-color: #282c34; color: #abb2bf; padding: 10px; border-radius: 4px; font-family: monospace; font-size: 13px;"\u003e`;
+            resultHtml += `function addMultipleItems(items) {\n  const fragment = document.createDocumentFragment();\n  \n  items.forEach(item =\u003e {\n    const div = document.createElement('div');\n    div.textContent = item;\n    fragment.appendChild(div);\n  });\n  \n  // 一次性添加到DOM\n  document.body.appendChild(fragment);\n}`;
+            resultHtml += `\u003c/div\u003e`;
+            resultHtml += `\u003c/div\u003e`;
+            
+            // Web Workers演示
+            resultHtml += `\u003cdiv style="margin-bottom: 20px; padding: 15px; background-color: #f0f7ff; border-radius: 6px; border-left: 4px solid #2196f3;"\u003e`;
+            resultHtml += `\u003ch5 style="margin-top: 0;"\u003e使用Web Workers进行后台计算\u003c/h5\u003e`;
+            resultHtml += `\u003cp style="margin-bottom: 10px;"\u003e将耗时计算移至Web Worker，保持主线程响应流畅。\u003c/p\u003e`;
+            
+            // 模拟Web Worker演示
+            function simulateWebWorker() {
+                resultHtml += `\u003cdiv style="display: flex; gap: 20px;"\u003e`;
+                
+                // 主线程计算
+                resultHtml += `\u003cdiv style="flex: 1; padding: 10px; background-color: #f8f9fa; border-radius: 4px;"\u003e`;
+                resultHtml += `\u003cstrong\u003e主线程计算:\u003c/strong\u003e\u003cbr\u003e`;
+                resultHtml += `\u003cdiv id="main-thread-time" style="margin-top: 10px; padding: 10px; background-color: #ffebee; border-radius: 4px;"\u003e正在计算...\u003c/div\u003e`;
+                resultHtml += `\u003c/div\u003e`;
+                
+                // Web Worker计算
+                resultHtml += `\u003cdiv style="flex: 1; padding: 10px; background-color: #f8f9fa; border-radius: 4px;"\u003e`;
+                resultHtml += `\u003cstrong\u003eWeb Worker计算:\u003c/strong\u003e\u003cbr\u003e`;
+                resultHtml += `\u003cdiv id="worker-time" style="margin-top: 10px; padding: 10px; background-color: #e8f5e8; border-radius: 4px;"\u003e正在计算...\u003c/div\u003e`;
+                resultHtml += `\u003c/div\u003e`;
+                
+                resultHtml += `\u003c/div\u003e`;
+            }
+            
+            simulateWebWorker();
+            
+            resultDiv.innerHTML = resultHtml;
+            
+            // 模拟计算时间
+            setTimeout(() =\u003e {
+                const mainThreadTime = Math.floor(Math.random() * 300) + 200; // 200-500ms
+                const workerTime = Math.floor(mainThreadTime * 0.7); // 假设Worker快30%
+                
+                // 在实际页面中会显示这些结果
+            }, 1000);
+        }
+        
+        // 5. 媒体优化演示
+        function runMediaOptimizationDemo() {
+            const resultDiv = document.getElementById('mediaOptimizationResult');
+            
+            let resultHtml = '\u003ch4\u003e图像与媒体优化技术:\u003c/h4\u003e';
+            
+            // 响应式图像
+            resultHtml += `\u003cdiv style="margin-bottom: 20px; padding: 15px; background-color: #fff3e0; border-radius: 6px; border-left: 4px solid #ff9800;"\u003e`;
+            resultHtml += `\u003ch5 style="margin-top: 0;"\u003e响应式图像实现\u003c/h5\u003e`;
+            resultHtml += `\u003cp style="margin-bottom: 10px;"\u003e使用srcset和sizes属性为不同设备提供最佳图像尺寸。\u003c/p\u003e`;
+            resultHtml += `\u003cdiv style="background-color: #282c34; color: #abb2bf; padding: 10px; border-radius: 4px; font-family: monospace; font-size: 13px;"\u003e`;
+            resultHtml += `<img \n  src="small.jpg" \n  srcset="small.jpg 400w, medium.jpg 800w, large.jpg 1200w"\n  sizes="(max-width: 600px) 400px, (max-width: 1200px) 800px, 1200px"\n  alt="响应式图像"\n  loading="lazy"\n/>`;
+            resultHtml += `\u003c/div\u003e`;
+            resultHtml += `\u003c/div\u003e`;
+            
+            // 现代图像格式比较
+            resultHtml += `\u003cdiv style="margin-bottom: 20px; padding: 15px; background-color: #e3f2fd; border-radius: 6px; border-left: 4px solid #2196f3;"\u003e`;
+            resultHtml += `\u003ch5 style="margin-top: 0;"\u003e图像格式比较\u003c/h5\u003e`;
+            
+            const formats = [
+                { name: 'JPEG', quality: '中等', compression: '有损', transparency: '不支持', size: '100%', browser: '所有浏览器' },
+                { name: 'PNG', quality: '高', compression: '无损', transparency: '支持', size: '150-300%', browser: '所有浏览器' },
+                { name: 'WebP', quality: '高', compression: '有损/无损', transparency: '支持', size: '65-80%', browser: '现代浏览器' },
+                { name: 'AVIF', quality: '很高', compression: '有损/无损', transparency: '支持', size: '50-60%', browser: '最新浏览器' },
+                { name: 'SVG', quality: '矢量', compression: '无损', transparency: '支持', size: '取决于复杂度', browser: '所有现代浏览器' }
+            ];
+            
+            resultHtml += `\u003ctable style="width: 100%; border-collapse: collapse; margin-top: 10px;"\u003e`;
+            resultHtml += `\u003cthead\u003e`;
+            resultHtml += `\u003ctr style="background-color: #f2f2f2;"\u003e`;
+            resultHtml += `\u003cth style="padding: 8px; text-align: left; border: 1px solid #ddd; font-size: 14px;"\u003e格式\u003c/th\u003e`;
+            resultHtml += `\u003cth style="padding: 8px; text-align: left; border: 1px solid #ddd; font-size: 14px;"\u003e质量\u003c/th\u003e`;
+            resultHtml += `\u003cth style="padding: 8px; text-align: left; border: 1px solid #ddd; font-size: 14px;"\u003e压缩\u003c/th\u003e`;
+            resultHtml += `\u003cth style="padding: 8px; text-align: left; border: 1px solid #ddd; font-size: 14px;"\u003e透明\u003c/th\u003e`;
+            resultHtml += `\u003cth style="padding: 8px; text-align: left; border: 1px solid #ddd; font-size: 14px;"\u003e大小\u003c/th\u003e`;
+            resultHtml += `\u003cth style="padding: 8px; text-align: left; border: 1px solid #ddd; font-size: 14px;"\u003e兼容性\u003c/th\u003e`;
+            resultHtml += `\u003c/tr\u003e`;
+            resultHtml += `\u003c/thead\u003e`;
+            resultHtml += `\u003ctbody\u003e`;
+            
+            formats.forEach(format =\u003e {
+                resultHtml += `\u003ctr\u003e`;
+                resultHtml += `\u003ctd style="padding: 8px; border: 1px solid #ddd; font-size: 14px; font-weight: bold;"\u003e${format.name}\u003c/td\u003e`;
+                resultHtml += `\u003ctd style="padding: 8px; border: 1px solid #ddd; font-size: 14px;"\u003e${format.quality}\u003c/td\u003e`;
+                resultHtml += `\u003ctd style="padding: 8px; border: 1px solid #ddd; font-size: 14px;"\u003e${format.compression}\u003c/td\u003e`;
+                resultHtml += `\u003ctd style="padding: 8px; border: 1px solid #ddd; font-size: 14px;"\u003e${format.transparency}\u003c/td\u003e`;
+                resultHtml += `\u003ctd style="padding: 8px; border: 1px solid #ddd; font-size: 14px;"\u003e${format.size}\u003c/td\u003e`;
+                resultHtml += `\u003ctd style="padding: 8px; border: 1px solid #ddd; font-size: 14px;"\u003e${format.browser}\u003c/td\u003e`;
+                resultHtml += `\u003c/tr\u003e`;
+            });
+            
+            resultHtml += `\u003c/tbody\u003e`;
+            resultHtml += `\u003c/table\u003e`;
+            resultHtml += `\u003c/div\u003e`;
+            
+            // 视频优化建议
+            resultHtml += `\u003cdiv style="margin-bottom: 20px; padding: 15px; background-color: #f3e5f5; border-radius: 6px; border-left: 4px solid #9c27b0;"\u003e`;
+            resultHtml += `\u003ch5 style="margin-top: 0;"\u003e视频优化最佳实践\u003c/h5\u003e`;
+            resultHtml += `\u003cul\u003e`;
+            resultHtml += `\u003cli\u003e使用MP4和WebM格式提供视频，以支持不同浏览器\u003c/li\u003e`;
+            resultHtml += `\u003cli\u003e启用自适应比特率流媒体（如HLS或DASH）\u003c/li\u003e`;
+            resultHtml += `\u003cli\u003e设置合适的preload属性（'metadata'通常是最佳选择）\u003c/li\u003e`;
+            resultHtml += `\u003cli\u003e提供视频缩略图以提升用户体验\u003c/li\u003e`;
+            resultHtml += `\u003cli\u003e考虑使用视频CDN服务进行分发\u003c/li\u003e`;
+            resultHtml += `\u003c/ul\u003e`;
+            resultHtml += `\u003c/div\u003e`;
+            
+            resultDiv.innerHTML = resultHtml;
+        }
+        
+        // 6. 框架性能优化演示
+        function runFrameworkOptimizationDemo() {
+            const resultDiv = document.getElementById('frameworkOptimizationResult');
+            
+            let resultHtml = '\u003ch4\u003e前端框架性能优化技术:\u003c/h4\u003e';
+            
+            // React优化
+            resultHtml += `\u003cdiv style="margin-bottom: 20px; padding: 15px; background-color: #e1f5fe; border-radius: 6px; border-left: 4px solid #03a9f4;"\u003e`;
+            resultHtml += `\u003ch5 style="margin-top: 0;"\u003eReact性能优化\u003c/h5\u003e`;
+            resultHtml += `\u003cul\u003e`;
+            resultHtml += `\u003cli\u003e使用React.memo避免不必要的组件重渲染\u003c/li\u003e`;
+            resultHtml += `\u003cli\u003e使用useMemo记忆化计算结果\u003c/li\u003e`;
+            resultHtml += `\u003cli\u003e使用useCallback稳定函数引用\u003c/li\u003e`;
+            resultHtml += `\u003cli\u003e实现虚拟滚动处理长列表\u003c/li\u003e`;
+            resultHtml += `\u003cli\u003e使用代码分割优化初始加载\u003c/li\u003e`;
+            resultHtml += `\u003c/ul\u003e`;
+            resultHtml += `\u003c/div\u003e`;
+            
+            // Vue优化
+            resultHtml += `\u003cdiv style="margin-bottom: 20px; padding: 15px; background-color: #e8f5e8; border-radius: 6px; border-left: 4px solid #4caf50;"\u003e`;
+            resultHtml += `\u003ch5 style="margin-top: 0;"\u003eVue性能优化\u003c/h5\u003e`;
+            resultHtml += `\u003cul\u003e`;
+            resultHtml += `\u003cli\u003e使用v-memo指令（Vue 3）缓存渲染结果\u003c/li\u003e`;
+            resultHtml += `\u003cli\u003e利用计算属性的缓存特性\u003c/li\u003e`;
+            resultHtml += `\u003cli\u003e合理使用v-show和v-if\u003c/li\u003e`;
+            resultHtml += `\u003cli\u003e使用keep-alive缓存组件状态\u003c/li\u003e`;
+            resultHtml += `\u003cli\u003e为v-for提供唯一的key值\u003c/li\u003e`;
+            resultHtml += `\u003c/ul\u003e`;
+            resultHtml += `\u003c/div\u003e`;
+            
+            // 通用优化策略
+            resultHtml += `\u003cdiv style="margin-bottom: 20px; padding: 15px; background-color: #fff8e1; border-radius: 6px; border-left: 4px solid #ffc107;"\u003e`;
+            resultHtml += `\u003ch5 style="margin-top: 0;"\u003e跨框架通用优化策略\u003c/h5\u003e`;
+            resultHtml += `\u003cul\u003e`;
+            resultHtml += `\u003cli\u003e减少不必要的状态更新和组件渲染\u003c/li\u003e`;
+            resultHtml += `\u003cli\u003e优化大型列表渲染（虚拟滚动）\u003c/li\u003e`;
+            resultHtml += `\u003cli\u003e合理使用组件拆分和复用\u003c/li\u003e`;
+            resultHtml += `\u003cli\u003e避免在渲染期间执行昂贵操作\u003c/li\u003e`;
+            resultHtml += `\u003cli\u003e使用懒加载和代码分割\u003c/li\u003e`;
+            resultHtml += `\u003c/ul\u003e`;
+            resultHtml += `\u003c/div\u003e`;
+            
+            resultDiv.innerHTML = resultHtml;
+        }
+        
+        // 7. 高级优化技术演示
+        function runAdvancedOptimizationDemo() {
+            const resultDiv = document.getElementById('advancedOptimizationResult');
+            
+            let resultHtml = '\u003ch4\u003e高级性能优化技术:\u003c/h4\u003e';
+            
+            // SSR vs CSR比较
+            resultHtml += `\u003cdiv style="margin-bottom: 20px; padding: 15px; background-color: #f3e5f5; border-radius: 6px; border-left: 4px solid #9c27b0;"\u003e`;
+            resultHtml += `\u003ch5 style="margin-top: 0;"\u003eSSR vs CSR性能对比\u003c/h5\u003e`;
+            
+            resultHtml += `\u003cdiv style="display: flex; gap: 20px;"\u003e`;
+            
+            // SSR
+            resultHtml += `\u003cdiv style="flex: 1; padding: 15px; background-color: #e8f5e8; border-radius: 6px;"\u003e`;
+            resultHtml += `\u003ch6 style="margin-top: 0; text-align: center;"\u003e服务端渲染 (SSR)\u003c/h6\u003e`;
+            resultHtml += `\u003cdiv style="margin-bottom: 10px;"\u003e\u003cstrong\u003e优点:\u003c/strong\u003e\u003c/div\u003e`;
+            resultHtml += `\u003cul style="margin-bottom: 15px;"\u003e`;
+            resultHtml += `\u003cli\u003e更快的首次内容绘制 (FCP)\u003c/li\u003e`;
+            resultHtml += `\u003cli\u003e更好的SEO支持\u003c/li\u003e`;
+            resultHtml += `\u003cli\u003e更好的内容可访问性\u003c/li\u003e`;
+            resultHtml += `\u003cli\u003e在低性能设备上表现更好\u003c/li\u003e`;
+            resultHtml += `\u003c/ul\u003e`;
+            resultHtml += `\u003cdiv style="margin-bottom: 10px;"\u003e\u003cstrong\u003e缺点:\u003c/strong\u003e\u003c/div\u003e`;
+            resultHtml += `\u003cul\u003e`;
+            resultHtml += `\u003cli\u003e服务器负载增加\u003c/li\u003e`;
+            resultHtml += `\u003cli\u003e需要额外的水合（hydration）步骤\u003c/li\u003e`;
+            resultHtml += `\u003cli\u003e开发复杂度增加\u003c/li\u003e`;
+            resultHtml += `\u003c/ul\u003e`;
+            resultHtml += `\u003c/div\u003e`;
+            
+            // CSR
+            resultHtml += `\u003cdiv style="flex: 1; padding: 15px; background-color: #ffebee; border-radius: 6px;"\u003e`;
+            resultHtml += `\u003ch6 style="margin-top: 0; text-align: center;"\u003e客户端渲染 (CSR)\u003c/h6\u003e`;
+            resultHtml += `\u003cdiv style="margin-bottom: 10px;"\u003e\u003cstrong\u003e优点:\u003c/strong\u003e\u003c/div\u003e`;
+            resultHtml += `\u003cul style="margin-bottom: 15px;"\u003e`;
+            resultHtml += `\u003cli\u003e服务器负载轻\u003c/li\u003e`;
+            resultHtml += `\u003cli\u003e开发更简单\u003c/li\u003e`;
+            resultHtml += `\u003cli\u003e前后端分离更彻底\u003c/li\u003e`;
+            resultHtml += `\u003cli\u003e单页应用体验流畅\u003c/li\u003e`;
+            resultHtml += `\u003c/ul\u003e`;
+            resultHtml += `\u003cdiv style="margin-bottom: 10px;"\u003e\u003cstrong\u003e缺点:\u003c/strong\u003e\u003c/div\u003e`;
+            resultHtml += `\u003cul\u003e`;
+            resultHtml += `\u003cli\u003e首屏加载较慢\u003c/li\u003e`;
+            resultHtml += `\u003cli\u003eSEO不够友好\u003c/li\u003e`;
+            resultHtml += `\u003cli\u003e依赖JavaScript执行\u003c/li\u003e`;
+            resultHtml += `\u003c/ul\u003e`;
+            resultHtml += `\u003c/div\u003e`;
+            
+            resultHtml += `\u003c/div\u003e`;
+            resultHtml += `\u003c/div\u003e`;
+            
+            // WebAssembly加速
+            resultHtml += `\u003cdiv style="margin-bottom: 20px; padding: 15px; background-color: #e1f5fe; border-radius: 6px; border-left: 4px solid #03a9f4;"\u003e`;
+            resultHtml += `\u003ch5 style="margin-top: 0;"\u003eWebAssembly性能加速\u003c/h5\u003e`;
+            resultHtml += `\u003cp style="margin-bottom: 15px;"\u003eWebAssembly可以显著提升计算密集型任务的性能。以下是一些适合使用WebAssembly的场景：\u003c/p\u003e`;
+            
+            const wasmUseCases = [
+                { scenario: '图像处理', performance: '10-20x', example: '滤镜应用、图像压缩' },
+                { scenario: '物理模拟', performance: '20-50x', example: '游戏物理、粒子系统' },
+                { scenario: '数学计算', performance: '5-30x', example: '矩阵运算、科学计算' },
+                { scenario: '视频处理', performance: '8-15x', example: '编解码、实时滤镜' },
+                { scenario: '加密算法', performance: '5-20x', example: '哈希计算、加密解密' }
+            ];
+            
+            resultHtml += `\u003ctable style="width: 100%; border-collapse: collapse;"\u003e`;
+            resultHtml += `\u003cthead\u003e`;
+            resultHtml += `\u003ctr style="background-color: #f2f2f2;"\u003e`;
+            resultHtml += `\u003cth style="padding: 10px; text-align: left; border: 1px solid #ddd;"\u003e应用场景\u003c/th\u003e`;
+            resultHtml += `\u003cth style="padding: 10px; text-align: left; border: 1px solid #ddd;"\u003e性能提升\u003c/th\u003e`;
+            resultHtml += `\u003cth style="padding: 10px; text-align: left; border: 1px solid #ddd;"\u003e示例应用\u003c/th\u003e`;
+            resultHtml += `\u003c/tr\u003e`;
+            resultHtml += `\u003c/thead\u003e`;
+            resultHtml += `\u003ctbody\u003e`;
+            
+            wasmUseCases.forEach(useCase =\u003e {
+                resultHtml += `\u003ctr\u003e`;
+                resultHtml += `\u003ctd style="padding: 10px; border: 1px solid #ddd;"\u003e${useCase.scenario}\u003c/td\u003e`;
+                resultHtml += `\u003ctd style="padding: 10px; border: 1px solid #ddd; color: #27ae60; font-weight: bold;"\u003e${useCase.performance}\u003c/td\u003e`;
+                resultHtml += `\u003ctd style="padding: 10px; border: 1px solid #ddd;"\u003e${useCase.example}\u003c/td\u003e`;
+                resultHtml += `\u003c/tr\u003e`;
+            });
+            
+            resultHtml += `\u003c/tbody\u003e`;
+            resultHtml += `\u003c/table\u003e`;
+            resultHtml += `\u003c/div\u003e`;
+            
+            resultDiv.innerHTML = resultHtml;
+        }
+        
+        // 8. 性能优化工作流程演示
+        function runWorkflowOptimizationDemo() {
+            const resultDiv = document.getElementById('workflowOptimizationResult');
+            
+            let resultHtml = '\u003ch4\u003e性能优化工作流程:\u003c/h4\u003e';
+            
+            // 工作流程图
+            resultHtml += `\u003cdiv style="margin-bottom: 30px; text-align: center;"\u003e`;
+            resultHtml += `\u003cdiv style="display: inline-block; background-color: #f8f9fa; padding: 20px; border-radius: 8px;"\u003e`;
+            
+            const workflowSteps = [
+                { step: '1', title: '性能审计', desc: '使用Lighthouse/DevTools进行基准测量' },
+                { step: '2', title: '识别瓶颈', desc: '确定性能问题的主要来源' },
+                { step: '3', title: '设定预算', desc: '制定性能目标和监控指标' },
+                { step: '4', title: '实施优化', desc: '应用针对性的优化技术' },
+                { step: '5', title: '验证结果', desc: '测量优化效果并比较差异' },
+                { step: '6', title: '持续监控', desc: '集成到CI/CD流程中定期检查' }
+            ];
+            
+            resultHtml += `\u003cdiv style="display: flex; flex-direction: column; gap: 10px;"\u003e`;
+            
+            workflowSteps.forEach((step, index) =\u003e {
+                resultHtml += `\u003cdiv style="display: flex; align-items: center; gap: 15px; padding: 15px; background-color: white; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);"\u003e`;
+                resultHtml += `\u003cdiv style="width: 40px; height: 40px; background-color: #3498db; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 18px;"\u003e${step.step}\u003c/div\u003e`;
+                resultHtml += `\u003cdiv style="text-align: left; flex: 1;"\u003e`;
+                resultHtml += `\u003ch6 style="margin: 0; font-size: 16px;"\u003e${step.title}\u003c/h6\u003e`;
+                resultHtml += `\u003cp style="margin: 5px 0 0 0; font-size: 14px; color: #7f8c8d;"\u003e${step.desc}\u003c/p\u003e`;
+                resultHtml += `\u003c/div\u003e`;
+                resultHtml += `\u003c/div\u003e`;
+                
+                // 添加箭头
+                if (index \u003c workflowSteps.length - 1) {
+                    resultHtml += `\u003cdiv style="text-align: center; font-size: 20px; color: #3498db;"\u003e↓\u003c/div\u003e`;
+                }
+            });
+            
+            resultHtml += `\u003c/div\u003e`;
+            resultHtml += `\u003c/div\u003e`;
+            resultHtml += `\u003c/div\u003e`;
+            
+            // 性能监控建议
+            resultHtml += `\u003cdiv style="margin-bottom: 20px; padding: 15px; background-color: #f0f7ff; border-radius: 6px; border-left: 4px solid #3498db;"\u003e`;
+            resultHtml += `\u003ch5 style="margin-top: 0;"\u003e持续性能监控建议\u003c/h5\u003e`;
+            resultHtml += `\u003cul\u003e`;
+            resultHtml += `\u003cli\u003e集成Lighthouse CI到CI/CD流程中\u003c/li\u003e`;
+            resultHtml += `\u003cli\u003e设置性能预算并在超标时告警\u003c/li\u003e`;
+            resultHtml += `\u003cli\u003e收集真实用户监控数据（RUM）\u003c/li\u003e`;
+            resultHtml += `\u003cli\u003e定期生成性能报告并进行趋势分析\u003c/li\u003e`;
+            resultHtml += `\u003cli\u003e监控不同地区和设备的性能表现\u003c/li\u003e`;
+            resultHtml += `\u003c/ul\u003e`;
+            resultHtml += `\u003c/div\u003e`;
+            
+            resultDiv.innerHTML = resultHtml;
+        }
+        
+        // 页面加载完成后执行代码高亮
+        document.addEventListener('DOMContentLoaded', () =\u003e {
+            try {
+                highlightCode();
+            } catch (error) {
+                console.log('代码高亮初始化失败:', error);
+            }
+            
+            // 初始化演示数据
+            console.log('性能优化演示页面已加载');
+        });
+    \u003c/script\u003e
+\u003c/body\u003e
+\u003c/html\u003e

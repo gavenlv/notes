@@ -1,0 +1,1158 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>微前端架构详解</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+        
+        h1, h2, h3, h4 {
+            color: #2c3e50;
+        }
+        
+        h1 {
+            text-align: center;
+            border-bottom: 2px solid #e74c3c;
+            padding-bottom: 10px;
+            margin-bottom: 40px;
+        }
+        
+        h2 {
+            border-left: 4px solid #e74c3c;
+            padding-left: 15px;
+            margin-top: 50px;
+        }
+        
+        h3 {
+            color: #e74c3c;
+            margin-top: 30px;
+        }
+        
+        .container {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .code-block {
+            background-color: #282c34;
+            color: #abb2bf;
+            padding: 20px;
+            border-radius: 6px;
+            margin: 15px 0;
+            overflow-x: auto;
+            font-family: 'Courier New', Courier, monospace;
+            white-space: pre-wrap;
+            line-height: 1.5;
+        }
+        
+        .demo-section {
+            margin-bottom: 40px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 6px;
+        }
+        
+        button {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: #c0392b;
+        }
+        
+        .result {
+            background-color: #e8f4f8;
+            border: 1px solid #b3e5fc;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 15px 0;
+            font-family: 'Courier New', Courier, monospace;
+        }
+        
+        .concept-box {
+            background-color: #f0f0f0;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 15px 0;
+            border-left: 4px solid #e74c3c;
+        }
+        
+        .comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .comparison-item {
+            padding: 15px;
+            border-radius: 6px;
+            border: 1px solid #ddd;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        th {
+            background-color: #f2f2f2;
+        }
+        
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+        
+        .highlight {
+            background-color: #ffeb3b;
+            padding: 2px 5px;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>微前端架构详解</h1>
+        
+        <div class="demo-section">
+            <h2>1. 微前端基础概念</h2>
+            
+            <div class="concept-box">
+                <p>微前端是一种架构模式，将前端应用分解为更小、更简单的应用，这些应用可以独立开发、测试和部署，但在客户端被集成在一起，给用户提供统一的体验。</p>
+                <p>微前端的核心思想是：<span class="highlight">将大型前端应用拆分为多个小型、松耦合、可独立部署的微应用</span>，每个微应用由不同的团队负责，使用适合其业务的技术栈。</p>
+            </div>
+            
+            <h3>1.1 微前端的优势</h3>
+            <ul>
+                <li><strong>技术栈无关：</strong>每个团队可以选择适合自己业务的技术栈</li>
+                <li><strong>独立开发与部署：</strong>各团队可以并行开发，独立部署</li>
+                <li><strong>增量升级：</strong>可以逐步升级或替换系统的部分功能</li>
+                <li><strong>团队自治：</strong>小团队可以独立负责完整的业务功能</li>
+                <li><strong>容错隔离：</strong>单个微应用的故障不会影响整个系统</li>
+            </ul>
+            
+            <h3>1.2 微前端架构的挑战</h3>
+            <ul>
+                <li><strong>应用间通信：</strong>微应用之间需要高效可靠的通信机制</li>
+                <li><strong>共享状态管理：</strong>如何在多个微应用间共享和同步状态</li>
+                <li><strong>路由管理：</strong>需要统一的路由系统管理各微应用</li>
+                <li><strong>样式隔离：</strong>避免微应用间的样式冲突</li>
+                <li><strong>性能开销：</strong>可能增加额外的加载和渲染成本</li>
+                <li><strong>团队协作：</strong>需要明确的规范和接口定义</li>
+            </ul>
+            
+            <button onclick="runBasicConceptDemo()">运行基础概念演示</button>
+            <div id="basicConceptResult" class="result">点击按钮查看微前端基础概念演示结果...</div>
+        </div>
+        
+        <div class="demo-section">
+            <h2>2. 微前端实现模式</h2>
+            
+            <h3>2.1 iframe 模式</h3>
+            <div class="code-block">
+<!-- iframe 集成示例 -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>主应用 - iframe 模式</title>
+</head>
+<body>
+    <header>全局导航</header>
+    
+    <!-- 微应用容器 -->
+    <div class="micro-app-container">
+        <!-- 微应用 1 -->
+        <iframe id="app1" src="http://micro-app-1.example.com" 
+                style="border: none; width: 100%; height: 600px;"></iframe>
+        
+        <!-- 微应用 2 -->
+        <iframe id="app2" src="http://micro-app-2.example.com" 
+                style="border: none; width: 100%; height: 600px; display: none;"></iframe>
+    </div>
+    
+    <footer>全局页脚</footer>
+    
+    <script>
+        // 路由控制切换不同的微应用
+        function switchApp(appName) {
+            document.getElementById('app1').style.display = appName === 'app1' ? 'block' : 'none';
+            document.getElementById('app2').style.display = appName === 'app2' ? 'block' : 'none';
+            
+            // 向微应用发送消息
+            const targetApp = document.getElementById(appName).contentWindow;
+            targetApp.postMessage({ type: 'APP_SWITCHED', data: appName }, '*');
+        }
+        
+        // 接收微应用发送的消息
+        window.addEventListener('message', (event) => {
+            if (event.data.type === 'MICRO_APP_READY') {
+                console.log('微应用已准备就绪:', event.data.appName);
+            }
+        });
+    </script>
+</body>
+</html>
+            </div>
+            
+            <h3>2.2 Single-SPA 模式</h3>
+            <div class="code-block">
+// 主应用配置 - Single-SPA 模式
+import { registerApplication, start } from 'single-spa';
+
+// 注册微应用
+registerApplication(
+  'app1', // 微应用名称
+  () => import('./src/app1'), // 加载微应用
+  (location) => location.pathname.startsWith('/app1'), // 激活规则
+  { customProps: { authToken: 'token123' } } // 传递给微应用的自定义属性
+);
+
+registerApplication(
+  'app2',
+  () => import('./src/app2'),
+  (location) => location.pathname.startsWith('/app2')
+);
+
+// 启动 single-spa
+start();
+
+// 微应用配置示例
+// app1/src/main.js
+import { LifeCycles } from 'single-spa';
+
+export const bootstrap: LifeCycles = [
+  () => {
+    console.log('app1 启动中...');
+  }
+];
+
+export const mount: LifeCycles = [
+  (props) => {
+    console.log('app1 挂载中...', props);
+    // 渲染应用到 DOM
+    const el = document.getElementById('app1-container');
+    if (el) {
+      el.innerHTML = '<h1>App 1 内容</h1>';
+    }
+    return Promise.resolve();
+  }
+];
+
+export const unmount: LifeCycles = [
+  () => {
+    console.log('app1 卸载中...');
+    // 清理资源
+    const el = document.getElementById('app1-container');
+    if (el) {
+      el.innerHTML = '';
+    }
+    return Promise.resolve();
+  }
+];
+            </div>
+            
+            <h3>2.3 Web Components 模式</h3>
+            <div class="code-block">
+// 微应用定义为 Web Component
+class MicroApp1 extends HTMLElement {
+  constructor() {
+    super();
+    // 创建 Shadow DOM
+    this.attachShadow({ mode: 'open' });
+  }
+  
+  connectedCallback() {
+    // 加载微应用资源
+    this.loadApp();
+  }
+  
+  loadApp() {
+    // 模拟加载应用内容
+    this.shadowRoot.innerHTML = `
+      <style>
+        :host { display: block; padding: 20px; background: #f0f0f0; }
+        h2 { color: #333; }
+      </style>
+      <div>
+        <h2>微应用 1</h2>
+        <p>这是一个作为 Web Component 的微应用</p>
+      </div>
+    `;
+  }
+}
+
+// 注册自定义元素
+customElements.define('micro-app-1', MicroApp1);
+
+// 主应用中使用
+/*
+<!DOCTYPE html>
+<html>
+<head>
+    <title>主应用 - Web Components 模式</title>
+</head>
+<body>
+    <header>全局导航</header>
+    
+    <!-- 加载微应用脚本 -->
+    <script src="http://micro-app-1.example.com/micro-app-1.js"></script>
+    
+    <!-- 使用微应用组件 -->
+    <micro-app-1></micro-app-1>
+    
+    <footer>全局页脚</footer>
+</body>
+</html>
+*/
+            </div>
+            
+            <h3>2.4 Module Federation 模式</h3>
+            <div class="code-block">
+// Webpack Module Federation 配置 - 微应用 1
+// webpack.config.js
+const { ModuleFederationPlugin } = require('webpack').container;
+
+module.exports = {
+  // ...其他配置
+  plugins: [
+    new ModuleFederationPlugin({
+      name: 'microApp1',
+      filename: 'remoteEntry.js',
+      exposes: {
+        './App': './src/App',
+        './store': './src/store'
+      },
+      shared: ['react', 'react-dom']
+    })
+  ]
+};
+
+// 主应用配置
+// webpack.config.js
+const { ModuleFederationPlugin } = require('webpack').container;
+
+module.exports = {
+  // ...其他配置
+  plugins: [
+    new ModuleFederationPlugin({
+      name: 'mainApp',
+      remotes: {
+        microApp1: 'microApp1@http://localhost:3001/remoteEntry.js',
+        microApp2: 'microApp2@http://localhost:3002/remoteEntry.js'
+      },
+      shared: ['react', 'react-dom']
+    })
+  ]
+};
+
+// 主应用中动态加载微应用
+// src/App.js
+import React, { lazy, Suspense } from 'react';
+
+const MicroApp1 = lazy(() => import('microApp1/App'));
+
+function App() {
+  return (
+    <div>
+      <h1>主应用</h1>
+      <Suspense fallback={<div>加载中...</div>}>
+        <MicroApp1 />
+      </Suspense>
+    </div>
+  );
+}
+
+export default App;
+            </div>
+            
+            <button onclick="runIntegrationModesDemo()">运行集成模式对比演示</button>
+            <div id="integrationModesResult" class="result">点击按钮查看微前端集成模式对比结果...</div>
+        </div>
+        
+        <div class="demo-section">
+            <h2>3. 微前端架构实现 - 基于 Qiankun</h2>
+            
+            <h3>3.1 Qiankun 框架简介</h3>
+            <div class="concept-box">
+                <p>Qiankun 是一个基于 Single-SPA 的微前端实现框架，由蚂蚁金服开发和维护，提供了更完善的功能和更友好的 API。</p>
+                <p>主要特性：</p>
+                <ul>
+                    <li>基于 Single-SPA 封装，提供了更简单的 API</li>
+                    <li>支持 HTML Entry 接入方式</li>
+                    <li>内置样式隔离方案</li>
+                    <li>提供了 JS 沙箱</li>
+                    <li>支持资源预加载</li>
+                    <li>支持动态加载微应用</li>
+                </ul>
+            </div>
+            
+            <h3>3.2 主应用配置</h3>
+            <div class="code-block">
+// 主应用配置 - main.js
+import { registerMicroApps, start, setDefaultMountApp } from 'qiankun';
+
+// 注册微应用
+registerMicroApps([
+  {
+    name: 'vue-app', // 微应用名称
+    entry: 'http://localhost:7100', // 微应用入口
+    container: '#container', // 微应用挂载容器
+    activeRule: '/vue', // 激活规则
+    props: { // 传递给微应用的属性
+      auth: 'token123'
+    }
+  },
+  {
+    name: 'react-app',
+    entry: 'http://localhost:7101',
+    container: '#container',
+    activeRule: '/react',
+    props: {
+      auth: 'token123'
+    }
+  }
+]);
+
+// 设置默认加载的微应用
+setDefaultMountApp('/vue');
+
+// 启动 qiankun
+start({
+  prefetch: true, // 是否开启预加载
+  sandbox: {
+    strictStyleIsolation: true, // 严格的样式隔离
+    experimentalStyleIsolation: false // 实验性样式隔离
+  }
+});
+            </div>
+            
+            <h3>3.3 Vue 微应用配置</h3>
+            <div class="code-block">
+// Vue 微应用 - main.js
+import Vue from 'vue';
+import App from './App.vue';
+import router from './router';
+
+let instance = null;
+
+// 渲染应用
+function render(props = {}) {
+  const { container } = props;
+  instance = new Vue({
+    router,
+    render: h => h(App)
+  }).$mount(container ? container.querySelector('#app') : '#app');
+}
+
+// 独立运行时直接渲染
+if (!window.__POWERED_BY_QIANKUN__) {
+  render();
+}
+
+// 微应用导出生命周期函数
+export async function bootstrap() {
+  console.log('[vue-app] 启动');
+}
+
+export async function mount(props) {
+  console.log('[vue-app] 挂载', props);
+  render(props);
+}
+
+export async function unmount() {
+  console.log('[vue-app] 卸载');
+  instance.$destroy();
+  instance = null;
+}
+
+// public-path.js
+if (window.__POWERED_BY_QIANKUN__) {
+  // 动态设置 webpack publicPath，防止资源加载出错
+  __webpack_public_path__ = window.__INJECTED_PUBLIC_PATH_BY_QIANKUN__;
+}
+
+// vue.config.js
+module.exports = {
+  devServer: {
+    port: 7100,
+    headers: {
+      'Access-Control-Allow-Origin': '*' // 允许跨域
+    }
+  },
+  configureWebpack: {
+    output: {
+      library: 'vue-app',
+      libraryTarget: 'umd'
+    }
+  }
+};
+            </div>
+            
+            <h3>3.4 React 微应用配置</h3>
+            <div class="code-block">
+// React 微应用 - index.js
+import React from 'react';
+import ReactDOM from 'react-dom';
+import App from './App';
+import './index.css';
+
+let root = null;
+
+// 渲染应用
+function render(props = {}) {
+  const { container } = props;
+  root = ReactDOM.createRoot(
+    container ? container.querySelector('#root') : document.getElementById('root')
+  );
+  root.render(
+    <React.StrictMode>
+      <App />
+    </React.StrictMode>
+  );
+}
+
+// 独立运行时直接渲染
+if (!window.__POWERED_BY_QIANKUN__) {
+  render();
+}
+
+// 微应用导出生命周期函数
+export async function bootstrap() {
+  console.log('[react-app] 启动');
+}
+
+export async function mount(props) {
+  console.log('[react-app] 挂载', props);
+  render(props);
+}
+
+export async function unmount() {
+  console.log('[react-app] 卸载');
+  root.unmount();
+  root = null;
+}
+
+// public-path.js
+if (window.__POWERED_BY_QIANKUN__) {
+  __webpack_public_path__ = window.__INJECTED_PUBLIC_PATH_BY_QIANKUN__;
+}
+
+// webpack.config.js
+module.exports = {
+  entry: {
+    main: ['src/public-path.js', 'src/index.js']
+  },
+  output: {
+    library: 'react-app',
+    libraryTarget: 'umd',
+    filename: '[name].js'
+  },
+  devServer: {
+    port: 7101,
+    headers: {
+      'Access-Control-Allow-Origin': '*'
+    }
+  }
+};
+            </div>
+            
+            <button onclick="runQiankunDemo()">运行 Qiankun 演示</button>
+            <div id="qiankunResult" class="result">点击按钮查看 Qiankun 微前端架构演示结果...</div>
+        </div>
+        
+        <div class="demo-section">
+            <h2>4. 微前端核心问题解决方案</h2>
+            
+            <h3>4.1 应用间通信</h3>
+            <div class="code-block">
+// 基于发布订阅模式的通信方案
+// event-bus.js
+class EventBus {
+  constructor() {
+    this.events = {};
+  }
+  
+  // 订阅事件
+  on(event, callback) {
+    if (!this.events[event]) {
+      this.events[event] = [];
+    }
+    this.events[event].push(callback);
+  }
+  
+  // 发布事件
+  emit(event, data) {
+    if (!this.events[event]) return;
+    this.events[event].forEach(callback => callback(data));
+  }
+  
+  // 取消订阅
+  off(event, callback) {
+    if (!this.events[event]) return;
+    if (!callback) {
+      delete this.events[event];
+      return;
+    }
+    this.events[event] = this.events[event].filter(cb => cb !== callback);
+  }
+}
+
+// 创建单例实例
+const eventBus = new EventBus();
+
+// 在主应用中提供给微应用
+window.eventBus = eventBus;
+
+// 微应用中使用
+// 在微应用中订阅事件
+eventBus.on('userLogin', (userInfo) => {
+  console.log('用户登录信息:', userInfo);
+  // 更新微应用中的用户状态
+});
+
+// 微应用发布事件
+eventBus.emit('appInitialized', { appName: 'microApp1' });
+
+// 基于 shared store 的通信方案
+// shared-store.js
+class SharedStore {
+  constructor() {
+    this.state = {};
+    this.listeners = [];
+  }
+  
+  // 获取状态
+  getState() {
+    return { ...this.state };
+  }
+  
+  // 设置状态
+  setState(newState) {
+    this.state = { ...this.state, ...newState };
+    this.notifyListeners();
+  }
+  
+  // 添加监听器
+  subscribe(listener) {
+    this.listeners.push(listener);
+    // 返回取消订阅函数
+    return () => {
+      this.listeners = this.listeners.filter(l => l !== listener);
+    };
+  }
+  
+  // 通知所有监听器
+  notifyListeners() {
+    this.listeners.forEach(listener => listener(this.getState()));
+  }
+}
+
+// 创建共享状态管理实例
+const sharedStore = new SharedStore();
+
+// 在主应用中提供给微应用
+window.sharedStore = sharedStore;
+            </div>
+            
+            <h3>4.2 样式隔离</h3>
+            <div class="code-block">
+// 1. CSS Modules 或 CSS-in-JS
+// 使用 CSS Modules
+// styles.module.css
+.container {
+  background: #fff;
+  padding: 20px;
+}
+
+// 在组件中使用
+import styles from './styles.module.css';
+
+function Component() {
+  return <div className={styles.container}>内容</div>;
+}
+
+// 2. Shadow DOM 隔离
+class IsolatedComponent extends HTMLElement {
+  constructor() {
+    super();
+    this.attachShadow({ mode: 'open' });
+  }
+  
+  connectedCallback() {
+    this.shadowRoot.innerHTML = `
+      <style>
+        /* 这里的样式不会影响外部 */
+        div { color: red; }
+      </style>
+      <div>隔离的内容</div>
+    `;
+  }
+}
+
+// 3. BEM 命名规范
+/*
+.block {}
+.block__element {}
+.block--modifier {}
+
+例如：
+.micro-app1 {}
+.micro-app1__header {}
+.micro-app1__content--expanded {}
+*/
+
+// 4. PostCSS 插件 - 前缀添加
+// postcss.config.js
+module.exports = {
+  plugins: [
+    require('postcss-prefix-selector')({
+      prefix: '.micro-app1-',
+      transform(prefix, selector) {
+        return `${prefix}${selector}`;
+      }
+    })
+  ]
+};
+            </div>
+            
+            <h3>4.3 路由管理</h3>
+            <div class="code-block">
+// 主应用路由配置
+import Vue from 'vue';
+import VueRouter from 'vue-router';
+
+Vue.use(VueRouter);
+
+const routes = [
+  {
+    path: '/',
+    name: 'Home',
+    component: () => import('@/views/Home.vue')
+  },
+  // 微应用路由占位符，实际路由由微应用内部管理
+  {
+    path: '/vue/*', // 注意使用通配符
+    name: 'VueApp',
+    beforeEnter: (to, from, next) => {
+      // 触发微应用加载
+      next();
+    }
+  },
+  {
+    path: '/react/*', // 注意使用通配符
+    name: 'ReactApp',
+    beforeEnter: (to, from, next) => {
+      next();
+    }
+  }
+];
+
+const router = new VueRouter({
+  mode: 'history',
+  base: process.env.BASE_URL,
+  routes
+});
+
+// 微应用路由配置 - Vue 示例
+import Vue from 'vue';
+import VueRouter from 'vue-router';
+
+Vue.use(VueRouter);
+
+const routes = [
+  {
+    path: '/',
+    name: 'VueHome',
+    component: () => import('@/views/Home.vue')
+  },
+  {
+    path: '/about',
+    name: 'VueAbout',
+    component: () => import('@/views/About.vue')
+  }
+];
+
+// 动态设置路由基础路径
+const router = new VueRouter({
+  mode: 'history',
+  base: window.__POWERED_BY_QIANKUN__ ? '/vue' : process.env.BASE_URL,
+  routes
+});
+
+// 监听路由变化，通知主应用
+router.afterEach((to) => {
+  if (window.__POWERED_BY_QIANKUN__) {
+    window.history.pushState(null, null, `/vue${to.fullPath}`);
+  }
+});
+            </div>
+            
+            <button onclick="runSolutionsDemo()">运行核心问题解决方案演示</button>
+            <div id="solutionsResult" class="result">点击按钮查看微前端核心问题解决方案演示结果...</div>
+        </div>
+        
+        <div class="demo-section">
+            <h2>5. 微前端最佳实践</h2>
+            
+            <h3>5.1 项目结构与规范</h3>
+            <div class="concept-box">
+                <h4>推荐的项目结构</h4>
+                <pre style="background-color: #f5f5f5; padding: 10px; border-radius: 4px;">
+microservices-frontend/
+├── main-app/                  # 主应用
+│   ├── src/
+│   │   ├── components/        # 公共组件
+│   │   ├── utils/             # 工具函数
+│   │   ├── services/          # 共享服务
+│   │   ├── store/             # 全局状态
+│   │   └── app.js             # 应用入口
+│   └── package.json
+├── micro-apps/                # 微应用集合
+│   ├── micro-app-1/           # 微应用 1
+│   │   ├── src/
+│   │   └── package.json
+│   ├── micro-app-2/           # 微应用 2
+│   │   ├── src/
+│   │   └── package.json
+│   └── ...
+├── shared/                    # 共享资源
+│   ├── components/            # 共享组件库
+│   ├── utils/                 # 共享工具函数
+│   └── theme/                 # 主题样式
+└── docs/                      # 文档
+    ├── api/                   # API 文档
+    ├── guidelines/            # 开发规范
+    └── architecture.md        # 架构文档
+                </pre>
+            </div>
+            
+            <h3>5.2 团队协作与治理</h3>
+            <table>
+                <tr>
+                    <th>方面</th>
+                    <th>建议</th>
+                </tr>
+                <tr>
+                    <td>团队划分</td>
+                    <td>按业务域划分团队，每个团队负责一个或多个微应用</td>
+                </tr>
+                <tr>
+                    <td>技术栈选择</td>
+                    <td>允许团队选择技术栈，但建议核心框架保持一致</td>
+                </tr>
+                <tr>
+                    <td>接口规范</td>
+                    <td>制定统一的接口设计规范和 API 文档标准</td>
+                </tr>
+                <tr>
+                    <td>样式规范</td>
+                    <td>共享设计系统，确保 UI 一致性</td>
+                </tr>
+                <tr>
+                    <td>代码审查</td>
+                    <td>建立跨团队代码审查机制</td>
+                </tr>
+                <tr>
+                    <td>监控告警</td>
+                    <td>统一的监控系统，支持按微应用划分</td>
+                </tr>
+            </table>
+            
+            <h3>5.3 部署与发布策略</h3>
+            <div class="code-block">
+# CI/CD 配置示例 - 使用 Jenkins Pipeline
+pipeline {
+    agent any
+    
+    stages {
+        stage('构建') {
+            steps {
+                sh 'npm install'
+                sh 'npm run build'
+            }
+        }
+        
+        stage('测试') {
+            steps {
+                sh 'npm run test'
+                sh 'npm run lint'
+            }
+        }
+        
+        stage('打包') {
+            steps {
+                sh 'tar -czf dist.tar.gz dist'
+            }
+        }
+        
+        stage('部署') {
+            when {
+                branch 'main'
+            }
+            steps {
+                // 部署到 CDN 或静态资源服务器
+                sh 'scp dist.tar.gz deploy@server:/path/to/deploy'
+                sshagent(['ssh-key']) {
+                    sh '''
+                        ssh deploy@server << EOF
+                        cd /path/to/deploy
+                        tar -xzf dist.tar.gz
+                        rm dist.tar.gz
+                        # 通知主应用微应用已更新
+                        curl -X POST http://main-app.example.com/api/apps/update?name=micro-app-1
+                        EOF
+                    '''
+                }
+            }
+        }
+    }
+    
+    post {
+        success {
+            // 发送成功通知
+            echo '部署成功'
+        }
+        failure {
+            // 发送失败通知
+            echo '部署失败'
+        }
+    }
+}
+
+# 微应用注册中心示例
+// app-registry.json
+{
+  "apps": [
+    {
+      "name": "micro-app-1",
+      "entry": "https://cdn.example.com/micro-app-1/latest/index.html",
+      "activeRule": "/micro-app-1",
+      "version": "1.0.2",
+      "deployTime": "2023-06-15T10:30:00Z",
+      "status": "active"
+    },
+    {
+      "name": "micro-app-2",
+      "entry": "https://cdn.example.com/micro-app-2/latest/index.html",
+      "activeRule": "/micro-app-2",
+      "version": "2.1.0",
+      "deployTime": "2023-06-14T14:20:00Z",
+      "status": "active"
+    }
+  ]
+}
+            </div>
+            
+            <button onclick="runBestPracticesDemo()">运行最佳实践演示</button>
+            <div id="bestPracticesResult" class="result">点击按钮查看微前端最佳实践演示结果...</div>
+        </div>
+    </div>
+
+    <script>
+        // 基础概念演示函数
+        function runBasicConceptDemo() {
+            const resultDiv = document.getElementById('basicConceptResult');
+            const results = [
+                '微前端架构基础概念:',
+                '',
+                '1. 核心理念:',
+                '   - 将大型前端应用拆分为多个小型、松耦合的微应用',
+                '   - 每个微应用可以独立开发、测试和部署',
+                '   - 使用适合业务场景的技术栈',
+                '',
+                '2. 微前端的优势:',
+                '   - 技术栈无关: 各团队可选择适合的技术',
+                '   - 独立开发部署: 加速开发迭代',
+                '   - 增量升级: 逐步替换系统功能',
+                '   - 团队自治: 小团队独立负责完整业务',
+                '   - 容错隔离: 单个应用故障不影响整体',
+                '',
+                '3. 主要挑战:',
+                '   - 应用间通信机制',
+                '   - 共享状态管理',
+                '   - 统一路由管理',
+                '   - 样式隔离',
+                '   - 性能优化',
+                '   - 团队协作规范'
+            ];
+            resultDiv.textContent = results.join('\n');
+        }
+        
+        // 集成模式对比演示函数
+        function runIntegrationModesDemo() {
+            const resultDiv = document.getElementById('integrationModesResult');
+            const results = [
+                '微前端集成模式对比:',
+                '',
+                '1. iframe 模式:',
+                '   - 优点: 完全隔离，实现简单',
+                '   - 缺点: 性能较差，通信复杂，UI 一致性难保证',
+                '   - 适用: 简单集成场景，安全隔离要求高',
+                '',
+                '2. Single-SPA 模式:',
+                '   - 优点: 轻量，路由控制灵活，共享资源',
+                '   - 缺点: 需要适配，配置相对复杂',
+                '   - 适用: 多框架共存的复杂应用',
+                '',
+                '3. Web Components 模式:',
+                '   - 优点: 标准组件，天然隔离，跨框架',
+                '   - 缺点: 浏览器兼容性，功能相对受限',
+                '   - 适用: 标准化组件集成',
+                '',
+                '4. Module Federation 模式:',
+                '   - 优点: 代码共享，动态加载，构建优化',
+                '   - 缺点: 依赖 Webpack 5，学习成本较高',
+                '   - 适用: 大型现代前端应用，代码共享需求强',
+                '',
+                '5. 组合模式 (Qiankun 等框架):',
+                '   - 优点: 集成多种方案，功能完善，开发体验好',
+                '   - 缺点: 框架依赖，定制性可能受限',
+                '   - 适用: 企业级微前端架构'
+            ];
+            resultDiv.textContent = results.join('\n');
+        }
+        
+        // Qiankun 演示函数
+        function runQiankunDemo() {
+            const resultDiv = document.getElementById('qiankunResult');
+            const results = [
+                'Qiankun 微前端框架演示:',
+                '',
+                '1. 核心功能:',
+                '   - 基于 Single-SPA 封装，简化 API',
+                '   - HTML Entry 接入方式，简单易用',
+                '   - 内置样式隔离和 JS 沙箱',
+                '   - 资源预加载，提升性能',
+                '   - 支持跨框架微应用',
+                '',
+                '2. 接入步骤:',
+                '   - 主应用: 注册微应用配置，启动 qiankun',
+                '   - 微应用: 导出生命周期函数，配置跨域',
+                '   - 设置 publicPath 处理静态资源',
+                '',
+                '3. 生命周期钩子:',
+                '   - bootstrap: 微应用初始化',
+                '   - mount: 微应用挂载到容器',
+                '   - unmount: 微应用卸载清理',
+                '   - update: 微应用状态更新（可选）',
+                '',
+                '4. 核心特性:',
+                '   - 样式隔离: strictStyleIsolation 和 experimentalStyleIsolation',
+                '   - JS 沙箱: 运行时隔离，避免全局变量冲突',
+                '   - 预加载: 预先加载未激活的微应用资源',
+                '   - 应用间通信: props 传递和全局状态管理'
+            ];
+            resultDiv.textContent = results.join('\n');
+        }
+        
+        // 核心问题解决方案演示函数
+        function runSolutionsDemo() {
+            const resultDiv = document.getElementById('solutionsResult');
+            const results = [
+                '微前端核心问题解决方案:',
+                '',
+                '1. 应用间通信方案:',
+                '   - 基于发布订阅模式: EventBus 实现松耦合通信',
+                '   - 共享状态管理: 类似 Redux 的全局 Store',
+                '   - 本地存储: localStorage/sessionStorage 共享数据',
+                '   - 消息广播: 基于 BroadcastChannel API',
+                '   - props 传递: 初始化时传递数据',
+                '',
+                '2. 样式隔离方案:',
+                '   - CSS Modules: 自动生成唯一类名',
+                '   - CSS-in-JS: 运行时生成隔离样式',
+                '   - Shadow DOM: 浏览器原生样式隔离',
+                '   - BEM 命名规范: 约定式命名避免冲突',
+                '   - PostCSS 插件: 自动添加前缀',
+                '   - 动态样式处理: 运行时注入和移除',
+                '',
+                '3. 路由管理方案:',
+                '   - 主应用统一路由: 主应用控制所有路由',
+                '   - 微应用内部路由: 微应用自主管理路由',
+                '   - 路由守卫: 拦截和控制路由跳转',
+                '   - 路由同步: 微应用路由变化通知主应用',
+                '',
+                '4. 状态管理方案:',
+                '   - 共享状态库: 全局状态可被所有微应用访问',
+                '   - 应用级别状态: 微应用内部独立状态',
+                '   - 状态同步: 关键状态在微应用间同步',
+                '   - 服务化: 将状态管理封装为服务'
+            ];
+            resultDiv.textContent = results.join('\n');
+        }
+        
+        // 最佳实践演示函数
+        function runBestPracticesDemo() {
+            const resultDiv = document.getElementById('bestPracticesResult');
+            const results = [
+                '微前端最佳实践:',
+                '',
+                '1. 架构设计原则:',
+                '   - 明确定义微应用边界: 按业务领域拆分',
+                '   - 遵循单一职责: 每个微应用专注于特定业务',
+                '   - 接口契约优先: 严格定义应用间接口',
+                '   - 渐进式采用: 逐步迁移现有系统',
+                '',
+                '2. 技术选型建议:',
+                '   - 主框架: 选择成熟稳定的框架',
+                '   - 微应用: 允许团队选择适合的技术栈',
+                '   - 通信方案: 根据场景选择合适的通信机制',
+                '   - 构建工具: 统一或兼容的构建系统',
+                '',
+                '3. 团队协作策略:',
+                '   - 建立设计系统: 确保 UI/UX 一致性',
+                '   - 接口文档规范: 使用 OpenAPI 等工具',
+                '   - 代码审查机制: 跨团队代码审查',
+                '   - 统一开发规范: 代码风格和质量标准',
+                '',
+                '4. 部署发布建议:',
+                '   - CI/CD 流水线: 自动化构建测试部署',
+                '   - 版本管理: 语义化版本控制',
+                '   - 灰度发布: 逐步推送新版本',
+                '   - 监控告警: 统一监控系统',
+                '   - 回滚机制: 快速回滚故障版本',
+                '',
+                '5. 性能优化策略:',
+                '   - 资源预加载: 提升用户体验',
+                '   - 懒加载: 按需加载微应用',
+                '   - 缓存策略: 合理利用缓存',
+                '   - 资源共享: 复用公共库',
+                '   - 按需渲染: 避免不必要的渲染'
+            ];
+            resultDiv.textContent = results.join('\n');
+        }
+        
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('微前端架构演示页面加载完成');
+        });
+    </script>
+</body>
+</html>
