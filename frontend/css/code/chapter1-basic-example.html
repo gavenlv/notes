@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSS基础入门示例</title>
+    <style>
+        /* 全局重置和基础样式 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f5f5;
+            padding: 20px;
+        }
+
+        /* 示例容器 */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* 标题样式 */
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 20px;
+            background-color: #3498db;
+            color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        /* 章节样式 */
+        .section {
+            background-color: white;
+            padding: 30px;
+            margin-bottom: 40px;
+            border-radius: 10px;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .section h2 {
+            color: #3498db;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #ecf0f1;
+        }
+
+        .section h3 {
+            color: #2980b9;
+            margin: 25px 0 15px 0;
+        }
+
+        /* 代码示例样式 */
+        .code-example {
+            background-color: #2c3e50;
+            color: #ecf0f1;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+        }
+
+        /* 展示区域样式 */
+        .demo-box {
+            border: 2px dashed #bdc3c7;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 8px;
+            min-height: 100px;
+        }
+
+        /* 示例1：颜色表示法 */
+        .color-demo {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .color-box {
+            height: 100px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+            transition: transform 0.3s ease;
+        }
+
+        .color-box:hover {
+            transform: translateY(-5px);
+        }
+
+        .color-name {
+            font-size: 12px;
+            margin-top: 5px;
+            text-align: center;
+        }
+
+        /* 示例2：字体样式 */
+        .font-demo {
+            margin-top: 20px;
+        }
+
+        .font-sample {
+            margin-bottom: 15px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-left: 4px solid #3498db;
+        }
+
+        /* 示例3：盒模型 */
+        .box-model-demo {
+            margin-top: 20px;
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .box {
+            width: 200px;
+            height: 150px;
+            background-color: #3498db;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .content-box {
+            box-sizing: content-box;
+            padding: 20px;
+            border: 5px solid #e74c3c;
+        }
+
+        .border-box {
+            box-sizing: border-box;
+            padding: 20px;
+            border: 5px solid #27ae60;
+        }
+
+        /* 示例4：背景样式 */
+        .bg-demo {
+            margin-top: 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .bg-example {
+            height: 150px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+        }
+
+        /* 示例5：卡片组件 */
+        .card-demo {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 20px;
+        }
+
+        .card {
+            background-color: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .card-image {
+            height: 200px;
+            overflow: hidden;
+        }
+
+        .card-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .card:hover .card-image img {
+            transform: scale(1.1);
+        }
+
+        .card-content {
+            padding: 20px;
+        }
+
+        .card-content h4 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .card-content p {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+        }
+
+        .card-button {
+            display: inline-block;
+            padding: 8px 16px;
+            background-color: #3498db;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 0.9rem;
+            transition: background-color 0.3s ease;
+        }
+
+        .card-button:hover {
+            background-color: #2980b9;
+        }
+
+        /* 响应式调整 */
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .section {
+                padding: 20px;
+            }
+            
+            .color-demo, .bg-demo {
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>CSS基础入门示例演示</h1>
+
+        <!-- 示例1：颜色表示法 -->
+        <div class="section">
+            <h2>1. CSS颜色表示法</h2>
+            <div class="demo-box">
+                <div class="color-demo">
+                    <div>
+                        <div class="color-box" style="background-color: red;">颜色关键字</div>
+                        <div class="color-name">red</div>
+                    </div>
+                    <div>
+                        <div class="color-box" style="background-color: #00FF00;">十六进制</div>
+                        <div class="color-name">#00FF00</div>
+                    </div>
+                    <div>
+                        <div class="color-box" style="background-color: rgb(0, 0, 255);">RGB</div>
+                        <div class="color-name">rgb(0,0,255)</div>
+                    </div>
+                    <div>
+                        <div class="color-box" style="background-color: rgba(255, 0, 0, 0.7);">RGBA</div>
+                        <div class="color-name">rgba(255,0,0,0.7)</div>
+                    </div>
+                    <div>
+                        <div class="color-box" style="background-color: hsl(60, 100%, 50%);">HSL</div>
+                        <div class="color-name">hsl(60,100%,50%)</div>
+                    </div>
+                    <div>
+                        <div class="color-box" style="background-color: hsla(180, 100%, 50%, 0.8);">HSLA</div>
+                        <div class="color-name">hsla(180,100%,50%,0.8)</div>
+                    </div>
+                </div>
+            </div>
+            <div class="code-example">/* 颜色表示法示例 */
+.color-red {
+    background-color: red; /* 颜色关键字 */
+}
+
+.color-hex {
+    background-color: #00FF00; /* 十六进制 */
+}
+
+.color-rgb {
+    background-color: rgb(0, 0, 255); /* RGB */
+}
+
+.color-rgba {
+    background-color: rgba(255, 0, 0, 0.7); /* RGBA带透明度 */
+}
+
+.color-hsl {
+    background-color: hsl(60, 100%, 50%); /* HSL */
+}
+
+.color-hsla {
+    background-color: hsla(180, 100%, 50%, 0.8); /* HSLA带透明度 */
+}</div>
+        </div>
+
+        <!-- 示例2：字体与文本样式 -->
+        <div class="section">
+            <h2>2. 字体与文本样式</h2>
+            <div class="demo-box">
+                <div class="font-demo">
+                    <div class="font-sample">
+                        <h4 style="font-family: 'Microsoft YaHei', sans-serif;">字体族：Microsoft YaHei</h4>
+                        <p style="font-size: 18px;">字体大小：18px</p>
+                    </div>
+                    <div class="font-sample">
+                        <p style="font-weight: bold;">字体粗细：font-weight: bold;</p>
+                        <p style="font-style: italic;">字体样式：font-style: italic;</p>
+                    </div>
+                    <div class="font-sample">
+                        <p style="text-align: left;">文本对齐：text-align: left;</p>
+                        <p style="text-align: center;">文本对齐：text-align: center;</p>
+                        <p style="text-align: right;">文本对齐：text-align: right;</p>
+                    </div>
+                    <div class="font-sample">
+                        <p style="text-decoration: underline;">文本装饰：text-decoration: underline;</p>
+                        <p style="text-decoration: line-through;">文本装饰：text-decoration: line-through;</p>
+                        <p style="text-transform: uppercase;">文本转换：text-transform: uppercase;</p>
+                    </div>
+                </div>
+            </div>
+            <div class="code-example">/* 字体与文本样式示例 */
+.font-family {
+    font-family: 'Microsoft YaHei', Arial, sans-serif;
+}
+
+.font-size {
+    font-size: 18px; /* 也可以使用rem, em, % */
+}
+
+.font-weight {
+    font-weight: bold; /* 也可以使用数值100-900 */
+}
+
+.font-style {
+    font-style: italic;
+}
+
+.text-align {
+    text-align: center; /* left, right, justify */
+}
+
+.text-decoration {
+    text-decoration: underline; /* none, line-through, overline */
+}
+
+.text-transform {
+    text-transform: uppercase; /* lowercase, capitalize */
+}
+
+.line-height {
+    line-height: 1.6; /* 推荐使用无单位值 */
+}</div>
+        </div>
+
+        <!-- 示例3：盒模型 -->
+        <div class="section">
+            <h2>3. CSS盒模型</h2>
+            <h3>标准盒模型 vs IE盒模型</h3>
+            <div class="demo-box">
+                <div class="box-model-demo">
+                    <div>
+                        <div class="box content-box">标准盒模型</div>
+                        <p style="text-align: center; margin-top: 10px;">width: 200px + padding: 40px + border: 10px</p>
+                        <p style="text-align: center; font-size: 0.9rem; color: #666;">总宽度: 250px</p>
+                    </div>
+                    <div>
+                        <div class="box border-box">IE盒模型</div>
+                        <p style="text-align: center; margin-top: 10px;">width: 200px (包含padding和border)</p>
+                        <p style="text-align: center; font-size: 0.9rem; color: #666;">内容宽度: 150px</p>
+                    </div>
+                </div>
+            </div>
+            <div class="code-example">/* 盒模型示例 */
+/* 标准盒模型（默认） */
+.content-box {
+    box-sizing: content-box;
+    width: 200px;
+    height: 150px;
+    padding: 20px;
+    border: 5px solid #e74c3c;
+    /* 实际宽度 = 200 + 20*2 + 5*2 = 250px */
+}
+
+/* IE盒模型（推荐） */
+.border-box {
+    box-sizing: border-box;
+    width: 200px;
+    height: 150px;
+    padding: 20px;
+    border: 5px solid #27ae60;
+    /* 内容宽度 = 200 - 20*2 - 5*2 = 150px */
+}
+
+/* 为所有元素设置IE盒模型（最佳实践） */
+* {
+    box-sizing: border-box;
+}</div>
+        </div>
+
+        <!-- 示例4：背景样式 -->
+        <div class="section">
+            <h2>4. CSS背景样式</h2>
+            <div class="demo-box">
+                <div class="bg-demo">
+                    <div class="bg-example" style="background-color: #3498db;">背景颜色</div>
+                    <div class="bg-example" style="background-image: url('https://picsum.photos/400/300?random=1'); background-size: cover;">背景图片</div>
+                    <div class="bg-example" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">渐变背景</div>
+                    <div class="bg-example" style="background-color: #e74c3c; background-image: url('https://picsum.photos/200/200?random=2'); background-repeat: no-repeat; background-position: center;">混合背景</div>
+                </div>
+            </div>
+            <div class="code-example">/* 背景样式示例 */
+.bg-color {
+    background-color: #3498db;
+}
+
+.bg-image {
+    background-image: url('image.jpg');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+}
+
+.bg-gradient {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.bg-multiple {
+    background-color: #e74c3c;
+    background-image: url('pattern.png');
+    background-repeat: repeat-x;
+    background-position: bottom;
+}
+
+/* 背景简写 */
+.bg-shorthand {
+    background: #3498db url('image.jpg') no-repeat center/cover fixed;
+}</div>
+        </div>
+
+        <!-- 示例5：综合案例 - 卡片组件 -->
+        <div class="section">
+            <h2>5. 综合案例：响应式卡片组件</h2>
+            <div class="demo-box">
+                <div class="card-demo">
+                    <div class="card">
+                        <div class="card-image">
+                            <img src="https://picsum.photos/600/400?random=10" alt="风景照片">
+                        </div>
+                        <div class="card-content">
+                            <h4>自然风景</h4>
+                            <p>这是一个精美的响应式卡片组件，包含图片、标题和描述文字。悬停时有动画效果。</p>
+                            <a href="#" class="card-button">查看详情</a>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-image">
+                            <img src="https://picsum.photos/600/400?random=11" alt="城市照片">
+                        </div>
+                        <div class="card-content">
+                            <h4>城市风光</h4>
+                            <p>使用纯CSS实现的卡片设计，响应式布局自动适应不同屏幕尺寸。</p>
+                            <a href="#" class="card-button">查看详情</a>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-image">
+                            <img src="https://picsum.photos/600/400?random=12" alt="美食照片">
+                        </div>
+                        <div class="card-content">
+                            <h4>美食分享</h4>
+                            <p>结合了盒模型、背景、过渡动画等多种CSS技术的现代组件设计。</p>
+                            <a href="#" class="card-button">查看详情</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="code-example">/* 响应式卡片组件 */
+.card {
+    background-color: white;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* 卡片悬停效果 */
+.card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+/* 卡片图片 */
+.card-image {
+    height: 200px;
+    overflow: hidden;
+}
+
+.card-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.card:hover .card-image img {
+    transform: scale(1.1);
+}
+
+/* 卡片内容 */
+.card-content {
+    padding: 20px;
+}
+
+/* 响应式布局 */
+.card-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 30px;
+}
+
+/* 媒体查询 */
+@media (max-width: 768px) {
+    .card-container {
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 20px;
+    }
+}</div>
+        </div>
+    </div>
+</body>
+</html>

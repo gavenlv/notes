@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSS响应式设计示例</title>
+    <style>
+        /* 全局样式重置 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f5f5;
+        }
+
+        /* 容器样式 */
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+
+        /* 响应式导航栏 */
+        header {
+            background-color: #3498db;
+            color: white;
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .menu-toggle {
+            display: block;
+            width: 35px;
+            height: 25px;
+            position: relative;
+            cursor: pointer;
+            background: transparent;
+            border: none;
+        }
+
+        .menu-toggle span {
+            position: absolute;
+            width: 100%;
+            height: 3px;
+            background-color: white;
+            transition: all 0.3s ease;
+        }
+
+        .menu-toggle span:nth-child(1) {
+            top: 0;
+        }
+
+        .menu-toggle span:nth-child(2) {
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .menu-toggle span:nth-child(3) {
+            bottom: 0;
+        }
+
+        .nav-links {
+            position: fixed;
+            top: 70px;
+            left: -100%;
+            width: 100%;
+            height: calc(100vh - 70px);
+            background-color: #2980b9;
+            list-style: none;
+            transition: left 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .nav-links.active {
+            left: 0;
+        }
+
+        .nav-links li {
+            margin: 15px 0;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-size: 1.2rem;
+            padding: 10px 15px;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        /* 英雄区域 */
+        .hero {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 60px 0;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: clamp(2rem, 5vw, 4rem);
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+
+        .hero p {
+            font-size: clamp(1rem, 2vw, 1.5rem);
+            max-width: 800px;
+            margin: 0 auto 30px;
+            opacity: 0.9;
+        }
+
+        .btn {
+            display: inline-block;
+            background-color: #2ecc71;
+            color: white;
+            padding: 12px 25px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background-color: #27ae60;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        /* 特性区域 */
+        .features {
+            padding: 80px 0;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 50px;
+            font-size: clamp(1.5rem, 3vw, 2.5rem);
+            color: #2c3e50;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+        }
+
+        .feature-card {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .feature-icon {
+            font-size: 2.5rem;
+            color: #3498db;
+            margin-bottom: 20px;
+        }
+
+        .feature-card h3 {
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+            color: #2c3e50;
+        }
+
+        /* 响应式图片示例 */
+        .image-section {
+            padding: 80px 0;
+            background-color: #ecf0f1;
+        }
+
+        .image-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .image-box {
+            position: relative;
+            overflow: hidden;
+            border-radius: 10px;
+            height: 300px;
+        }
+
+        .responsive-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .image-box:hover .responsive-image {
+            transform: scale(1.1);
+        }
+
+        /* 响应式表格 */
+        .table-section {
+            padding: 80px 0;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        /* 响应式表单 */
+        .form-section {
+            padding: 80px 0;
+            background-color: #34495e;
+            color: white;
+        }
+
+        .form-container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .submit-btn {
+            background-color: #e74c3c;
+            color: white;
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .submit-btn:hover {
+            background-color: #c0392b;
+        }
+
+        /* 视口单位示例 */
+        .viewport-section {
+            padding: 10vh 0;
+            background-color: #16a085;
+            color: white;
+            text-align: center;
+        }
+
+        .viewport-text {
+            font-size: 5vw;
+            margin-bottom: 3vh;
+        }
+
+        .viewport-box {
+            width: 50vw;
+            height: 30vh;
+            background-color: rgba(255, 255, 255, 0.2);
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3vw;
+            border-radius: 10px;
+        }
+
+        /* 响应式页脚 */
+        footer {
+            background-color: #2c3e50;
+            color: white;
+            padding: 50px 0 20px;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .footer-column h3 {
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+            position: relative;
+            padding-bottom: 10px;
+        }
+
+        .footer-column h3::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 50px;
+            height: 3px;
+            background-color: #3498db;
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 10px;
+        }
+
+        .footer-links a {
+            color: #ecf0f1;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: #3498db;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 15px;
+        }
+
+        .social-link {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            color: white;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .social-link:hover {
+            background-color: #3498db;
+            transform: translateY(-3px);
+        }
+
+        .copyright {
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.9rem;
+            color: #bdc3c7;
+        }
+
+        /* 媒体查询示例 - 移动优先 */
+        @media (min-width: 768px) {
+            /* 导航栏 - 桌面版 */
+            .menu-toggle {
+                display: none;
+            }
+
+            .nav-links {
+                position: static;
+                width: auto;
+                height: auto;
+                flex-direction: row;
+                background-color: transparent;
+            }
+
+            .nav-links li {
+                margin: 0 10px;
+            }
+
+            /* 英雄区域调整 */
+            .hero {
+                padding: 100px 0;
+            }
+
+            /* 表单布局调整 */
+            .form-container {
+                padding: 40px;
+                border-radius: 10px;
+                background-color: rgba(255, 255, 255, 0.05);
+            }
+        }
+
+        @media (min-width: 992px) {
+            /* 大屏幕特定样式 */
+            .features-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            .image-container {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            .footer-content {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        @media (max-width: 576px) {
+            /* 小屏幕特定优化 */
+            .hero {
+                padding: 40px 0;
+            }
+
+            .features, .image-section, .table-section, .form-section {
+                padding: 50px 0;
+            }
+
+            .feature-card {
+                padding: 20px;
+            }
+
+            th, td {
+                padding: 10px;
+                font-size: 0.9rem;
+            }
+        }
+
+        /* 高分辨率屏幕适配 */
+        @media (min-resolution: 192dpi), (min-resolution: 2dppx) {
+            .logo {
+                background-image: url('logo@2x.png');
+            }
+        }
+
+        /* 打印样式 */
+        @media print {
+            header, .btn, .social-links {
+                display: none;
+            }
+
+            body {
+                font-size: 12pt;
+                line-height: 1.4;
+            }
+
+            .container {
+                width: 100%;
+                max-width: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 响应式导航栏 -->
+    <header>
+        <div class="container navbar">
+            <div class="logo">响应式设计</div>
+            <button class="menu-toggle" id="menuToggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="#features">特性</a></li>
+                <li><a href="#images">图片</a></li>
+                <li><a href="#table">表格</a></li>
+                <li><a href="#form">表单</a></li>
+                <li><a href="#viewport">视口单位</a></li>
+            </ul>
+        </div>
+    </header>
+
+    <!-- 英雄区域 -->
+    <section class="hero">
+        <div class="container">
+            <h1>CSS响应式设计演示</h1>
+            <p>这个示例展示了如何使用现代CSS技术创建适应各种设备的响应式网站。从移动设备到大屏幕，体验流畅的布局变化。</p>
+            <a href="#features" class="btn">探索特性</a>
+        </div>
+    </section>
+
+    <!-- 特性区域 - 使用grid和响应式卡片 -->
+    <section id="features" class="features">
+        <div class="container">
+            <h2 class="section-title">响应式设计特性</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">📱</div>
+                    <h3>移动优先设计</h3>
+                    <p>从移动设备开始设计，然后逐步增强到更大屏幕。确保在所有设备上都有出色的用户体验。</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <h3>灵活的网格布局</h3>
+                    <p>使用CSS Grid和Flexbox创建灵活的响应式布局，轻松适应不同屏幕尺寸。</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔍</div>
+                    <h3>媒体查询</h3>
+                    <p>使用媒体查询根据屏幕尺寸、方向和分辨率应用不同的样式规则。</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🖼️</div>
+                    <h3>响应式图像</h3>
+                    <p>确保图像在不同设备上正确显示，优化加载性能和视觉体验。</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📝</div>
+                    <h3>响应式排版</h3>
+                    <p>使用clamp()、rem和视口单位创建适应不同屏幕的流畅排版。</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">⚡</div>
+                    <h3>性能优化</h3>
+                    <p>为不同设备优化资源加载，确保快速的页面加载和交互响应。</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 响应式图片示例 -->
+    <section id="images" class="image-section">
+        <div class="container">
+            <h2 class="section-title">响应式图片展示</h2>
+            <div class="image-container">
+                <div class="image-box">
+                    <img src="https://picsum.photos/id/1015/800/600" alt="山脉风景" class="responsive-image" loading="lazy">
+                </div>
+                <div class="image-box">
+                    <img src="https://picsum.photos/id/1016/800/600" alt="海景" class="responsive-image" loading="lazy">
+                </div>
+                <div class="image-box">
+                    <img src="https://picsum.photos/id/1018/800/600" alt="森林" class="responsive-image" loading="lazy">
+                </div>
+                <div class="image-box">
+                    <img src="https://picsum.photos/id/1019/800/600" alt="峡谷" class="responsive-image" loading="lazy">
+                </div>
+                <div class="image-box">
+                    <img src="https://picsum.photos/id/1039/800/600" alt="山脉湖泊" class="responsive-image" loading="lazy">
+                </div>
+                <div class="image-box">
+                    <img src="https://picsum.photos/id/1040/800/600" alt="雪山" class="responsive-image" loading="lazy">
+                </div>
+            </div>
+            <!-- 使用picture元素的高级响应式图像 -->
+            <div class="image-box" style="max-width: 800px; margin: 40px auto; height: auto;">
+                <picture>
+                    <source media="(max-width: 768px)" srcset="https://picsum.photos/id/1025/800/600">
+                    <source media="(min-width: 769px)" srcset="https://picsum.photos/id/1025/1200/800">
+                    <img src="https://picsum.photos/id/1025/800/600" alt="高级响应式图像示例" class="responsive-image" style="border-radius: 10px;">
+                </picture>
+                <p style="text-align: center; margin-top: 15px; color: #666;">使用picture元素的高级响应式图像示例</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 响应式表格示例 -->
+    <section id="table" class="table-section">
+        <div class="container">
+            <h2 class="section-title">响应式表格</h2>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>设备类型</th>
+                            <th>屏幕宽度</th>
+                            <th>布局特点</th>
+                            <th>优化重点</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>手机</td>
+                            <td>&lt; 576px</td>
+                            <td>单列布局</td>
+                            <td>内容优先，触摸目标</td>
+                        </tr>
+                        <tr>
+                            <td>平板（竖屏）</td>
+                            <td>576px - 767px</td>
+                            <td>2列网格</td>
+                            <td>可读性，简化导航</td>
+                        </tr>
+                        <tr>
+                            <td>平板（横屏）</td>
+                            <td>768px - 991px</td>
+                            <td>3列网格</td>
+                            <td>内容组织，交互优化</td>
+                        </tr>
+                        <tr>
+                            <td>笔记本</td>
+                            <td>992px - 1199px</td>
+                            <td>4列网格</td>
+                            <td>空间利用，视觉层次</td>
+                        </tr>
+                        <tr>
+                            <td>桌面</td>
+                            <td>≥ 1200px</td>
+                            <td>完整布局</td>
+                            <td>丰富交互，细节展示</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- 响应式表单示例 -->
+    <section id="form" class="form-section">
+        <div class="container">
+            <h2 class="section-title">响应式表单</h2>
+            <div class="form-container">
+                <form>
+                    <div class="form-group">
+                        <label for="name">姓名</label>
+                        <input type="text" id="name" placeholder="请输入您的姓名">
+                    </div>
+                    <div class="form-group">
+                        <label for="email">邮箱</label>
+                        <input type="email" id="email" placeholder="请输入您的邮箱">
+                    </div>
+                    <div class="form-group">
+                        <label for="message">留言</label>
+                        <textarea id="message" placeholder="请输入您的留言内容..."></textarea>
+                    </div>
+                    <button type="submit" class="submit-btn">提交</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- 视口单位示例 -->
+    <section id="viewport" class="viewport-section">
+        <div class="container">
+            <h2 class="section-title">视口单位示例</h2>
+            <p>此区域展示了视口单位(vw, vh, vmin, vmax)的应用，大小会随着视口变化而变化</p>
+            <div class="viewport-text">5vw 字体大小</div>
+            <div class="viewport-box">50vw × 30vh</div>
+        </div>
+    </section>
+
+    <!-- 响应式页脚 -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h3>关于我们</h3>
+                    <p>我们专注于创建响应式、高性能的现代网站，为用户提供卓越的浏览体验。</p>
+                </div>
+                <div class="footer-column">
+                    <h3>快速链接</h3>
+                    <ul class="footer-links">
+                        <li><a href="#features">特性</a></li>
+                        <li><a href="#images">图片</a></li>
+                        <li><a href="#table">表格</a></li>
+                        <li><a href="#form">表单</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>学习资源</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">CSS教程</a></li>
+                        <li><a href="#">响应式设计指南</a></li>
+                        <li><a href="#">Web性能优化</a></li>
+                        <li><a href="#">前端最佳实践</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>联系我们</h3>
+                    <div class="social-links">
+                        <a href="#" class="social-link">👍</a>
+                        <a href="#" class="social-link">❤️</a>
+                        <a href="#" class="social-link">🌟</a>
+                        <a href="#" class="social-link">💬</a>
+                    </div>
+                </div>
+            </div>
+            <div class="copyright">
+                &copy; 2023 CSS响应式设计示例. 保留所有权利.
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript用于响应式导航 -->
+    <script>
+        // 移动菜单切换
+        const menuToggle = document.getElementById('menuToggle');
+        const navLinks = document.getElementById('navLinks');
+
+        menuToggle.addEventListener('click', () => {
+            navLinks.classList.toggle('active');
+            
+            // 汉堡菜单动画
+            const spans = menuToggle.querySelectorAll('span');
+            spans[0].style.transform = navLinks.classList.contains('active') ? 'rotate(45deg) translate(5px, 5px)' : 'none';
+            spans[1].style.opacity = navLinks.classList.contains('active') ? '0' : '1';
+            spans[2].style.transform = navLinks.classList.contains('active') ? 'rotate(-45deg) translate(5px, -5px)' : 'none';
+        });
+
+        // 导航链接点击后关闭菜单
+        const navItems = navLinks.querySelectorAll('a');
+        navItems.forEach(item => {
+            item.addEventListener('click', () => {
+                if (window.innerWidth < 768) {
+                    navLinks.classList.remove('active');
+                    const spans = menuToggle.querySelectorAll('span');
+                    spans[0].style.transform = 'none';
+                    spans[1].style.opacity = '1';
+                    spans[2].style.transform = 'none';
+                }
+            });
+        });
+
+        // 窗口大小变化时调整菜单状态
+        window.addEventListener('resize', () => {
+            if (window.innerWidth >= 768) {
+                navLinks.classList.remove('active');
+                const spans = menuToggle.querySelectorAll('span');
+                spans[0].style.transform = 'none';
+                spans[1].style.opacity = '1';
+                spans[2].style.transform = 'none';
+            }
+        });
+
+        // 平滑滚动
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href');
+                if (targetId === '#') return;
+                
+                const targetElement = document.querySelector(targetId);
+                if (targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 70, // 减去导航栏高度
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+
+        // 图片加载错误处理
+        document.querySelectorAll('img').forEach(img => {
+            img.addEventListener('error', () => {
+                img.src = 'https://picsum.photos/400/300?grayscale';
+                img.alt = '图片加载失败';
+            });
+        });
+    </script>
+</body>
+</html>

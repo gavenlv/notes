@@ -1,0 +1,164 @@
+.demo-container {
+  width: 100%;
+}
+
+.demo-description {
+  background-color: #f8f9fa;
+  padding: 15px;
+  border-left: 4px solid #4dabf7;
+  margin-bottom: 20px;
+  border-radius: 0 4px 4px 0;
+}
+
+.demo-description h3 {
+  margin-top: 0;
+  color: #24292e;
+}
+
+.demo-section {
+  margin-bottom: 30px;
+  padding: 20px;
+  background-color: white;
+  border: 1px solid #eaecef;
+  border-radius: 6px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.section-title {
+  margin-top: 0;
+  color: #24292e;
+  border-bottom: 1px solid #eaecef;
+  padding-bottom: 10px;
+}
+
+.code-block {
+  background-color: #f6f8fa;
+  padding: 15px;
+  border-radius: 6px;
+  margin-top: 10px;
+}
+
+.button-group {
+  margin-bottom: 15px;
+}
+
+.input-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.conditional-rendering {
+  margin-top: 15px;
+}
+
+.welcome-message {
+  background-color: #d4edda;
+  border: 1px solid #c3e6cb;
+  padding: 10px;
+  border-radius: 4px;
+  color: #155724;
+}
+
+.login-prompt {
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+  padding: 10px;
+  border-radius: 4px;
+  color: #721c24;
+}
+
+.login-status {
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.status-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.status-indicator.online {
+  background-color: #28a745;
+}
+
+.status-indicator.offline {
+  background-color: #dc3545;
+}
+
+.task-list {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.task-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid #eaecef;
+}
+
+.task-item:last-child {
+  border-bottom: none;
+}
+
+.empty-message {
+  color: #6c757d;
+  font-style: italic;
+  padding: 10px 0;
+  text-align: center;
+}
+
+.highlight {
+  color: #007bff;
+  font-weight: bold;
+}
+
+.style-examples {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.style-box {
+  padding: 10px;
+  margin: 5px 0;
+  border-radius: 4px;
+  min-width: 200px;
+  text-align: center;
+}
+
+.style-class {
+  background-color: #e9ecef;
+  border: 1px solid #ced4da;
+  color: #495057;
+}
+
+.style-logged-in {
+  background-color: #d4edda;
+  border: 1px solid #c3e6cb;
+  color: #155724;
+}
+
+.style-logged-out {
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+  color: #721c24;
+}
+
+.code-snippet {
+  background-color: #f6f8fa;
+  padding: 15px;
+  border-radius: 4px;
+  overflow-x: auto;
+  font-family: monospace;
+  font-size: 14px;
+  line-height: 1.4;
+}

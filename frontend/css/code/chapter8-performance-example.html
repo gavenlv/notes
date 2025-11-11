@@ -1,0 +1,995 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSS性能优化与最佳实践示例</title>
+    <style>
+        /* 内联关键CSS - 性能优化技术1 */
+        :root {
+            --color-primary: #3498db;
+            --color-secondary: #2ecc71;
+            --color-danger: #e74c3c;
+            --color-text: #333333;
+            --color-text-light: #666666;
+            --color-background: #ffffff;
+            --color-background-light: #f8f9fa;
+            --spacing-xs: 0.25rem;
+            --spacing-sm: 0.5rem;
+            --spacing-md: 1rem;
+            --spacing-lg: 2rem;
+            --spacing-xl: 4rem;
+            --font-size-sm: 0.875rem;
+            --font-size-md: 1rem;
+            --font-size-lg: 1.25rem;
+            --font-size-xl: 1.5rem;
+            --font-size-2xl: 2rem;
+            --border-radius-sm: 0.25rem;
+            --border-radius-md: 0.5rem;
+            --border-radius-lg: 1rem;
+            --transition-fast: 0.2s ease;
+            --transition-normal: 0.3s ease;
+        }
+
+        /* 基础样式重置 - 使用精确选择器而非通配符 */
+        html, body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            font-size: var(--font-size-md);
+            line-height: 1.6;
+            color: var(--color-text);
+            background-color: var(--color-background);
+        }
+
+        /* 高效的元素选择器 */
+        h1, h2, h3, h4, h5, h6 {
+            margin-top: 0;
+            font-weight: 600;
+            line-height: 1.3;
+        }
+
+        h1 {
+            font-size: var(--font-size-2xl);
+            margin-bottom: var(--spacing-lg);
+            color: var(--color-primary);
+        }
+
+        h2 {
+            font-size: var(--font-size-xl);
+            margin-bottom: var(--spacing-md);
+            padding-bottom: var(--spacing-sm);
+            border-bottom: 2px solid var(--color-background-light);
+        }
+
+        h3 {
+            font-size: var(--font-size-lg);
+            margin-bottom: var(--spacing-sm);
+            color: var(--color-text-light);
+        }
+
+        p {
+            margin-bottom: var(--spacing-md);
+        }
+
+        /* 容器布局 - 直接使用类选择器 */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 var(--spacing-md);
+        }
+
+        .header {
+            background-color: var(--color-primary);
+            color: white;
+            padding: var(--spacing-md) 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .header__container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header__logo {
+            font-size: var(--font-size-xl);
+            font-weight: 700;
+            text-decoration: none;
+            color: white;
+        }
+
+        /* BEM命名规范示例 - 性能优化技术2 */
+        .nav {
+            display: flex;
+            gap: var(--spacing-md);
+        }
+
+        .nav__item {
+            list-style: none;
+        }
+
+        .nav__link {
+            color: white;
+            text-decoration: none;
+            padding: var(--spacing-sm);
+            border-radius: var(--border-radius-sm);
+            transition: background-color var(--transition-fast);
+        }
+
+        .nav__link:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .nav__link--active {
+            background-color: rgba(255, 255, 255, 0.3);
+            font-weight: 500;
+        }
+
+        .content {
+            padding: var(--spacing-xl) 0;
+        }
+
+        /* 高效的类选择器而非嵌套选择器 */
+        .demo-section {
+            margin-bottom: var(--spacing-xl);
+            padding: var(--spacing-lg);
+            background-color: var(--color-background-light);
+            border-radius: var(--border-radius-md);
+            border: 1px solid #e9ecef;
+        }
+
+        .demo-title {
+            margin-bottom: var(--spacing-md);
+            font-size: var(--font-size-lg);
+            font-weight: 600;
+            color: var(--color-primary);
+        }
+
+        .demo-description {
+            margin-bottom: var(--spacing-md);
+            color: var(--color-text-light);
+        }
+
+        /* 高效的选择器层次结构 */
+        .demo-box {
+            margin: var(--spacing-md) 0;
+            padding: var(--spacing-md);
+            background-color: var(--color-background);
+            border-radius: var(--border-radius-md);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        /* 使用CSS containment限制影响范围 - 性能优化技术3 */
+        .containment-demo {
+            contain: layout style paint;
+            padding: var(--spacing-md);
+            background-color: #fff;
+            border-radius: var(--border-radius-md);
+            margin: var(--spacing-md) 0;
+        }
+
+        /* 优化动画性能 - 使用transform而非其他属性 */
+        .animation-demo {
+            display: flex;
+            gap: var(--spacing-md);
+            margin: var(--spacing-md) 0;
+            flex-wrap: wrap;
+        }
+
+        .animation-box {
+            width: 100px;
+            height: 100px;
+            background-color: var(--color-secondary);
+            border-radius: var(--border-radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 500;
+        }
+
+        /* 优化的动画 - 只改变transform和opacity */
+        .animation-box--optimized {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.1);
+                opacity: 0.8;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        /* 未优化的动画 - 改变布局属性 */
+        .animation-box--unoptimized {
+            animation: unoptimizedPulse 2s infinite;
+        }
+
+        @keyframes unoptimizedPulse {
+            0% {
+                width: 100px;
+                height: 100px;
+                background-color: var(--color-secondary);
+            }
+            50% {
+                width: 110px;
+                height: 110px;
+                background-color: var(--color-primary);
+            }
+            100% {
+                width: 100px;
+                height: 100px;
+                background-color: var(--color-secondary);
+            }
+        }
+
+        /* 使用will-change提示浏览器优化 - 性能优化技术4 */
+        .will-change-demo {
+            width: 100px;
+            height: 100px;
+            background-color: var(--color-danger);
+            margin: var(--spacing-md) 0;
+            transition: transform var(--transition-normal);
+            will-change: transform;
+        }
+
+        .will-change-demo:hover {
+            transform: rotate(45deg) scale(1.2);
+        }
+
+        /* 选择器性能测试区域 */
+        .selector-performance {
+            display: flex;
+            gap: var(--spacing-md);
+            margin: var(--spacing-md) 0;
+            flex-wrap: wrap;
+        }
+
+        .selector-item {
+            padding: var(--spacing-sm);
+            border-radius: var(--border-radius-sm);
+            background-color: #fff;
+            border: 1px solid #ddd;
+        }
+
+        /* 类选择器（高性能） */
+        .high-performance {
+            color: var(--color-secondary);
+        }
+
+        /* 优化的CSS变量使用 - 性能优化技术5 */
+        .css-variables {
+            --box-width: 100px;
+            --box-height: 100px;
+            --box-color: var(--color-primary);
+            --box-transition: all var(--transition-normal);
+        }
+
+        .css-variables__box {
+            width: var(--box-width);
+            height: var(--box-height);
+            background-color: var(--box-color);
+            transition: var(--box-transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            margin: var(--spacing-md) 0;
+        }
+
+        .css-variables__box:hover {
+            --box-color: var(--color-secondary);
+            transform: scale(1.1);
+        }
+
+        /* 减少重排操作的示例 */
+        .reflow-demo {
+            margin: var(--spacing-md) 0;
+        }
+
+        .reflow-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--spacing-sm);
+        }
+
+        .reflow-item {
+            padding: var(--spacing-sm);
+            background-color: #fff;
+            border-radius: var(--border-radius-sm);
+            border: 1px solid #ddd;
+            width: 80px;
+            text-align: center;
+        }
+
+        /* 响应式设计 - 性能优化技术6 */
+        .responsive-demo {
+            margin: var(--spacing-md) 0;
+        }
+
+        .responsive-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--spacing-md);
+        }
+
+        .responsive-item {
+            flex: 1 1 250px;
+            padding: var(--spacing-md);
+            background-color: #fff;
+            border-radius: var(--border-radius-md);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        /* 高效的媒体查询 */
+        @media (max-width: 768px) {
+            .header__container {
+                flex-direction: column;
+                gap: var(--spacing-md);
+            }
+            
+            .nav {
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+            
+            .animation-demo {
+                justify-content: center;
+            }
+        }
+
+        /* 加载优化的按钮 */
+        .btn {
+            display: inline-block;
+            padding: var(--spacing-sm) var(--spacing-md);
+            border: none;
+            border-radius: var(--border-radius-sm);
+            font-size: var(--font-size-md);
+            font-weight: 500;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            outline: none;
+            user-select: none;
+        }
+
+        .btn--primary {
+            background-color: var(--color-primary);
+            color: white;
+        }
+
+        .btn--secondary {
+            background-color: var(--color-secondary);
+            color: white;
+        }
+
+        .btn--danger {
+            background-color: var(--color-danger);
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        /* 使用CSS Grid的优化布局 */
+        .grid-demo {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: var(--spacing-md);
+            margin: var(--spacing-md) 0;
+        }
+
+        .grid-item {
+            padding: var(--spacing-md);
+            background-color: #fff;
+            border-radius: var(--border-radius-md);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        /* 避免重绘的示例 */
+        .repaint-demo {
+            margin: var(--spacing-md) 0;
+        }
+
+        .repaint-box {
+            width: 100px;
+            height: 100px;
+            background-color: var(--color-primary);
+            margin: var(--spacing-md) 0;
+            border-radius: var(--border-radius-sm);
+            transition: all var(--transition-normal);
+        }
+
+        .repaint-box:hover {
+            /* 只改变不会触发重排的属性 */
+            background-color: var(--color-secondary);
+            opacity: 0.8;
+            /* 注意：不改变宽高、位置等几何属性 */
+        }
+
+        /* 代码展示区域 */
+        .code-block {
+            background-color: #f8f9fa;
+            border-left: 4px solid var(--color-primary);
+            padding: var(--spacing-md);
+            border-radius: var(--border-radius-sm);
+            margin: var(--spacing-md) 0;
+            overflow-x: auto;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: var(--font-size-sm);
+            line-height: 1.5;
+        }
+
+        /* 辅助类 - 单一职责原则 */
+        .text-center {
+            text-align: center;
+        }
+
+        .mb-1 {
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .mb-2 {
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .mb-3 {
+            margin-bottom: var(--spacing-md);
+        }
+
+        .mb-4 {
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .p-1 {
+            padding: var(--spacing-xs);
+        }
+
+        .p-2 {
+            padding: var(--spacing-sm);
+        }
+
+        .p-3 {
+            padding: var(--spacing-md);
+        }
+
+        .p-4 {
+            padding: var(--spacing-lg);
+        }
+
+        /* CSS containment演示 */
+        .containment-demo {
+            contain: layout paint style;
+            background-color: #fff;
+            padding: var(--spacing-md);
+            border-radius: var(--border-radius-md);
+            margin: var(--spacing-md) 0;
+        }
+
+        /* 减少DOM操作的示例容器 */
+        .dom-manipulation-demo {
+            margin: var(--spacing-md) 0;
+        }
+
+        .dom-target {
+            min-height: 100px;
+            padding: var(--spacing-md);
+            background-color: #fff;
+            border: 1px dashed #ddd;
+            border-radius: var(--border-radius-sm);
+            margin: var(--spacing-md) 0;
+        }
+
+        /* 演示按钮组 */
+        .demo-controls {
+            display: flex;
+            gap: var(--spacing-sm);
+            flex-wrap: wrap;
+            margin: var(--spacing-md) 0;
+        }
+
+        /* 打印样式优化 */
+        @media print {
+            .header,
+            .demo-controls {
+                display: none;
+            }
+            
+            .demo-section {
+                break-inside: avoid;
+                border: 1px solid #ddd;
+            }
+        }
+
+        /* 减少动画的用户偏好支持 */
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+                scroll-behavior: auto !important;
+            }
+        }
+    </style>
+    <!-- 延迟加载非关键CSS - 性能优化技术7 -->
+    <link rel="preload" href="non-critical.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="non-critical.css"></noscript>
+</head>
+<body>
+    <header class="header">
+        <div class="container header__container">
+            <a href="#" class="header__logo">CSS优化示例</a>
+            <nav class="nav">
+                <li class="nav__item"><a href="#" class="nav__link nav__link--active">首页</a></li>
+                <li class="nav__item"><a href="#selectors" class="nav__link">选择器优化</a></li>
+                <li class="nav__item"><a href="#animation" class="nav__link">动画优化</a></li>
+                <li class="nav__item"><a href="#reflow" class="nav__link">重排优化</a></li>
+                <li class="nav__item"><a href="#css-vars" class="nav__link">CSS变量</a></li>
+            </nav>
+        </div>
+    </header>
+
+    <main class="content">
+        <div class="container">
+            <h1 class="text-center">CSS性能优化与最佳实践示例集</h1>
+            <p class="text-center">这个示例页面展示了各种CSS性能优化技术的实际应用，帮助你编写更高效的CSS代码。</p>
+
+            <!-- 1. 选择器性能优化 -->
+            <section id="selectors" class="demo-section">
+                <h2>1. 选择器性能优化</h2>
+                <p class="demo-description">比较不同类型选择器的性能差异，优先使用ID和类选择器。</p>
+                <
+                <div class="demo-box">
+                    <h3>选择器类型对比</h3>
+                    <div class="selector-performance">
+                        <div class="selector-item high-performance">
+                            类选择器 (高性能)
+                        </div>
+                        <div class="selector-item">
+                            标签选择器 (中性能)
+                        </div>
+                        <div class="selector-item">
+                            属性选择器 (较低性能)
+                        </div>
+                        <div class="selector-item">
+                            后代选择器 (嵌套层级越多性能越差)
+                        </div>
+                    </div>
+
+                    <div class="code-block">
+/* 不好的实践 - 复杂选择器 */
+body div#main-content article.post .content h2.title {
+    color: #333;
+}
+
+/* 好的实践 - 简单选择器 */
+.post-title {
+    color: #333;
+}
+                    </div>
+                </div>
+            </section>
+
+            <!-- 2. 动画性能优化 -->
+            <section id="animation" class="demo-section">
+                <h2>2. 动画性能优化</h2>
+                <p class="demo-description">使用transform和opacity进行动画，避免修改布局属性。</p>
+                <div class="demo-box">
+                    <h3>动画性能对比</h3>
+                    <div class="animation-demo">
+                        <div class="animation-box animation-box--optimized">优化动画
+                        </div>
+                        <div class="animation-box animation-box--unoptimized">未优化动画
+                        </div>
+                    </div>
+
+                    <div class="code-block">
+/* 优化的动画 - 仅使用transform和opacity */
+@keyframes optimizedAnimation {
+    0% {
+        transform: scale(1) translateX(0);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.1) translateX(20px);
+        opacity: 0.8;
+    }
+    100% {
+        transform: scale(1) translateX(0);
+        opacity: 1;
+    }
+}
+
+/* 未优化的动画 - 修改布局属性 */
+@keyframes unoptimizedAnimation {
+    0% {
+        width: 100px;
+        left: 0;
+        background-color: blue;
+    }
+    50% {
+        width: 120px;
+        left: 20px;
+        background-color: red;
+    }
+    100% {
+        width: 100px;
+        left: 0;
+        background-color: blue;
+    }
+}
+                    </div>
+                </div>
+
+                <div class="demo-box">
+                    <h3>使用will-change优化动画性能</h3>
+                    <div class="will-change-demo"></div>
+                    <p>悬停在红色方块上，注意性能差异。will-change告诉浏览器提前优化元素。</p>
+
+                    <div class="code-block">
+.animated-element {
+    /* 告诉浏览器该元素将要进行变换 */
+    will-change: transform;
+    transition: transform 0.3s ease;
+}
+
+.animated-element:hover {
+    transform: rotate(45deg) scale(1.2);
+}
+                    </div>
+                </div>
+            </section>
+
+            <!-- 3. 减少重排与重绘 -->
+            <section id="reflow" class="demo-section">
+                <h2>3. 减少重排与重绘优化>
+                <p class="demo-description">通过批量DOM操作和减少布局属性的读取来优化性能。</p>
+                <div class="demo-box">
+                    <h3>批量DOM操作演示</h3>
+                    <div class="demo-controls">
+                        <button id="badUpdateBtn" class="btn btn--danger">非优化更新（慢）</button>
+                        <button id="goodUpdateBtn" class="btn btn--primary">优化更新（快）</button>
+                    </div>
+                    <div id="domUpdateTarget" class="dom-target">
+                        <ul class="reflow-list" id="reflowList">
+                            <!-- 这里将动态添加元素 -->
+                        </ul>
+                    </div>
+
+                    <div class="code-block">
+// 不好的实践 - 每次循环都访问DOM并触发重排
+function badUpdate() {
+    const list = document.getElementById('reflowList');
+    list.innerHTML = '';
+    
+    for (let i = 0; i < 100; i++) {
+        const li = document.createElement('li');
+        li.className = 'reflow-item';
+        li.textContent = 'Item ' + i;
+        list.appendChild(li); // 每次都触发重排
+    }
+}
+
+// 好的实践 - 批量DOM操作
+function goodUpdate() {
+    const list = document.getElementById('reflowList');
+    const fragment = document.createDocumentFragment();
+    
+    for (let i = 0; i < 100; i++) {
+        const li = document.createElement('li');
+        li.className = 'reflow-item';
+        li.textContent = 'Item ' + i;
+        fragment.appendChild(li); // 不触发重排
+    }
+    
+    list.innerHTML = '';
+    list.appendChild(fragment); // 一次性更新，只触发一次重排
+}
+                    </div>
+                </div>
+
+                <div class="demo-box">
+                    <h3>避免读取布局属性触发强制同步布局</h3>
+                    <div class="demo-controls">
+                        <button id="forceLayoutBtn" class="btn btn--danger">触发强制同步布局</button>
+                        <button id="avoidLayoutBtn" class="btn btn--primary">避免强制同步布局</button>
+                    </div>
+                    <div id="layoutTarget" class="dom-target">
+                        <div id="measuredElement" style="width: 100px; height: 100px; background-color: var(--color-primary);"></div>
+                    </div>
+
+                    <div class="code-block">
+// 不好的实践 - 读取布局属性触发强制同步布局
+function forceLayout() {
+    const element = document.getElementById('measuredElement');
+    
+    for (let i = 0; i < 100; i++) {
+        element.style.width = (element.offsetWidth + 10) + 'px'; // 每次循环都读取offsetWidth
+    }
+}
+
+// 好的实践 - 避免强制同步布局
+function avoidLayout() {
+    const element = document.getElementById('measuredElement');
+    const width = element.offsetWidth; // 一次性读取
+    
+    for (let i = 0; i < 100; i++) {
+        element.style.width = (width + i * 10) + 'px'; // 只修改，不读取
+    }
+}
+                    </div>
+                <div class="demo-box">
+                    <h3>避免不必要的重绘示例</h3>
+                    <div class="repaint-box"></div>
+                    <p>悬停在蓝色方块上，只改变背景色和透明度，不触发重排。</p>
+                </div>
+            </section>
+
+            <!-- 4. CSS变量优化 -->
+            <section id="css-vars" class="demo-section">
+                <h2>4. CSS变量优化技术>
+                <p class="demo-description">使用CSS变量管理主题和动态样式，提高维护性和性能。</p>
+                <div class="demo-box">
+                    <h3>CSS变量动态更新演示</h3>
+                    <div class="css-variables">
+                        <div class="css-variables__box">悬停我
+                        </div>
+                    </div>
+                    <p>CSS变量允许在一个地方更新多个元素的样式，减少CSS体积和提高维护性。</p>
+
+                    <div class="demo-controls">
+                        <button id="changeThemeBtn" class="btn btn--secondary">更改主题色</button>
+                    </div>
+
+                    <div class="code-block">
+:root {
+    --color-primary: #3498db;
+    --color-secondary: #2ecc71;
+}
+
+/* 使用CSS变量 */
+.element {
+    background-color: var(--color-primary);
+    border-color: var(--color-secondary);
+}
+
+/* 动态更新CSS变量 */
+function changeTheme() {
+    document.documentElement.style.setProperty('--color-primary', '#e74c3c');
+    document.documentElement.style.setProperty('--color-secondary', '#9b59b6');
+    // 所有使用这些变量的元素都会自动更新
+}
+                    </div>
+                </div>
+            </section>
+
+            <!-- 5. CSS containment演示 -->
+            <section id="containment" class="demo-section">
+                <h2>5. CSS Containment优化>
+                <p class="demo-description">使用CSS containment限制样式影响范围，提高渲染性能。</p>
+                <div class="demo-box">
+                    <h3>Containment演示</h3>
+                    <div class="containment-demo">
+                        <p>这个元素使用了contain: layout paint style，限制其内部变化影响范围。</p>
+                        <p>当内部内容变化时，浏览器只需要重新计算此区域，而不是整个页面。</p>
+                    </div>
+
+                    <div class="code-block">
+/* 使用CSS containment */
+.component {
+    contain: layout paint style;
+    /* layout: 该元素的布局不会影响其他元素 */
+    /* paint: 该元素的绘制不会溢出到其他区域 */
+    /* style: 该元素的样式规则不会影响其他元素 */
+}
+
+/* 或使用简写 */
+.component {
+    contain: strict;
+    /* 等同于 contain: layout style paint size */
+}
+                    </div>
+                </div>
+            </section>
+
+            <!-- 6. 响应式布局优化 -->
+            <section id="responsive" class="demo-section">
+                <h2>6. 响应式布局优化>
+                <p class="demo-description">使用现代布局技术如Grid和Flexbox创建高效的响应式布局。</p>
+                <div class="demo-box">
+                    <h3>CSS Grid响应式布局演示>
+                    <div class="grid-demo">
+                        <div class="grid-item">项目 1
+                        </div>
+                        <div class="grid-item">项目 2
+                        <div class="grid-item">项目 3
+                        </div>
+                        <div class="grid-item">项目 4
+                        </div>
+                        <div class="grid-item">项目 5
+                        </div>
+                    </div>
+
+                    <div class="code-block">
+/* 响应式Grid布局 - 性能更好 */
+.responsive-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1rem;
+}
+
+/* 媒体查询优化 */
+@media (max-width: 768px) {
+    .header {
+        padding: 0.5rem;
+    }
+    
+    .nav {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+}
+                    </div>
+                </div>
+            </section>
+
+            <!-- 7. 性能监控工具提示 -->
+            <section id="monitoring" class="demo-section">
+                <h2>7. 性能监控工具提示>
+                <p class="demo-description">使用浏览器开发工具监控和分析CSS性能。</p>
+                <div class="demo-box">
+                    <h3>推荐的性能分析工具>
+                    <ul>
+                        <li>Chrome DevTools - Performance面板：分析重排和重绘性能</li>
+                        <li>Chrome DevTools - Coverage面板：检测未使用的CSS</li>
+                        <li>Lighthouse：全面的性能审计工具</li>
+                        <li>WebPageTest：详细的网页加载性能分析</li>
+                    </ul>
+
+                    <p class="demo-description">要打开Chrome DevTools并分析CSS性能：</p>
+                    <ol>
+                        <li>按F12打开DevTools</li>
+                        <li>切换到Performance面板</li>
+                        <li>点击录制按钮，然后与页面交互</li>
+                        <li>停止录制，查看性能时间轴，特别关注Layout和Paint事件</li>
+                    </ol>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer style="background-color: #f8f9fa; padding: 2rem 0; text-align: center;">
+        <div class="container">
+            <p>CSS性能优化与最佳实践示例 © 2023</p>
+        </div>
+    </footer>
+
+    <script>
+        // 等待DOM加载完成
+        document.addEventListener('DOMContentLoaded', () => {
+            // 1. 批量DOM操作演示
+            const badUpdateBtn = document.getElementById('badUpdateBtn');
+            const goodUpdateBtn = document.getElementById('goodUpdateBtn');
+            const reflowList = document.getElementById('reflowList');
+
+            badUpdateBtn.addEventListener('click', () => {
+                console.time('Bad Update');
+                // 非优化的DOM更新
+                reflowList.innerHTML = '';
+                for (let i = 0; i < 100; i++) {
+                    const li = document.createElement('li');
+                    li.className = 'reflow-item';
+                    li.textContent = 'Item ' + i;
+                    reflowList.appendChild(li); // 每次都触发重排
+                }
+                console.timeEnd('Bad Update');
+            });
+
+            goodUpdateBtn.addEventListener('click', () => {
+                console.time('Good Update');
+                // 优化的DOM更新
+                const fragment = document.createDocumentFragment();
+                reflowList.innerHTML = '';
+                
+                for (let i = 0; i < 100; i++) {
+                    const li = document.createElement('li');
+                    li.className = 'reflow-item';
+                    li.textContent = 'Item ' + i;
+                    fragment.appendChild(li); // 不触发重排
+                }
+                
+                reflowList.appendChild(fragment); // 一次性更新，只触发一次重排
+                console.timeEnd('Good Update');
+            });
+
+            // 2. 避免强制同步布局
+            const forceLayoutBtn = document.getElementById('forceLayoutBtn');
+            const avoidLayoutBtn = document.getElementById('avoidLayoutBtn');
+            const measuredElement = document.getElementById('measuredElement');
+
+            forceLayoutBtn.addEventListener('click', () => {
+                console.time('Force Layout');
+                // 非优化的布局操作
+                for (let i = 0; i < 100; i++) {
+                    measuredElement.style.width = (measuredElement.offsetWidth + 10) + 'px'; // 每次循环都读取offsetWidth
+                }
+                console.timeEnd('Force Layout');
+                
+                // 重置宽度
+                setTimeout(() => {
+                    measuredElement.style.width = '100px';
+                }, 1000);
+            });
+
+            avoidLayoutBtn.addEventListener('click', () => {
+                console.time('Avoid Layout');
+                // 优化的布局操作
+                const width = measuredElement.offsetWidth; // 一次性读取
+                
+                for (let i = 0; i < 100; i++) {
+                    measuredElement.style.width = (width + i * 10) + 'px'; // 只修改，不读取
+                }
+                console.timeEnd('Avoid Layout');
+                
+                // 重置宽度
+                setTimeout(() => {
+                    measuredElement.style.width = '100px';
+                }, 1000);
+            });
+
+            // 3. 更改CSS变量演示
+            const changeThemeBtn = document.getElementById('changeThemeBtn');
+            let themeToggle = false;
+
+            changeThemeBtn.addEventListener('click', () => {
+                themeToggle = !themeToggle;
+                if (themeToggle) {
+                    document.documentElement.style.setProperty('--color-primary', '#e74c3c');
+                    document.documentElement.style.setProperty('--color-secondary', '#9b59b6');
+                } else {
+                    document.documentElement.style.setProperty('--color-primary', '#3498db');
+                    document.documentElement.style.setProperty('--color-secondary', '#2ecc71');
+                }
+            });
+
+            // 4. 为了演示效果，预先填充一些数据
+            badUpdateBtn.click();
+
+            // 5. 添加平滑滚动效果
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href');
+                    if (targetId === '#') return;
+                    
+                    const targetElement = document.querySelector(targetId);
+                    if (targetElement) {
+                        targetElement.scrollIntoView({ behavior: 'smooth' });
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

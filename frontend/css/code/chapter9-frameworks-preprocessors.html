@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSS现代框架与预处理器示例</title>
+    
+    <!-- 引入Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- 引入Font Awesome图标库 -->
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    
+    <!-- 自定义CSS（模拟预处理器编译后的结果） -->
+    <style>
+        /* 模拟Sass/SCSS编译后的变量 */
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2ecc71;
+            --danger-color: #e74c3c;
+            --warning-color: #f39c12;
+            --info-color: #9b59b6;
+            --light-color: #f8f9fa;
+            --dark-color: #343a40;
+            --border-radius: 4px;
+            --transition-speed: 0.3s;
+            --font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        }
+
+        /* 模拟基础样式重置 */
+        body {
+            font-family: var(--font-family);
+            line-height: 1.6;
+            color: var(--dark-color);
+            background-color: var(--light-color);
+        }
+
+        /* 页面样式 */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 30px 0;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            margin: 0;
+            font-weight: 600;
+        }
+
+        .section {
+            margin-bottom: 40px;
+            padding: 20px;
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .section-title {
+            margin-top: 0;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--light-color);
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        .demo-box {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            background-color: #fafafa;
+        }
+
+        .demo-title {
+            margin-top: 0;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--secondary-color);
+        }
+
+        .code-block {
+            margin-top: 15px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-left: 4px solid var(--primary-color);
+            border-radius: 0 var(--border-radius) var(--border-radius) 0;
+            overflow-x: auto;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.9rem;
+        }
+
+        /* 模拟CSS预处理器生成的按钮样式 */
+        .btn-custom {
+            display: inline-block;
+            padding: 8px 16px;
+            margin-right: 10px;
+            margin-bottom: 10px;
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 14px;
+            font-weight: 500;
+            text-align: center;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all var(--transition-speed) ease;
+        }
+
+        .btn-custom-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-custom-primary:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(52, 152, 219, 0.3);
+        }
+
+        .btn-custom-secondary {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+
+        .btn-custom-secondary:hover {
+            background-color: #27ae60;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(46, 204, 113, 0.3);
+        }
+
+        .btn-custom-outline {
+            background-color: transparent;
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .btn-custom-outline:hover {
+            background-color: var(--primary-color);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        /* 模拟CSS预处理器生成的卡片样式 */
+        .card-custom {
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            margin-bottom: 20px;
+            transition: all var(--transition-speed) ease;
+        }
+
+        .card-custom:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-custom-header {
+            padding: 15px;
+            background-color: var(--light-color);
+            border-bottom: 1px solid #ddd;
+        }
+
+        .card-custom-body {
+            padding: 15px;
+        }
+
+        .card-custom-footer {
+            padding: 15px;
+            background-color: var(--light-color);
+            border-top: 1px solid #ddd;
+        }
+
+        /* 模拟媒体查询生成的响应式样式 */
+        @media (max-width: 768px) {
+            .header {
+                padding: 20px 0;
+            }
+            
+            .header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .btn-custom {
+                display: block;
+                width: 100%;
+                margin-right: 0;
+            }
+        }
+
+        /* 模拟Tailwind CSS工具类风格 */
+        .tw-text-center {
+            text-align: center;
+        }
+        
+        .tw-p-4 {
+            padding: 1rem;
+        }
+        
+        .tw-m-4 {
+            margin: 1rem;
+        }
+        
+        .tw-bg-blue-500 {
+            background-color: #3b82f6;
+        }
+        
+        .tw-text-white {
+            color: white;
+        }
+        
+        .tw-rounded-lg {
+            border-radius: 0.5rem;
+        }
+        
+        .tw-shadow-md {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        
+        .tw-flex {
+            display: flex;
+        }
+        
+        .tw-justify-center {
+            justify-content: center;
+        }
+        
+        .tw-items-center {
+            align-items: center;
+        }
+        
+        .tw-gap-4 {
+            gap: 1rem;
+        }
+        
+        /* 模拟CSS-in-JS生成的样式 */
+        .styled-button {
+            background-color: #3498db;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .styled-button:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+        
+        .styled-button--primary {
+            background-color: #3498db;
+        }
+        
+        .styled-button--secondary {
+            background-color: #2ecc71;
+        }
+        
+        /* 模拟CSS变量主题切换 */
+        .theme-light {
+            --theme-bg: #ffffff;
+            --theme-text: #333333;
+            --theme-border: #dddddd;
+        }
+        
+        .theme-dark {
+            --theme-bg: #1a1a1a;
+            --theme-text: #f0f0f0;
+            --theme-border: #444444;
+        }
+        
+        .theme-demo {
+            padding: 20px;
+            margin: 20px 0;
+            background-color: var(--theme-bg);
+            color: var(--theme-text);
+            border: 1px solid var(--theme-border);
+            border-radius: var(--border-radius);
+            transition: all var(--transition-speed) ease;
+        }
+        
+        /* 模拟嵌套选择器生成的样式 */
+        .nested-nav {
+            background-color: var(--primary-color);
+            padding: 10px;
+            border-radius: var(--border-radius);
+        }
+        
+        .nested-nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            gap: 10px;
+        }
+        
+        .nested-nav ul li {
+            display: inline-block;
+        }
+        
+        .nested-nav ul li a {
+            color: white;
+            text-decoration: none;
+            padding: 8px 12px;
+            border-radius: var(--border-radius);
+            transition: background-color var(--transition-speed) ease;
+        }
+        
+        .nested-nav ul li a:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        .nested-nav ul li a.active {
+            background-color: rgba(255, 255, 255, 0.3);
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body class="theme-light">
+    <!-- 页面头部 -->
+    <header class="header">
+        <div class="container">
+            <h1 class="text-center">CSS现代框架与预处理器示例集</h1>
+            <p class="text-center text-white/90">这个示例页面展示了各种CSS框架和预处理器的实际应用效果。</p>
+        </div>
+    </header>
+
+    <!-- 主内容区 --<main class="container">
+        <!-- 1. Bootstrap示例 -->
+        <section class="section">
+            <h2 class="section-title">1. Bootstrap 5 框架示例</h2>
+            <div class="demo-box">
+                <h3 class="demo-title">Bootstrap网格系统和组件>
+                
+                <!-- Bootstrap网格系统示例 -->
+                <div class="row mb-4">
+                    <div class="col-md-6 col-lg-4 mb-3">
+                        <div class="card">
+                            <div class="card-header bg-primary text-white">
+                                卡片标题 1
+                            </div>
+                            <div class="card-body">
+                                <p class="card-text">这是一个使用Bootstrap网格系统和卡片组件创建的元素。在中等屏幕上占用6列，大屏幕上占用4列。</p>
+                                <a href="#" class="btn btn-primary">查看详情</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-4 mb-3">
+                        <div class="card">
+                            <div class="card-header bg-secondary text-white">
+                                卡片标题 2
+                            </div>
+                            <div class="card-body">
+                                <p class="card-text">Bootstrap提供了丰富的组件库，帮助开发者快速构建美观、响应式的界面。</p>
+                                <a href="#" class="btn btn-secondary">查看详情</a>
+                            </div>
+                        </div>
+                    <div class="col-md-6 col-lg-4 mb-3">
+                        <div class="card">
+                            <div class="card-header bg-info text-white">
+                                卡片标题 3
+                            </div>
+                            <div class="card-body">
+                                <p class="card-text">响应式设计是Bootstrap的核心特性，自动适应不同屏幕尺寸。</p>
+                                <a href="#" class="btn btn-info">查看详情</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bootstrap表单示例 --<div class="mb-4">
+                    <h4 class="mb-2">Bootstrap表单组件：</h4>
+                    <form>
+                        <div class="mb-3">
+                            <label for="exampleInputEmail1" class="form-label">邮箱地址</label>
+                            <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="请输入邮箱">
+                            <div id="emailHelp" class="form-text">我们不会分享您的邮箱给任何人。</div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="exampleInputPassword1" class="form-label">密码</label>
+                            <input type="password" class="form-control" id="exampleInputPassword1" placeholder="请输入密码">
+                        </div>
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="exampleCheck1">
+                            <label class="form-check-label" for="exampleCheck1">记住我</label>
+                        </div>
+                        <button type="submit" class="btn btn-primary">提交</button>
+                        <button type="reset" class="btn btn-secondary ms-2">重置</button>
+                    </form>
+                </div>
+
+                <div class="code-block">
+                    <!-- Bootstrap示例代码 -->
+                    <pre>
+<!-- Bootstrap网格系统 -->
+<div class="row">
+    <div class="col-md-6 col-lg-4">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                卡片标题
+            </div>
+            <div class="card-body">
+                <p class="card-text">卡片内容...</p>
+                <a href="#" class="btn btn-primary">操作按钮</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 引入Bootstrap -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+                    </pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. 模拟预处理器生成的样式 -->
+        <section class="section">
+            <h2 class="section-title">2. CSS预处理器（Sass/SCSS）示例</h2>
+            <div class="demo-box">
+                <h3 class="demo-title">模拟Sass变量和混合（Mixins）生成的按钮样式>
+                <
+                <div class="mb-4">
+                    <button class="btn-custom btn-custom-primary">主要按钮</button>
+                    <button class="btn-custom btn-custom-secondary">次要按钮</button>
+                    <button class="btn-custom btn-custom-outline">轮廓按钮</button>
+                </div>
+
+                <h3 class="demo-title">模拟Sass嵌套生成的导航样式>
+                <nav class="nested-nav mb-4">
+                    <ul>
+                        <li><a href="#" class="active">首页</a></li>
+                        <li><a href="#">产品</a></li>
+                        <li><a href="#">关于我们</a></li>
+                        <li><a href="#">联系我们</a></li>
+                    </ul>
+                </nav>
+
+                <h3 class="demo-title">模拟Sass混合生成的卡片组件>
+                <div class="card-custom mb-4">
+                    <div class="card-custom-header">
+                        <h4>卡片标题</h4>
+                    </div>
+                    <div class="card-custom-body">
+                        <p>这是一个使用Sass混合（Mixins）和变量生成的卡片组件。通过预处理器可以轻松实现样式的复用和定制。</p>
+                    </div>
+                    <div class="card-custom-footer">
+                        <button class="btn-custom btn-custom-primary btn-sm">了解更多</button>
+                    </div>
+                </div>
+
+                <div class="code-block">
+                    <!-- Sass代码示例 -->
+                    <pre>
+// Sass变量定义
+$primary-color: #3498db;
+$secondary-color: #2ecc71;
+$border-radius: 4px;
+$transition-speed: 0.3s;
+
+// Sass混合定义
+@mixin button-base {
+  display: inline-block;
+  padding: 8px 16px;
+  margin-right: 10px;
+  margin-bottom: 10px;
+  border: none;
+  border-radius: $border-radius;
+  font-size: 14px;
+  font-weight: 500;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all $transition-speed ease;
+  
+  &:hover {
+    transform: translateY(-2px);
+  }
+}
+
+@mixin button-variant($bg-color, $hover-color) {
+  background-color: $bg-color;
+  color: white;
+  
+  &:hover {
+    background-color: $hover-color;
+    box-shadow: 0 4px 8px rgba($bg-color, 0.3);
+  }
+}
+
+// 使用混合生成样式
+.btn-custom {
+  @include button-base;
+}
+
+.btn-custom-primary {
+  @include button-variant($primary-color, darken($primary-color, 10%));
+}
+
+.btn-custom-secondary {
+  @include button-variant($secondary-color, darken($secondary-color, 10%));
+}
+
+// Sass嵌套示例
+.nested-nav {
+  background-color: $primary-color;
+  padding: 10px;
+  border-radius: $border-radius;
+  
+  ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    gap: 10px;
+    
+    li {
+      display: inline-block;
+      
+      a {
+        color: white;
+        text-decoration: none;
+        padding: 8px 12px;
+        border-radius: $border-radius;
+        transition: background-color $transition-speed ease;
+        
+        &:hover {
+          background-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        &.active {
+          background-color: rgba(255, 255, 255, 0.3);
+          font-weight: 600;
+        }
+      }
+    }
+  }
+}
+                    </pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. 模拟Tailwind CSS工具类 -->
+        <section class="section">
+            <h2 class="section-title">3. 实用优先CSS（Tailwind CSS风格）示例</h2>
+            <div class="demo-box">
+                <h3 class="demo-title">模拟Tailwind CSS工具类构建的组件>
+                <
+                <div class="tw-bg-blue-500 tw-text-white tw-p-4 tw-rounded-lg tw-shadow-md mb-4 tw-text-center">
+                    这是一个使用工具类构建的简单组件
+                </div>
+
+                <div class="tw-flex tw-justify-center tw-items-center tw-gap-4 mb-4">
+                    <div class="tw-bg-blue-500 tw-text-white tw-p-4 tw-rounded-lg">项目 1
+                    </div>
+                    <div class="tw-bg-green-500 tw-text-white tw-p-4 tw-rounded-lg">项目 2
+                    <div class="tw-bg-red-500 tw-text-white tw-p-4 tw-rounded-lg">项目 3
+                    </div>
+                </div>
+
+                <div class="tw-m-4 tw-p-4 border border-gray-200 rounded-lg tw-shadow-md mb-4">
+                    <h3 class="text-lg font-semibold mb-2">使用工具类的优势：</h3>
+                    <ul class="list-disc pl-5 space-y-1">
+                        <li>减少命名冲突
+                        <li>提高开发速度
+                        <li>减少CSS文件体积
+                        <li>直接在HTML中设计界面
+                        <li>通过配置自定义主题
+                    </ul>
+                </div>
+
+                <div class="code-block">
+                    <!-- Tailwind CSS风格代码示例 -->
+                    <pre>
+<!-- Tailwind CSS风格的工具类用法 -->
+<div class="bg-blue-500 text-white p-4 rounded-lg shadow-md">
+    这是一个使用Tailwind CSS工具类构建的组件
+</div>
+
+<div class="flex justify-center items-center gap-4">
+    <div class="bg-blue-500 text-white p-4 rounded-lg">项目 1</div>
+    <div class="bg-green-500 text-white p-4 rounded-lg">项目 2</div>
+    <div class="bg-red-500 text-white p-4 rounded-lg">项目 3</div>
+</div>
+
+<!-- Tailwind配置文件示例 -->
+// tailwind.config.js
+module.exports = {
+  content: ["\.\/src\/**\/*\.{html,js}"],
+  theme: {
+    extend: {
+      colors: {
+        primary: '#1E40AF',
+        secondary: '#3B82F6',
+      },
+      fontFamily: {
+        sans: ['Inter', 'sans-serif'],
+      },
+    },
+  },
+  plugins: [],
+}
+                    </pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. CSS变量主题切换示例 -->
+        <section class="section">
+            <h2 class="section-title">4. CSS变量与主题切换示例</h2>
+            <div class="demo-box">
+                <h3 class="demo-title">使用CSS变量实现的主题切换功能>
+                <
+                <div class="mb-4">
+                    <button id="themeToggle" class="btn-custom btn-custom-primary">
+                        <i class="fa fa-moon-o" aria-hidden="true"></i> 切换到深色主题
+                    </button>
+                </div>
+
+                <div class="theme-demo mb-4">
+                    <h3 class="mb-2">主题演示区域</h3>
+                    <p class="mb-2">这个区域的背景、文字和边框颜色会随着主题的切换而改变，完全基于CSS变量实现。</p>
+                    <div style="padding: 10px; margin: 10px 0; border: 1px solid var(--theme-border); border-radius: var(--border-radius);">
+                        嵌套内容也会自动适应主题变化
+                    </div>
+                </div>
+
+                <div class="code-block">
+                    <!-- CSS变量示例代码 -->
+                    <pre>
+// CSS变量定义
+:root {
+    --primary-color: #3498db;
+    --secondary-color: #2ecc71;
+    --border-radius: 4px;
+    --transition-speed: 0.3s;
+}
+
+// 主题定义
+.theme-light {
+    --theme-bg: #ffffff;
+    --theme-text: #333333;
+    --theme-border: #dddddd;
+}
+
+.theme-dark {
+    --theme-bg: #1a1a1a;
+    --theme-text: #f0f0f0;
+    --theme-border: #444444;
+}
+
+// 使用CSS变量
+.theme-demo {
+    padding: 20px;
+    background-color: var(--theme-bg);
+    color: var(--theme-text);
+    border: 1px solid var(--theme-border);
+    border-radius: var(--border-radius);
+    transition: all var(--transition-speed) ease;
+}
+
+// JavaScript主题切换
+const themeToggle = document.getElementById('themeToggle');
+const body = document.body;
+let isDarkTheme = false;
+
+themeToggle.addEventListener('click', () => {
+    isDarkTheme = !isDarkTheme;
+    
+    if (isDarkTheme) {
+        body.classList.remove('theme-light');
+        body.classList.add('theme-dark');
+        themeToggle.innerHTML = '\u003ci class="fa fa-sun-o" aria-hidden="true"\u003e\u003c/i\u003e 切换到浅色主题';
+    } else {
+        body.classList.remove('theme-dark');
+        body.classList.add('theme-light');
+        themeToggle.innerHTML = '\u003ci class="fa fa-moon-o" aria-hidden="true"\u003e\u003c/i\u003e 切换到深色主题';
+    }
+});
+                    </pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5. 模拟CSS-in-JS样式 -->
+        <section class="section">
+            <h2 class="section-title">5. CSS-in-JS示例（模拟）</h2>
+            <div class="demo-box">
+                <h3 class="demo-title">模拟Styled Components生成的组件样式>
+                <
+                <div class="mb-4">
+                    <button class="styled-button styled-button--primary">主要按钮</button>
+                    <button class="styled-button styled-button--secondary">次要按钮</button>
+                </div>
+
+                <div class="code-block">
+                    <!-- CSS-in-JS示例代码 -->
+                    <pre>
+// Styled Components示例
+import styled from 'styled-components';
+
+const Button = styled.button`
+  background-color: ${props => props.primary ? '#3498db' : '#2ecc71'};
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    opacity: 0.9;
+    transform: translateY(-2px);
+  }
+`;
+
+// 在React组件中使用
+function App() {
+  return (
+    <div>
+      <Button primary>主要按钮</Button>
+      <Button>次要按钮</Button>
+    </div>
+  );
+}
+
+// 或者使用动态主题
+const ThemeProvider = styled.div`
+  --primary-color: ${props => props.theme.primary};
+  --secondary-color: ${props => props.theme.secondary};
+  
+  // 主题内部的组件可以访问这些CSS变量
+`;
+                    </pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- 6. 构建工具集成建议 -->
+        <section class="section">
+            <h2 class="section-title">6. 构建工具集成示例
+            </p>
+
+            <div class="demo-box">
+                <h3 class="demo-title">Webpack和PostCSS配置示例>
+                <
+                <div class="code-block">
+                    <!-- Webpack配置示例 -->
+                    <pre>
+// webpack.config.js
+module.exports = {
+  module: {
+    rules: [
+      {
+        test: /\.(scss|sass)$/,
+        use: [
+          'style-loader', // 将CSS注入到DOM
+          'css-loader',   // 解析CSS文件
+          {
+            loader: 'postcss-loader',
+            options: {
+              postcssOptions: {
+                plugins: ['autoprefixer']
+              }
+            }
+          },
+          'sass-loader'   // 编译SCSS到CSS
+        ]
+      }
+    ]
+  }
+}
+
+// postcss.config.js
+module.exports = {
+  plugins: [
+    require('autoprefixer'),
+    require('postcss-preset-env')({
+      stage: 3,
+      features: {
+        'custom-properties': false
+      }
+    }),
+    require('cssnano')({
+      preset: 'default'
+    })
+  ]
+}
+                    </pre>
+                </div>
+
+                <h3 class="demo-title">Vite配置示例>
+                <div class="code-block">
+                    <!-- Vite配置示例 -->
+                    <pre>
+// vite.config.js
+import { defineConfig } from 'vite'
+import autoprefixer from 'autoprefixer'
+
+export default defineConfig({
+  css: {
+    postcss: {
+      plugins: [
+        autoprefixer()
+      ]
+    },
+    preprocessorOptions: {
+      scss: {
+        additionalData: `@import "${__dirname}/src/styles/variables.scss";`
+      }
+    }
+  }
+})
+                    </pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- 7. 最佳实践总结 -->
+        <section class="section">
+            <h2 class="section-title">7. CSS框架与预处理器最佳实践总结</h2>
+            <div class="demo-box">
+                <h3 class="demo-title">选择合适的CSS技术栈
+                </p>
+
+                <table class="table table-striped table-hover mb-4">
+                    <thead class="table-dark">
+                        <tr>
+                            <th scope="col">技术/框架</th>
+                            <th scope="col">适用场景
+                            <th scope="col">优势
+                            <th scope="col">注意事项
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Bootstrap
+                            <td>企业网站、管理后台、快速原型
+                            <td>组件丰富、文档完善、社区支持强
+                            <td>文件体积较大、定制化需要覆盖样式
+                        </tr>
+                        <tr>
+                            <td>Tailwind CSS
+                            <td>需要高度定制化的界面、快速开发
+                            <td>开发效率高、无命名冲突、体积可控
+                            <td>HTML类名较多、需要熟悉工具类
+                        </tr>
+                        <tr>
+                            <td>Sass/SCSS
+                            <td>大型项目、需要复用样式
+                            <td>功能丰富、结构清晰、易于维护
+                            <td>需要编译步骤、学习曲线较陡
+                        </tr>
+                        <tr>
+                            <td>PostCSS
+                            <td>需要特定后处理功能的项目
+                            <td>灵活、可插拔、模块化
+                            <td>配置复杂、需要选择合适的插件
+                        </tr>
+                        <tr>
+                            <td>CSS-in-JS
+                            <td>React/Vue等现代前端框架项目
+                            <td>组件级样式封装、动态样式能力强
+                            <td>运行时开销、调试困难
+                        </tr>
+                    </thead>
+                <table>
+
+                <h3 class="demo-title">性能优化建议
+                </ul>
+
+                <ul class="list-disc pl-5 mb-4 space-y-2">
+                    <li>使用PurgeCSS移除未使用的CSS
+                    <li>按需引入框架组件，减少体积
+                    <li>利用CSS Modules或命名空间避免冲突
+                    <li>优化CSS选择器，避免复杂嵌套
+                    <li>压缩CSS文件，减少传输大小
+                    <li>使用content-visibility提升渲染性能
+                </ul>
+
+                <h3 class="demo-title">可维护性最佳实践
+                </p>
+
+                <ul class="list-disc pl-5 space-y-2">
+                    <li>建立清晰的文件结构和命名约定
+                    <li>使用变量管理颜色、字体、间距等设计系统
+                    <li>封装可复用的样式为混合或组件
+                    <li>编写有意义的注释，解释复杂样式
+                    <li>定期重构和优化CSS代码
+                    <li>在团队中统一CSS编码规范
+                </ul>
+            </div>
+        </section>
+    </main>
+
+    <!-- 页脚 --<footer class="bg-dark text-white text-center p-4 mt-5">
+        <div class="container">
+            <p class="mb-0">CSS现代框架与预处理器示例 © 2023</p>
+        </div>
+    </footer>
+
+    <!-- JavaScript代码 -->
+    <script>
+        // 主题切换功能
+        document.addEventListener('DOMContentLoaded', function() {
+            const themeToggle = document.getElementById('themeToggle');
+            const body = document.body;
+            let isDarkTheme = false;
+
+            themeToggle.addEventListener('click', function() {
+                isDarkTheme = !isDarkTheme;
+                
+                if (isDarkTheme) {
+                    body.classList.remove('theme-light');
+                    body.classList.add('theme-dark');
+                    themeToggle.innerHTML = '\u003ci class="fa fa-sun-o" aria-hidden="true"\u003e\u003c/i\u003e 切换到浅色主题';
+                } else {
+                    body.classList.remove('theme-dark');
+                    body.classList.add('theme-light');
+                    themeToggle.innerHTML = '\u003ci class="fa fa-moon-o" aria-hidden="true"\u003e\u003c/i\u003e 切换到深色主题';
+                }
+            });
+
+            // 平滑滚动功能
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href');
+                    if (targetId === '#') return;
+                    
+                    const targetElement = document.querySelector(targetId);
+                    if (targetElement) {
+                        window.scrollTo({
+                            top: targetElement.offsetTop - 20,
+                            behavior: 'smooth'
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+
+    <!-- 引入Bootstrap JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

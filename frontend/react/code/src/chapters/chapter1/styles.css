@@ -1,0 +1,37 @@
+.chapter-container {
+  width: 100%;
+}
+
+.example-tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid #eaecef;
+  overflow-x: auto;
+  padding-bottom: 10px;
+}
+
+.example-tab {
+  padding: 8px 15px;
+  background-color: transparent;
+  border: 1px solid #eaecef;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  font-size: 14px;
+}
+
+.example-tab:hover {
+  background-color: #f6f8fa;
+}
+
+.example-tab.active {
+  background-color: #4dabf7;
+  color: white;
+  border-color: #4dabf7;
+}
+
+.example-content {
+  width: 100%;
+}

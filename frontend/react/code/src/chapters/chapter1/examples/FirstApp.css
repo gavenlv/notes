@@ -1,0 +1,270 @@
+.app-container {
+  min-height: 100vh;
+  transition: all 0.3s ease;
+}
+
+.light-theme {
+  background-color: #f8f9fa;
+  color: #333;
+}
+
+.dark-theme {
+  background-color: #1a1a1a;
+  color: #f5f5f5;
+}
+
+.app-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  margin-bottom: 20px;
+  border-radius: 8px;
+}
+
+.light-theme .app-header {
+  background-color: #ffffff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.dark-theme .app-header {
+  background-color: #2d2d2d;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.search-box {
+  position: relative;
+}
+
+.search-input {
+  padding: 8px 12px;
+  border-radius: 20px;
+  border: 1px solid #ddd;
+  width: 250px;
+}
+
+.light-theme .search-input {
+  background-color: #ffffff;
+  border-color: #eaecef;
+  color: #333;
+}
+
+.dark-theme .search-input {
+  background-color: #3d3d3d;
+  border-color: #555;
+  color: #f5f5f5;
+}
+
+.theme-toggle {
+  padding: 8px 16px;
+  border-radius: 20px;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.light-theme .theme-toggle {
+  background-color: #e9ecef;
+  color: #333;
+}
+
+.dark-theme .theme-toggle {
+  background-color: #444;
+  color: #f5f5f5;
+}
+
+.app-main {
+  width: 100%;
+}
+
+.selected-user-info {
+  margin-bottom: 30px;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+.light-theme .selected-user-info {
+  background-color: #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.dark-theme .selected-user-info {
+  background-color: #2d2d2d;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.selected-user-card {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
+.selected-avatar {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #4dabf7;
+}
+
+.selected-details h2 {
+  margin-top: 0;
+  color: #4dabf7;
+}
+
+.user-stats {
+  display: flex;
+  gap: 20px;
+  margin-top: 15px;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.stat-value {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #4dabf7;
+}
+
+.stat-label {
+  font-size: 0.8rem;
+  color: #6c757d;
+}
+
+.dark-theme .stat-label {
+  color: #aaa;
+}
+
+.user-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.user-card {
+  padding: 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.light-theme .user-card {
+  background-color: #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid #eaecef;
+}
+
+.dark-theme .user-card {
+  background-color: #2d2d2d;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  border: 1px solid #444;
+}
+
+.user-card:hover {
+  transform: translateY(-5px);
+}
+
+.light-theme .user-card:hover {
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+}
+
+.dark-theme .user-card:hover {
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+}
+
+.user-card.selected {
+  border: 2px solid #4dabf7;
+}
+
+.user-avatar {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 15px;
+}
+
+.user-info {
+  flex-grow: 1;
+}
+
+.user-info h3 {
+  margin-top: 0;
+  margin-bottom: 8px;
+}
+
+.user-bio {
+  color: #6c757d;
+  margin-bottom: 15px;
+  font-size: 0.9rem;
+}
+
+.dark-theme .user-bio {
+  color: #aaa;
+}
+
+.user-skills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 15px;
+}
+
+.skill-tag {
+  background-color: #e9ecef;
+  color: #495057;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+}
+
+.dark-theme .skill-tag {
+  background-color: #444;
+  color: #ddd;
+}
+
+.user-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: auto;
+  padding-top: 10px;
+}
+
+.follow-btn {
+  padding: 6px 12px;
+  border-radius: 4px;
+  border: none;
+  background-color: #4dabf7;
+  color: white;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.follow-btn:hover {
+  background-color: #3a9ae5;
+}
+
+.no-results {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 40px;
+  color: #6c757d;
+  font-size: 1.2rem;
+}
+
+.dark-theme .no-results {
+  color: #aaa;
+}
