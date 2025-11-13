@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tailwind CSS基础示例</title>
+  <!-- 通过CDN引入Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- 自定义配置 -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#3B82F6',
+            secondary: '#10B981',
+            accent: '#8B5CF6',
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          },
+        },
+      }
+    }
+  </script>
+  <!-- 自定义工具类 -->
+  <style type="text/tailwindcss">
+    @layer utilities {
+      .content-auto {
+        content-visibility: auto;
+      }
+      .card-shadow {
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      }
+    }
+  </style>
+</head>
+<body class="bg-gray-50 min-h-screen font-sans">
+  <!-- 页面头部 -->
+  <header class="bg-white shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between h-16 items-center">
+        <div class="flex items-center">
+          <svg class="h-8 w-8 text-primary" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+          </svg>
+          <span class="ml-2 text-xl font-semibold text-gray-900">Tailwind CSS示例</span>
+        </div>
+        <nav class="hidden md:flex space-x-8">
+          <a href="#" class="text-gray-600 hover:text-primary font-medium">首页</a>
+          <a href="#" class="text-gray-600 hover:text-primary font-medium">功能</a>
+          <a href="#" class="text-gray-600 hover:text-primary font-medium">文档</a>
+          <a href="#" class="text-gray-600 hover:text-primary font-medium">关于</a>
+        </nav>
+        <div class="md:hidden">
+          <button type="button" class="text-gray-600 hover:text-primary">
+            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- 主内容区 -->
+  <main class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+    <!-- 欢迎消息 -->
+    <div class="text-center mb-12">
+      <h1 class="text-[clamp(2rem,5vw,3.5rem)] font-bold text-gray-900 mb-4">
+        欢迎使用 <span class="text-primary">Tailwind CSS</span>
+      </h1>
+      <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+        功能类优先的CSS框架，让你无需编写自定义CSS即可快速构建现代美观的用户界面
+      </p>
+    </div>
+
+    <!-- 卡片示例 -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <!-- 卡片1：基础卡片 -->
+      <div class="bg-white rounded-xl overflow-hidden card-shadow hover:transform hover:scale-[1.02] transition-all">
+        <div class="h-48 bg-gradient-to-r from-primary to-accent"></div>
+        <div class="p-6">
+          <h2 class="text-xl font-bold text-gray-900 mb-2">基础卡片</h2>
+          <p class="text-gray-600 mb-4">
+            这是一个使用Tailwind CSS创建的基础卡片组件，展示了基本的布局和样式。
+          </p>
+          <div class="flex items-center justify-between">
+            <span class="text-sm font-medium text-gray-500">最后更新: 2023-06-01</span>
+            <a href="#" class="text-primary hover:text-primary/80 font-medium flex items-center">
+              查看详情
+              <svg class="w-4 h-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+              </svg>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- 卡片2：功能展示 -->
+      <div class="bg-white rounded-xl overflow-hidden card-shadow hover:transform hover:scale-[1.02] transition-all">
+        <div class="p-6">
+          <div class="inline-flex items-center justify-center p-3 bg-secondary/10 rounded-full mb-4">
+            <svg class="h-6 w-6 text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+            </svg>
+          </div>
+          <h2 class="text-xl font-bold text-gray-900 mb-2">响应式设计</h2>
+          <p class="text-gray-600 mb-4">
+            Tailwind CSS内置响应式支持，让你的页面在不同屏幕尺寸下都能完美展示。
+          </p>
+          <div class="flex space-x-2 mb-4">
+            <span class="px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded">移动优先</span>
+            <span class="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded">响应式</span>
+            <span class="px-2 py-1 text-xs font-medium bg-purple-100 text-purple-800 rounded">灵活布局</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 卡片3：交互按钮 -->
+      <div class="bg-white rounded-xl overflow-hidden card-shadow hover:transform hover:scale-[1.02] transition-all">
+        <div class="p-6">
+          <h2 class="text-xl font-bold text-gray-900 mb-4">交互按钮示例</h2>
+          <div class="space-y-3">
+            <button class="w-full py-2 px-4 bg-primary hover:bg-primary/90 text-white font-medium rounded-md transition-colors flex items-center justify-center">
+              <svg class="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+              </svg>
+              主要按钮
+            </button>
+            <button class="w-full py-2 px-4 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium rounded-md transition-colors">
+              次要按钮
+            </button>
+            <button class="w-full py-2 px-4 bg-secondary hover:bg-secondary/90 text-white font-medium rounded-md transition-colors">
+              成功按钮
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 表单示例 -->
+    <div class="mt-16 bg-white p-8 rounded-xl card-shadow">
+      <h2 class="text-2xl font-bold text-gray-900 mb-6">表单示例</h2>
+      <form class="space-y-6 max-w-lg mx-auto">
+        <div>
+          <label for="name" class="block text-sm font-medium text-gray-700 mb-1">姓名</label>
+          <input type="text" id="name" name="name" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary/50 focus:border-primary transition-colors" placeholder="请输入姓名">
+        </div>
+        <div>
+          <label for="email" class="block text-sm font-medium text-gray-700 mb-1">邮箱</label>
+          <input type="email" id="email" name="email" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary/50 focus:border-primary transition-colors" placeholder="请输入邮箱">
+        </div>
+        <div>
+          <label for="message" class="block text-sm font-medium text-gray-700 mb-1">留言</label>
+          <textarea id="message" name="message" rows="4" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary/50 focus:border-primary transition-colors" placeholder="请输入留言内容"></textarea>
+        </div>
+        <div class="flex items-center">
+          <input id="agreement" name="agreement" type="checkbox" class="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded">
+          <label for="agreement" class="ml-2 block text-sm text-gray-700">
+            我同意所有条款和条件
+          </label>
+        </div>
+        <div>
+          <button type="submit" class="w-full bg-primary hover:bg-primary/90 text-white font-medium py-2 px-4 rounded-md transition-colors">
+            提交表单
+          </button>
+        </div>
+      </form>
+    </div>
+  </main>
+
+  <!-- 页脚 -->
+  <footer class="bg-gray-800 text-white mt-16">
+    <div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div>
+          <h3 class="text-lg font-semibold mb-4">Tailwind CSS示例</h3>
+          <p class="text-gray-300">
+            这个示例展示了Tailwind CSS的基础用法，包括布局、颜色、排版和交互等核心功能。
+          </p>
+        </div>
+        <div>
+          <h3 class="text-lg font-semibold mb-4">快速链接</h3>
+          <ul class="space-y-2">
+            <li><a href="#" class="text-gray-300 hover:text-white transition-colors">首页</a></li>
+            <li><a href="#" class="text-gray-300 hover:text-white transition-colors">功能</a></li>
+            <li><a href="#" class="text-gray-300 hover:text-white transition-colors">文档</a></li>
+            <li><a href="#" class="text-gray-300 hover:text-white transition-colors">关于</a></li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="text-lg font-semibold mb-4">联系我们</h3>
+          <p class="text-gray-300 mb-2">邮箱: example@tailwindcss.com</p>
+          <p class="text-gray-300">电话: 123-456-7890</p>
+        </div>
+      </div>
+      <div class="mt-8 pt-8 border-t border-gray-700 text-center text-gray-300">
+        <p>&copy; 2023 Tailwind CSS示例. 保留所有权利。</p>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

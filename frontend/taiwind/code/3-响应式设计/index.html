@@ -1,0 +1,1062 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tailwind CSS 响应式设计示例</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#3B82F6',
+            secondary: '#10B981',
+            accent: '#8B5CF6',
+            neutral: '#6B7280',
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          },
+        },
+      }
+    }
+  </script>
+  <style type="text/tailwindcss">
+    @layer utilities {
+      .content-auto {
+        content-visibility: auto;
+      }
+      .text-balance {
+        text-wrap: balance;
+      }
+      .aspect-golden {
+        aspect-ratio: 1.618 / 1;
+      }
+      .transition-custom {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+    }
+  </style>
+  <style>
+    /* 导入字体 */
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+  </style>
+</head>
+<body class="font-sans bg-gray-50 text-gray-900">
+  <!-- 导航栏 - 响应式设计 -->
+  <header class="sticky top-0 z-50 bg-white shadow-sm">
+    <div class="container mx-auto px-4 py-3">
+      <nav class="flex items-center justify-between">
+        <div class="flex items-center">
+          <div class="text-2xl font-bold text-primary">
+            <i class="fa fa-cube mr-2"></i>Tailwind响应式
+          </div>
+        </div>
+        
+        <!-- 桌面导航菜单 -->
+        <div class="hidden md:flex space-x-8">
+          <a href="#intro" class="text-primary font-medium hover:text-primary/80 transition-colors">
+            简介
+          </a>
+          <a href="#layouts" class="text-gray-600 hover:text-gray-900 transition-colors">
+            布局示例
+          </a>
+          <a href="#typography" class="text-gray-600 hover:text-gray-900 transition-colors">
+            排版展示
+          </a>
+          <a href="#components" class="text-gray-600 hover:text-gray-900 transition-colors">
+            组件示例
+          </a>
+          <a href="#responsive" class="text-gray-600 hover:text-gray-900 transition-colors">
+            响应式技巧
+          </a>
+        </div>
+        
+        <!-- 移动端菜单按钮 -->
+        <div class="md:hidden">
+          <button id="mobile-menu-button" class="p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">
+            <i class="fa fa-bars text-xl"></i>
+          </button>
+        </div>
+      </nav>
+      
+      <!-- 移动端下拉菜单 -->
+      <div id="mobile-menu" class="md:hidden hidden mt-3 py-2 bg-white rounded-lg shadow-lg">
+        <a href="#intro" class="block px-4 py-2 text-primary font-medium hover:bg-gray-50 rounded-md">
+          简介
+        </a>
+        <a href="#layouts" class="block px-4 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md">
+          布局示例
+        </a>
+        <a href="#typography" class="block px-4 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md">
+          排版展示
+        </a>
+        <a href="#components" class="block px-4 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md">
+          组件示例
+        </a>
+        <a href="#responsive" class="block px-4 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md">
+          响应式技巧
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- 英雄区域 -->
+  <section class="relative bg-gradient-to-r from-primary/90 to-accent/90 text-white">
+    <div class="absolute inset-0 bg-[url('https://picsum.photos/1920/1080')] bg-cover bg-center opacity-20"></div>
+    <div class="container mx-auto px-4 py-16 sm:py-24 md:py-32 relative z-10">
+      <div class="max-w-3xl">
+        <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-[clamp(2.5rem,5vw,4rem)] font-bold mb-6 leading-tight">
+          Tailwind CSS 响应式设计完全指南
+        </h1>
+        <p class="text-lg sm:text-xl text-white/90 mb-8 max-w-2xl text-balance">
+          学习如何使用 Tailwind CSS 创建在所有设备上都能完美显示的响应式网站
+        </p>
+        <div class="flex flex-col sm:flex-row gap-4">
+          <a href="#examples" class="bg-white text-primary px-6 py-3 rounded-lg font-medium hover:bg-gray-100 transition-colors text-center">
+            查看示例
+          </a>
+          <a href="#learn" class="bg-transparent border-2 border-white text-white px-6 py-3 rounded-lg font-medium hover:bg-white/10 transition-colors text-center">
+            学习响应式设计
+          </a>
+        </div>
+      </div>
+    </div>
+    <div class="absolute bottom-0 left-0 w-full h-12 bg-gradient-to-t from-gray-50 to-transparent"></div>
+  </section>
+
+  <!-- 简介部分 -->
+  <section id="intro" class="py-16 bg-white">
+    <div class="container mx-auto px-4">
+      <div class="text-center mb-12">
+        <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold mb-4">什么是响应式设计？</h2>
+        <p class="text-gray-600 max-w-2xl mx-auto">
+          响应式设计是一种网页设计方法，使网站能够根据用户的设备（如桌面电脑、平板电脑或手机）自动调整布局和内容。
+        </p>
+      </div>
+      
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <!-- 特性卡片 1 -->
+        <div class="bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow border border-gray-100">
+          <div class="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
+            <i class="fa fa-mobile text-2xl text-primary"></i>
+          </div>
+          <h3 class="text-xl font-semibold mb-3">移动优先</h3>
+          <p class="text-gray-600">
+            Tailwind 采用移动优先的设计理念，从最小屏幕开始，然后逐步扩展到更大的屏幕。
+          </p>
+        </div>
+        
+        <!-- 特性卡片 2 -->
+        <div class="bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow border border-gray-100">
+          <div class="w-12 h-12 bg-secondary/10 rounded-lg flex items-center justify-center mb-4">
+            <i class="fa fa-th-large text-2xl text-secondary"></i>
+          </div>
+          <h3 class="text-xl font-semibold mb-3">响应式前缀</h3>
+          <p class="text-gray-600">
+            使用 sm:, md:, lg:, xl: 等前缀可以在不同屏幕尺寸上应用特定的样式。
+          </p>
+        </div>
+        
+        <!-- 特性卡片 3 -->
+        <div class="bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow border border-gray-100">
+          <div class="w-12 h-12 bg-accent/10 rounded-lg flex items-center justify-center mb-4">
+            <i class="fa fa-code text-2xl text-accent"></i>
+          </div>
+          <h3 class="text-xl font-semibold mb-3">无媒体查询</h3>
+          <p class="text-gray-600">
+            无需编写传统的媒体查询，Tailwind 的响应式前缀使响应式设计变得简单直观。
+          </p>
+        </div>
+      </div>
+      
+      <!-- 断点展示 -->
+      <div class="mt-16 p-6 bg-gray-50 rounded-lg border border-gray-100">
+        <h3 class="text-xl font-semibold mb-6">Tailwind 默认断点</h3>
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead>
+              <tr>
+                <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">断点前缀</th>
+                <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">最小宽度</th>
+                <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">说明</th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+              <tr>
+                <td class="px-6 py-4 whitespace-nowrap font-medium">无</td>
+                <td class="px-6 py-4 whitespace-nowrap">0px</td>
+                <td class="px-6 py-4">移动设备（默认）</td>
+              </tr>
+              <tr>
+                <td class="px-6 py-4 whitespace-nowrap font-medium">sm:</td>
+                <td class="px-6 py-4 whitespace-nowrap">640px</td>
+                <td class="px-6 py-4">小型设备，如小屏平板</td>
+              </tr>
+              <tr>
+                <td class="px-6 py-4 whitespace-nowrap font-medium">md:</td>
+                <td class="px-6 py-4 whitespace-nowrap">768px</td>
+                <td class="px-6 py-4">中等设备，如大屏平板</td>
+              </tr>
+              <tr>
+                <td class="px-6 py-4 whitespace-nowrap font-medium">lg:</td>
+                <td class="px-6 py-4 whitespace-nowrap">1024px</td>
+                <td class="px-6 py-4">大型设备，如笔记本电脑</td>
+              </tr>
+              <tr>
+                <td class="px-6 py-4 whitespace-nowrap font-medium">xl:</td>
+                <td class="px-6 py-4 whitespace-nowrap">1280px</td>
+                <td class="px-6 py-4">超大型设备，如桌面显示器</td>
+              </tr>
+              <tr>
+                <td class="px-6 py-4 whitespace-nowrap font-medium">2xl:</td>
+                <td class="px-6 py-4 whitespace-nowrap">1536px</td>
+                <td class="px-6 py-4">超大显示器</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 布局示例部分 -->
+  <section id="layouts" class="py-16 bg-gray-50">
+    <div class="container mx-auto px-4">
+      <div class="text-center mb-12">
+        <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold mb-4">响应式布局示例</h2>
+        <p class="text-gray-600 max-w-2xl mx-auto">
+          探索使用 Tailwind CSS 创建的各种响应式布局技术
+        </p>
+      </div>
+      
+      <!-- Flexbox 布局示例 -->
+      <div class="mb-16">
+        <h3 class="text-xl font-semibold mb-6">响应式 Flexbox 布局</h3>
+        <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+          <div class="flex flex-col sm:flex-row gap-4 mb-6">
+            <div class="flex-1 bg-primary/10 p-4 rounded-lg text-center">
+              <p class="font-medium text-primary">弹性项 1</p>
+            </div>
+            <div class="flex-1 bg-secondary/10 p-4 rounded-lg text-center">
+              <p class="font-medium text-secondary">弹性项 2</p>
+            </div>
+            <div class="flex-1 bg-accent/10 p-4 rounded-lg text-center">
+              <p class="font-medium text-accent">弹性项 3</p>
+            </div>
+          </div>
+          <p class="text-sm text-gray-500">
+            <i class="fa fa-info-circle mr-1"></i> 在移动设备上垂直堆叠，在小型设备及以上水平排列
+          </p>
+        </div>
+      </div>
+      
+      <!-- Grid 布局示例 -->
+      <div class="mb-16">
+        <h3 class="text-xl font-semibold mb-6">响应式 Grid 布局</h3>
+        <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+            <div class="bg-gray-100 p-4 rounded-lg text-center">
+              <p class="font-medium">网格项 1</p>
+            </div>
+            <div class="bg-gray-100 p-4 rounded-lg text-center">
+              <p class="font-medium">网格项 2</p>
+            </div>
+            <div class="bg-gray-100 p-4 rounded-lg text-center">
+              <p class="font-medium">网格项 3</p>
+            </div>
+            <div class="bg-gray-100 p-4 rounded-lg text-center">
+              <p class="font-medium">网格项 4</p>
+            </div>
+            <div class="bg-gray-100 p-4 rounded-lg text-center">
+              <p class="font-medium">网格项 5</p>
+            </div>
+            <div class="bg-gray-100 p-4 rounded-lg text-center">
+              <p class="font-medium">网格项 6</p>
+            </div>
+          </div>
+          <p class="text-sm text-gray-500">
+            <i class="fa fa-info-circle mr-1"></i> 在移动设备上1列，小型设备上2列，大型设备上3列
+          </p>
+        </div>
+      </div>
+      
+      <!-- 复杂布局示例 -->
+      <div>
+        <h3 class="text-xl font-semibold mb-6">复杂响应式布局</h3>
+        <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+          <!-- 头部 -->
+          <div class="bg-gray-100 p-4 rounded-lg mb-4 text-center">
+            <p class="font-medium">页头区域</p>
+          </div>
+          
+          <!-- 主体区域 -->
+          <div class="flex flex-col lg:flex-row gap-4 mb-4">
+            <!-- 侧边栏 -->
+            <div class="lg:w-1/4 bg-gray-100 p-4 rounded-lg">
+              <p class="font-medium mb-3">侧边栏导航</p>
+              <ul class="space-y-2">
+                <li class="bg-white p-2 rounded">菜单项 1</li>
+                <li class="bg-white p-2 rounded">菜单项 2</li>
+                <li class="bg-white p-2 rounded">菜单项 3</li>
+              </ul>
+            </div>
+            
+            <!-- 主内容 -->
+            <div class="lg:w-3/4 bg-gray-100 p-4 rounded-lg">
+              <p class="font-medium mb-3">主内容区域</p>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div class="bg-white p-3 rounded">内容块 1</div>
+                <div class="bg-white p-3 rounded">内容块 2</div>
+                <div class="bg-white p-3 rounded">内容块 3</div>
+                <div class="bg-white p-3 rounded">内容块 4</div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- 页脚 -->
+          <div class="bg-gray-100 p-4 rounded-lg text-center">
+            <p class="font-medium">页脚区域</p>
+          </div>
+          
+          <p class="mt-4 text-sm text-gray-500">
+            <i class="fa fa-info-circle mr-1"></i> 响应式布局展示：在大屏幕上侧边栏和主内容并排显示，小屏幕上垂直堆叠
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 排版展示部分 -->
+  <section id="typography" class="py-16 bg-white">
+    <div class="container mx-auto px-4">
+      <div class="text-center mb-12">
+        <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold mb-4">响应式排版展示</h2>
+        <p class="text-gray-600 max-w-2xl mx-auto">
+          展示如何根据屏幕尺寸调整文本的大小、行高和其他排版属性
+        </p>
+      </div>
+      
+      <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+        <!-- 响应式标题示例 -->
+        <div class="mb-8">
+          <h3 class="text-xl font-semibold mb-4">响应式标题大小</h3>
+          <div class="space-y-4">
+            <h1 class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900">
+              这是一个响应式 H1 标题
+            </h1>
+            <h2 class="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800">
+              这是一个响应式 H2 标题
+            </h2>
+            <h3 class="text-lg sm:text-xl md:text-2xl font-semibold text-gray-700">
+              这是一个响应式 H3 标题
+            </h3>
+          </div>
+        </div>
+        
+        <!-- 响应式段落示例 -->
+        <div class="mb-8">
+          <h3 class="text-xl font-semibold mb-4">响应式段落文本</h3>
+          <p class="text-sm md:text-base text-gray-700 leading-relaxed mb-4">
+            这是一个响应式段落文本。在小屏幕上，它使用较小的字体大小和更紧凑的行高；在大屏幕上，它使用更大的字体大小和更宽松的行高，以提高可读性。
+          </p>
+          <p class="text-sm md:text-base text-gray-700 leading-relaxed">
+            良好的响应式排版对于确保内容在各种设备上都能清晰可读至关重要。在移动设备上，我们可能需要使用更大的字体大小和更紧凑的行高，而在大屏幕上，我们可以使用更宽松的排版来提高可读性。
+          </p>
+        </div>
+        
+        <!-- 响应式文本对齐示例 -->
+        <div class="mb-8">
+          <h3 class="text-xl font-semibold mb-4">响应式文本对齐</h3>
+          <p class="text-center sm:text-left text-gray-700 p-4 bg-gray-50 rounded-lg">
+            这段文本在移动设备上居中对齐，在小型设备及以上左对齐。这对于在移动设备上创建更紧凑、更集中的布局非常有用，而在大屏幕上提供更传统的阅读体验。
+          </p>
+        </div>
+        
+        <!-- 响应式列表示例 -->
+        <div>
+          <h3 class="text-xl font-semibold mb-4">响应式列表</h3>
+          <div class="flex flex-col sm:flex-row gap-6">
+            <div class="sm:w-1/2">
+              <h4 class="font-medium mb-2">有序列表</h4>
+              <ol class="list-decimal pl-5 space-y-1 text-gray-700">
+                <li>列表项 1</li>
+                <li>列表项 2</li>
+                <li>列表项 3</li>
+              </ol>
+            </div>
+            <div class="sm:w-1/2">
+              <h4 class="font-medium mb-2">无序列表</h4>
+              <ul class="list-disc pl-5 space-y-1 text-gray-700">
+                <li>列表项 A</li>
+                <li>列表项 B</li>
+                <li>列表项 C</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 组件示例部分 -->
+  <section id="components" class="py-16 bg-gray-50">
+    <div class="container mx-auto px-4">
+      <div class="text-center mb-12">
+        <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold mb-4">响应式组件示例</h2>
+        <p class="text-gray-600 max-w-2xl mx-auto">
+          展示如何创建在各种设备上都能完美工作的响应式组件
+        </p>
+      </div>
+      
+      <!-- 响应式卡片示例 -->
+      <div class="mb-16">
+        <h3 class="text-xl font-semibold mb-6">响应式卡片组件</h3>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <!-- 卡片 1 -->
+          <div class="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+            <div class="aspect-video bg-gray-200 relative">
+              <img src="https://picsum.photos/600/400?random=1" alt="卡片图片" class="w-full h-full object-cover">
+            </div>
+            <div class="p-5">
+              <h4 class="font-semibold text-lg mb-2">响应式卡片标题</h4>
+              <p class="text-gray-600 mb-4 text-sm sm:text-base">
+                这是一个响应式卡片组件，在各种屏幕尺寸上都能完美显示。
+              </p>
+              <div class="flex justify-between items-center">
+                <span class="font-bold text-primary">¥199.00</span>
+                <button class="bg-primary text-white px-4 py-2 rounded hover:bg-primary/90 transition-colors text-sm">
+                  查看详情
+                </button>
+              </div>
+            </div>
+          </div>
+          
+          <!-- 卡片 2 -->
+          <div class="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+            <div class="aspect-video bg-gray-200 relative">
+              <img src="https://picsum.photos/600/400?random=2" alt="卡片图片" class="w-full h-full object-cover">
+            </div>
+            <div class="p-5">
+              <h4 class="font-semibold text-lg mb-2">响应式卡片标题</h4>
+              <p class="text-gray-600 mb-4 text-sm sm:text-base">
+                这是一个响应式卡片组件，在各种屏幕尺寸上都能完美显示。
+              </p>
+              <div class="flex justify-between items-center">
+                <span class="font-bold text-primary">¥249.00</span>
+                <button class="bg-primary text-white px-4 py-2 rounded hover:bg-primary/90 transition-colors text-sm">
+                  查看详情
+                </button>
+              </div>
+            </div>
+          </div>
+          
+          <!-- 卡片 3 -->
+          <div class="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+            <div class="aspect-video bg-gray-200 relative">
+              <img src="https://picsum.photos/600/400?random=3" alt="卡片图片" class="w-full h-full object-cover">
+            </div>
+            <div class="p-5">
+              <h4 class="font-semibold text-lg mb-2">响应式卡片标题</h4>
+              <p class="text-gray-600 mb-4 text-sm sm:text-base">
+                这是一个响应式卡片组件，在各种屏幕尺寸上都能完美显示。
+              </p>
+              <div class="flex justify-between items-center">
+                <span class="font-bold text-primary">¥299.00</span>
+                <button class="bg-primary text-white px-4 py-2 rounded hover:bg-primary/90 transition-colors text-sm">
+                  查看详情
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 响应式表单示例 -->
+      <div class="mb-16">
+        <h3 class="text-xl font-semibold mb-6">响应式表单组件</h3>
+        <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-100 max-w-3xl mx-auto">
+          <form class="space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label for="firstName" class="block text-sm font-medium text-gray-700 mb-1">姓氏</label>
+                <input 
+                  type="text" 
+                  id="firstName" 
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm sm:text-base"
+                  placeholder="请输入姓氏"
+                >
+              </div>
+              <div>
+                <label for="lastName" class="block text-sm font-medium text-gray-700 mb-1">名字</label>
+                <input 
+                  type="text" 
+                  id="lastName" 
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm sm:text-base"
+                  placeholder="请输入名字"
+                >
+              </div>
+            </div>
+            
+            <div>
+              <label for="email" class="block text-sm font-medium text-gray-700 mb-1">电子邮箱</label>
+              <input 
+                type="email" 
+                id="email" 
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm sm:text-base"
+                placeholder="请输入电子邮箱"
+              >
+            </div>
+            
+            <div>
+              <label for="message" class="block text-sm font-medium text-gray-700 mb-1">留言内容</label>
+              <textarea 
+                id="message" 
+                rows="4" 
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm sm:text-base"
+                placeholder="请输入留言内容..."
+              ></textarea>
+            </div>
+            
+            <div class="flex flex-col sm:flex-row justify-end gap-4">
+              <button type="button" class="px-6 py-2 border border-gray-300 rounded-md text-sm sm:text-base font-medium text-gray-700 hover:bg-gray-50 transition-colors">
+                取消
+              </button>
+              <button type="submit" class="px-6 py-2 bg-primary border border-transparent rounded-md text-sm sm:text-base font-medium text-white hover:bg-primary/90 transition-colors">
+                提交表单
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+      
+      <!-- 响应式标签页示例 -->
+      <div>
+        <h3 class="text-xl font-semibold mb-6">响应式标签页组件</h3>
+        <div class="bg-white rounded-lg shadow-sm overflow-hidden border border-gray-100">
+          <!-- 标签页导航 -->
+          <div class="border-b sm:flex sm:space-x-8">
+            <button class="tab-button active block py-3 px-4 text-sm sm:text-base border-b-2 border-primary text-primary font-medium hover:text-primary/80 transition-colors w-full sm:w-auto text-left sm:text-center">
+              标签页 1
+            </button>
+            <button class="tab-button block py-3 px-4 text-sm sm:text-base border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 transition-colors w-full sm:w-auto text-left sm:text-center">
+              标签页 2
+            </button>
+            <button class="tab-button block py-3 px-4 text-sm sm:text-base border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 transition-colors w-full sm:w-auto text-left sm:text-center">
+              标签页 3
+            </button>
+          </div>
+          
+          <!-- 标签页内容 -->
+          <div class="tab-content active p-6">
+            <h4 class="font-semibold text-lg mb-3">标签页 1 内容</h4>
+            <p class="text-gray-600 mb-4">
+              这是标签页 1 的内容。在移动设备上，标签页导航垂直堆叠，每个标签占满整个宽度；在小型设备及以上，标签页导航水平排列，更节省空间。
+            </p>
+            <div class="bg-gray-50 p-4 rounded-lg">
+              <p class="text-sm text-gray-500">
+                响应式标签页组件可以有效地组织内容，在不同设备上提供良好的用户体验。
+              </p>
+            </div>
+          </div>
+          
+          <div class="tab-content hidden p-6">
+            <h4 class="font-semibold text-lg mb-3">标签页 2 内容</h4>
+            <p class="text-gray-600">
+              这是标签页 2 的内容。您可以在这里放置任何相关信息，如表单、详细说明、图片等。
+            </p>
+          </div>
+          
+          <div class="tab-content hidden p-6">
+            <h4 class="font-semibold text-lg mb-3">标签页 3 内容</h4>
+            <p class="text-gray-600">
+              这是标签页 3 的内容。您可以在这里放置任何相关信息，如表单、详细说明、图片等。
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 响应式技巧部分 -->
+  <section id="responsive" class="py-16 bg-white">
+    <div class="container mx-auto px-4">
+      <div class="text-center mb-12">
+        <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold mb-4">响应式设计技巧</h2>
+        <p class="text-gray-600 max-w-2xl mx-auto">
+          学习一些实用的响应式设计技巧和最佳实践
+        </p>
+      </div>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <!-- 技巧卡片 1 -->
+        <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+          <div class="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
+            <i class="fa fa-mobile text-primary"></i>
+          </div>
+          <h3 class="text-lg font-semibold mb-3">移动优先设计</h3>
+          <p class="text-gray-600 mb-4">
+            始终从移动设备开始设计，然后逐步增强到更大的屏幕。这样可以确保在所有设备上都有良好的用户体验。
+          </p>
+          <code class="block text-sm bg-gray-50 p-3 rounded font-mono">
+            &lt;div class="text-base md:text-lg lg:text-xl"&gt;
+              移动优先的文本大小
+            &lt;/div&gt;
+          </code>
+        </div>
+        
+        <!-- 技巧卡片 2 -->
+        <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+          <div class="w-10 h-10 bg-secondary/10 rounded-lg flex items-center justify-center mb-4">
+            <i class="fa fa-image text-secondary"></i>
+          </div>
+          <h3 class="text-lg font-semibold mb-3">响应式图像</h3>
+          <p class="text-gray-600 mb-4">
+            确保图像在各种屏幕尺寸上都能正确显示，使用 object-cover 保持图像比例，同时填充容器。
+          </p>
+          <code class="block text-sm bg-gray-50 p-3 rounded font-mono">
+            &lt;img src="image.jpg" class="w-full h-48 object-cover"&gt;
+          </code>
+        </div>
+        
+        <!-- 技巧卡片 3 -->
+        <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+          <div class="w-10 h-10 bg-accent/10 rounded-lg flex items-center justify-center mb-4">
+            <i class="fa fa-mouse-pointer text-accent"></i>
+          </div>
+          <h3 class="text-lg font-semibold mb-3">触摸友好设计</h3>
+          <p class="text-gray-600 mb-4">
+            确保交互元素足够大，在移动设备上至少 44x44px，以便于触摸。
+          </p>
+          <code class="block text-sm bg-gray-50 p-3 rounded font-mono">
+            &lt;button class="px-4 py-2 rounded-md"&gt;
+              触摸友好的按钮
+            &lt;/button&gt;
+          </code>
+        </div>
+        
+        <!-- 技巧卡片 4 -->
+        <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+          <div class="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
+            <i class="fa fa-th text-primary"></i>
+          </div>
+          <h3 class="text-lg font-semibold mb-3">响应式间距</h3>
+          <p class="text-gray-600 mb-4">
+            使用响应式间距来调整不同屏幕尺寸上元素之间的空间。
+          </p>
+          <code class="block text-sm bg-gray-50 p-3 rounded font-mono">
+            &lt;div class="p-4 md:p-6 lg:p-8"&gt;
+              响应式内边距
+            &lt;/div&gt;
+          </code>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 示例区域 -->
+  <section id="examples" class="py-16 bg-gray-50">
+    <div class="container mx-auto px-4">
+      <div class="text-center mb-12">
+        <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold mb-4">响应式设计示例</h2>
+        <p class="text-gray-600 max-w-2xl mx-auto">
+          查看一个完整的响应式布局示例
+        </p>
+      </div>
+      
+      <div class="bg-white rounded-lg shadow-sm overflow-hidden border border-gray-100">
+        <!-- 示例标题 -->
+        <div class="px-6 py-4 border-b border-gray-100 bg-gray-50">
+          <h3 class="font-semibold text-lg">响应式仪表板示例</h3>
+        </div>
+        
+        <!-- 示例内容 -->
+        <div class="p-4 md:p-6">
+          <!-- 统计卡片行 -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            <!-- 统计卡片 1 -->
+            <div class="bg-primary/10 p-4 rounded-lg">
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-sm font-medium text-primary">总访问量</span>
+                <span class="bg-primary/20 text-primary p-1.5 rounded-full">
+                  <i class="fa fa-eye"></i>
+                </span>
+              </div>
+              <h4 class="text-2xl font-bold text-gray-900">12,846</h4>
+              <div class="flex items-center mt-1 text-xs text-green-600">
+                <i class="fa fa-arrow-up mr-1"></i>
+                <span>12.5%</span>
+                <span class="text-gray-500 ml-1">较上月</span>
+              </div>
+            </div>
+            
+            <!-- 统计卡片 2 -->
+            <div class="bg-secondary/10 p-4 rounded-lg">
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-sm font-medium text-secondary">活跃用户</span>
+                <span class="bg-secondary/20 text-secondary p-1.5 rounded-full">
+                  <i class="fa fa-users"></i>
+                </span>
+              </div>
+              <h4 class="text-2xl font-bold text-gray-900">3,248</h4>
+              <div class="flex items-center mt-1 text-xs text-green-600">
+                <i class="fa fa-arrow-up mr-1"></i>
+                <span>8.2%</span>
+                <span class="text-gray-500 ml-1">较上月</span>
+              </div>
+            </div>
+            
+            <!-- 统计卡片 3 -->
+            <div class="bg-accent/10 p-4 rounded-lg">
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-sm font-medium text-accent">转化率</span>
+                <span class="bg-accent/20 text-accent p-1.5 rounded-full">
+                  <i class="fa fa-exchange"></i>
+                </span>
+              </div>
+              <h4 class="text-2xl font-bold text-gray-900">6.4%</h4>
+              <div class="flex items-center mt-1 text-xs text-red-600">
+                <i class="fa fa-arrow-down mr-1"></i>
+                <span>1.8%</span>
+                <span class="text-gray-500 ml-1">较上月</span>
+              </div>
+            </div>
+            
+            <!-- 统计卡片 4 -->
+            <div class="bg-amber-100 p-4 rounded-lg">
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-sm font-medium text-amber-600">平均停留时间</span>
+                <span class="bg-amber-200 text-amber-600 p-1.5 rounded-full">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+              </div>
+              <h4 class="text-2xl font-bold text-gray-900">4m 32s</h4>
+              <div class="flex items-center mt-1 text-xs text-green-600">
+                <i class="fa fa-arrow-up mr-1"></i>
+                <span>3.1%</span>
+                <span class="text-gray-500 ml-1">较上月</span>
+              </div>
+            </div>
+          </div>
+          
+          <!-- 图表和活动区域 -->
+          <div class="flex flex-col lg:flex-row gap-6 mb-6">
+            <!-- 图表区域 -->
+            <div class="lg:w-2/3 bg-gray-50 p-4 rounded-lg">
+              <div class="flex justify-between items-center mb-4">
+                <h4 class="font-semibold">流量趋势</h4>
+                <div class="flex space-x-2">
+                  <button class="px-3 py-1 text-xs rounded bg-primary text-white">日</button>
+                  <button class="px-3 py-1 text-xs rounded bg-gray-200 text-gray-600">周</button>
+                  <button class="px-3 py-1 text-xs rounded bg-gray-200 text-gray-600">月</button>
+                </div>
+              </div>
+              <div class="h-64 bg-white rounded p-4 flex items-center justify-center">
+                <p class="text-gray-400">图表占位区域</p>
+              </div>
+            </div>
+            
+            <!-- 最近活动 -->
+            <div class="lg:w-1/3 bg-gray-50 p-4 rounded-lg">
+              <h4 class="font-semibold mb-4">最近活动</h4>
+              <div class="space-y-4">
+                <div class="flex items-start space-x-3">
+                  <div class="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
+                    <i class="fa fa-user-plus text-primary text-xs"></i>
+                  </div>
+                  <div>
+                    <p class="text-sm font-medium">新用户注册</p>
+                    <p class="text-xs text-gray-500">5分钟前</p>
+                  </div>
+                </div>
+                <div class="flex items-start space-x-3">
+                  <div class="w-8 h-8 rounded-full bg-secondary/20 flex items-center justify-center flex-shrink-0">
+                    <i class="fa fa-comment text-secondary text-xs"></i>
+                  </div>
+                  <div>
+                    <p class="text-sm font-medium">新评论发布</p>
+                    <p class="text-xs text-gray-500">15分钟前</p>
+                  </div>
+                </div>
+                <div class="flex items-start space-x-3">
+                  <div class="w-8 h-8 rounded-full bg-accent/20 flex items-center justify-center flex-shrink-0">
+                    <i class="fa fa-shopping-cart text-accent text-xs"></i>
+                  </div>
+                  <div>
+                    <p class="text-sm font-medium">新订单创建</p>
+                    <p class="text-xs text-gray-500">30分钟前</p>
+                  </div>
+                </div>
+                <div class="flex items-start space-x-3">
+                  <div class="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center flex-shrink-0">
+                    <i class="fa fa-star text-amber-600 text-xs"></i>
+                  </div>
+                  <div>
+                    <p class="text-sm font-medium">新评分提交</p>
+                    <p class="text-xs text-gray-500">1小时前</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- 最近订单表格 -->
+          <div class="bg-gray-50 p-4 rounded-lg">
+            <h4 class="font-semibold mb-4">最近订单</h4>
+            <div class="overflow-x-auto">
+              <table class="min-w-full divide-y divide-gray-200">
+                <thead>
+                  <tr>
+                    <th class="px-4 py-3 bg-white text-left text-xs font-medium text-gray-500 uppercase tracking-wider">订单号</th>
+                    <th class="px-4 py-3 bg-white text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">客户</th>
+                    <th class="px-4 py-3 bg-white text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">金额</th>
+                    <th class="px-4 py-3 bg-white text-left text-xs font-medium text-gray-500 uppercase tracking-wider">状态</th>
+                    <th class="px-4 py-3 bg-white text-left text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
+                  </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                  <tr>
+                    <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">ORD-2023-0001</td>
+                    <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500 hidden md:table-cell">张三</td>
+                    <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500 hidden sm:table-cell">¥1,299.00</td>
+                    <td class="px-4 py-3 whitespace-nowrap">
+                      <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">已完成</span>
+                    </td>
+                    <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
+                      <button class="text-primary hover:text-primary/80">查看</button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">ORD-2023-0002</td>
+                    <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500 hidden md:table-cell">李四</td>
+                    <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500 hidden sm:table-cell">¥899.00</td>
+                    <td class="px-4 py-3 whitespace-nowrap">
+                      <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">处理中</span>
+                    </td>
+                    <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
+                      <button class="text-primary hover:text-primary/80">查看</button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">ORD-2023-0003</td>
+                    <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500 hidden md:table-cell">王五</td>
+                    <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500 hidden sm:table-cell">¥1,599.00</td>
+                    <td class="px-4 py-3 whitespace-nowrap">
+                      <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">已发货</span>
+                    </td>
+                    <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
+                      <button class="text-primary hover:text-primary/80">查看</button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 学习资源部分 -->
+  <section id="learn" class="py-16 bg-gray-50">
+    <div class="container mx-auto px-4">
+      <div class="text-center mb-12">
+        <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold mb-4">学习更多</h2>
+        <p class="text-gray-600 max-w-2xl mx-auto">
+          探索更多关于响应式设计和 Tailwind CSS 的资源
+        </p>
+      </div>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- 资源卡片 1 -->
+        <a href="#" class="block bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow border border-gray-100 group">
+          <div class="mb-4">
+            <i class="fa fa-book text-3xl text-primary group-hover:text-primary/80 transition-colors"></i>
+          </div>
+          <h3 class="text-lg font-semibold mb-2">Tailwind CSS 官方文档</h3>
+          <p class="text-gray-600 mb-4">
+            查看官方文档，学习 Tailwind CSS 的所有特性和用法。
+          </p>
+          <div class="flex items-center text-primary font-medium">
+            <span>查看详情</span>
+            <i class="fa fa-arrow-right ml-2 group-hover:translate-x-1 transition-transform"></i>
+          </div>
+        </a>
+        
+        <!-- 资源卡片 2 -->
+        <a href="#" class="block bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow border border-gray-100 group">
+          <div class="mb-4">
+            <i class="fa fa-code text-3xl text-secondary group-hover:text-secondary/80 transition-colors"></i>
+          </div>
+          <h3 class="text-lg font-semibold mb-2">响应式设计教程</h3>
+          <p class="text-gray-600 mb-4">
+            学习响应式设计的核心概念和最佳实践。
+          </p>
+          <div class="flex items-center text-secondary font-medium">
+            <span>查看详情</span>
+            <i class="fa fa-arrow-right ml-2 group-hover:translate-x-1 transition-transform"></i>
+          </div>
+        </a>
+        
+        <!-- 资源卡片 3 -->
+        <a href="#" class="block bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow border border-gray-100 group">
+          <div class="mb-4">
+            <i class="fa fa-youtube-play text-3xl text-accent group-hover:text-accent/80 transition-colors"></i>
+          </div>
+          <h3 class="text-lg font-semibold mb-2">视频教程</h3>
+          <p class="text-gray-600 mb-4">
+            通过视频教程，更直观地学习 Tailwind CSS 响应式设计。
+          </p>
+          <div class="flex items-center text-accent font-medium">
+            <span>查看详情</span>
+            <i class="fa fa-arrow-right ml-2 group-hover:translate-x-1 transition-transform"></i>
+          </div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- 页脚 -->
+  <footer class="bg-gray-900 text-white py-12">
+    <div class="container mx-auto px-4">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+        <div>
+          <div class="text-2xl font-bold mb-4">
+            <i class="fa fa-cube mr-2"></i>Tailwind响应式
+          </div>
+          <p class="text-gray-400 mb-4">
+            学习如何使用 Tailwind CSS 创建在所有设备上都能完美显示的响应式网站。
+          </p>
+          <div class="flex space-x-4">
+            <a href="#" class="text-gray-400 hover:text-white transition-colors">
+              <i class="fa fa-github text-xl"></i>
+            </a>
+            <a href="#" class="text-gray-400 hover:text-white transition-colors">
+              <i class="fa fa-twitter text-xl"></i>
+            </a>
+            <a href="#" class="text-gray-400 hover:text-white transition-colors">
+              <i class="fa fa-linkedin text-xl"></i>
+            </a>
+          </div>
+        </div>
+        
+        <div>
+          <h3 class="text-lg font-semibold mb-4">章节导航</h3>
+          <ul class="space-y-2">
+            <li><a href="#" class="text-gray-400 hover:text-white transition-colors">第1章：入门基础</a></li>
+            <li><a href="#" class="text-gray-400 hover:text-white transition-colors">第2章：核心概念</a></li>
+            <li><a href="#" class="text-gray-400 hover:text-white transition-colors">第3章：响应式设计</a></li>
+            <li><a href="#" class="text-gray-400 hover:text-white transition-colors">第4章：自定义配置</a></li>
+            <li><a href="#" class="text-gray-400 hover:text-white transition-colors">第5章：高级技巧</a></li>
+          </ul>
+        </div>
+        
+        <div>
+          <h3 class="text-lg font-semibold mb-4">资源链接</h3>
+          <ul class="space-y-2">
+            <li><a href="#" class="text-gray-400 hover:text-white transition-colors">官方文档</a></li>
+            <li><a href="#" class="text-gray-400 hover:text-white transition-colors">GitHub 仓库</a></li>
+            <li><a href="#" class="text-gray-400 hover:text-white transition-colors">社区论坛</a></li>
+            <li><a href="#" class="text-gray-400 hover:text-white transition-colors">视频教程</a></li>
+            <li><a href="#" class="text-gray-400 hover:text-white transition-colors">示例项目</a></li>
+          </ul>
+        </div>
+        
+        <div>
+          <h3 class="text-lg font-semibold mb-4">联系我们</h3>
+          <ul class="space-y-2">
+            <li class="flex items-center">
+              <i class="fa fa-envelope text-gray-400 mr-2"></i>
+              <a href="mailto:contact@example.com" class="text-gray-400 hover:text-white transition-colors">contact@example.com</a>
+            </li>
+            <li class="flex items-center">
+              <i class="fa fa-phone text-gray-400 mr-2"></i>
+              <a href="tel:+86123456789" class="text-gray-400 hover:text-white transition-colors">+86 123 4567 89</a>
+            </li>
+          </ul>
+          <div class="mt-6">
+            <h4 class="text-sm font-medium mb-2">订阅我们的新闻通讯</h4>
+            <div class="flex">
+              <input 
+                type="email" 
+                placeholder="输入您的邮箱" 
+                class="px-3 py-2 bg-gray-800 text-white rounded-l-md focus:outline-none focus:ring-1 focus:ring-primary w-full"
+              >
+              <button class="bg-primary hover:bg-primary/90 text-white px-4 rounded-r-md transition-colors">
+                订阅
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="mt-12 pt-8 border-t border-gray-800 text-center text-gray-400">
+        <p>&copy; 2023 Tailwind响应式设计教程. 保留所有权利.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- JavaScript -->
+  <script>
+    // 移动端菜单切换
+    document.getElementById('mobile-menu-button').addEventListener('click', function() {
+      const menu = document.getElementById('mobile-menu');
+      menu.classList.toggle('hidden');
+    });
+    
+    // 标签页切换
+    const tabButtons = document.querySelectorAll('.tab-button');
+    const tabContents = document.querySelectorAll('.tab-content');
+    
+    tabButtons.forEach((button, index) => {
+      button.addEventListener('click', () => {
+        // 移除所有活动状态
+        tabButtons.forEach(btn => btn.classList.remove('active', 'border-primary', 'text-primary'));
+        tabButtons.forEach(btn => btn.classList.add('border-transparent', 'text-gray-500'));
+        tabContents.forEach(content => content.classList.add('hidden'));
+        
+        // 添加当前活动状态
+        button.classList.add('active', 'border-primary', 'text-primary');
+        button.classList.remove('border-transparent', 'text-gray-500');
+        tabContents[index].classList.remove('hidden');
+      });
+    });
+    
+    // 平滑滚动
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        
+        const targetId = this.getAttribute('href');
+        if (targetId === '#') return;
+        
+        const targetElement = document.querySelector(targetId);
+        if (targetElement) {
+          window.scrollTo({
+            top: targetElement.offsetTop - 80, // 考虑导航栏高度
+            behavior: 'smooth'
+          });
+          
+          // 关闭移动菜单（如果打开）
+          const mobileMenu = document.getElementById('mobile-menu');
+          if (!mobileMenu.classList.contains('hidden')) {
+            mobileMenu.classList.add('hidden');
+          }
+        }
+      });
+    });
+    
+    // 响应式导航栏效果
+    window.addEventListener('scroll', function() {
+      const header = document.querySelector('header');
+      if (window.scrollY > 10) {
+        header.classList.add('shadow');
+      } else {
+        header.classList.remove('shadow');
+      }
+    });
+  </script>
+</body>
+</html>

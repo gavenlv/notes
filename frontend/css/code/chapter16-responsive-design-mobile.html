@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>第16章 - 响应式设计与移动端优化</title>
+    <style>
+        /* 基础变量定义 */
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2ecc71;
+            --dark-color: #34495e;
+            --light-color: #ecf0f1;
+            --accent-color: #e74c3c;
+            --text-color: #2c3e50;
+            --spacing-xs: 0.5rem;
+            --spacing-sm: 1rem;
+            --spacing-md: 1.5rem;
+            --spacing-lg: 2rem;
+            --spacing-xl: 3rem;
+            --border-radius-sm: 4px;
+            --border-radius-md: 8px;
+            --border-radius-lg: 12px;
+            --box-shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
+            --box-shadow-md: 0 4px 8px rgba(0, 0, 0, 0.15);
+            --box-shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.2);
+            --transition-fast: 0.2s ease;
+            --transition-normal: 0.3s ease;
+            --font-family-sans: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        /* 基础重置 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-family-sans);
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: #f9f9f9;
+        }
+
+        /* 容器样式 */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 var(--spacing-md);
+        }
+
+        /* 标题样式 */
+        h1, h2, h3, h4 {
+            margin-bottom: var(--spacing-md);
+            color: var(--dark-color);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-top: var(--spacing-xl);
+            text-align: center;
+        }
+
+        h2 {
+            font-size: 2rem;
+            margin-top: var(--spacing-xl);
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: var(--spacing-xs);
+        }
+
+        h3 {
+            font-size: 1.5rem;
+            margin-top: var(--spacing-lg);
+        }
+
+        /* 段落样式 */
+        p {
+            margin-bottom: var(--spacing-md);
+        }
+
+        /* 代码样式 */
+        .code-block {
+            background-color: #f5f5f5;
+            border-radius: var(--border-radius-md);
+            padding: var(--spacing-md);
+            margin-bottom: var(--spacing-md);
+            overflow-x: auto;
+            font-family: 'Courier New', Courier, monospace;
+            white-space: pre-wrap;
+        }
+
+        /* 示例容器 */
+        .example-container {
+            background-color: white;
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--box-shadow-md);
+            padding: var(--spacing-lg);
+            margin-bottom: var(--spacing-xl);
+        }
+
+        /* 1. 响应式布局示例 */
+        .responsive-grid {
+            display: grid;
+            grid-template-columns: repeat(1, 1fr);
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .grid-item {
+            background-color: var(--primary-color);
+            color: white;
+            padding: var(--spacing-lg);
+            border-radius: var(--border-radius-md);
+            text-align: center;
+            transition: background-color var(--transition-normal);
+        }
+
+        .grid-item:hover {
+            background-color: #2980b9;
+        }
+
+        /* 2. 媒体查询示例 */
+        .media-query-demo {
+            background-color: var(--light-color);
+            padding: var(--spacing-lg);
+            border-radius: var(--border-radius-md);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        /* 3. 移动端优化技术 */
+        .mobile-optimization {
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .optimization-card {
+            background-color: white;
+            border-radius: var(--border-radius-md);
+            padding: var(--spacing-md);
+            margin-bottom: var(--spacing-md);
+            box-shadow: var(--box-shadow-sm);
+        }
+
+        /* 4. 弹性布局示例 */
+        .flex-layout {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .flex-item {
+            background-color: var(--secondary-color);
+            color: white;
+            padding: var(--spacing-md);
+            border-radius: var(--border-radius-md);
+            text-align: center;
+        }
+
+        /* 5. 视口单位示例 */
+        .viewport-units {
+            background-color: var(--accent-color);
+            color: white;
+            padding: calc(5vh + 1rem);
+            border-radius: var(--border-radius-md);
+            margin-bottom: var(--spacing-lg);
+            text-align: center;
+        }
+
+        /* 6. 响应式字体大小 */
+        .responsive-text {
+            font-size: clamp(1rem, 3vw, 1.5rem);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        /* 7. 响应式导航 */
+        .nav-container {
+            background-color: var(--dark-color);
+            border-radius: var(--border-radius-md);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .nav-toggle {
+            display: block;
+            width: 100%;
+            padding: var(--spacing-sm);
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            border-radius: var(--border-radius-md);
+        }
+
+        .nav-links {
+            display: none;
+            list-style: none;
+            padding: 0;
+        }
+
+        .nav-links.active {
+            display: block;
+        }
+
+        .nav-links li {
+            padding: var(--spacing-sm);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-links li a {
+            color: white;
+            text-decoration: none;
+            display: block;
+        }
+
+        /* 8. 触摸友好设计 */
+        .touch-friendly {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .touch-button {
+            min-width: 80px;
+            min-height: 80px;
+            padding: var(--spacing-md);
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius-md);
+            font-size: 1rem;
+            cursor: pointer;
+            transition: transform var(--transition-fast);
+        }
+
+        .touch-button:active {
+            transform: scale(0.95);
+        }
+
+        /* 9. 移动性能优化 */
+        .performance-tips {
+            background-color: var(--light-color);
+            padding: var(--spacing-lg);
+            border-radius: var(--border-radius-md);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .performance-tips ul {
+            padding-left: var(--spacing-lg);
+        }
+
+        /* 媒体查询响应式调整 */
+        @media (min-width: 576px) {
+            .responsive-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .flex-layout {
+                flex-direction: row;
+                flex-wrap: wrap;
+            }
+            
+            .flex-item {
+                flex: 1 1 calc(50% - 1rem);
+            }
+        }
+
+        @media (min-width: 768px) {
+            .responsive-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            
+            .flex-item {
+                flex: 1 1 calc(33.333% - 1rem);
+            }
+            
+            .nav-toggle {
+                display: none;
+            }
+            
+            .nav-links {
+                display: flex;
+                justify-content: center;
+            }
+            
+            .nav-links li {
+                border-bottom: none;
+                border-right: 1px solid rgba(255, 255, 255, 0.1);
+            }
+            
+            .nav-links li:last-child {
+                border-right: none;
+            }
+        }
+
+        @media (min-width: 992px) {
+            .responsive-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        /* 打印样式 */
+        @media print {
+            body {
+                font-size: 12pt;
+                color: black;
+                background: white;
+            }
+            
+            .example-container {
+                break-inside: avoid;
+                box-shadow: none;
+                border: 1px solid #ccc;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>第16章 - 响应式设计与移动端优化</h1>
+        
+        <!-- 1. 响应式布局基础 -->
+        <div class="example-container">
+            <h2>1. 响应式布局基础</h2>
+            <p>响应式设计允许网页在不同设备上自适应显示，通过媒体查询、流式布局和灵活的图像来实现。</p>
+            
+            <div class="code-block">
+/* 媒体查询基本语法 */
+@media (min-width: 768px) {
+    .element {
+        /* 在宽度大于768px时应用的样式 */
+    }
+}
+
+/* 流式布局 */
+.container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
+}</div>
+            
+            <div class="responsive-grid">
+                <div class="grid-item">项目 1</div>
+                <div class="grid-item">项目 2</div>
+                <div class="grid-item">项目 3</div>
+                <div class="grid-item">项目 4</div>
+            </div>
+        </div>
+        
+        <!-- 2. 媒体查询详解 -->
+        <div class="example-container">
+            <h2>2. 媒体查询详解</h2>
+            <p>媒体查询允许根据设备特性（如宽度、高度、方向）应用不同的CSS样式。</p>
+            
+            <div class="code-block">
+/* 常见断点设置 */
+/* 移动端 */
+@media (max-width: 575px) {
+    /* 移动端样式 */
+}
+
+/* 平板竖屏 */
+@media (min-width: 576px) and (max-width: 767px) {
+    /* 平板竖屏样式 */
+}
+
+/* 平板横屏 */
+@media (min-width: 768px) and (max-width: 991px) {
+    /* 平板横屏样式 */
+}
+
+/* 桌面 */
+@media (min-width: 992px) {
+    /* 桌面样式 */
+}
+
+/* 方向媒体查询 */
+@media (orientation: landscape) {
+    /* 横屏样式 */
+}</div>
+            
+            <div class="media-query-demo">
+                <p>调整浏览器窗口大小，观察此区域的变化</p>
+            </div>
+        </div>
+        
+        <!-- 3. 移动端优化技术 -->
+        <div class="example-container">
+            <h2>3. 移动端优化技术</h2>
+            <p>移动端优化涉及多个方面，包括触摸友好设计、性能优化和响应式导航等。</p>
+            
+            <div class="mobile-optimization">
+                <div class="optimization-card">
+                    <h3>触摸友好设计</h3>
+                    <p>确保按钮和交互元素足够大，间距合理，以便在移动设备上易于点击。</p>
+                </div>
+                
+                <div class="optimization-card">
+                    <h3>性能优化</h3>
+                    <p>优化CSS选择器，减少重排和重绘，使用CSS变量提高维护性。</p>
+                </div>
+                
+                <div class="optimization-card">
+                    <h3>响应式图像</h3>
+                    <p>使用srcset和sizes属性为不同屏幕提供适当大小的图像，减少加载时间。</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 4. 弹性布局与网格布局 -->
+        <div class="example-container">
+            <h2>4. 弹性布局与网格布局</h2>
+            <p>Flexbox和Grid是实现响应式设计的强大工具，可以创建灵活且适应性强的布局。</p>
+            
+            <div class="code-block">
+/* 弹性布局示例 */
+.flex-container {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.flex-item {
+    flex: 1 1 300px; /* 增长、收缩、基础尺寸 */
+}
+
+/* 网格布局示例 */
+.grid-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+}</div>
+            
+            <div class="flex-layout">
+                <div class="flex-item">弹性项目 1</div>
+                <div class="flex-item">弹性项目 2</div>
+                <div class="flex-item">弹性项目 3</div>
+            </div>
+        </div>
+        
+        <!-- 5. 视口单位与响应式字体 -->
+        <div class="example-container">
+            <h2>5. 视口单位与响应式字体</h2>
+            <p>视口单位和响应式字体大小可以确保内容在不同尺寸的屏幕上都有良好的可读性。</p>
+            
+            <div class="code-block">
+/* 视口单位 */
+.element {
+    width: 50vw; /* 视口宽度的50% */
+    height: 25vh; /* 视口高度的25% */
+    font-size: 5vmin; /* 视口最小尺寸的5% */
+}
+
+/* 响应式字体 */
+.responsive-text {
+    font-size: clamp(1rem, 3vw, 1.5rem); /* 最小、首选、最大值 */
+}</div>
+            
+            <div class="viewport-units">
+                <p>此区域大小随视口变化</p>
+            </div>
+            
+            <div class="responsive-text">
+                <p>这是使用clamp()函数的响应式文本，大小会根据视口宽度自动调整。</p>
+            </div>
+        </div>
+        
+        <!-- 6. 响应式导航 -->
+        <div class="example-container">
+            <h2>6. 响应式导航</h2>
+            <p>响应式导航在移动端通常转换为汉堡菜单，在桌面端显示完整导航栏。</p>
+            
+            <div class="code-block">
+/* 响应式导航基本样式 */
+.nav-container {
+    background-color: #333;
+}
+
+.nav-toggle {
+    display: block; /* 在移动端显示 */
+}
+
+.nav-links {
+    display: none; /* 默认隐藏 */
+}
+
+.nav-links.active {
+    display: block; /* 激活时显示 */
+}
+
+/* 桌面端样式 */
+@media (min-width: 768px) {
+    .nav-toggle {
+        display: none;
+    }
+    
+    .nav-links {
+        display: flex;
+    }
+}</div>
+            
+            <div class="nav-container">
+                <button class="nav-toggle" id="navToggle">菜单 ☰</button>
+                <ul class="nav-links" id="navLinks">
+                    <li><a href="#">首页</a></li>
+                    <li><a href="#">产品</a></li>
+                    <li><a href="#">服务</a></li>
+                    <li><a href="#">关于我们</a></li>
+                    <li><a href="#">联系我们</a></li>
+                </ul>
+            </div>
+        </div>
+        
+        <!-- 7. 触摸友好设计 -->
+        <div class="example-container">
+            <h2>7. 触摸友好设计</h2>
+            <p>为触摸屏优化的界面应该有足够大的点击区域和适当的反馈。</p>
+            
+            <div class="code-block">
+/* 触摸友好的按钮 */
+.touch-button {
+    min-width: 48px;
+    min-height: 48px;
+    padding: 12px;
+    font-size: 16px; /* 避免iOS缩放 */
+    border-radius: 8px;
+}
+
+/* 触摸反馈 */
+.touch-button:active {
+    transform: scale(0.95);
+}</div>
+            
+            <div class="touch-friendly">
+                <button class="touch-button">按钮 1</button>
+                <button class="touch-button">按钮 2</button>
+                <button class="touch-button">按钮 3</button>
+            </div>
+        </div>
+        
+        <!-- 8. 移动性能优化 -->
+        <div class="example-container">
+            <h2>8. 移动性能优化</h2>
+            <p>移动设备性能优化对于提供良好的用户体验至关重要。</p>
+            
+            <div class="performance-tips">
+                <h3>移动性能优化技巧：</h3>
+                <ul>
+                    <li>使用CSS动画而非JavaScript动画</li>
+                    <li>避免频繁的DOM操作和样式计算</li>
+                    <li>使用CSS变量简化样式管理</li>
+                    <li>优化选择器性能</li>
+                    <li>使用will-change属性提前告知浏览器</li>
+                    <li>避免不必要的重排和重绘</li>
+                </ul>
+            </div>
+            
+            <div class="code-block">
+/* 性能优化示例 */
+/* 1. 使用transform代替改变位置属性 */
+.element {
+    transform: translateX(100px); /* 比left性能更好 */
+}
+
+/* 2. 提前告知浏览器 */
+.element {
+    will-change: transform, opacity;
+}
+
+/* 3. 避免复杂选择器 */
+/* 不推荐 */
+ul li a {
+    /* 样式 */
+}
+
+/* 推荐 */
+.nav-link {
+    /* 样式 */
+}</div>
+        </div>
+        
+        <!-- 9. 响应式设计最佳实践 -->
+        <div class="example-container">
+            <h2>9. 响应式设计最佳实践</h2>
+            <p>遵循这些最佳实践可以创建出高效、易用的响应式网站。</p>
+            
+            <div class="code-block">
+/* 最佳实践示例 */
+/* 1. 移动优先设计 */
+.element {
+    /* 移动端基础样式 */
+}
+
+@media (min-width: 768px) {
+    .element {
+        /* 平板及以上样式 */
+    }
+}
+
+/* 2. 使用CSS变量管理响应式设计 */
+:root {
+    --container-width: 100%;
+}
+
+@media (min-width: 768px) {
+    :root {
+        --container-width: 750px;
+    }
+}
+
+.container {
+    width: var(--container-width);
+    margin: 0 auto;
+}</div>
+        </div>
+    </div>
+
+    <script>
+        // 响应式导航切换
+        document.getElementById('navToggle').addEventListener('click', function() {
+            document.getElementById('navLinks').classList.toggle('active');
+        });
+
+        // 窗口大小变化时的处理
+        window.addEventListener('resize', function() {
+            // 如果在桌面视图下，确保导航是可见的
+            if (window.innerWidth >= 768) {
+                document.getElementById('navLinks').classList.add('active');
+            } else {
+                document.getElementById('navLinks').classList.remove('active');
+            }
+        });
+
+        // 初始化导航状态
+        if (window.innerWidth >= 768) {
+            document.getElementById('navLinks').classList.add('active');
+        }
+
+        // 添加触摸友好的交互反馈
+        const touchButtons = document.querySelectorAll('.touch-button');
+        touchButtons.forEach(button => {
+            button.addEventListener('touchstart', function() {
+                this.style.backgroundColor = '#27ae60';
+            });
+            
+            button.addEventListener('touchend', function() {
+                this.style.backgroundColor = '';
+            });
+        });
+
+        // 模拟响应式性能监控
+        const performanceDemo = () => {
+            const mediaQueryDemo = document.querySelector('.media-query-demo');
+            const viewportWidth = window.innerWidth;
+            
+            if (viewportWidth < 576) {
+                mediaQueryDemo.style.backgroundColor = '#e74c3c';
+            } else if (viewportWidth < 768) {
+                mediaQueryDemo.style.backgroundColor = '#f39c12';
+            } else if (viewportWidth < 992) {
+                mediaQueryDemo.style.backgroundColor = '#2ecc71';
+            } else {
+                mediaQueryDemo.style.backgroundColor = '#3498db';
+            }
+        };
+
+        // 初始性能演示
+        performanceDemo();
+        
+        // 窗口大小变化时更新性能演示
+        window.addEventListener('resize', performanceDemo);
+    </script>
+</body>
+</html>

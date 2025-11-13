@@ -1,0 +1,1487 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSS动画与过渡示例</title>
+    <style>
+        /* 全局重置和基础样式 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* CSS变量定义 */
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2ecc71;
+            --accent-color: #e74c3c;
+            --text-color: #333;
+            --background-color: #f5f5f5;
+            --transition-speed: 0.3s;
+            --animation-duration: 2s;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--background-color);
+            padding: 20px;
+        }
+
+        /* 示例容器 */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* 标题样式 */
+        h1 {
+            color: white;
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 20px;
+            background-color: var(--primary-color);
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        /* 章节样式 */
+        .section {
+            background-color: white;
+            padding: 30px;
+            margin-bottom: 40px;
+            border-radius: 10px;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .section h2 {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #ecf0f1;
+        }
+
+        .section h3 {
+            color: var(--secondary-color);
+            margin: 25px 0 15px 0;
+        }
+
+        /* 代码示例样式 */
+        .code-example {
+            background-color: #2c3e50;
+            color: #ecf0f1;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+        }
+
+        /* 展示区域样式 */
+        .demo-box {
+            border: 2px dashed #bdc3c7;
+            padding: 30px;
+            margin: 20px 0;
+            border-radius: 8px;
+            background-color: #fafafa;
+            min-height: 150px;
+        }
+
+        /* 过渡效果示例 */
+        .transitions {
+            margin: 20px 0;
+        }
+
+        .transition-box {
+            width: 150px;
+            height: 150px;
+            background-color: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            border-radius: 8px;
+            margin: 0 auto 20px auto;
+            cursor: pointer;
+        }
+
+        /* 基本过渡 */
+        .basic-transition {
+            transition: background-color var(--transition-speed) ease;
+        }
+
+        .basic-transition:hover {
+            background-color: var(--accent-color);
+        }
+
+        /* 多属性过渡 */
+        .multi-transition {
+            transition: background-color 0.5s ease, transform 0.3s ease, border-radius 0.5s ease;
+        }
+
+        .multi-transition:hover {
+            background-color: var(--secondary-color);
+            transform: scale(1.1) rotate(5deg);
+            border-radius: 50%;
+        }
+
+        /* 不同时间函数 */
+        .ease-transition {
+            transition: all 1s ease;
+        }
+
+        .linear-transition {
+            transition: all 1s linear;
+        }
+
+        .ease-in-transition {
+            transition: all 1s ease-in;
+        }
+
+        .ease-out-transition {
+            transition: all 1s ease-out;
+        }
+
+        .ease-in-out-transition {
+            transition: all 1s ease-in-out;
+        }
+
+        .custom-cubic-transition {
+            transition: all 1s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        .timing-functions:hover .transition-box {
+            transform: translateX(100px);
+            background-color: var(--accent-color);
+        }
+
+        /* 延迟过渡 */
+        .delay-transition {
+            transition: all 0.5s ease 0.2s;
+        }
+
+        .delay-transition:hover {
+            transform: translateY(-20px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        /* 过渡简写 */
+        .shorthand-transition {
+            /* property duration timing-function delay */
+            transition: all 0.3s ease 0s;
+        }
+
+        .shorthand-transition:hover {
+            width: 200px;
+            height: 200px;
+            background-color: var(--secondary-color);
+        }
+
+        /* 变换效果示例 */
+        .transforms {
+            margin: 20px 0;
+        }
+
+        .transform-box {
+            width: 120px;
+            height: 120px;
+            background-color: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            border-radius: 8px;
+            margin: 15px;
+            transition: transform 0.5s ease;
+        }
+
+        /* 平移变换 */
+        .translate-transform:hover {
+            transform: translate(20px, -10px);
+        }
+
+        /* 缩放变换 */
+        .scale-transform:hover {
+            transform: scale(1.2);
+        }
+
+        /* 旋转变换 */
+        .rotate-transform:hover {
+            transform: rotate(45deg);
+        }
+
+        /* 倾斜变换 */
+        .skew-transform:hover {
+            transform: skew(10deg, 5deg);
+        }
+
+        /* 组合变换 */
+        .combo-transform:hover {
+            transform: translate(10px, -10px) rotate(15deg) scale(1.1);
+        }
+
+        /* 3D变换 */
+        .perspective-container {
+            perspective: 1000px;
+            margin: 30px 0;
+        }
+
+        .rotate-x-transform:hover {
+            transform: rotateX(45deg);
+        }
+
+        .rotate-y-transform:hover {
+            transform: rotateY(45deg);
+        }
+
+        .rotate-z-transform:hover {
+            transform: rotateZ(45deg);
+        }
+
+        .rotate-3d-transform:hover {
+            transform: rotate3d(1, 1, 1, 45deg);
+        }
+
+        .transform-origin-center {
+            transform-origin: center;
+        }
+
+        .transform-origin-top-left {
+            transform-origin: top left;
+        }
+
+        .transform-origin-bottom-right {
+            transform-origin: bottom right;
+        }
+
+        /* 关键帧动画示例 */
+        .keyframe-animations {
+            margin: 20px 0;
+        }
+
+        .animation-box {
+            width: 150px;
+            height: 150px;
+            background-color: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            border-radius: 8px;
+            margin: 20px auto;
+        }
+
+        /* 基础动画 */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in-animation {
+            animation: fadeIn 1s ease-out;
+        }
+
+        /* 多步骤动画 */
+        @keyframes slideIn {
+            0% {
+                transform: translateX(-100%);
+                opacity: 0;
+            }
+            50% {
+                transform: translateX(50px);
+                opacity: 0.8;
+            }
+            100% {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .slide-in-animation {
+            animation: slideIn 1.5s ease-out;
+        }
+
+        /* 无限动画 */
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                background-color: var(--primary-color);
+            }
+            50% {
+                transform: scale(1.1);
+                background-color: var(--secondary-color);
+            }
+            100% {
+                transform: scale(1);
+                background-color: var(--primary-color);
+            }
+        }
+
+        .pulse-animation {
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        /* 循环动画 */
+        @keyframes rotate {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .rotate-animation {
+            animation: rotate 3s linear infinite;
+        }
+
+        /* 暂停/播放动画 */
+        .pause-resume-animation {
+            animation: rotate 3s linear infinite;
+        }
+
+        .pause-resume-animation:hover {
+            animation-play-state: paused;
+        }
+
+        /* 延迟动画 */
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(-30px);
+            }
+            60% {
+                transform: translateY(-15px);
+            }
+        }
+
+        .bounce-animation {
+            animation: bounce 2s ease-in-out infinite 1s;
+        }
+
+        /* 交替动画 */
+        @keyframes slideHorizontal {
+            from {
+                transform: translateX(-50px);
+            }
+            to {
+                transform: translateX(50px);
+            }
+        }
+
+        .alternate-animation {
+            animation: slideHorizontal 2s ease-in-out infinite alternate;
+        }
+
+        /* 填充模式动画 */
+        @keyframes fadeOut {
+            from {
+                opacity: 1;
+            }
+            to {
+                opacity: 0.3;
+            }
+        }
+
+        .fill-mode-animation {
+            animation: fadeOut 2s ease-in-out forwards;
+        }
+
+        /* 多重动画 */
+        @keyframes colorChange {
+            0% { background-color: var(--primary-color); }
+            50% { background-color: var(--secondary-color); }
+            100% { background-color: var(--accent-color); }
+        }
+
+        .multiple-animations {
+            animation: 
+                slideHorizontal 3s ease-in-out infinite alternate,
+                colorChange 6s ease-in-out infinite;
+        }
+
+        /* 常用动画效果 */
+        .common-animations {
+            margin: 20px 0;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .common-animation-box {
+            height: 150px;
+            background-color: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        /* 心跳动画 */
+        @keyframes heartbeat {
+            0% {
+                transform: scale(1);
+            }
+            14% {
+                transform: scale(1.3);
+            }
+            28% {
+                transform: scale(1);
+            }
+            42% {
+                transform: scale(1.3);
+            }
+            70% {
+                transform: scale(1);
+            }
+        }
+
+        .heartbeat-animation {
+            animation: heartbeat 1.5s ease-in-out infinite;
+        }
+
+        /* 呼吸动画 */
+        @keyframes breathing {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.05);
+                opacity: 0.8;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .breathing-animation {
+            animation: breathing 3s ease-in-out infinite;
+        }
+
+        /* 浮动动画 */
+        @keyframes float {
+            0% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-20px);
+            }
+            100% {
+                transform: translateY(0px);
+            }
+        }
+
+        .float-animation {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        /* 闪光动画 */
+        @keyframes shine {
+            from {
+                background-position: 100%;
+            }
+            to {
+                background-position: -100%;
+            }
+        }
+
+        .shine-animation {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .shine-animation::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                to right,
+                rgba(255, 255, 255, 0) 0%,
+                rgba(255, 255, 255, 0.3) 50%,
+                rgba(255, 255, 255, 0) 100%
+            );
+            transform: rotate(30deg);
+            animation: shine 3s ease-in-out infinite;
+        }
+
+        /* 抖动动画 */
+        @keyframes shake {
+            0%, 100% {
+                transform: translateX(0);
+            }
+            10%, 30%, 50%, 70%, 90% {
+                transform: translateX(-10px);
+            }
+            20%, 40%, 60%, 80% {
+                transform: translateX(10px);
+            }
+        }
+
+        .shake-animation {
+            animation: shake 0.82s cubic-bezier(.36,.07,.19,.97) both;
+            transform: translate3d(0, 0, 0);
+            backface-visibility: hidden;
+            perspective: 1000px;
+        }
+
+        .shake-animation:hover {
+            animation: shake 0.82s cubic-bezier(.36,.07,.19,.97) both;
+        }
+
+        /* 交互反馈动画 */
+        .interaction-animations {
+            margin: 20px 0;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 10px;
+            outline: none;
+        }
+
+        /* 按钮悬停效果 */
+        .hover-btn:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .hover-btn:active {
+            transform: translateY(-1px);
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        /* 波纹效果按钮 */
+        .ripple-btn {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .ripple-btn::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.5);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .ripple-btn:active::after {
+            width: 300px;
+            height: 300px;
+        }
+
+        /* 3D翻转卡片 */
+        .card-flip-container {
+            perspective: 1000px;
+            width: 200px;
+            height: 200px;
+            margin: 20px auto;
+        }
+
+        .card-flip-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.8s;
+            transform-style: preserve-3d;
+        }
+
+        .card-flip-container:hover .card-flip-inner {
+            transform: rotateY(180deg);
+        }
+
+        .card-flip-front,
+        .card-flip-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+        }
+
+        .card-flip-front {
+            background-color: var(--primary-color);
+        }
+
+        .card-flip-back {
+            background-color: var(--secondary-color);
+            transform: rotateY(180deg);
+        }
+
+        /* 加载动画 */
+        .loading-animations {
+            margin: 20px 0;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            border-top: 4px solid var(--primary-color);
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .pulse-loader {
+            width: 50px;
+            height: 50px;
+            background-color: var(--primary-color);
+            border-radius: 50%;
+            animation: pulse-loader 1.5s ease-in-out infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes pulse-loader {
+            0% {
+                transform: scale(0);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 0;
+            }
+        }
+
+        .dots-loader {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .dot {
+            width: 15px;
+            height: 15px;
+            background-color: var(--primary-color);
+            border-radius: 50%;
+            animation: dot-bounce 1.4s infinite ease-in-out both;
+        }
+
+        .dot:nth-child(1) {
+            animation-delay: -0.32s;
+        }
+
+        .dot:nth-child(2) {
+            animation-delay: -0.16s;
+        }
+
+        @keyframes dot-bounce {
+            0%, 80%, 100% {
+                transform: scale(0);
+            }
+            40% {
+                transform: scale(1);
+            }
+        }
+
+        /* 响应式调整 */
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .section {
+                padding: 20px;
+            }
+            
+            .demo-box {
+                padding: 20px;
+            }
+            
+            .common-animations {
+                grid-template-columns: 1fr;
+            }
+            
+            .transform-box {
+                margin: 10px auto;
+            }
+            
+            .btn {
+                margin: 10px auto;
+                display: block;
+                width: 80%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>CSS动画与过渡示例演示</h1>
+
+        <!-- 示例1：基础过渡效果 -->
+        <div class="section">
+            <h2>1. CSS过渡效果 (Transitions)</h2>
+            <h3>基础过渡效果</h3>
+            <div class="demo-box">
+                <div class="transitions">
+                    <div class="transition-box basic-transition">
+                        悬停变色
+                    </div>
+                    <div class="transition-box multi-transition">
+                        多属性过渡
+                    </div>
+                </div>
+            </div>
+            <div class="code-example">/* 基础过渡效果示例 */
+/* 单属性过渡 */
+.basic-transition {
+    transition: background-color 0.3s ease;
+}
+
+.basic-transition:hover {
+    background-color: #e74c3c;
+}
+
+/* 多属性过渡 */
+.multi-transition {
+    transition: 
+        background-color 0.5s ease,
+        transform 0.3s ease,
+        border-radius 0.5s ease;
+}
+
+.multi-transition:hover {
+    background-color: #2ecc71;
+    transform: scale(1.1) rotate(5deg);
+    border-radius: 50%;
+}
+
+/* 简写形式 */
+.element {
+    /* property duration timing-function delay */
+    transition: all 0.3s ease 0s;
+}
+
+/* 分别定义多个过渡 */
+.element {
+    transition-property: background-color, transform;
+    transition-duration: 0.5s, 0.3s;
+    transition-timing-function: ease, linear;
+    transition-delay: 0s, 0.2s;
+}</div>
+
+            <h3>过渡时间函数 (Timing Functions)</h3>
+            <div class="demo-box">
+                <div class="transitions timing-functions">
+                    <div class="transition-box ease-transition">ease</div>
+                    <div class="transition-box linear-transition">linear</div>
+                    <div class="transition-box ease-in-transition">ease-in</div>
+                    <div class="transition-box ease-out-transition">ease-out</div>
+                    <div class="transition-box ease-in-out-transition">ease-in-out</div>
+                    <div class="transition-box custom-cubic-transition">cubic-bezier</div>
+                </div>
+            </div>
+            <div class="code-example">/* 过渡时间函数示例 */
+/* 预定义时间函数 */
+.ease-transition {
+    transition: all 1s ease; /* 慢-快-慢 */
+}
+
+.linear-transition {
+    transition: all 1s linear; /* 匀速 */
+}
+
+.ease-in-transition {
+    transition: all 1s ease-in; /* 慢开始 */
+}
+
+.ease-out-transition {
+    transition: all 1s ease-out; /* 慢结束 */
+}
+
+.ease-in-out-transition {
+    transition: all 1s ease-in-out; /* 慢开始和结束 */
+}
+
+/* 自定义贝塞尔曲线 */
+.custom-cubic-transition {
+    transition: all 1s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    /* 可以创建回弹效果 */
+}
+
+/* 常见的自定义贝塞尔曲线 */
+.ease-out-quad {
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.ease-out-back {
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}</div>
+        </div>
+
+        <!-- 示例2：CSS变换效果 -->
+        <div class="section">
+            <h2>2. CSS变换效果 (Transforms)</h2>
+            <h3>2D变换效果</h3>
+            <div class="demo-box">
+                <div class="transforms" style="display: flex; flex-wrap: wrap; justify-content: center;">
+                    <div class="transform-box translate-transform">平移
+(translate)</div>
+                    <div class="transform-box scale-transform">缩放
+(scale)</div>
+                    <div class="transform-box rotate-transform">旋转
+(rotate)</div>
+                    <div class="transform-box skew-transform">倾斜
+(skew)</div>
+                    <div class="transform-box combo-transform">组合变换</div>
+                </div>
+            </div>
+            <div class="code-example">/* 2D变换效果示例 */
+/* 平移变换 */
+.translate-transform:hover {
+    transform: translate(20px, -10px); /* X轴, Y轴 */
+    /* 也可以单独设置：translateX(), translateY() */
+}
+
+/* 缩放变换 */
+.scale-transform:hover {
+    transform: scale(1.2); /* 同时缩放X和Y */
+    /* 也可以单独设置：scaleX(), scaleY() */
+}
+
+/* 旋转变换 */
+.rotate-transform:hover {
+    transform: rotate(45deg); /* 正值顺时针，负值逆时针 */
+}
+
+/* 倾斜变换 */
+.skew-transform:hover {
+    transform: skew(10deg, 5deg); /* X轴倾斜，Y轴倾斜 */
+    /* 也可以单独设置：skewX(), skewY() */
+}
+
+/* 组合变换 */
+.combo-transform:hover {
+    transform: translate(10px, -10px) rotate(15deg) scale(1.1);
+    /* 注意变换的顺序会影响最终结果 */
+}
+
+/* 设置变换原点 */
+.transform-origin-center {
+    transform-origin: center;
+}
+
+.transform-origin-top-left {
+    transform-origin: top left;
+}
+
+.transform-origin-bottom-right {
+    transform-origin: bottom right;
+}</div>
+
+            <h3>3D变换效果</h3>
+            <div class="demo-box">
+                <div class="transforms perspective-container">
+                    <div style="display: flex; flex-wrap: wrap; justify-content: center;">
+                        <div class="transform-box rotate-x-transform">X轴旋转
+(rotateX)</div>
+                        <div class="transform-box rotate-y-transform">Y轴旋转
+(rotateY)</div>
+                        <div class="transform-box rotate-z-transform">Z轴旋转
+(rotateZ)</div>
+                        <div class="transform-box rotate-3d-transform">3D旋转
+(rotate3D)</div>
+                    </div>
+                </div>
+            </div>
+            <div class="code-example">/* 3D变换效果示例 */
+/* 首先需要设置透视效果 */
+.perspective-container {
+    perspective: 1000px; /* 设置透视距离 */
+}
+
+/* 3D变换需要设置变换样式 */
+.transform-3d {
+    transform-style: preserve-3d;
+}
+
+/* X轴旋转 */
+.rotate-x-transform:hover {
+    transform: rotateX(45deg);
+}
+
+/* Y轴旋转 */
+.rotate-y-transform:hover {
+    transform: rotateY(45deg);
+}
+
+/* Z轴旋转 */
+.rotate-z-transform:hover {
+    transform: rotateZ(45deg);
+    /* 效果类似于2D旋转 */
+}
+
+/* 3D旋转 */
+.rotate-3d-transform:hover {
+    transform: rotate3d(1, 1, 1, 45deg);
+    /* rotate3d(x, y, z, angle) */
+}
+
+/* 3D平移 */
+.translate-3d-transform:hover {
+    transform: translate3d(10px, 10px, 50px);
+    /* translate3d(x, y, z) */
+}
+
+/* 3D缩放 */
+.scale-3d-transform:hover {
+    transform: scale3d(1.2, 1.2, 1.2);
+    /* scale3d(x, y, z) */
+}
+
+/* 背面可见性 */
+.backface-hidden {
+    backface-visibility: hidden;
+}
+
+.backface-visible {
+    backface-visibility: visible;
+}</div>
+        </div>
+
+        <!-- 示例3：CSS关键帧动画 -->
+        <div class="section">
+            <h2>3. CSS关键帧动画 (Keyframe Animations)</h2>
+            <h3>基础关键帧动画</h3>
+            <div class="demo-box">
+                <div class="keyframe-animations">
+                    <div class="animation-box fade-in-animation">淡入动画</div>
+                    <div class="animation-box slide-in-animation">滑入动画</div>
+                    <div class="animation-box pulse-animation">脉冲动画</div>
+                    <div class="animation-box rotate-animation">旋转动画</div>
+                </div>
+            </div>
+            <div class="code-example">/* 基础关键帧动画示例 */
+/* 定义关键帧 */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* 使用动画 */
+.fade-in-animation {
+    animation: fadeIn 1s ease-out;
+}
+
+/* 多步骤关键帧 */
+@keyframes slideIn {
+    0% {
+        transform: translateX(-100%);
+        opacity: 0;
+    }
+    50% {
+        transform: translateX(50px);
+        opacity: 0.8;
+    }
+    100% {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* 无限循环动画 */
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+        background-color: #3498db;
+    }
+    50% {
+        transform: scale(1.1);
+        background-color: #2ecc71;
+    }
+    100% {
+        transform: scale(1);
+        background-color: #3498db;
+    }
+}
+
+.pulse-animation {
+    animation: pulse 2s ease-in-out infinite;
+}
+
+/* 动画属性完整定义 */
+.animation-example {
+    animation-name: fadeIn;
+    animation-duration: 1s;
+    animation-timing-function: ease-out;
+    animation-delay: 0s;
+    animation-iteration-count: 1;
+    animation-direction: normal;
+    animation-fill-mode: none;
+    animation-play-state: running;
+}
+
+/* 简写形式 */
+.animation-shorthand {
+    /* name duration timing-function delay iteration-count direction fill-mode */
+    animation: fadeIn 1s ease-out 0s 1 normal none;
+}</div>
+
+            <h3>动画控制与高级技巧</h3>
+            <div class="demo-box">
+                <div class="keyframe-animations">
+                    <div class="animation-box pause-resume-animation">悬停暂停动画</div>
+                    <div class="animation-box bounce-animation">延迟弹跳动画</div>
+                    <div class="animation-box alternate-animation">交替动画</div>
+                    <div class="animation-box fill-mode-animation">填充模式动画</div>
+                    <div class="animation-box multiple-animations">多重动画</div>
+                </div>
+            </div>
+            <div class="code-example">/* 动画控制与高级技巧 */
+/* 暂停/播放动画 */
+.pause-resume-animation {
+    animation: rotate 3s linear infinite;
+}
+
+.pause-resume-animation:hover {
+    animation-play-state: paused;
+    /* 可以通过JavaScript控制：element.style.animationPlayState = 'paused' */
+}
+
+/* 延迟动画 */
+.bounce-animation {
+    animation: bounce 2s ease-in-out infinite 1s;
+    /* 最后一个值是延迟时间 */
+}
+
+/* 交替动画 */
+.alternate-animation {
+    animation: slideHorizontal 2s ease-in-out infinite alternate;
+    /* alternate: 正向-反向-正向... */
+    /* alternate-reverse: 反向-正向-反向... */
+}
+
+/* 填充模式 */
+.fill-mode-animation {
+    animation: fadeOut 2s ease-in-out forwards;
+    /* none: 默认值，动画结束后回到初始状态 */
+    /* forwards: 保持动画结束状态 */
+    /* backwards: 应用第一个关键帧的样式到动画开始前 */
+    /* both: 同时应用forwards和backwards */
+}
+
+/* 多重动画 */
+.multiple-animations {
+    animation: 
+        slideHorizontal 3s ease-in-out infinite alternate,
+        colorChange 6s ease-in-out infinite;
+    /* 可以同时应用多个动画 */
+}
+
+/* 性能优化：使用GPU加速 */
+.gpu-accelerated {
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    perspective: 1000px;
+}
+
+/* 动画性能最佳实践 */
+.optimized-animation {
+    animation: optimizedMove 1s ease-out;
+}
+
+@keyframes optimizedMove {
+    /* 优先使用transform和opacity，避免重排 */
+    from {
+        transform: translateY(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateY(100px);
+        opacity: 0;
+    }
+}</div>
+        </div>
+
+        <!-- 示例4：常用动画效果 -->
+        <div class="section">
+            <h2>4. 常用动画效果集合</h2>
+            <div class="demo-box">
+                <div class="common-animations">
+                    <div>
+                        <div class="common-animation-box heartbeat-animation">心跳动画</div>
+                        <p style="text-align: center;">heartbeat</p>
+                    </div>
+                    <div>
+                        <div class="common-animation-box breathing-animation">呼吸动画</div>
+                        <p style="text-align: center;">breathing</p>
+                    </div>
+                    <div>
+                        <div class="common-animation-box float-animation">浮动动画</div>
+                        <p style="text-align: center;">float</p>
+                    </div>
+                    <div>
+                        <div class="common-animation-box shine-animation">闪光动画</div>
+                        <p style="text-align: center;">shine</p>
+                    </div>
+                    <div>
+                        <div class="common-animation-box shake-animation">抖动动画</div>
+                        <p style="text-align: center;">shake (悬停触发)</p>
+                    </div>
+                </div>
+            </div>
+            <div class="code-example">/* 常用动画效果 */
+/* 心跳动画 */
+@keyframes heartbeat {
+    0% {
+        transform: scale(1);
+    }
+    14% {
+        transform: scale(1.3);
+    }
+    28% {
+        transform: scale(1);
+    }
+    42% {
+        transform: scale(1.3);
+    }
+    70% {
+        transform: scale(1);
+    }
+}
+
+/* 呼吸动画 */
+@keyframes breathing {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.05);
+        opacity: 0.8;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* 浮动动画 */
+@keyframes float {
+    0% {
+        transform: translateY(0px);
+    }
+    50% {
+        transform: translateY(-20px);
+    }
+    100% {
+        transform: translateY(0px);
+    }
+}
+
+/* 闪光动画 */
+@keyframes shine {
+    from {
+        background-position: 100%;
+    }
+    to {
+        background-position: -100%;
+    }
+}
+
+.shine-animation::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(
+        to right,
+        rgba(255, 255, 255, 0) 0%,
+        rgba(255, 255, 255, 0.3) 50%,
+        rgba(255, 255, 255, 0) 100%
+    );
+    transform: rotate(30deg);
+    animation: shine 3s ease-in-out infinite;
+}
+
+/* 抖动动画 */
+@keyframes shake {
+    0%, 100% {
+        transform: translateX(0);
+    }
+    10%, 30%, 50%, 70%, 90% {
+        transform: translateX(-10px);
+    }
+    20%, 40%, 60%, 80% {
+        transform: translateX(10px);
+    }
+}</div>
+        </div>
+
+        <!-- 示例5：交互反馈动画 -->
+        <div class="section">
+            <h2>5. 交互反馈动画</h2>
+            <div class="demo-box">
+                <div class="interaction-animations">
+                    <div style="text-align: center; margin-bottom: 30px;">
+                        <button class="btn hover-btn">悬停效果按钮</button>
+                        <button class="btn ripple-btn">波纹效果按钮</button>
+                    </div>
+                    <div style="text-align: center;">
+                        <h4>3D翻转卡片 (悬停查看背面)</h4>
+                        <div class="card-flip-container">
+                            <div class="card-flip-inner">
+                                <div class="card-flip-front">正面
+点击翻转</div>
+                                <div class="card-flip-back">背面
+3D效果</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="code-example">/* 交互反馈动画 */
+/* 悬停效果按钮 */
+.hover-btn {
+    transition: all 0.3s ease;
+}
+
+.hover-btn:hover {
+    background-color: #2ecc71;
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.hover-btn:active {
+    transform: translateY(-1px);
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* 波纹效果按钮 */
+.ripple-btn {
+    position: relative;
+    overflow: hidden;
+}
+
+.ripple-btn::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.5);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.ripple-btn:active::after {
+    width: 300px;
+    height: 300px;
+}
+
+/* 3D翻转卡片 */
+.card-flip-container {
+    perspective: 1000px;
+}
+
+.card-flip-inner {
+    transition: transform 0.8s;
+    transform-style: preserve-3d;
+}
+
+.card-flip-container:hover .card-flip-inner {
+    transform: rotateY(180deg);
+}
+
+.card-flip-front,
+.card-flip-back {
+    backface-visibility: hidden;
+}
+
+.card-flip-back {
+    transform: rotateY(180deg);
+}
+
+/* 其他交互效果示例 */
+
+/* 点击效果 */
+.click-effect:active {
+    transform: scale(0.95);
+    transition: transform 0.1s ease;
+}
+
+/* 聚焦效果 */
+.focus-effect:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.3);
+    transform: scale(1.02);
+}</div>
+        </div>
+
+        <!-- 示例6：加载动画 -->
+        <div class="section">
+            <h2>6. 加载动画效果</h2>
+            <div class="demo-box">
+                <div class="loading-animations">
+                    <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 50px;">
+                        <div style="text-align: center;">
+                            <div class="spinner"></div>
+                            <p>旋转加载器</p>
+                        </div>
+                        <div style="text-align: center;">
+                            <div class="pulse-loader"></div>
+                            <p>脉冲加载器</p>
+                        </div>
+                        <div style="text-align: center;">
+                            <div class="dots-loader">
+                                <div class="dot"></div>
+                                <div class="dot"></div>
+                                <div class="dot"></div>
+                            </div>
+                            <p>点状加载器</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="code-example">/* 加载动画效果 */
+/* 旋转加载器 */
+.spinner {
+    width: 50px;
+    height: 50px;
+    border: 4px solid rgba(0, 0, 0, 0.1);
+    border-radius: 50%;
+    border-top: 4px solid #3498db;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* 脉冲加载器 */
+.pulse-loader {
+    width: 50px;
+    height: 50px;
+    background-color: #3498db;
+    border-radius: 50%;
+    animation: pulse-loader 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse-loader {
+    0% {
+        transform: scale(0);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 0;
+    }
+}
+
+/* 点状加载器 */
+.dots-loader {
+    display: flex;
+    gap: 10px;
+}
+
+.dot {
+    width: 15px;
+    height: 15px;
+    background-color: #3498db;
+    border-radius: 50%;
+    animation: dot-bounce 1.4s infinite ease-in-out both;
+}
+
+/* 延迟每个点的动画 */
+.dot:nth-child(1) { animation-delay: -0.32s; }
+.dot:nth-child(2) { animation-delay: -0.16s; }
+
+@keyframes dot-bounce {
+    0%, 80%, 100% {
+        transform: scale(0);
+    }
+    40% {
+        transform: scale(1);
+    }
+}
+
+/* 条形加载器 */
+.bar-loader {
+    width: 100px;
+    height: 4px;
+    background-color: #ecf0f1;
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.bar-loader::after {
+    content: '';
+    display: block;
+    width: 50%;
+    height: 100%;
+    background-color: #3498db;
+    animation: bar-slide 1.5s ease-in-out infinite;
+}
+
+@keyframes bar-slide {
+    0% {
+        transform: translateX(-100%);
+    }
+    50%, 100% {
+        transform: translateX(200%);
+    }
+}</div>
+        </div>
+    </div>
+</body>
+</html>

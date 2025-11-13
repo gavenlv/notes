@@ -1,0 +1,1636 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSS实战项目与案例分析示例</title>
+    <!-- 引入Font Awesome用于图标 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* 全局重置和基础样式 */
+        :root {
+            /* 浅色主题变量 */
+            --primary: #1E40AF;
+            --primary-light: #3B82F6;
+            --primary-dark: #1E3A8A;
+            --secondary: #F97316;
+            --background: #FFFFFF;
+            --surface: #F9FAFB;
+            --text-primary: #111827;
+            --text-secondary: #4B5563;
+            --text-muted: #9CA3AF;
+            --border: #E5E7EB;
+            --success: #10B981;
+            --warning: #FBBF24;
+            --danger: #EF4444;
+            --gray-50: #F9FAFB;
+            --gray-100: #F3F4F6;
+            --gray-200: #E5E7EB;
+            --gray-300: #D1D5DB;
+            --gray-400: #9CA3AF;
+            --gray-500: #6B7280;
+            --gray-600: #4B5563;
+            --gray-700: #374151;
+            --gray-800: #1F2937;
+            --gray-900: #111827;
+            --white: #FFFFFF;
+        }
+
+        /* 深色主题 */
+        .dark-theme {
+            --primary: #3B82F6;
+            --primary-light: #60A5FA;
+            --primary-dark: #2563EB;
+            --secondary: #FB923C;
+            --background: #0F172A;
+            --surface: #1E293B;
+            --text-primary: #F8FAFC;
+            --text-secondary: #CBD5E1;
+            --text-muted: #94A3B8;
+            --border: #334155;
+            --success: #34D399;
+            --warning: #FCD34D;
+            --danger: #F87171;
+        }
+
+        /* 基础重置 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-primary);
+            background-color: var(--background);
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        a {
+            color: var(--primary);
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+
+        a:hover {
+            color: var(--primary-dark);
+        }
+
+        /* 无障碍样式 */
+        *:focus-visible {
+            outline: 3px solid var(--primary);
+            outline-offset: 2px;
+        }
+
+        .visually-hidden {
+            position: absolute !important;
+            width: 1px !important;
+            height: 1px !important;
+            padding: 0 !important;
+            margin: -1px !important;
+            overflow: hidden !important;
+            clip: rect(0, 0, 0, 0) !important;
+            white-space: nowrap !important;
+            border: 0 !important;
+        }
+
+        /* 跳过导航链接 */
+        .skip-link {
+            position: absolute;
+            top: -100px;
+            left: 0;
+            background-color: var(--primary);
+            color: white;
+            padding: 0.75rem 1rem;
+            text-decoration: none;
+            z-index: 1000;
+            border-radius: 0 0 0.25rem 0.25rem;
+            transition: top 0.3s ease;
+        }
+
+        .skip-link:focus {
+            top: 0;
+        }
+
+        /* 按钮基础样式 */
+        .btn {
+            min-height: 3rem;
+            min-width: 3rem;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1.5;
+            border: none;
+            touch-action: manipulation;
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background-color: var(--primary-dark);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-secondary {
+            background-color: var(--surface);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover:not(:disabled) {
+            border-color: var(--primary);
+            color: var(--primary);
+            background-color: transparent;
+        }
+
+        /* 布局容器 */
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        /* 章节样式 */
+        .chapter {
+            padding: 3rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .chapter:last-child {
+            border-bottom: none;
+        }
+
+        .chapter-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            color: var(--text-primary);
+            text-align: center;
+        }
+
+        /* 示例切换器 */
+        .example-selector {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            justify-content: center;
+            margin-bottom: 2rem;
+            padding: 1rem;
+            background-color: var(--surface);
+            border-radius: 0.5rem;
+        }
+
+        .example-selector button {
+            padding: 0.75rem 1.5rem;
+            border: 1px solid var(--border);
+            background-color: var(--background);
+            color: var(--text-secondary);
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .example-selector button.active {
+            background-color: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .example-selector button:hover:not(.active) {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        /* 示例容器 */
+        .example-container {
+            margin-bottom: 3rem;
+        }
+
+        /* 导航栏样式 - 企业官网示例 */
+        .enterprise-nav {
+            background-color: var(--background);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            transition: all 0.3s ease;
+        }
+
+        .enterprise-nav.scrolled {
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding-top: 0.5rem;
+            padding-bottom: 0.5rem;
+            background-color: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+        }
+
+        .dark-theme .enterprise-nav.scrolled {
+            background-color: rgba(15, 23, 42, 0.95);
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .nav-logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s ease;
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+
+        .nav-links a.active {
+            color: var(--primary);
+        }
+
+        .nav-links a.active::after {
+            content: '';
+            position: absolute;
+            bottom: -6px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: var(--primary);
+        }
+
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.5rem;
+            color: var(--text-primary);
+        }
+
+        /* 英雄区域样式 */
+        .hero {
+            background: linear-gradient(135deg, var(--primary-light) 0%, var(--primary) 100%);
+            color: white;
+            padding: 6rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23ffffff' fill-opacity='0.1' fill-rule='evenodd'/%3E%3C/svg%3E");
+            opacity: 0.1;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .hero-title {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            line-height: 1.2;
+        }
+
+        .hero-subtitle {
+            font-size: 1.25rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+
+        .hero-cta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            justify-content: center;
+        }
+
+        /* 特性区域 */
+        .features {
+            padding: 6rem 0;
+            background-color: var(--surface);
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .feature-card {
+            background-color: var(--background);
+            border-radius: 0.5rem;
+            padding: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid var(--border);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .feature-icon {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+
+        .feature-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .feature-description {
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* 产品卡片样式 - 电商网站示例 */
+        .products-section {
+            padding: 4rem 0;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .product-card {
+            background-color: var(--background);
+            border-radius: 0.5rem;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .product-image {
+            position: relative;
+            padding-top: 100%;
+            overflow: hidden;
+        }
+
+        .product-image img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .product-card:hover .product-image img {
+            transform: scale(1.05);
+        }
+
+        .product-content {
+            padding: 1.5rem;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .product-category {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.5rem;
+        }
+
+        .product-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+            line-height: 1.4;
+        }
+
+        .product-description {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+            line-height: 1.5;
+            flex-grow: 1;
+        }
+
+        .product-price {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+
+        .product-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-add-to-cart {
+            flex-grow: 1;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.75rem;
+            border-radius: 0.25rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .btn-add-to-cart:hover {
+            background-color: var(--primary-dark);
+        }
+
+        .btn-wishlist {
+            background: none;
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            width: 40px;
+            height: 40px;
+            border-radius: 0.25rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .btn-wishlist:hover {
+            border-color: var(--danger);
+            color: var(--danger);
+        }
+
+        /* 响应式表单样式 */
+        .form-container {
+            max-width: 100%;
+            margin: 2rem auto;
+            padding: 2rem;
+            background-color: var(--background);
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border);
+        }
+
+        .form-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .form-input,
+        .form-textarea,
+        .form-select {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+            background-color: var(--background);
+            color: var(--text-primary);
+        }
+
+        .form-input:focus,
+        .form-textarea:focus,
+        .form-select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .form-input::placeholder,
+        .form-textarea::placeholder {
+            color: var(--text-muted);
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .form-select {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 0.75rem center;
+            background-repeat: no-repeat;
+            background-size: 1.5em 1.5em;
+        }
+
+        .form-check {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-check-input {
+            width: 1.25rem;
+            height: 1.25rem;
+            margin-right: 0.5rem;
+            accent-color: var(--primary);
+        }
+
+        .form-check-label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .form-row {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+            margin-bottom: 0;
+        }
+
+        .form-actions {
+            margin-top: 2rem;
+        }
+
+        /* 滚动动画类 */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+
+        .fade-in.animate {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .slide-in-left {
+            opacity: 0;
+            transform: translateX(-30px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+
+        .slide-in-left.animate {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .slide-in-right {
+            opacity: 0;
+            transform: translateX(30px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+
+        .slide-in-right.animate {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        /* 延迟动画 */
+        .delay-1 { transition-delay: 0.1s; }
+        .delay-2 { transition-delay: 0.2s; }
+        .delay-3 { transition-delay: 0.3s; }
+        .delay-4 { transition-delay: 0.4s; }
+        .delay-5 { transition-delay: 0.5s; }
+
+        /* 单页应用示例样式 */
+        .spa-layout {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .spa-header {
+            background-color: var(--background);
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .spa-header .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .spa-logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .spa-nav {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        .spa-nav a {
+            color: var(--text-secondary);
+            font-weight: 500;
+            transition: color 0.2s ease;
+        }
+
+        .spa-nav a:hover,
+        .spa-nav a.active {
+            color: var(--primary);
+        }
+
+        .spa-main {
+            flex-grow: 1;
+            padding: 3rem 0;
+        }
+
+        .spa-footer {
+            background-color: var(--surface);
+            padding: 2rem 0;
+            border-top: 1px solid var(--border);
+            margin-top: auto;
+        }
+
+        /* 移动端优先样式 */
+        @media (max-width: 768px) {
+            .chapter {
+                padding: 2rem 0;
+            }
+
+            .chapter-title {
+                font-size: 1.5rem;
+            }
+
+            .nav-links {
+                position: fixed;
+                top: 60px;
+                left: 0;
+                right: 0;
+                background-color: var(--background);
+                flex-direction: column;
+                align-items: center;
+                padding: 2rem;
+                gap: 1.5rem;
+                box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+                transform: translateY(-150%);
+                transition: transform 0.3s ease;
+                z-index: 99;
+                border-bottom: 1px solid var(--border);
+            }
+
+            .nav-links.open {
+                transform: translateY(0);
+            }
+
+            .menu-toggle {
+                display: block;
+            }
+
+            .hero {
+                padding: 4rem 0;
+            }
+
+            .hero-title {
+                font-size: 2rem;
+            }
+
+            .hero-subtitle {
+                font-size: 1rem;
+            }
+
+            .features {
+                padding: 4rem 0;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            .form-container {
+                padding: 1.5rem;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+
+        @media (min-width: 768px) {
+            .form-row {
+                flex-direction: row;
+            }
+        }
+
+        /* 减少动画模式支持 */
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+                scroll-behavior: auto !important;
+            }
+        }
+
+        /* 高对比度模式支持 */
+        @media (prefers-contrast: high) {
+            :root {
+                --primary: #0033cc;
+                --text-primary: #000000;
+                --background: #ffffff;
+                --border: #000000;
+            }
+
+            .dark-theme {
+                --primary: #3b82f6;
+                --text-primary: #ffffff;
+                --background: #000000;
+                --border: #ffffff;
+            }
+
+            a {
+                text-decoration: underline;
+                text-decoration-thickness: 2px;
+            }
+        }
+
+        /* 主题切换按钮 */
+        .theme-toggle {
+            background: none;
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            width: 40px;
+            height: 40px;
+            border-radius: 0.25rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .theme-toggle:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        /* 标签页样式 */
+        .tabs {
+            margin-bottom: 2rem;
+        }
+
+        .tab-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            font-weight: 500;
+        }
+
+        .tab-btn.active {
+            color: var(--primary);
+        }
+
+        .tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: var(--primary);
+        }
+
+        .tab-btn:hover:not(.active) {
+            color: var(--primary);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <!-- 跳过导航链接 -->
+    <a href="#main-content" class="skip-link">跳过导航，直接到主要内容</a>
+
+    <!-- 主题切换按钮 -->
+    <button id="theme-toggle" class="theme-toggle" aria-label="切换主题">
+        <i class="fas fa-moon"></i>
+    </button>
+
+    <header>
+        <div class="container">
+            <h1 style="text-align: center; padding: 2rem 0;">CSS实战项目与案例分析示例</h1>
+        </div>
+    </header>
+
+    <main id="main-content">
+        <!-- 示例切换器 -->
+        <div class="container">
+            <div class="example-selector">
+                <button class="active" data-example="enterprise">企业官网</button>
+                <button data-example="ecommerce">电商网站</button>
+                <button data-example="spa">单页应用</button>
+                <button data-example="responsive">响应式设计</button>
+                <button data-example="accessibility">无障碍设计</button>
+                <button data-example="interactive">交互效果</button>
+            </div>
+        </div>
+
+        <!-- 企业官网示例 -->
+        <div id="enterprise-example" class="example-container">
+            <section class="chapter">
+                <div class="container">
+                    <h2 class="chapter-title">企业官网示例</h2>
+                    
+                    <!-- 导航栏 -->
+                    <nav class="enterprise-nav">
+                        <div class="nav-container">
+                            <a href="#" class="nav-logo">企业名称</a>
+                            <div class="nav-links">
+                                <a href="#" class="active">首页</a>
+                                <a href="#">关于我们</a>
+                                <a href="#">服务</a>
+                                <a href="#">案例</a>
+                                <a href="#">联系我们</a>
+                            </div>
+                            <button class="menu-toggle" aria-expanded="false" aria-label="打开菜单">
+                                <i class="fas fa-bars"></i>
+                            </button>
+                        </div>
+                    </nav>
+
+                    <!-- 英雄区域 -->
+                    <section class="hero">
+                        <div class="container">
+                            <div class="hero-content">
+                                <h1 class="hero-title fade-in">创新解决方案，助力企业成长</h1>
+                                <p class="hero-subtitle fade-in delay-1">我们提供专业的企业服务，帮助您实现业务增长和数字化转型</p>
+                                <div class="hero-cta fade-in delay-2">
+                                    <button class="btn btn-primary">了解更多</button>
+                                    <button class="btn btn-secondary">联系我们</button>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- 特性区域 -->
+                    <section class="features">
+                        <div class="container">
+                            <h2 class="chapter-title">我们的核心服务</h2>
+                            <div class="features-grid">
+                                <div class="feature-card slide-in-left">
+                                    <div class="feature-icon"><i class="fas fa-laptop-code"></i></div>
+                                    <h3 class="feature-title">网站开发</h3>
+                                    <p class="feature-description">为企业打造现代化、高性能的网站，提升品牌形象和用户体验</p>
+                                </div>
+                                <div class="feature-card slide-in-left delay-1">
+                                    <div class="feature-icon"><i class="fas fa-mobile-alt"></i></div>
+                                    <h3 class="feature-title">移动应用开发</h3>
+                                    <p class="feature-description">开发功能丰富、用户友好的移动应用，满足企业移动化需求</p>
+                                </div>
+                                <div class="feature-card slide-in-left delay-2">
+                                    <div class="feature-icon"><i class="fas fa-chart-line"></i></div>
+                                    <h3 class="feature-title">数据分析</h3>
+                                    <p class="feature-description">提供专业的数据分析服务，帮助企业做出数据驱动的决策</p>
+                                </div>
+                                <div class="feature-card slide-in-right delay-1">
+                                    <div class="feature-icon"><i class="fas fa-cloud"></i></div>
+                                    <h3 class="feature-title">云服务</h3>
+                                    <p class="feature-description">提供安全、可靠的云服务解决方案，降低IT成本，提高效率</p>
+                                </div>
+                                <div class="feature-card slide-in-right delay-2">
+                                    <div class="feature-icon"><i class="fas fa-shield-alt"></i></div>
+                                    <h3 class="feature-title">网络安全</h3>
+                                    <p class="feature-description">全方位的网络安全服务，保护企业数据和系统安全</p>
+                                </div>
+                                <div class="feature-card slide-in-right">
+                                    <div class="feature-icon"><i class="fas fa-cogs"></i></div>
+                                    <h3 class="feature-title">IT咨询</h3>
+                                    <p class="feature-description">专业的IT咨询服务，为企业提供战略规划和技术支持</p>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </section>
+        </div>
+
+        <!-- 电商网站示例 -->
+        <div id="ecommerce-example" class="example-container" style="display: none;">
+            <section class="chapter">
+                <div class="container">
+                    <h2 class="chapter-title">电商网站示例</h2>
+                    
+                    <!-- 产品展示 -->
+                    <section class="products-section">
+                        <h3 style="text-align: center; margin-bottom: 2rem;">热门产品</h3>
+                        <div class="products-grid">
+                            <!-- 产品卡片1 -->
+                            <div class="product-card fade-in">
+                                <div class="product-image">
+                                    <img src="https://picsum.photos/seed/product1/500/500" alt="产品图片" loading="lazy">
+                                </div>
+                                <div class="product-content">
+                                    <div class="product-category">电子产品</div>
+                                    <h3 class="product-title">无线蓝牙耳机</h3>
+                                    <p class="product-description">高品质音效，长续航时间，舒适佩戴体验</p>
+                                    <div class="product-price">¥299.00</div>
+                                    <div class="product-actions">
+                                        <button class="btn-add-to-cart">加入购物车</button>
+                                        <button class="btn-wishlist" aria-label="加入收藏">
+                                            <i class="far fa-heart"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 产品卡片2 -->
+                            <div class="product-card fade-in delay-1">
+                                <div class="product-image">
+                                    <img src="https://picsum.photos/seed/product2/500/500" alt="产品图片" loading="lazy">
+                                </div>
+                                <div class="product-content">
+                                    <div class="product-category">智能家居</div>
+                                    <h3 class="product-title">智能手表</h3>
+                                    <p class="product-description">健康监测，运动追踪，智能通知</p>
+                                    <div class="product-price">¥1299.00</div>
+                                    <div class="product-actions">
+                                        <button class="btn-add-to-cart">加入购物车</button>
+                                        <button class="btn-wishlist" aria-label="加入收藏">
+                                            <i class="far fa-heart"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 产品卡片3 -->
+                            <div class="product-card fade-in delay-2">
+                                <div class="product-image">
+                                    <img src="https://picsum.photos/seed/product3/500/500" alt="产品图片" loading="lazy">
+                                </div>
+                                <div class="product-content">
+                                    <div class="product-category">家用电器</div>
+                                    <h3 class="product-title">便携式加湿器</h3>
+                                    <p class="product-description">静音设计，大容量水箱，适用于办公室和卧室</p>
+                                    <div class="product-price">¥159.00</div>
+                                    <div class="product-actions">
+                                        <button class="btn-add-to-cart">加入购物车</button>
+                                        <button class="btn-wishlist" aria-label="加入收藏">
+                                            <i class="far fa-heart"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 产品卡片4 -->
+                            <div class="product-card fade-in delay-3">
+                                <div class="product-image">
+                                    <img src="https://picsum.photos/seed/product4/500/500" alt="产品图片" loading="lazy">
+                                </div>
+                                <div class="product-content">
+                                    <div class="product-category">时尚配饰</div>
+                                    <h3 class="product-title">简约石英手表</h3>
+                                    <p class="product-description">经典设计，精密机芯，防水性能</p>
+                                    <div class="product-price">¥599.00</div>
+                                    <div class="product-actions">
+                                        <button class="btn-add-to-cart">加入购物车</button>
+                                        <button class="btn-wishlist" aria-label="加入收藏">
+                                            <i class="far fa-heart"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 产品卡片5 -->
+                            <div class="product-card fade-in delay-1">
+                                <div class="product-image">
+                                    <img src="https://picsum.photos/seed/product5/500/500" alt="产品图片" loading="lazy">
+                                </div>
+                                <div class="product-content">
+                                    <div class="product-category">厨房用品</div>
+                                    <h3 class="product-title">多功能料理机</h3>
+                                    <p class="product-description">一机多用，强劲动力，易清洗设计</p>
+                                    <div class="product-price">¥899.00</div>
+                                    <div class="product-actions">
+                                        <button class="btn-add-to-cart">加入购物车</button>
+                                        <button class="btn-wishlist" aria-label="加入收藏">
+                                            <i class="far fa-heart"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 产品卡片6 -->
+                            <div class="product-card fade-in delay-2">
+                                <div class="product-image">
+                                    <img src="https://picsum.photos/seed/product6/500/500" alt="产品图片" loading="lazy">
+                                </div>
+                                <div class="product-content">
+                                    <div class="product-category">户外装备</div>
+                                    <h3 class="product-title">轻便折叠帐篷</h3>
+                                    <p class="product-description">快速搭建，防水防紫外线，收纳便捷</p>
+                                    <div class="product-price">¥499.00</div>
+                                    <div class="product-actions">
+                                        <button class="btn-add-to-cart">加入购物车</button>
+                                        <button class="btn-wishlist" aria-label="加入收藏">
+                                            <i class="far fa-heart"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </section>
+        </div>
+
+        <!-- 单页应用示例 -->
+        <div id="spa-example" class="example-container" style="display: none;">
+            <section class="chapter spa-layout">
+                <div class="container">
+                    <h2 class="chapter-title">单页应用示例</h2>
+                    
+                    <!-- SPA布局 -->
+                    <header class="spa-header">
+                        <div class="container">
+                            <div class="spa-logo">SPA应用</div>
+                            <nav class="spa-nav">
+                                <a href="#" class="active">首页</a>
+                                <a href="#">仪表板</a>
+                                <a href="#">设置</a>
+                                <a href="#">帮助</a>
+                            </nav>
+                        </div>
+                    </header>
+
+                    <main class="spa-main">
+                        <!-- 标签页内容 -->
+                        <div class="tabs">
+                            <div class="tab-buttons">
+                                <button class="tab-btn active" data-tab="home">首页</button>
+                                <button class="tab-btn" data-tab="dashboard">仪表板</button>
+                                <button class="tab-btn" data-tab="settings">设置</button>
+                            </div>
+
+                            <div id="home-tab" class="tab-content active">
+                                <div class="fade-in">
+                                    <h3>欢迎使用我们的单页应用</h3>
+                                    <p>这是一个现代化的单页应用示例，展示了如何使用CSS和JavaScript创建流畅的用户体验。</p>
+                                    <div style="margin-top: 2rem;">
+                                        <button class="btn btn-primary">开始使用</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div id="dashboard-tab" class="tab-content">
+                                <div class="fade-in">
+                                    <h3>仪表板</h3>
+                                    <p>这里是您的个人仪表板，展示了关键数据和指标。</p>
+                                    <div style="margin-top: 2rem; background-color: var(--surface); padding: 1.5rem; border-radius: 0.5rem; border: 1px solid var(--border);">
+                                        <p>数据图表和分析内容将显示在这里...</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div id="settings-tab" class="tab-content">
+                                <div class="fade-in">
+                                    <h3>设置</h3>
+                                    <form class="form-container" style="max-width: 600px;">
+                                        <div class="form-group">
+                                            <label for="username" class="form-label">用户名</label>
+                                            <input type="text" id="username" class="form-input" value="user123" disabled>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="email" class="form-label">电子邮箱</label>
+                                            <input type="email" id="email" class="form-input" value="user@example.com">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="theme" class="form-label">主题偏好</label>
+                                            <select id="theme" class="form-select">
+                                                <option value="light">浅色模式</option>
+                                                <option value="dark">深色模式</option>
+                                                <option value="system">跟随系统</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="form-check">
+                                                <input type="checkbox" id="notifications" class="form-check-input" checked>
+                                                <label for="notifications" class="form-check-label">接收通知</label>
+                                            </div>
+                                        </div>
+                                        <div class="form-actions">
+                                            <button type="submit" class="btn btn-primary">保存设置</button>
+                                            <button type="button" class="btn btn-secondary">取消</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </main>
+
+                    <footer class="spa-footer">
+                        <div class="container">
+                            <p style="text-align: center;">© 2023 SPA应用 - 版权所有</p>
+                        </div>
+                    </footer>
+                </div>
+            </section>
+        </div>
+
+        <!-- 响应式设计示例 -->
+        <div id="responsive-example" class="example-container" style="display: none;">
+            <section class="chapter">
+                <div class="container">
+                    <h2 class="chapter-title">响应式设计示例</h2>
+                    
+                    <p style="text-align: center; margin-bottom: 3rem;">调整浏览器窗口大小，查看响应式效果</p>
+                    
+                    <!-- 响应式网格 -->
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-bottom: 3rem;">
+                        <div style="background-color: var(--surface); padding: 2rem; border-radius: 0.5rem; border: 1px solid var(--border); text-align: center;">
+                            <div style="font-size: 2rem; margin-bottom: 1rem; color: var(--primary);"><i class="fas fa-mobile-alt"></i></div>
+                            <h3>移动优先</h3>
+                            <p>从移动设备开始设计，然后逐步增强</p>
+                        </div>
+                        <div style="background-color: var(--surface); padding: 2rem; border-radius: 0.5rem; border: 1px solid var(--border); text-align: center;">
+                            <div style="font-size: 2rem; margin-bottom: 1rem; color: var(--primary);"><i class="fas fa-tablet-alt"></i></div>
+                            <h3>平板适配</h3>
+                            <p>针对中等屏幕尺寸优化布局</p>
+                        </div>
+                        <div style="background-color: var(--surface); padding: 2rem; border-radius: 0.5rem; border: 1px solid var(--border); text-align: center;">
+                            <div style="font-size: 2rem; margin-bottom: 1rem; color: var(--primary);"><i class="fas fa-desktop"></i></div>
+                            <h3>桌面优化</h3>
+                            <p>充分利用大屏幕空间展示内容</p>
+                        </div>
+                        <div style="background-color: var(--surface); padding: 2rem; border-radius: 0.5rem; border: 1px solid var(--border); text-align: center;">
+                            <div style="font-size: 2rem; margin-bottom: 1rem; color: var(--primary);"><i class="fas fa-expand-arrows-alt"></i></div>
+                            <h3>流畅过渡</h3>
+                            <p>在不同屏幕尺寸间平滑过渡</p>
+                        </div>
+                    </div>
+
+                    <!-- 响应式表单 -->
+                    <div class="form-container">
+                        <h3 class="form-title">响应式表单示例</h3>
+                        <form>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="firstname" class="form-label">名字</label>
+                                    <input type="text" id="firstname" class="form-input" placeholder="请输入您的名字">
+                                </div>
+                                <div class="form-group">
+                                    <label for="lastname" class="form-label">姓氏</label>
+                                    <input type="text" id="lastname" class="form-input" placeholder="请输入您的姓氏">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="email" class="form-label">电子邮箱</label>
+                                <input type="email" id="email" class="form-input" placeholder="请输入您的电子邮箱">
+                            </div>
+                            <div class="form-group">
+                                <label for="message" class="form-label">留言</label>
+                                <textarea id="message" class="form-textarea" placeholder="请输入您的留言..."></textarea>
+                            </div>
+                            <div class="form-actions">
+                                <button type="submit" class="btn btn-primary">提交</button>
+                                <button type="reset" class="btn btn-secondary">重置</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- 无障碍设计示例 -->
+        <div id="accessibility-example" class="example-container" style="display: none;">
+            <section class="chapter">
+                <div class="container">
+                    <h2 class="chapter-title">无障碍设计示例</h2>
+                    
+                    <div style="max-width: 800px; margin: 0 auto; background-color: var(--surface); padding: 2rem; border-radius: 0.5rem; border: 1px solid var(--border);">
+                        <h3 style="margin-bottom: 1.5rem;">无障碍设计要点展示</h3>
+                        
+                        <div style="margin-bottom: 2rem;">
+                            <h4 style="margin-bottom: 1rem;">1. 语义化HTML结构</h4>
+                            <p>使用正确的HTML元素传达内容结构和目的</p>
+                        </div>
+                        
+                        <div style="margin-bottom: 2rem;">
+                            <h4 style="margin-bottom: 1rem;">2. 键盘可访问性</h4>
+                            <p>所有功能都可以通过键盘访问和操作</p>
+                            <div style="margin-top: 1rem; display: flex; gap: 1rem; flex-wrap: wrap;">
+                                <button class="btn btn-primary">主要操作</button>
+                                <button class="btn btn-secondary">次要操作</button>
+                                <button class="btn btn-secondary">另一个操作</button>
+                            </div>
+                        </div>
+                        
+                        <div style="margin-bottom: 2rem;">
+                            <h4 style="margin-bottom: 1rem;">3. 颜色对比度</h4>
+                            <p>确保文本和背景之间有足够的颜色对比度</p>
+                            <div style="background-color: var(--primary); color: white; padding: 1rem; border-radius: 0.5rem; margin-top: 1rem;">
+                                这是高对比度文本示例
+                            </div>
+                        </div>
+                        
+                        <div style="margin-bottom: 2rem;">
+                            <h4 style="margin-bottom: 1rem;">4. 替代文本</h4>
+                            <p>为所有图像提供描述性的替代文本</p>
+                            <img src="https://picsum.photos/seed/accessibility/400/200" alt="展示无障碍设计的抽象图像" style="max-width: 100%; border-radius: 0.5rem; margin-top: 1rem;">
+                        </div>
+                        
+                        <div style="margin-bottom: 2rem;">
+                            <h4 style="margin-bottom: 1rem;">5. 表单标签和错误提示</h4>
+                            <form>
+                                <div class="form-group">
+                                    <label for="username" class="form-label">用户名</label>
+                                    <input type="text" id="username" class="form-input" aria-required="true">
+                                </div>
+                                <div class="form-group">
+                                    <label for="password" class="form-label">密码</label>
+                                    <input type="password" id="password" class="form-input" aria-required="true">
+                                </div>
+                                <button type="submit" class="btn btn-primary">登录</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- 交互效果示例 -->
+        <div id="interactive-example" class="example-container" style="display: none;">
+            <section class="chapter">
+                <div class="container">
+                    <h2 class="chapter-title">CSS与JavaScript交互效果示例</h2>
+                    
+                    <div style="max-width: 800px; margin: 0 auto;">
+                        <!-- 主题切换 -->
+                        <div style="background-color: var(--surface); padding: 2rem; border-radius: 0.5rem; border: 1px solid var(--border); margin-bottom: 2rem;">
+                            <h3 style="margin-bottom: 1.5rem;">主题切换</h3>
+                            <p>点击下方按钮切换浅色/深色主题</p>
+                            <div style="margin-top: 1rem;">
+                                <button id="demo-theme-toggle" class="btn btn-primary">切换主题</button>
+                            </div>
+                        </div>
+                        
+                        <!-- 滚动动画触发区域 -->
+                        <div style="background-color: var(--surface); padding: 2rem; border-radius: 0.5rem; border: 1px solid var(--border); margin-bottom: 2rem;">
+                            <h3 style="margin-bottom: 1.5rem;">滚动触发动画</h3>
+                            <p>向下滚动页面，查看元素进入视口时的动画效果</p>
+                            
+                            <!-- 创建足够的空间以便滚动 -->
+                            <div style="height: 500px;"></div>
+                            
+                            <div class="fade-in">
+                                <div style="background-color: var(--background); padding: 2rem; border-radius: 0.5rem; border: 1px solid var(--border); text-align: center;">
+                                    <h4>淡入动画元素</h4>
+                                    <p>当这个元素进入视口时，会触发淡入动画</p>
+                                </div>
+                            </div>
+                            
+                            <div style="height: 200px;"></div>
+                            
+                            <div class="slide-in-left">
+                                <div style="background-color: var(--background); padding: 2rem; border-radius: 0.5rem; border: 1px solid var(--border); text-align: center;">
+                                    <h4>从左侧滑入元素</h4>
+                                    <p>当这个元素进入视口时，会从左侧滑入</p>
+                                </div>
+                            </div>
+                            
+                            <div style="height: 200px;"></div>
+                            
+                            <div class="slide-in-right">
+                                <div style="background-color: var(--background); padding: 2rem; border-radius: 0.5rem; border: 1px solid var(--border); text-align: center;">
+                                    <h4>从右侧滑入元素</h4>
+                                    <p>当这个元素进入视口时，会从右侧滑入</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer style="background-color: var(--surface); padding: 2rem 0; border-top: 1px solid var(--border);">
+        <div class="container">
+            <p style="text-align: center;">© 2023 CSS实战项目示例 - 版权所有</p>
+        </div>
+    </footer>
+
+    <script>
+        // 示例切换功能
+        function setupExampleSelector() {
+            const selectorButtons = document.querySelectorAll('.example-selector button');
+            const exampleContainers = document.querySelectorAll('.example-container');
+            
+            selectorButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    // 移除所有活动类
+                    selectorButtons.forEach(btn => btn.classList.remove('active'));
+                    exampleContainers.forEach(container => container.style.display = 'none');
+                    
+                    // 添加当前活动类
+                    button.classList.add('active');
+                    const exampleId = button.getAttribute('data-example');
+                    document.getElementById(`${exampleId}-example`).style.display = 'block';
+                    
+                    // 重置滚动动画
+                    resetAnimations();
+                    // 初始检查动画
+                    setTimeout(() => {
+                        animateOnScroll();
+                    }, 100);
+                });
+            });
+        }
+        
+        // 主题切换功能
+        function setupThemeToggle() {
+            const themeToggle = document.getElementById('theme-toggle');
+            const demoThemeToggle = document.getElementById('demo-theme-toggle');
+            const html = document.documentElement;
+            
+            // 检查本地存储中的主题偏好
+            const savedTheme = localStorage.getItem('theme');
+            
+            // 检查系统偏好
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            
+            // 设置初始主题
+            if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+                html.classList.add('dark-theme');
+                updateThemeToggleIcon(themeToggle);
+                if (demoThemeToggle) updateThemeToggleIcon(demoThemeToggle);
+            }
+            
+            // 更新主题切换按钮图标
+            function updateThemeToggleIcon(toggle) {
+                const isDark = html.classList.contains('dark-theme');
+                
+                // 移除所有图标类
+                toggle.innerHTML = '';
+                
+                // 添加当前主题对应的图标
+                if (isDark) {
+                    toggle.innerHTML = '<i class="fas fa-sun"></i>';
+                    toggle.setAttribute('aria-label', '切换到浅色模式');
+                } else {
+                    toggle.innerHTML = '<i class="fas fa-moon"></i>';
+                    toggle.setAttribute('aria-label', '切换到深色模式');
+                }
+            }
+            
+            // 添加点击事件监听器
+            function toggleTheme() {
+                html.classList.toggle('dark-theme');
+                
+                // 保存主题偏好到本地存储
+                const currentTheme = html.classList.contains('dark-theme') ? 'dark' : 'light';
+                localStorage.setItem('theme', currentTheme);
+                
+                // 更新按钮图标
+                updateThemeToggleIcon(themeToggle);
+                if (demoThemeToggle) updateThemeToggleIcon(demoThemeToggle);
+            }
+            
+            themeToggle.addEventListener('click', toggleTheme);
+            if (demoThemeToggle) {
+                demoThemeToggle.addEventListener('click', toggleTheme);
+            }
+            
+            // 监听系统主题变化
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+                if (!localStorage.getItem('theme')) { // 只有在用户没有明确设置主题时才响应系统变化
+                    if (e.matches) {
+                        html.classList.add('dark-theme');
+                    } else {
+                        html.classList.remove('dark-theme');
+                    }
+                    updateThemeToggleIcon(themeToggle);
+                    if (demoThemeToggle) updateThemeToggleIcon(demoThemeToggle);
+                }
+            });
+        }
+        
+        // 移动端菜单切换
+        function setupMobileMenu() {
+            const menuToggle = document.querySelector('.menu-toggle');
+            const navLinks = document.querySelector('.nav-links');
+            
+            if (menuToggle && navLinks) {
+                menuToggle.addEventListener('click', () => {
+                    navLinks.classList.toggle('open');
+                    
+                    // 更新按钮图标和无障碍属性
+                    const isOpen = navLinks.classList.contains('open');
+                    if (isOpen) {
+                        menuToggle.innerHTML = '<i class="fas fa-times"></i>';
+                        menuToggle.setAttribute('aria-expanded', 'true');
+                        // 禁用背景滚动
+                        document.body.style.overflow = 'hidden';
+                    } else {
+                        menuToggle.innerHTML = '<i class="fas fa-bars"></i>';
+                        menuToggle.setAttribute('aria-expanded', 'false');
+                        // 启用背景滚动
+                        document.body.style.overflow = '';
+                    }
+                });
+            }
+        }
+        
+        // 滚动监听 - 导航栏样式变化
+        function setupScrollEffects() {
+            const nav = document.querySelector('.enterprise-nav');
+            
+            if (nav) {
+                function handleScroll() {
+                    if (window.scrollY > 20) {
+                        nav.classList.add('scrolled');
+                    } else {
+                        nav.classList.remove('scrolled');
+                    }
+                }
+                
+                window.addEventListener('scroll', handleScroll);
+                // 初始调用
+                handleScroll();
+            }
+        }
+        
+        // 滚动触发动画
+        function setupScrollAnimations() {
+            // 初始检查动画
+            setTimeout(() => {
+                animateOnScroll();
+            }, 300);
+            
+            // 监听滚动事件
+            window.addEventListener('scroll', animateOnScroll);
+            
+            // 监听窗口大小变化
+            window.addEventListener('resize', animateOnScroll);
+        }
+        
+        // 重置动画
+        function resetAnimations() {
+            const animatedElements = document.querySelectorAll('.fade-in, .slide-in-left, .slide-in-right');
+            animatedElements.forEach(element => {
+                element.classList.remove('animate');
+                // 强制重绘
+                void element.offsetWidth;
+            });
+        }
+        
+        // 检查元素是否在视口内并添加动画类
+        function animateOnScroll() {
+            const animatedElements = document.querySelectorAll('.fade-in, .slide-in-left, .slide-in-right');
+            
+            animatedElements.forEach(element => {
+                // 如果元素已经有动画类，则跳过
+                if (element.classList.contains('animate')) return;
+                
+                const elementTop = element.getBoundingClientRect().top;
+                const elementBottom = element.getBoundingClientRect().bottom;
+                const isVisible = (elementTop < window.innerHeight - 100) && (elementBottom > 0);
+                
+                if (isVisible) {
+                    element.classList.add('animate');
+                }
+            });
+        }
+        
+        // 标签页功能
+        function setupTabs() {
+            const tabButtons = document.querySelectorAll('.tab-btn');
+            const tabContents = document.querySelectorAll('.tab-content');
+            
+            if (tabButtons.length > 0) {
+                tabButtons.forEach(button => {
+                    button.addEventListener('click', () => {
+                        // 移除所有活动类
+                        tabButtons.forEach(btn => btn.classList.remove('active'));
+                        tabContents.forEach(content => content.classList.remove('active'));
+                        
+                        // 添加当前活动类
+                        button.classList.add('active');
+                        const tabId = button.getAttribute('data-tab');
+                        document.getElementById(`${tabId}-tab`).classList.add('active');
+                        
+                        // 重置并触发动画
+                        resetAnimations();
+                        setTimeout(() => {
+                            animateOnScroll();
+                        }, 100);
+                    });
+                });
+            }
+        }
+        
+        // 初始化所有功能
+        document.addEventListener('DOMContentLoaded', () => {
+            setupExampleSelector();
+            setupThemeToggle();
+            setupMobileMenu();
+            setupScrollEffects();
+            setupScrollAnimations();
+            setupTabs();
+        });
+    </script>
+</body>
+</html>

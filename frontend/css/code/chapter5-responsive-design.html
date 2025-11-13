@@ -1,0 +1,2151 @@
+\u003c!DOCTYPE html\u003e
+\u003chtml lang="zh-CN"\u003e
+\u003chead\u003e
+    \u003cmeta charset="UTF-8"\u003e
+    \u003cmeta name="viewport" content="width=device-width, initial-scale=1.0"\u003e
+    \u003ctitle\u003eCSS响应式设计示例\u003c/title\u003e
+    \u003cstyle\u003e
+        /* 全局重置和基础样式 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* CSS变量定义 */
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2ecc71;
+            --accent-color: #e74c3c;
+            --text-color: #333;
+            --background-color: #f5f5f5;
+            --card-bg-color: #ffffff;
+            --border-color: #e0e0e0;
+            --spacing-unit: 8px;
+            --transition-speed: 0.3s;
+        }
+
+        /* 基础字体设置 */
+        html {
+            font-size: 16px;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--background-color);
+            padding: calc(var(--spacing-unit) * 2);
+        }
+
+        /* 容器样式 */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* 标题样式 */
+        h1 {
+            color: white;
+            text-align: center;
+            margin-bottom: calc(var(--spacing-unit) * 5);
+            padding: calc(var(--spacing-unit) * 2.5);
+            background-color: var(--primary-color);
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            font-size: 2rem;
+        }
+
+        /* 章节样式 */
+        .section {
+            background-color: var(--card-bg-color);
+            padding: calc(var(--spacing-unit) * 3);
+            margin-bottom: calc(var(--spacing-unit) * 5);
+            border-radius: 10px;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .section h2 {
+            color: var(--primary-color);
+            margin-bottom: calc(var(--spacing-unit) * 2.5);
+            padding-bottom: calc(var(--spacing-unit) * 1.25);
+            border-bottom: 2px solid #ecf0f1;
+            font-size: 1.75rem;
+        }
+
+        .section h3 {
+            color: var(--secondary-color);
+            margin: calc(var(--spacing-unit) * 3) 0 calc(var(--spacing-unit) * 1.875) 0;
+            font-size: 1.375rem;
+        }
+
+        /* 代码示例样式 */
+        .code-example {
+            background-color: #2c3e50;
+            color: #ecf0f1;
+            padding: calc(var(--spacing-unit) * 2.5);
+            border-radius: 8px;
+            margin: calc(var(--spacing-unit) * 1.875) 0;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+            line-height: 1.5;
+        }
+
+        /* 展示区域样式 */
+        .demo-box {
+            border: 2px dashed #bdc3c7;
+            padding: calc(var(--spacing-unit) * 3.75);
+            margin: calc(var(--spacing-unit) * 2.5) 0;
+            border-radius: 8px;
+            background-color: #fafafa;
+            min-height: 200px;
+        }
+
+        /* 响应式网格系统演示 */
+        .grid-demo {
+            display: grid;
+            gap: calc(var(--spacing-unit) * 2);
+            margin-bottom: calc(var(--spacing-unit) * 2.5);
+        }
+
+        .grid-item {
+            background-color: var(--primary-color);
+            color: white;
+            padding: calc(var(--spacing-unit) * 2);
+            border-radius: 6px;
+            text-align: center;
+            font-weight: bold;
+            transition: all var(--transition-speed) ease;
+        }
+
+        .grid-item:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-2px);
+        }
+
+        /* 基础响应式网格 */
+        .basic-grid {
+            /* 移动设备: 单列布局 */
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+        }
+
+        /* 媒体查询演示 */
+        .media-query-demo {
+            background-color: var(--card-bg-color);
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .media-query-text {
+            font-size: 1rem;
+            color: var(--text-color);
+            font-weight: bold;
+        }
+
+        /* 响应式导航栏 */
+        .navbar {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+
+        .navbar-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .navbar-logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .navbar-menu {
+            display: flex;
+            gap: 16px;
+            list-style: none;
+        }
+
+        .navbar-link {
+            color: white;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            transition: background-color var(--transition-speed) ease;
+        }
+
+        .navbar-link:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .navbar-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        /* 响应式卡片 */
+        .card-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .card {
+            background-color: var(--card-bg-color);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            transition: transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .card-content {
+            padding: 20px;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+        }
+
+        /* 响应式图像 */
+        .image-container {
+            margin: 20px 0;
+        }
+
+        .responsive-img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            display: block;
+        }
+
+        .img-fluid {
+            max-width: 100%;
+            height: auto;
+        }
+
+        .img-container {
+            position: relative;
+            width: 100%;
+            padding-top: 56.25%; /* 16:9 比例 */
+            overflow: hidden;
+            border-radius: 8px;
+        }
+
+        .img-container img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* 响应式表格 */
+        .table-responsive {
+            overflow-x: auto;
+            margin: 20px 0;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .table th,
+        .table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .table th {
+            background-color: var(--primary-color);
+            color: white;
+            font-weight: bold;
+        }
+
+        .table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        .table tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        /* 响应式表单 */
+        .form-container {
+            background-color: var(--card-bg-color);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: var(--text-color);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 1rem;
+            transition: border-color var(--transition-speed) ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color var(--transition-speed) ease;
+        }
+
+        .btn:hover {
+            background-color: #2980b9;
+        }
+
+        /* 响应式工具类演示 */
+        .text-center {
+            text-align: center;
+        }
+
+        .text-left {
+            text-align: left;
+        }
+
+        .text-right {
+            text-align: right;
+        }
+
+        .d-none {
+            display: none;
+        }
+
+        .d-block {
+            display: block;
+        }
+
+        .d-flex {
+            display: flex;
+        }
+
+        .d-grid {
+            display: grid;
+        }
+
+        .justify-center {
+            justify-content: center;
+        }
+
+        .align-center {
+            align-items: center;
+        }
+
+        .gap-2 {
+            gap: 16px;
+        }
+
+        .flex-wrap {
+            flex-wrap: wrap;
+        }
+
+        /* 视口单位演示 */
+        .viewport-units {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .viewport-box {
+            padding: 20px;
+            border-radius: 8px;
+            color: white;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .vw-box {
+            background-color: var(--primary-color);
+            width: 50vw;
+        }
+
+        .vh-box {
+            background-color: var(--secondary-color);
+            height: 30vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .vmin-box {
+            background-color: var(--accent-color);
+            width: 40vmin;
+            height: 40vmin;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* 弹性布局响应式 */
+        .flex-demo {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .flex-item {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 16px;
+            border-radius: 6px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        /* 移动优先设计示例 */
+        .mobile-first-demo {
+            background-color: var(--card-bg-color);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        /* 响应式导航菜单 - 移动优先 */
+        .mobile-nav {
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 8px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+
+        .mobile-nav-header {
+            padding: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .mobile-nav-title {
+            font-size: 1.25rem;
+            font-weight: bold;
+        }
+
+        .mobile-nav-toggle {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .mobile-nav-menu {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .mobile-nav-menu.active {
+            max-height: 300px;
+        }
+
+        .mobile-nav-item {
+            list-style: none;
+        }
+
+        .mobile-nav-link {
+            display: block;
+            padding: 16px;
+            color: white;
+            text-decoration: none;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            transition: background-color 0.3s ease;
+        }
+
+        .mobile-nav-link:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        /* 打印样式 */
+        @media print {
+            body {
+                background-color: white;
+                color: black;
+            }
+
+            .section {
+                box-shadow: none;
+                border: 1px solid #ddd;
+                page-break-inside: avoid;
+            }
+
+            h1, h2, h3 {
+                page-break-after: avoid;
+            }
+
+            .no-print {
+                display: none !important;
+            }
+
+            a {
+                text-decoration: none;
+                color: black;
+            }
+
+            a[href]:after {
+                content: " (" attr(href) ")";
+                font-size: 0.8em;
+            }
+        }
+
+        /* 高对比度模式支持 */
+        @media (prefers-contrast: high) {
+            body {
+                --primary-color: #0066cc;
+                --secondary-color: #009933;
+                --text-color: #000000;
+                --background-color: #ffffff;
+                --border-color: #000000;
+            }
+
+            .section {
+                border: 2px solid var(--border-color);
+            }
+        }
+
+        /* 深色模式支持 */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --primary-color: #5dade2;
+                --secondary-color: #52be80;
+                --accent-color: #ec7063;
+                --text-color: #ecf0f1;
+                --background-color: #2c3e50;
+                --card-bg-color: #34495e;
+                --border-color: #4a6075;
+            }
+
+            .code-example {
+                background-color: #2c3e50;
+                border: 1px solid var(--border-color);
+            }
+
+            .demo-box {
+                background-color: #34495e;
+                border-color: var(--border-color);
+            }
+
+            .table tr:nth-child(even) {
+                background-color: #3a5268;
+            }
+
+            .table tr:hover {
+                background-color: #405a73;
+            }
+        }
+
+        /* 减少动画偏好支持 */
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+                scroll-behavior: auto !important;
+            }
+        }
+
+        /* =========== 响应式布局断点 =========== */
+
+        /* 平板设备 (>= 768px) */
+        @media (min-width: 768px) {
+            /* 基础网格变为两列 */
+            .basic-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            /* 弹性布局横向排列 */
+            .flex-demo {
+                flex-direction: row;
+                flex-wrap: wrap;
+            }
+
+            .flex-item {
+                flex: 1 1 45%;
+            }
+
+            /* 卡片网格布局 */
+            .card-container {
+                flex-direction: row;
+                flex-wrap: wrap;
+            }
+
+            .card {
+                flex: 1 1 calc(50% - 10px);
+            }
+
+            /* 媒体查询演示文本变化 */
+            .media-query-text {
+                font-size: 1.25rem;
+                color: var(--secondary-color);
+            }
+
+            /* 移动优先导航 */
+            .mobile-nav-menu {
+                display: flex;
+                max-height: none;
+                overflow: visible;
+            }
+
+            .mobile-nav-toggle {
+                display: none;
+            }
+
+            .mobile-nav-link {
+                border-top: none;
+                padding: 16px 24px;
+            }
+        }
+
+        /* 桌面设备 (>= 992px) */
+        @media (min-width: 992px) {
+            /* 基础网格变为三列 */
+            .basic-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            /* 弹性布局项目调整 */
+            .flex-item {
+                flex: 1 1 30%;
+            }
+
+            /* 卡片网格布局三列 */
+            .card {
+                flex: 1 1 calc(33.333% - 14px);
+            }
+
+            /* 媒体查询演示文本变化 */
+            .media-query-text {
+                font-size: 1.5rem;
+                color: var(--primary-color);
+            }
+        }
+
+        /* 大屏幕设备 (>= 1200px) */
+        @media (min-width: 1200px) {
+            /* 基础网格变为四列 */
+            .basic-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+
+            /* 弹性布局项目调整 */
+            .flex-item {
+                flex: 1 1 22%;
+            }
+
+            /* 媒体查询演示文本变化 */
+            .media-query-text {
+                font-size: 1.75rem;
+                color: var(--accent-color);
+            }
+        }
+
+        /* 移动设备竖屏 (小屏幕) */
+        @media (max-width: 480px) {
+            .media-query-text {
+                font-size: 0.875rem;
+                color: var(--text-color);
+            }
+
+            .navbar-menu {
+                display: none;
+            }
+
+            .navbar-toggle {
+                display: block;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            .section h2 {
+                font-size: 1.375rem;
+            }
+
+            .section h3 {
+                font-size: 1.125rem;
+            }
+        }
+    \u003c/style\u003e
+\u003c/head\u003e
+\u003cbody\u003e
+    \u003cdiv class="container"\u003e
+        \u003ch1\u003eCSS响应式设计示例演示\u003c/h1\u003e
+
+        \u003c!-- 示例1：媒体查询基础 --\u003e
+        \u003cdiv class="section"\u003e
+            \u003ch2\u003e1. 媒体查询基础 (Media Queries)\u003c/h2\u003e
+            \u003ch3\u003e基础媒体查询演示\u003c/h3\u003e
+            \u003cdiv class="demo-box"\u003e
+                \u003cdiv class="media-query-demo"\u003e
+                    \u003cp class="media-query-text"\u003e调整浏览器窗口大小查看变化\u003c/p\u003e
+                    \u003cp style="margin-top: 10px;"\u003e当前显示的是根据屏幕宽度调整的响应式文本样式\u003c/p\u003e
+                \u003c/div\u003e
+            \u003c/div\u003e
+            \u003cdiv class="code-example"\u003e/* 媒体查询基础示例 */
+
+/* 移动设备优先 - 默认样式 */
+.media-query-text {
+    font-size: 1rem;
+    color: #333;
+}
+
+/* 平板设备 (>= 768px) */
+@media (min-width: 768px) {
+    .media-query-text {
+        font-size: 1.25rem;
+        color: #2ecc71;}
+    }
+}
+
+/* 响应式按钮样式 */
+.btn {
+    display: inline-block;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    background-color: var(--primary-color);
+    color: white;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all var(--transition-speed) ease;
+    text-align: center;
+    text-decoration: none;
+}
+
+.btn:hover {
+    background-color: var(--secondary-color);
+    transform: translateY(-2px);
+}
+
+.btn:active {
+    transform: translateY(0);
+}
+
+/* 响应式图像容器 */
+.img-container {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    border-radius: 8px;
+}
+
+.img-container img {
+    width: 100%;
+    height: auto;
+    display: block;
+    transition: transform var(--transition-speed) ease;
+}
+
+.img-container:hover img {
+    transform: scale(1.05);
+}
+
+/* 响应式视频容器 */
+.video-container {
+    position: relative;
+    width: 100%;
+    padding-bottom: 56.25%; /* 16:9 宽高比 */
+    height: 0;
+    overflow: hidden;
+    border-radius: 8px;
+}
+
+.video-container iframe,
+.video-container video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+/* 响应式表格样式 */
+.table-responsive {
+    overflow-x: auto;
+    margin: 20px 0;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.table th,
+.table td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.table th {
+    background-color: var(--primary-color);
+    color: white;
+    font-weight: bold;
+}
+
+.table tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.table tr:hover {
+    background-color: #f1f1f1;
+}
+
+/* 移动设备上优化表格 */
+@media (max-width: 767px) {
+    .table th,
+    .table td {
+        padding: 8px 10px;
+        font-size: 0.875rem;
+    }
+    
+    /* 可选：在小屏幕上将表格转换为卡片式显示 */
+    .responsive-card-table {
+        display: block;
+    }
+    
+    .responsive-card-table thead {
+        display: none;
+    }
+    
+    .responsive-card-table tbody tr {
+        display: block;
+        margin-bottom: 16px;
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+    }
+    
+    .responsive-card-table tbody td {
+        display: block;
+        text-align: right;
+        padding: 12px;
+        position: relative;
+    }
+    
+    .responsive-card-table tbody td::before {
+        content: attr(data-label);
+        position: absolute;
+        left: 12px;
+        font-weight: bold;
+    }
+}
+
+/* 响应式表单样式 */
+.form-container {
+    background-color: var(--card-bg-color);
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: var(--text-color);
+}
+
+.form-control {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    font-size: 1rem;
+    transition: border-color var(--transition-speed) ease;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+}
+
+/* 移动设备上优化表单 */
+@media (max-width: 767px) {
+    .form-container {
+        padding: 16px;
+    }
+    
+    .form-control {
+        padding: 14px;
+        font-size: 1.0625rem; /* 稍大的字体在移动设备上更易读 */
+    }
+    
+    .btn {
+        width: 100%;
+        padding: 14px;
+        font-size: 1.0625rem;
+    }
+}
+
+/* 响应式表单布局 */
+.form-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+@media (min-width: 768px) {
+    .form-grid {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+    
+    .form-grid .form-group {
+        flex: 1 1 45%;
+    }
+    
+    .form-grid .form-group.full-width {
+        flex: 1 1 100%;
+    }
+}
+
+/* 桌面设备 (>= 992px) */
+@media (min-width: 992px) {
+    .media-query-text {
+        font-size: 1.5rem;
+        color: #3498db;
+    }
+}
+
+/* 大屏幕设备 (>= 1200px) */
+@media (min-width: 1200px) {
+    .media-query-text {
+        font-size: 1.75rem;
+        color: #e74c3c;
+    }
+}
+
+/* 移动设备竖屏 (小屏幕) */
+@media (max-width: 480px) {
+    .media-query-text {
+        font-size: 0.875rem;
+    }
+}
+
+/* 媒体查询语法 */
+@media not|only mediatype and (mediafeature) {
+    /* CSS规则 */
+}
+
+/* 常见媒体类型 */
+/* @media all and (...) - 所有设备 */
+/* @media print and (...) - 打印设备 */
+/* @media screen and (...) - 屏幕设备 */
+
+/* 常见媒体特性 */
+/* width, max-width, min-width - 视口宽度 */
+/* height, max-height, min-height - 视口高度 */
+/* orientation: portrait|landscape - 设备方向 */
+/* aspect-ratio, device-aspect-ratio - 宽高比 */
+/* resolution - 分辨率 */
+/* color - 颜色位数 */
+/* hover - 是否支持悬停 */
+/* pointer - 指针精确度 */
+
+/* 媒体查询组合 */
+@media (min-width: 768px) and (max-width: 991px) {
+    /* 仅在768px到991px之间应用 */
+}
+
+/* 媒体查询逗号分隔 (逻辑或) */
+@media (max-width: 767px), (orientation: portrait) {
+    /* 在小屏幕或竖屏模式下应用 */
+}\u003c/div\u003e
+
+            \u003ch3\u003e设备方向响应\u003c/h3\u003e
+            \u003cdiv class="demo-box"\u003e
+                \u003cdiv style="text-align: center; padding: 20px;"\u003e
+                    \u003cp style="font-size: 1.25rem; font-weight: bold; margin-bottom: 20px;"\u003e在移动设备上旋转屏幕查看方向变化效果\u003c/p\u003e
+                    \u003cdiv id="orientation-demo" style="padding: 20px; border-radius: 8px; background-color: var(--primary-color); color: white;"\u003e
+                        当前方向: <span id="orientation-value">未知</span>
+                    \u003c/div\u003e
+                \u003c/div\u003e
+            \u003c/div\u003e
+            \u003cdiv class="code-example"\u003e/* 设备方向响应 */
+
+/* 竖屏模式 */
+@media (orientation: portrait) {
+    .orientation-content {
+        padding: 20px;
+        background-color: #3498db;
+    }
+}
+
+/* 横屏模式 */
+@media (orientation: landscape) {
+    .orientation-content {
+        padding: 40px;
+        background-color: #2ecc71;
+    }
+}
+
+/* 横屏模式且小屏幕 */
+@media (orientation: landscape) and (max-width: 767px) {
+    .compact-layout {
+        display: flex;
+        flex-direction: row;
+        gap: 10px;
+    }
+}
+
+/* 高宽比响应 */
+@media (aspect-ratio: 16/9) {
+    .video-container {
+        padding-top: 56.25%; /* 16:9 比例 */
+    }
+}
+
+@media (aspect-ratio: 4/3) {
+    .video-container {
+        padding-top: 75%; /* 4:3 比例 */
+    }
+}
+
+/* 通过JavaScript检测方向变化 */
+function updateOrientation() {
+    const isPortrait = window.innerHeight > window.innerWidth;
+    const orientationText = isPortrait ? '竖屏' : '横屏';
+    document.getElementById('orientation-value').textContent = orientationText;
+}
+
+// 初始检测
+updateOrientation();
+
+// 监听窗口大小变化
+window.addEventListener('resize', updateOrientation);
+
+// 监听方向变化事件（移动设备专用）
+window.addEventListener('orientationchange', updateOrientation);
+
+/* 常见方向断点 */
+/* 竖屏断点 */
+@media (orientation: portrait) and (min-width: 320px) and (max-width: 767px) {
+    .mobile-portrait {
+        /* 移动竖屏专用样式 */
+    }
+}
+
+/* 横屏断点 */
+@media (orientation: landscape) and (max-width: 991px) {
+    .tablet-landscape {
+        /* 平板横屏专用样式 */
+    }
+}\u003c/div\u003e
+
+            \u003ch3\u003e高级媒体功能\u003c/h3\u003e
+            \u003cdiv class="demo-box"\u003e
+                \u003cdiv style="text-align: center; padding: 20px;"\u003e
+                    \u003cp style="margin-bottom: 20px;"\u003e以下演示了高级媒体功能支持检测：\u003c/p\u003e
+                    \u003cdiv id="media-features" style="display: grid; grid-template-columns: 1fr; gap: 15px;"\u003e
+                        \u003cdiv style="padding: 15px; border-radius: 8px; background-color: #f8f9fa; border: 1px solid #dee2e6;"\u003e
+                            悬停支持: <span id="hover-support">检测中...</span>
+                        \u003c/div\u003e
+                        \u003cdiv style="padding: 15px; border-radius: 8px; background-color: #f8f9fa; border: 1px solid #dee2e6;"\u003e
+                            指针支持: <span id="pointer-support">检测中...</span>
+                        \u003c/div\u003e
+                        \u003cdiv style="padding: 15px; border-radius: 8px; background-color: #f8f9fa; border: 1px solid #dee2e6;"\u003e
+                            触摸支持: <span id="touch-support">检测中...</span>
+                        \u003c/div\u003e
+                    \u003c/div\u003e
+                \u003c/div\u003e
+            \u003c/div\u003e
+            \u003cdiv class="code-example"\u003e/* 高级媒体功能 */
+
+/* 悬停支持检测 */
+@media (hover: hover) {
+    .hover-effect:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    }
+}
+
+@media (hover: none) {
+    .hover-effect {
+        /* 触摸设备上不使用悬停效果 */
+        touch-action: manipulation; /* 防止双击缩放 */
+    }
+}
+
+/* 指针精确度检测 */
+@media (pointer: fine) {
+    /* 鼠标等高精确度指针设备 */
+    .cursor-demo {
+        cursor: pointer;
+    }
+}
+
+@media (pointer: coarse) {
+    /* 触摸等低精确度指针设备 */
+    .touch-target {
+        min-height: 48px;
+        min-width: 48px;
+    }
+}
+
+/* 触摸支持检测 */
+@media (any-pointer: coarse) {
+    /* 有触摸能力的设备 */
+    .touch-friendly {
+        padding: 12px;
+    }
+}
+
+/* 分辨率检测 */
+@media (min-resolution: 2dppx) {
+    /* 高分辨率屏幕（如Retina） */
+    .high-res-image {
+        background-image: url('high-res-image.png');
+    }
+}
+
+@media (max-resolution: 1dppx) {
+    /* 普通分辨率屏幕 */
+    .high-res-image {
+        background-image: url('normal-res-image.png');
+    }
+}
+
+/* 减少动画偏好 */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
+
+/* 深色模式支持 */
+@media (prefers-color-scheme: dark) {
+    body {
+        background-color: #2c3e50;
+        color: #ecf0f1;
+    }
+}
+
+/* 高对比度模式 */
+@media (prefers-contrast: high) {
+    body {
+        --primary-color: #0066cc;
+        --text-color: #000000;
+        --background-color: #ffffff;
+    }
+}
+
+/* 浅色模式 */
+@media (prefers-color-scheme: light) {
+    .theme-sensitive {
+        background-color: white;
+        color: black;
+    }
+}\u003c/div\u003e
+        \u003c/div\u003e
+
+        \u003c!-- 示例2：响应式网格布局 --\u003e
+        \u003cdiv class="section"\u003e
+            \u003ch2\u003e2. 响应式网格布局 (Responsive Grid)\u003c/h2\u003e
+            \u003ch3\u003e基础网格系统演示\u003c/h3\u003e
+            \u003cdiv class="demo-box"\u003e
+                \u003cdiv class="basic-grid"\u003e
+                    \u003cdiv class="grid-item"\u003e项目 1\u003c/div\u003e
+                    \u003cdiv class="grid-item"\u003e项目 2\u003c/div\u003e
+                    \u003cdiv class="grid-item"\u003e项目 3\u003c/div\u003e
+                    \u003cdiv class="grid-item"\u003e项目 4\u003c/div\u003e
+                    \u003cdiv class="grid-item"\u003e项目 5\u003c/div\u003e
+                    \u003cdiv class="grid-item"\u003e项目 6\u003c/div\u003e
+                    \u003cdiv class="grid-item"\u003e项目 7\u003c/div\u003e
+                    \u003cdiv class="grid-item"\u003e项目 8\u003c/div\u003e
+                \u003c/div\u003e
+            \u003c/div\u003e
+            \u003cdiv class="code-example"\u003e/* 基础响应式网格系统 */
+
+/* 移动优先 - 默认单列布局 */
+.basic-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+}
+
+/* 平板设备 (>= 768px) - 两列布局 */
+@media (min-width: 768px) {
+    .basic-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* 桌面设备 (>= 992px) - 三列布局 */
+@media (min-width: 992px) {
+    .basic-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+/* 大屏幕设备 (>= 1200px) - 四列布局 */
+@media (min-width: 1200px) {
+    .basic-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+/* 高级网格布局示例 */
+.advanced-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+}
+
+/* 平板设备上的高级网格 */
+@media (min-width: 768px) {
+    .advanced-grid {
+        grid-template-columns: 1fr 1fr;
+        grid-template-areas:
+            "header header"
+            "sidebar main"
+            "footer footer";
+    }
+    
+    .header {
+        grid-area: header;
+    }
+    
+    .sidebar {
+        grid-area: sidebar;
+    }
+    
+    .main {
+        grid-area: main;
+    }
+    
+    .footer {
+        grid-area: footer;
+    }
+}
+
+/* 桌面设备上的高级网格 */
+@media (min-width: 992px) {
+    .advanced-grid {
+        grid-template-columns: 200px 1fr 200px;
+        grid-template-areas:
+            "header header header"
+            "sidebar main sidebar2"
+            "footer footer footer";
+    }
+    
+    .sidebar2 {
+        grid-area: sidebar2;
+    }
+}
+
+/* 自动填充网格 */
+.auto-fill-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+/* 自动适应网格 */
+.auto-fit-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+/* 响应式行高比 */
+.aspect-ratio-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 20px;
+}
+
+.aspect-ratio-grid > div {
+    aspect-ratio: 1 / 1; /* 正方形 */
+}
+
+@media (min-width: 768px) {
+    .aspect-ratio-grid > div {
+        aspect-ratio: 3 / 2; /* 3:2 宽高比 */
+    }
+}\u003c/div\u003e
+
+            \u003ch3\u003e弹性布局响应式设计\u003c/h3\u003e
+            \u003cdiv class="demo-box"\u003e
+                \u003cdiv class="flex-demo"\u003e
+                    \u003cdiv class="flex-item"\u003e弹性项目 1\u003c/div\u003e
+                    \u003cdiv class="flex-item"\u003e弹性项目 2\u003c/div\u003e
+                    \u003cdiv class="flex-item"\u003e弹性项目 3\u003c/div\u003e
+                    \u003cdiv class="flex-item"\u003e弹性项目 4\u003c/div\u003e
+                \u003c/div\u003e
+            \u003c/div\u003e
+            \u003cdiv class="code-example"\u003e/* 弹性布局响应式设计 */
+
+/* 移动优先 - 垂直排列 */
+.flex-demo {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* 平板设备 - 水平排列并换行 */
+@media (min-width: 768px) {
+    .flex-demo {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+    
+    .flex-item {
+        flex: 1 1 45%; /* 每个项目占据大约45%的宽度 */
+    }
+}
+
+/* 桌面设备 - 调整弹性项目大小 */
+@media (min-width: 992px) {
+    .flex-item {
+        flex: 1 1 30%; /* 每个项目占据大约30%的宽度 */
+    }
+}
+
+/* 大屏幕设备 - 更小的项目 */
+@media (min-width: 1200px) {
+    .flex-item {
+        flex: 1 1 22%; /* 每个项目占据大约22%的宽度 */
+    }
+}
+
+/* 响应式导航栏 */
+.navbar {
+    background-color: #3498db;
+    color: white;
+}
+
+.navbar-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+}
+
+.navbar-menu {
+    display: none; /* 移动设备上隐藏菜单 */
+    list-style: none;
+    gap: 16px;
+}
+
+.navbar-toggle {
+    display: block; /* 移动设备上显示菜单按钮 */
+}
+
+/* 平板设备上显示完整菜单 */
+@media (min-width: 768px) {
+    .navbar-menu {
+        display: flex;
+    }
+    
+    .navbar-toggle {
+        display: none;
+    }
+}
+
+/* 响应式卡片布局 */
+.card-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.card {
+    background-color: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* 平板设备上的卡片网格 */
+@media (min-width: 768px) {
+    .card-container {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+    
+    .card {
+        flex: 1 1 calc(50% - 10px); /* 两列布局，减去间距 */
+    }
+}
+
+/* 桌面设备上的卡片网格 */
+@media (min-width: 992px) {
+    .card {
+        flex: 1 1 calc(33.333% - 14px); /* 三列布局，减去间距 */
+    }
+}
+
+/* 灵活的页脚布局 */
+.footer {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 20px;
+    background-color: #34495e;
+    color: white;
+}
+
+@media (min-width: 768px) {
+    .footer {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: flex-start;
+    }
+    
+    .footer-section {
+        flex: 1;
+        min-width: 200px;
+    }
+}\u003c/div\u003e
+        \u003c/div\u003e
+
+        \u003c!-- 示例3：响应式图像和媒体 --\u003e
+        \u003cdiv class="section"\u003e
+            \u003ch2\u003e3. 响应式图像和媒体 (Responsive Images)\u003c/h2\u003e
+            \u003ch3\u003e基本响应式图像\u003c/h3\u003e
+            \u003cdiv class="demo-box"\u003e
+                \u003cdiv class="image-container"\u003e
+                    \u003cp style="margin-bottom: 15px;"\u003e基础响应式图像（会根据容器宽度自动缩放）：\u003c/p\u003e
+                    \u003cimg class="responsive-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='400' viewBox='0 0 800 400'%3E%3Crect width='800' height='400' fill='%233498db'/%3E%3Ctext x='400' y='200' font-family='Arial' font-size='30' text-anchor='middle' fill='white'%3E响应式图像演示%3C/text%3E%3C/svg%3E" alt="响应式图像示例"\u003e
+                \u003c/div\u003e
+                \u003cdiv class="image-container"\u003e
+                    \u003cp style="margin-bottom: 15px; margin-top: 30px;"\u003e固定宽高比响应式图像容器：\u003c/p\u003e
+                    \u003cdiv class="img-container"\u003e
+                        \u003cimg src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='450' viewBox='0 0 800 450'%3E%3Crect width='800' height='450' fill='%232ecc71'/%3E%3Ctext x='400' y='225' font-family='Arial' font-size='30' text-anchor='middle' fill='white'%3E16:9 宽高比图像%3C/text%3E%3C/svg%3E" alt="固定宽高比图像示例"\u003e
+                    \u003c/div\u003e
+                \u003c/div\u003e
+            \u003c/div\u003e
+            \u003cdiv class="code-example"\u003e/* 响应式图像基础 */
+
+/* 基础响应式图像 */
+.responsive-img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+/* 固定宽高比容器 */
+.img-container {
+    position: relative;
+    width: 100%;
+    padding-top: 56.25%; /* 16:9 比例 */
+    overflow: hidden;
+    border-radius: 8px;
+}
+
+.img-container img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* 保持宽高比并填充容器 */
+}
+
+/* 不同宽高比容器 */
+.aspect-ratio-16-9 {
+    padding-top: 56.25%; /* 16:9 */
+}
+
+.aspect-ratio-4-3 {
+    padding-top: 75%; /* 4:3 */
+}
+
+.aspect-ratio-1-1 {
+    padding-top: 100%; /* 1:1 (正方形) */
+}
+
+/* srcset 和 sizes 属性 */
+img {
+    max-width: 100%;
+    height: auto;
+}
+
+/* 响应式图像使用 srcset */
+/* HTML 示例:
+<img 
+    src="small.jpg" 
+    srcset="small.jpg 500w, medium.jpg 1000w, large.jpg 1500w"
+    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+    alt="响应式图像"
+>
+*/
+
+/* 艺术方向响应式图像 (使用 picture 元素) */
+/* HTML 示例:
+<picture>
+    <source media="(max-width: 768px)" srcset="mobile-image.jpg">
+    <source media="(max-width: 1200px)" srcset="tablet-image.jpg">
+    <img src="desktop-image.jpg" alt="艺术方向响应式图像">
+</picture>
+*/
+
+/* 响应式媒体容器 */
+.video-container {
+    position: relative;
+    width: 100%;
+    padding-top: 56.25%; /* 16:9 视频比例 */
+    overflow: hidden;
+}
+
+.video-container iframe,
+.video-container video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+/* 响应式 SVG */
+.svg-responsive {
+    width: 100%;
+    height: auto;
+    max-width: 500px;
+}
+
+/* 高分辨率图像支持 */
+@media (min-resolution: 2dppx) {
+    .logo {
+        background-image: url('logo@2x.png');
+    }
+}
+
+@media (max-resolution: 1dppx) {
+    .logo {
+        background-image: url('logo.png');
+    }
+}
+
+/* 图像加载优化 */
+.lazy-image {
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.lazy-image.loaded {
+    opacity: 1;
+}
+
+/* 响应式背景图像 */
+.responsive-bg {
+    background-image: url('small-bg.jpg');
+    background-size: cover;
+    background-position: center;
+    padding: 100px 20px;
+    color: white;
+    text-align: center;
+}
+
+@media (min-width: 768px) {
+    .responsive-bg {
+        background-image: url('medium-bg.jpg');
+    }
+}
+
+@media (min-width: 1200px) {
+    .responsive-bg {
+        background-image: url('large-bg.jpg');
+    }
+}\u003c/div\u003e
+
+            \u003ch3\u003e高级响应式媒体技术\u003c/h3\u003e
+            \u003cdiv class="demo-box"\u003e
+                \u003cdiv style="margin-bottom: 30px;"\u003e
+                    \u003cp style="margin-bottom: 15px;"\u003e视口单位示例 (调整浏览器窗口大小查看变化)：\u003c/p\u003e
+                    \u003cdiv class="viewport-units"\u003e
+                        \u003cdiv class="viewport-box vw-box"\u003e50vw 宽度
+(视口宽度的50%)\u003c/div\u003e
+                        \u003cdiv class="viewport-box vh-box"\u003e30vh 高度
+(视口高度的30%)\u003c/div\u003e
+                        \u003cdiv class="viewport-box vmin-box"\u003e40vmin 宽高
+(视口最小尺寸的40%)\u003c/div\u003e
+                    \u003c/div\u003e
+                \u003c/div\u003e
+                \u003cdiv style="text-align: center;"\u003e
+                    \u003cp style="margin-bottom: 15px;"\u003e使用 srcset 实现的响应式图像（浏览器会根据屏幕尺寸和分辨率自动选择合适的图像）：\u003c/p\u003e
+                    \u003cimg 
+                        src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='200' viewBox='0 0 300 200'%3E%3Crect width='300' height='200' fill='%23e74c3c'/%3E%3Ctext x='150' y='100' font-family='Arial' font-size='20' text-anchor='middle' fill='white'%3E默认图像%3C/text%3E%3C/svg%3E" 
+                        srcset="
+                            data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='200' viewBox='0 0 300 200'%3E%3Crect width='300' height='200' fill='%23e74c3c'/%3E%3Ctext x='150' y='100' font-family='Arial' font-size='20' text-anchor='middle' fill='white'%3E小图像 300w%3C/text%3E%3C/svg%3E 300w,
+                            data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='400' viewBox='0 0 600 400'%3E%3Crect width='600' height='400' fill='%23f39c12'/%3E%3Ctext x='300' y='200' font-family='Arial' font-size='30' text-anchor='middle' fill='white'%3E中图像 600w%3C/text%3E%3C/svg%3E 600w,
+                            data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1200' height='800' viewBox='0 0 1200 800'%3E%3Crect width='1200' height='800' fill='%239b59b6'/%3E%3Ctext x='600' y='400' font-family='Arial' font-size='50' text-anchor='middle' fill='white'%3E大图像 1200w%3C/text%3E%3C/svg%3E 1200w
+                        "
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                        alt="使用srcset的响应式图像示例"
+                        class="responsive-img"
+                    \u003e
+                \u003c/div\u003e
+            \u003c/div\u003e
+            \u003cdiv class="code-example"\u003e/* 高级响应式媒体技术 */
+
+/* 视口单位 */
+.viewport-box {
+    /* 视口宽度单位 */
+    width: 50vw;    /* 视口宽度的50% */
+    min-width: 200px;
+    max-width: 600px;
+}
+
+.height-box {
+    /* 视口高度单位 */
+    height: 50vh;   /* 视口高度的50% */
+    min-height: 200px;
+}
+
+/* 视口最小/最大单位 */
+.square-box {
+    /* 基于视口最小尺寸的正方形 */
+    width: 50vmin;
+    height: 50vmin;
+}
+
+.text-responsive {
+    /* 响应式字体大小 */
+    font-size: 5vw;  /* 视口宽度的5% */
+    /* 限制字体大小范围 */
+    min-font-size: 1rem;
+    max-font-size: 3rem;
+}
+
+/* CSS clamp() 函数 - 更高级的响应式字体 */
+.optimized-text {
+    /* clamp(min, preferred, max) */
+    font-size: clamp(1rem, 2vw, 2rem);
+    padding: clamp(1rem, 5vw, 2.5rem);
+    margin: clamp(0.5rem, 2vw, 1.5rem);
+}
+
+/* 响应式图像 srcset 和 sizes */
+/* srcset 属性指定不同尺寸的图像及它们的宽度 */
+/* sizes 属性告诉浏览器在不同条件下图像将占据的空间大小 */
+
+/* HTML 示例 */
+/*
+<img 
+    src="fallback.jpg" 
+    srcset="
+        small.jpg 300w,
+        medium.jpg 600w,
+        large.jpg 1200w,
+        xlarge.jpg 2000w
+    "
+    sizes="
+        (max-width: 480px) 100vw,
+        (max-width: 768px) 50vw,
+        (max-width: 1200px) 33vw,
+        25vw
+    "
+    alt="示例图像"
+    loading="lazy"
+>
+*/
+
+/* 艺术方向响应式图像 */
+/* 使用 picture 元素可以根据媒体查询提供完全不同的图像 */
+
+/* HTML 示例 */
+/*
+<picture>
+    <!-- 移动设备上使用竖版图像 -->
+    <source 
+        media="(max-width: 768px) and (orientation: portrait)" 
+        srcset="mobile-portrait.jpg"
+    >
+    <!-- 移动设备横版使用横版图像 -->
+    <source 
+        media="(max-width: 768px) and (orientation: landscape)" 
+        srcset="mobile-landscape.jpg"
+    >
+    <!-- 平板使用不同裁剪的图像 -->
+    <source 
+        media="(max-width: 1200px)" 
+        srcset="tablet.jpg"
+    >
+    <!-- 桌面使用完整图像 -->
+    <img src="desktop.jpg" alt="艺术方向响应式图像">
+</picture>
+*/
+
+/* 高DPI/Retina 显示支持 */
+/* 为不同像素密度提供不同分辨率图像 */
+
+/* HTML 示例 */
+/*
+<img 
+    src="image.jpg" 
+    srcset="
+        image.jpg 1x,
+        image@2x.jpg 2x,
+        image@3x.jpg 3x
+    "
+    alt="高DPI图像"
+>
+*/
+
+/* 响应式背景图像高级技巧 */
+.hero-section {
+    background-image: url('hero-mobile.jpg');
+    background-size: cover;
+    background-position: center;
+    padding: 40px 20px;
+    color: white;
+    min-height: 50vh;
+    display: flex;
+    align-items: center;
+}
+
+/* 不同屏幕尺寸使用不同背景图像 */
+@media (min-width: 768px) {
+    .hero-section {
+        background-image: url('hero-tablet.jpg');
+        padding: 80px 40px;
+    }
+}
+
+@media (min-width: 1200px) {
+    .hero-section {
+        background-image: url('hero-desktop.jpg');
+        padding: 120px 60px;
+    }
+}
+
+/* 不同设备方向使用不同背景图像 */
+@media (orientation: portrait) {
+    .responsive-bg {
+        background-image: url('portrait-bg.jpg');
+    }
+}
+
+@media (orientation: landscape) {
+    .responsive-bg {
+        background-image: url('landscape-bg.jpg');
+    }
+}\u003c/div\u003e
+        \u003c/div\u003e
+
+        \u003c!-- 示例4：移动优先设计模式 --\u003e
+        \u003cdiv class="section"\u003e
+            \u003ch2\u003e4. 移动优先设计模式 (Mobile-First Design)\u003c/h2\u003e
+            \u003ch3\u003e移动优先导航示例\u003c/h3\u003e
+            \u003cdiv class="demo-box"\u003e
+                \u003cdiv class="mobile-nav"\u003e
+                    \u003cdiv class="mobile-nav-header"\u003e
+                        \u003cdiv class="mobile-nav-title"\u003e移动优先导航\u003c/div\u003e
+                        \u003cbutton class="mobile-nav-toggle" id="mobile-nav-toggle"\u003e☰\u003c/button\u003e
+                    \u003c/div\u003e
+                    \u003cul class="mobile-nav-menu" id="mobile-nav-menu"\u003e
+                        \u003cli class="mobile-nav-item"\u003e\u003ca href="#" class="mobile-nav-link"\u003e首页\u003c/a\u003e\u003c/li\u003e
+                        \u003cli class="mobile-nav-item"\u003e\u003ca href="#" class="mobile-nav-link"\u003e产品\u003c/a\u003e\u003c/li\u003e
+                        \u003cli class="mobile-nav-item"\u003e\u003ca href="#" class="mobile-nav-link"\u003e关于我们\u003c/a\u003e\u003c/li\u003e
+                        \u003cli class="mobile-nav-item"\u003e\u003ca href="#" class="mobile-nav-link"\u003e联系我们\u003c/a\u003e\u003c/li\u003e
+                    \u003c/ul\u003e
+                \u003c/div\u003e
+            \u003c/div\u003e
+            \u003cdiv class="code-example"\u003e/* 移动优先设计模式示例 */
+
+/* 移动优先导航 - 基础样式 (移动设备) */
+.mobile-nav {
+    background-color: #3498db;
+    color: white;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.mobile-nav-header {
+    padding: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.mobile-nav-menu {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+    list-style: none;
+}
+
+.mobile-nav-menu.active {
+    max-height: 300px;
+}
+
+.mobile-nav-link {
+    display: block;
+    padding: 16px;
+    color: white;
+    text-decoration: none;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    transition: background-color 0.3s ease;
+}
+
+.mobile-nav-link:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.mobile-nav-toggle {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+
+/* 平板设备上的导航样式 (768px及以上) */
+@media (min-width: 768px) {
+    .mobile-nav-menu {
+        display: flex;
+        max-height: none;
+        overflow: visible;
+    }
+    
+    .mobile-nav-toggle {
+        display: none;
+    }
+    
+    .mobile-nav-link {
+        border-top: none;
+        padding: 16px 24px;
+    }
+}
+
+/* 移动优先设计原则 */
+
+/* 1. 从移动设备开始编写CSS */
+.mobile-first {
+    /* 移动设备基础样式 */
+    padding: 16px;
+    font-size: 1rem;
+}
+
+/* 2. 使用 min-width 媒体查询逐步增强 */
+@media (min-width: 768px) {
+    .mobile-first {
+        /* 平板增强样式 */
+        padding: 24px;
+        font-size: 1.125rem;
+    }
+}
+
+@media (min-width: 1200px) {
+    .mobile-first {
+        /* 桌面增强样式 */
+        padding: 32px;
+        font-size: 1.25rem;
+    }
+}
+
+/* 移动优先布局转换 */
+/* 移动设备上垂直堆叠 */
+.card-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* 平板设备上变为网格 */
+@media (min-width: 768px) {
+    .card-stack {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+    }
+}
+
+/* 桌面设备上增加列数 */
+@media (min-width: 1200px) {
+    .card-stack {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 24px;
+    }
+}
+
+/* 移动优先的字体大小 */
+.responsive-heading {
+    font-size: 1.5rem; /* 移动设备默认大小 */
+    line-height: 1.2;
+}
+
+@media (min-width: 768px) {
+    .responsive-heading {
+        font-size: 2rem;
+    }
+}
+
+@media (min-width: 1200px) {
+    .responsive-heading {
+        font-size: 2.5rem;
+    }
+}
+
+/* 移动优先的边距和内边距 */
+.content-section {
+    margin: 16px 0;
+    padding: 16px;
+}
+
+@media (min-width: 768px) {
+    .content-section {
+        margin: 24px 0;
+        padding: 24px;
+    }
+}
+
+@media (min-width: 1200px) {
+    .content-section {
+        margin: 32px 0;
+        padding: 32px;
+    }
+}
+
+/* 移动优先的导航栏 */
+.navbar {
+    background-color: #3498db;
+    color: white;
+    padding: 16px;
+}
+
+/* 默认隐藏桌面菜单 */
+.desktop-menu {
+    display: none;
+}
+
+/* 平板设备上显示桌面菜单 */
+@media (min-width: 768px) {
+    .desktop-menu {
+        display: flex;
+        gap: 16px;
+    }
+    
+    .mobile-menu-btn {
+        display: none;
+    }
+}
+
+/* 移动优先工具类 */
+/* 小屏幕显示，大屏幕隐藏 */
+.mobile-only {
+    display: block;
+}
+
+@media (min-width: 768px) {
+    .mobile-only {
+        display: none;
+    }
+}
+
+/* 大屏幕显示，小屏幕隐藏 */
+.desktop-only {
+    display: none;
+}
+
+@media (min-width: 768px) {
+    .desktop-only {
+        display: block;
+    }
+}
+
+/* 移动优先设计的最佳实践 */
+
+/* 1. 使用相对单位 */
+.mobile-best-practice {
+    width: 100%;
+    max-width: 1200px;
+    padding: 2rem;
+    font-size: clamp(1rem, 2vw, 1.5rem);
+}
+
+/* 2. 触摸友好的目标大小 */
+.touch-target {
+    min-height: 48px;
+    min-width: 48px;
+    padding: 12px;
+}
+
+/* 3. 避免水平滚动 */
+.no-horizontal-scroll {
+    width: 100%;
+    overflow-x: hidden;
+}
+
+/* 4. 考虑性能 */
+@media (max-width: 767px) {
+    .optimize-performance {
+        /* 简化动画 */
+        animation-duration: 0.3s;
+        /* 减少阴影复杂度 */
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        /* 优化图像加载 */
+        background-image: url('optimized-mobile.jpg');
+    }
+}
+
+    <script>
+        // 响应式设计的JavaScript交互功能
+        
+        // 1. 移动菜单切换功能
+        const mobileNavToggle = document.getElementById('mobile-nav-toggle');
+        const mobileNavMenu = document.getElementById('mobile-nav-menu');
+        
+        if (mobileNavToggle && mobileNavMenu) {
+            mobileNavToggle.addEventListener('click', () => {
+                mobileNavMenu.classList.toggle('active');
+                mobileNavToggle.textContent = mobileNavMenu.classList.contains('active') ? '✕' : '☰';
+            });
+        }
+        
+        // 2. 响应式图像加载 - 延迟加载实现
+        const setupResponsiveImages = () => {
+            const lazyImages = document.querySelectorAll('img[data-src]');
+            
+            if ('IntersectionObserver' in window) {
+                const imageObserver = new IntersectionObserver((entries, observer) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            const img = entry.target;
+                            img.src = img.dataset.src;
+                            img.removeAttribute('data-src');
+                            imageObserver.unobserve(img);
+                        }
+                    });
+                });
+                
+                lazyImages.forEach(img => {
+                    imageObserver.observe(img);
+                });
+            } else {
+                // 降级处理
+                lazyImages.forEach(img => {
+                    img.src = img.dataset.src;
+                    img.removeAttribute('data-src');
+                });
+            }
+        };
+        
+        // 3. 视口检测 - 用于动态调整内容
+        const handleViewportChange = () => {
+            const viewportWidth = window.innerWidth;
+            const viewportIndicator = document.querySelector('.viewport-indicator');
+            
+            if (viewportIndicator) {
+                let viewportSize = '移动设备';
+                if (viewportWidth >= 1200) {
+                    viewportSize = '大屏幕桌面';
+                } else if (viewportWidth >= 992) {
+                    viewportSize = '中等屏幕桌面';
+                } else if (viewportWidth >= 768) {
+                    viewportSize = '平板设备';
+                }
+                
+                viewportIndicator.textContent = `当前视口宽度: ${viewportWidth}px (${viewportSize})`;
+            }
+        };
+        
+        // 4. 响应式导航栏滚动效果
+        const setupNavbarScrollEffect = () => {
+            const navbar = document.querySelector('.navbar');
+            let lastScrollTop = 0;
+            
+            if (navbar) {
+                window.addEventListener('scroll', () => {
+                    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                    
+                    if (scrollTop > 50) {
+                        navbar.classList.add('navbar-scrolled');
+                    } else {
+                        navbar.classList.remove('navbar-scrolled');
+                    }
+                    
+                    lastScrollTop = scrollTop <= 0 ? 0 : scrollTop;
+                });
+            }
+        };
+        
+        // 初始化所有功能
+        document.addEventListener('DOMContentLoaded', () => {
+            setupResponsiveImages();
+            handleViewportChange();
+            setupNavbarScrollEffect();
+            
+            // 监听窗口大小变化
+            window.addEventListener('resize', handleViewportChange);
+            
+            // 显示加载完成提示
+            console.log('响应式设计示例加载完成！');
+        });
+    </script>
+</body>
+</html>

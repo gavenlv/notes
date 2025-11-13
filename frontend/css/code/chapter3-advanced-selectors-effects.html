@@ -1,0 +1,1170 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSS高级选择器与特效示例</title>
+    <style>
+        /* 全局重置和基础样式 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* CSS变量定义 */
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2ecc71;
+            --accent-color: #e74c3c;
+            --text-color: #333;
+            --background-color: #f5f5f5;
+            --card-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            --transition-speed: 0.3s;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--background-color);
+            padding: 20px;
+        }
+
+        /* 示例容器 */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* 标题样式 */
+        h1 {
+            color: white;
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 20px;
+            background-color: var(--primary-color);
+            border-radius: 10px;
+            box-shadow: var(--card-shadow);
+        }
+
+        /* 章节样式 */
+        .section {
+            background-color: white;
+            padding: 30px;
+            margin-bottom: 40px;
+            border-radius: 10px;
+            box-shadow: var(--card-shadow);
+            transition: transform var(--transition-speed) ease;
+        }
+
+        .section:hover {
+            transform: translateY(-5px);
+        }
+
+        .section h2 {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #ecf0f1;
+        }
+
+        .section h3 {
+            color: var(--secondary-color);
+            margin: 25px 0 15px 0;
+        }
+
+        /* 代码示例样式 */
+        .code-example {
+            background-color: #2c3e50;
+            color: #ecf0f1;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+            position: relative;
+        }
+
+        /* 展示区域样式 */
+        .demo-box {
+            border: 2px dashed #bdc3c7;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 8px;
+            min-height: 100px;
+            background-color: #fafafa;
+        }
+
+        /* 高级选择器示例 */
+        .advanced-selectors {
+            margin: 20px 0;
+        }
+
+        /* 属性选择器 */
+        .attr-example [data-type="important"] {
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 6px;
+        }
+
+        .attr-example [data-type="info"] {
+            background-color: #d1ecf1;
+            border-left: 4px solid #17a2b8;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 6px;
+        }
+
+        .attr-example [class^="warning"] {
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 6px;
+        }
+
+        .attr-example [class$="-box"] {
+            background-color: #e2e3e5;
+            border-left: 4px solid #6c757d;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 6px;
+        }
+
+        /* 伪类选择器进阶 */
+        .pseudo-advanced {
+            margin: 20px 0;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .input-group input[type="text"]:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.25);
+            outline: none;
+        }
+
+        .input-group input[type="text"]:valid {
+            border-color: var(--secondary-color);
+        }
+
+        .input-group input[type="text"]:invalid {
+            border-color: var(--accent-color);
+        }
+
+        /* CSS变量示例 */
+        .css-vars {
+            margin: 20px 0;
+        }
+
+        .theme-container {
+            padding: 20px;
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .theme-box {
+            padding: 15px;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 6px;
+            margin-bottom: 10px;
+        }
+
+        .theme-button {
+            padding: 10px 20px;
+            background-color: white;
+            color: var(--primary-color);
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all var(--transition-speed) ease;
+        }
+
+        .theme-button:hover {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+
+        /* 渐变示例 */
+        .gradients {
+            margin: 20px 0;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .gradient-box {
+            height: 150px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+            transition: transform var(--transition-speed) ease;
+        }
+
+        .gradient-box:hover {
+            transform: scale(1.05);
+        }
+
+        .linear-gradient {
+            background: linear-gradient(135deg, #3498db, #9b59b6);
+        }
+
+        .radial-gradient {
+            background: radial-gradient(circle, #e74c3c, #f39c12);
+        }
+
+        .conic-gradient {
+            background: conic-gradient(from 45deg, #2ecc71, #3498db, #9b59b6, #e74c3c, #2ecc71);
+        }
+
+        .multiple-gradient {
+            background: linear-gradient(135deg, rgba(52, 152, 219, 0.8) 0%, rgba(46, 204, 113, 0.8) 100%),
+                        url('https://picsum.photos/400/300?random=1');
+            background-size: cover;
+            background-position: center;
+        }
+
+        /* 阴影效果 */
+        .shadows {
+            margin: 20px 0;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .shadow-box {
+            padding: 30px;
+            background-color: white;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: bold;
+            transition: all var(--transition-speed) ease;
+        }
+
+        .basic-shadow {
+            box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .multiple-shadow {
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1),
+                        0 6px 6px rgba(0, 0, 0, 0.15);
+        }
+
+        .inset-shadow {
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .text-shadow {
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            color: white;
+            background-color: var(--primary-color);
+        }
+
+        .shadow-box:hover {
+            transform: translateY(-5px);
+        }
+
+        /* 滤镜效果 */
+        .filters {
+            margin: 20px 0;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .filter-box {
+            text-align: center;
+        }
+
+        .filter-image {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            transition: filter var(--transition-speed) ease;
+        }
+
+        .filter-grayscale {
+            filter: grayscale(100%);
+        }
+
+        .filter-sepia {
+            filter: sepia(80%);
+        }
+
+        .filter-blur {
+            filter: blur(3px);
+        }
+
+        .filter-brightness {
+            filter: brightness(1.5);
+        }
+
+        .filter-contrast {
+            filter: contrast(150%);
+        }
+
+        .filter-hue-rotate {
+            filter: hue-rotate(90deg);
+        }
+
+        .filter-combo {
+            filter: brightness(1.2) contrast(1.1) saturate(1.3);
+        }
+
+        .filter-box:hover .filter-image {
+            filter: none;
+        }
+
+        /* 混合模式 */
+        .blend-modes {
+            margin: 20px 0;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .blend-box {
+            height: 200px;
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .blend-box::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, var(--primary-color), var(--accent-color));
+            mix-blend-mode: overlay;
+            z-index: 1;
+        }
+
+        .blend-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .blend-multiply::before {
+            mix-blend-mode: multiply;
+        }
+
+        .blend-screen::before {
+            mix-blend-mode: screen;
+        }
+
+        .blend-overlay::before {
+            mix-blend-mode: overlay;
+        }
+
+        .blend-darken::before {
+            mix-blend-mode: darken;
+        }
+
+        .blend-lighten::before {
+            mix-blend-mode: lighten;
+        }
+
+        /* 高级背景效果 */
+        .advanced-backgrounds {
+            margin: 20px 0;
+        }
+
+        .bg-pattern {
+            padding: 30px;
+            background-color: white;
+            background-image: 
+                radial-gradient(var(--primary-color) 2px, transparent 2px),
+                radial-gradient(var(--primary-color) 2px, transparent 2px);
+            background-size: 60px 60px;
+            background-position: 0 0, 30px 30px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .bg-clip-text {
+            font-size: 48px;
+            font-weight: bold;
+            text-align: center;
+            background-image: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 20px;
+        }
+
+        .bg-mesh {
+            height: 200px;
+            border-radius: 8px;
+            background-color: #fff;
+            background-image: 
+                linear-gradient(30deg, #3498db 12%, transparent 12.5%, transparent 87%, #3498db 87.5%, #3498db),
+                linear-gradient(150deg, #3498db 12%, transparent 12.5%, transparent 87%, #3498db 87.5%, #3498db),
+                linear-gradient(30deg, #3498db 12%, transparent 12.5%, transparent 87%, #3498db 87.5%, #3498db),
+                linear-gradient(150deg, #3498db 12%, transparent 12.5%, transparent 87%, #3498db 87.5%, #3498db),
+                linear-gradient(60deg, #2ecc71 25%, transparent 25.5%, transparent 75%, #2ecc71 75%, #2ecc71);
+            background-size: 20px 35px;
+            background-position: 0 0, 0 0, 10px 18px, 10px 18px, 0 0;
+        }
+
+        /* 形状与裁剪 */
+        .shapes-clipping {
+            margin: 20px 0;
+        }
+
+        .shape-example {
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .shape-circle {
+            width: 200px;
+            height: 200px;
+            background-color: var(--primary-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            margin: 0 auto;
+        }
+
+        .shape-triangle {
+            width: 0;
+            height: 0;
+            border-left: 100px solid transparent;
+            border-right: 100px solid transparent;
+            border-bottom: 173px solid var(--secondary-color);
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .shape-triangle::after {
+            content: '三角形';
+            position: absolute;
+            bottom: -150px;
+            left: -30px;
+            color: white;
+            font-weight: bold;
+        }
+
+        .shape-polygon {
+            width: 150px;
+            height: 150px;
+            background-color: var(--accent-color);
+            clip-path: polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            margin: 0 auto;
+        }
+
+        .clip-path-image {
+            width: 300px;
+            height: 200px;
+            object-fit: cover;
+            clip-path: circle(50% at 50% 50%);
+            margin: 0 auto;
+            display: block;
+            transition: clip-path var(--transition-speed) ease;
+        }
+
+        .clip-path-image:hover {
+            clip-path: circle(70% at 50% 50%);
+        }
+
+        /* 响应式调整 */
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .section {
+                padding: 20px;
+            }
+            
+            .gradients,
+            .shadows,
+            .filters,
+            .blend-modes {
+                grid-template-columns: 1fr;
+            }
+            
+            .bg-clip-text {
+                font-size: 32px;
+            }
+            
+            .clip-path-image {
+                width: 200px;
+                height: 150px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>CSS高级选择器与特效示例演示</h1>
+
+        <!-- 示例1：高级选择器 -->
+        <div class="section">
+            <h2>1. CSS高级选择器</h2>
+            
+            <h3>属性选择器</h3>
+            <div class="demo-box">
+                <div class="advanced-selectors attr-example">
+                    <div data-type="important">重要提示：使用[data-type="important"]选择器</div>
+                    <div data-type="info">信息提示：使用[data-type="info"]选择器</div>
+                    <div class="warning-message">警告信息：使用[class^="warning"]选择器</div>
+                    <div class="content-box">内容区块：使用[class$="-box"]选择器</div>
+                </div>
+            </div>
+            <div class="code-example">/* 属性选择器示例 */
+/* 精确属性值匹配 */
+[data-type="important"] {
+    background-color: #fff3cd;
+    border-left: 4px solid #ffc107;
+}
+
+[data-type="info"] {
+    background-color: #d1ecf1;
+    border-left: 4px solid #17a2b8;
+}
+
+/* 属性值开头匹配 */
+[class^="warning"] {
+    background-color: #fff3cd;
+    border-left: 4px solid #ffc107;
+}
+
+/* 属性值结尾匹配 */
+[class$="-box"] {
+    background-color: #e2e3e5;
+    border-left: 4px solid #6c757d;
+}
+
+/* 属性值包含匹配 */
+[class*="message"] {
+    font-weight: bold;
+}
+
+/* 属性存在匹配 */
+[title] {
+    cursor: help;
+}
+
+/* 多属性选择器 */
+input[type="text"][required] {
+    border-color: #ff0000;
+}</div>
+
+            <h3>伪类选择器进阶</h3>
+            <div class="demo-box">
+                <div class="advanced-selectors pseudo-advanced">
+                    <div class="input-group">
+                        <label for="name">用户名 (必填，聚焦时有特殊样式)</label>
+                        <input type="text" id="name" required placeholder="请输入用户名">
+                    </div>
+                    <div class="input-group">
+                        <label for="email">邮箱 (输入有效值后边框变绿)</label>
+                        <input type="text" id="email" pattern="[^@]+@[^@]+\.[^@]+" placeholder="请输入邮箱">
+                    </div>
+                </div>
+            </div>
+            <div class="code-example">/* 伪类选择器进阶示例 */
+/* 表单状态伪类 */
+input:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.25);
+    outline: none;
+}
+
+input:valid {
+    border-color: var(--secondary-color);
+}
+
+input:invalid {
+    border-color: var(--accent-color);
+}
+
+/* 否定伪类 */
+:not(.special) {
+    opacity: 0.7;
+}
+
+/* 任意匹配伪类 */
+:any-link {
+    color: var(--primary-color);
+}
+
+/* 焦点内伪类 */
+:focus-within {
+    background-color: rgba(52, 152, 219, 0.05);
+}
+
+/* 只读/可写伪类 */
+input:read-only {
+    background-color: #f8f9fa;
+}
+
+input:read-write {
+    background-color: white;
+}
+
+/* 选中伪类 */
+input:checked + label {
+    font-weight: bold;
+}
+
+/* 目标伪类 */
+:target {
+    background-color: #fff3cd;
+    padding: 10px;
+}</div>
+        </div>
+
+        <!-- 示例2：CSS变量 -->
+        <div class="section">
+            <h2>2. CSS变量 (自定义属性)</h2>
+            <div class="demo-box">
+                <div class="css-vars">
+                    <div class="theme-container">
+                        <div class="theme-box">使用CSS变量定义的主题颜色</div>
+                        <div class="theme-box">变量名: --primary-color, --secondary-color</div>
+                        <button class="theme-button" onclick="toggleTheme()">切换主题</button>
+                    </div>
+                </div>
+            </div>
+            <div class="code-example">/* CSS变量示例 */
+/* 定义根级变量 */
+:root {
+    --primary-color: #3498db;
+    --secondary-color: #2ecc71;
+    --accent-color: #e74c3c;
+    --text-color: #333;
+    --background-color: #f5f5f5;
+    --transition-speed: 0.3s;
+}
+
+/* 使用变量 */
+.element {
+    color: var(--text-color);
+    background-color: var(--primary-color);
+    transition: all var(--transition-speed) ease;
+}
+
+/* 局部变量 */
+.section {
+    --section-bg: #fff;
+    background-color: var(--section-bg);
+}
+
+/* 变量计算 */
+.element {
+    width: calc(var(--base-size) * 2);
+    padding: calc(var(--spacing) + 10px);
+}
+
+/* 变量回退值 */
+.element {
+    color: var(--non-existent-color, #333);
+}
+
+/* JavaScript操作变量 */
+/* document.documentElement.style.setProperty('--primary-color', '#ff0000'); */</div>
+        </div>
+
+        <!-- 示例3：渐变效果 -->
+        <div class="section">
+            <h2>3. CSS渐变效果</h2>
+            <div class="demo-box">
+                <div class="gradients">
+                    <div class="gradient-box linear-gradient">线性渐变</div>
+                    <div class="gradient-box radial-gradient">径向渐变</div>
+                    <div class="gradient-box conic-gradient">锥形渐变</div>
+                    <div class="gradient-box multiple-gradient">多重渐变</div>
+                </div>
+            </div>
+            <div class="code-example">/* CSS渐变效果示例 */
+/* 线性渐变 */
+.linear-gradient {
+    background: linear-gradient(135deg, #3498db, #9b59b6);
+}
+
+/* 多色线性渐变 */
+.multicolor-gradient {
+    background: linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet);
+}
+
+/* 带颜色停止点的渐变 */
+.stopped-gradient {
+    background: linear-gradient(to bottom, #3498db 0%, #2ecc71 50%, #e74c3c 100%);
+}
+
+/* 径向渐变 */
+.radial-gradient {
+    background: radial-gradient(circle, #e74c3c, #f39c12);
+}
+
+/* 带大小的径向渐变 */
+.sized-radial {
+    background: radial-gradient(circle at top left, #3498db 0%, transparent 50%);
+}
+
+/* 锥形渐变 */
+.conic-gradient {
+    background: conic-gradient(from 45deg, #2ecc71, #3498db, #9b59b6, #e74c3c, #2ecc71);
+}
+
+/* 重复渐变 */
+.repeating-gradient {
+    background: repeating-linear-gradient(45deg, #3498db, #3498db 10px, #2ecc71 10px, #2ecc71 20px);
+}
+
+/* 渐变与图片混合 */
+.blended-gradient {
+    background: linear-gradient(rgba(255,255,255,0.8), rgba(255,255,255,0.8)),
+                url('image.jpg');
+}</div>
+        </div>
+
+        <!-- 示例4：阴影效果 -->
+        <div class="section">
+            <h2>4. CSS阴影效果</h2>
+            <div class="demo-box">
+                <div class="shadows">
+                    <div class="shadow-box basic-shadow">基本阴影</div>
+                    <div class="shadow-box multiple-shadow">多重阴影</div>
+                    <div class="shadow-box inset-shadow">内阴影</div>
+                    <div class="shadow-box text-shadow">文字阴影</div>
+                </div>
+            </div>
+            <div class="code-example">/* CSS阴影效果示例 */
+/* 基本盒阴影 */
+.basic-shadow {
+    box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.2);
+    /* 水平偏移, 垂直偏移, 模糊半径, 颜色 */
+}
+
+/* 带扩展的阴影 */
+.expanded-shadow {
+    box-shadow: 5px 5px 15px 5px rgba(0, 0, 0, 0.2);
+    /* 水平偏移, 垂直偏移, 模糊半径, 扩展半径, 颜色 */
+}
+
+/* 多重阴影 */
+.multiple-shadow {
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1),
+                0 6px 6px rgba(0, 0, 0, 0.15);
+}
+
+/* 内阴影 */
+.inset-shadow {
+    box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.2);
+}
+
+/* 文字阴影 */
+.text-shadow {
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* 多重文字阴影 */
+.multiple-text-shadow {
+    text-shadow: 2px 2px 0px #3498db,
+                 4px 4px 0px #2ecc71;
+}
+
+/* 彩色阴影 */
+.colored-shadow {
+    box-shadow: 5px 5px 15px rgba(231, 76, 60, 0.5);
+}
+
+/* 零偏移大模糊阴影（发光效果） */
+.glow-effect {
+    box-shadow: 0 0 15px rgba(52, 152, 219, 0.7);
+}</div>
+        </div>
+
+        <!-- 示例5：滤镜效果 -->
+        <div class="section">
+            <h2>5. CSS滤镜效果</h2>
+            <div class="demo-box">
+                <div class="filters">
+                    <div class="filter-box">
+                        <img src="https://picsum.photos/400/300?random=10" alt="滤镜示例" class="filter-image filter-grayscale">
+                        <p>灰度滤镜</p>
+                    </div>
+                    <div class="filter-box">
+                        <img src="https://picsum.photos/400/300?random=11" alt="滤镜示例" class="filter-image filter-sepia">
+                        <p>复古滤镜</p>
+                    </div>
+                    <div class="filter-box">
+                        <img src="https://picsum.photos/400/300?random=12" alt="滤镜示例" class="filter-image filter-blur">
+                        <p>模糊滤镜</p>
+                    </div>
+                    <div class="filter-box">
+                        <img src="https://picsum.photos/400/300?random=13" alt="滤镜示例" class="filter-image filter-brightness">
+                        <p>亮度滤镜</p>
+                    </div>
+                    <div class="filter-box">
+                        <img src="https://picsum.photos/400/300?random=14" alt="滤镜示例" class="filter-image filter-contrast">
+                        <p>对比度滤镜</p>
+                    </div>
+                    <div class="filter-box">
+                        <img src="https://picsum.photos/400/300?random=15" alt="滤镜示例" class="filter-image filter-hue-rotate">
+                        <p>色相旋转</p>
+                    </div>
+                    <div class="filter-box">
+                        <img src="https://picsum.photos/400/300?random=16" alt="滤镜示例" class="filter-image filter-combo">
+                        <p>组合滤镜</p>
+                    </div>
+                </div>
+            </div>
+            <div class="code-example">/* CSS滤镜效果示例 */
+/* 灰度滤镜 */
+.filter-grayscale {
+    filter: grayscale(100%);
+}
+
+/* 复古滤镜 */
+.filter-sepia {
+    filter: sepia(80%);
+}
+
+/* 模糊滤镜 */
+.filter-blur {
+    filter: blur(3px);
+}
+
+/* 亮度滤镜 */
+.filter-brightness {
+    filter: brightness(1.5);
+}
+
+/* 对比度滤镜 */
+.filter-contrast {
+    filter: contrast(150%);
+}
+
+/* 饱和度滤镜 */
+.filter-saturate {
+    filter: saturate(2);
+}
+
+/* 色相旋转滤镜 */
+.filter-hue-rotate {
+    filter: hue-rotate(90deg);
+}
+
+/* 透明度滤镜 */
+.filter-opacity {
+    filter: opacity(0.7);
+}
+
+/* 反相滤镜 */
+.filter-invert {
+    filter: invert(100%);
+}
+
+/* 组合滤镜 */
+.filter-combo {
+    filter: brightness(1.2) contrast(1.1) saturate(1.3);
+}
+
+/* 阴影滤镜 */
+.filter-drop-shadow {
+    filter: drop-shadow(5px 5px 10px rgba(0, 0, 0, 0.3));
+}
+
+/* 无滤镜重置 */
+.filter-none {
+    filter: none;
+}</div>
+        </div>
+
+        <!-- 示例6：混合模式 -->
+        <div class="section">
+            <h2>6. CSS混合模式</h2>
+            <div class="demo-box">
+                <div class="blend-modes">
+                    <div class="blend-box blend-multiply">
+                        <img src="https://picsum.photos/400/300?random=20" alt="混合模式示例">
+                    </div>
+                    <div class="blend-box blend-screen">
+                        <img src="https://picsum.photos/400/300?random=21" alt="混合模式示例">
+                    </div>
+                    <div class="blend-box blend-overlay">
+                        <img src="https://picsum.photos/400/300?random=22" alt="混合模式示例">
+                    </div>
+                    <div class="blend-box blend-darken">
+                        <img src="https://picsum.photos/400/300?random=23" alt="混合模式示例">
+                    </div>
+                    <div class="blend-box blend-lighten">
+                        <img src="https://picsum.photos/400/300?random=24" alt="混合模式示例">
+                    </div>
+                </div>
+            </div>
+            <div class="code-example">/* CSS混合模式示例 */
+/* 颜色混合模式 */
+.blend-multiply {
+    background: linear-gradient(45deg, #3498db, #e74c3c);
+    mix-blend-mode: multiply;
+}
+
+/* 屏幕混合模式 */
+.blend-screen {
+    background: linear-gradient(45deg, #3498db, #e74c3c);
+    mix-blend-mode: screen;
+}
+
+/* 叠加混合模式 */
+.blend-overlay {
+    background: linear-gradient(45deg, #3498db, #e74c3c);
+    mix-blend-mode: overlay;
+}
+
+/* 变暗混合模式 */
+.blend-darken {
+    background: linear-gradient(45deg, #3498db, #e74c3c);
+    mix-blend-mode: darken;
+}
+
+/* 变亮混合模式 */
+.blend-lighten {
+    background: linear-gradient(45deg, #3498db, #e74c3c);
+    mix-blend-mode: lighten;
+}
+
+/* 颜色减淡混合模式 */
+.blend-color-dodge {
+    mix-blend-mode: color-dodge;
+}
+
+/* 颜色加深混合模式 */
+.blend-color-burn {
+    mix-blend-mode: color-burn;
+}
+
+/* 差值混合模式 */
+.blend-difference {
+    mix-blend-mode: difference;
+}
+
+/* 排除混合模式 */
+.blend-exclusion {
+    mix-blend-mode: exclusion;
+}
+
+/* 色相混合模式 */
+.blend-hue {
+    mix-blend-mode: hue;
+}
+
+/* 背景混合模式 */
+.background-blend {
+    background-image: url('image.jpg'), linear-gradient(to right, #3498db, #e74c3c);
+    background-blend-mode: overlay;
+}</div>
+        </div>
+
+        <!-- 示例7：高级背景效果 -->
+        <div class="section">
+            <h2>7. CSS高级背景效果</h2>
+            <div class="demo-box">
+                <div class="advanced-backgrounds">
+                    <div class="bg-pattern">CSS图案背景</div>
+                    <div class="bg-clip-text">渐变文字效果</div>
+                    <div class="bg-mesh">网格图案背景</div>
+                </div>
+            </div>
+            <div class="code-example">/* CSS高级背景效果示例 */
+/* 图案背景 */
+.bg-pattern {
+    background-color: white;
+    background-image: 
+        radial-gradient(#3498db 2px, transparent 2px),
+        radial-gradient(#3498db 2px, transparent 2px);
+    background-size: 60px 60px;
+    background-position: 0 0, 30px 30px;
+}
+
+/* 渐变文字 */
+.bg-clip-text {
+    background-image: linear-gradient(135deg, #3498db, #2ecc71);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+/* 网格图案 */
+.bg-mesh {
+    background-color: #fff;
+    background-image: 
+        linear-gradient(30deg, #3498db 12%, transparent 12.5%, transparent 87%, #3498db 87.5%, #3498db),
+        linear-gradient(150deg, #3498db 12%, transparent 12.5%, transparent 87%, #3498db 87.5%, #3498db),
+        linear-gradient(30deg, #3498db 12%, transparent 12.5%, transparent 87%, #3498db 87.5%, #3498db),
+        linear-gradient(150deg, #3498db 12%, transparent 12.5%, transparent 87%, #3498db 87.5%, #3498db),
+        linear-gradient(60deg, #2ecc71 25%, transparent 25.5%, transparent 75%, #2ecc71 75%, #2ecc71);
+    background-size: 20px 35px;
+    background-position: 0 0, 0 0, 10px 18px, 10px 18px, 0 0;
+}
+
+/* 固定背景 */
+.fixed-bg {
+    background-image: url('image.jpg');
+    background-attachment: fixed;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+/* 多背景图层 */
+.multiple-bg {
+    background-image: 
+        url('pattern.png'),
+        linear-gradient(to right, #3498db, #2ecc71);
+    background-position: top left, center;
+    background-repeat: repeat, no-repeat;
+    background-size: 50px 50px, cover;
+}
+
+/* 背景大小控制 */
+.bg-contain {
+    background-size: contain;
+}
+
+.bg-cover {
+    background-size: cover;
+}
+
+.bg-custom-size {
+    background-size: 300px 200px;
+}</div>
+        </div>
+
+        <!-- 示例8：形状与裁剪 -->
+        <div class="section">
+            <h2>8. CSS形状与裁剪</h2>
+            <div class="demo-box">
+                <div class="shapes-clipping">
+                    <div class="shape-example">
+                        <div class="shape-circle">圆形</div>
+                    </div>
+                    <div class="shape-example">
+                        <div class="shape-triangle"></div>
+                    </div>
+                    <div class="shape-example">
+                        <div class="shape-polygon">五边形</div>
+                    </div>
+                    <div class="shape-example">
+                        <img src="https://picsum.photos/400/300?random=30" alt="裁剪图片示例" class="clip-path-image">
+                    </div>
+                </div>
+            </div>
+            <div class="code-example">/* CSS形状与裁剪示例 */
+/* 圆形 */
+.shape-circle {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+}
+
+/* 三角形 */
+.shape-triangle {
+    width: 0;
+    height: 0;
+    border-left: 100px solid transparent;
+    border-right: 100px solid transparent;
+    border-bottom: 173px solid #2ecc71;
+}
+
+/* 使用clip-path创建五边形 */
+.shape-polygon {
+    width: 150px;
+    height: 150px;
+    clip-path: polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%);
+}
+
+/* 图片裁剪 */
+.clip-path-image {
+    clip-path: circle(50% at 50% 50%);
+}
+
+/* 矩形裁剪 */
+.clip-rectangle {
+    clip-path: inset(10px 20px 10px 20px);
+}
+
+/* 椭圆裁剪 */
+.clip-ellipse {
+    clip-path: ellipse(50% 40% at 50% 50%);
+}
+
+/* 多边形裁剪 */
+.clip-polygon {
+    clip-path: polygon(0% 0%, 100% 0%, 100% 75%, 75% 75%, 75% 100%, 50% 75%, 0% 75%);
+}
+
+/* 自定义路径裁剪 */
+.clip-path-custom {
+    clip-path: path('M0,0 L100,0 L100,100 Q50,150 0,100 Z');
+}
+
+/* 响应式裁剪 */
+@media (max-width: 768px) {
+    .responsive-clip {
+        clip-path: circle(40% at 50% 50%);
+    }
+}</div>
+        </div>
+    </div>
+
+    <script>
+        // 切换主题颜色的JavaScript函数
+        function toggleTheme() {
+            const root = document.documentElement;
+            const currentPrimary = root.style.getPropertyValue('--primary-color');
+            
+            if (currentPrimary === '#9b59b6') {
+                // 恢复默认主题
+                root.style.setProperty('--primary-color', '#3498db');
+                root.style.setProperty('--secondary-color', '#2ecc71');
+                root.style.setProperty('--accent-color', '#e74c3c');
+            } else {
+                // 切换到深色主题
+                root.style.setProperty('--primary-color', '#9b59b6');
+                root.style.setProperty('--secondary-color', '#f39c12');
+                root.style.setProperty('--accent-color', '#1abc9c');
+            }
+        }
+    </script>
+</body>
+</html>
