@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tailwind CSS 最佳实践示例</title>
+    
+    <!-- 使用 Tailwind CSS v3 CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- 引入 Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- 自定义 Tailwind 配置 -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3b82f6',
+                        secondary: '#8b5cf6',
+                        success: '#10b981',
+                        danger: '#ef4444',
+                        warning: '#f59e0b',
+                    },
+                    spacing: {
+                        '18': '4.5rem',
+                        '22': '5.5rem',
+                        '26': '6.5rem',
+                        '30': '7.5rem',
+                    },
+                },
+            },
+            plugins: [
+                function({ addUtilities }) {
+                    // 添加自定义工具类 - 遵循最佳实践
+                    addUtilities({
+                        '.btn-primary': {
+                            '@apply px-4 py-2 bg-primary text-white font-medium rounded-md hover:bg-primary/90 transition-colors focus:ring-2 focus:ring-primary/50 focus:outline-none': {},
+                        },
+                        '.btn-secondary': {
+                            '@apply px-4 py-2 bg-gray-200 text-gray-900 font-medium rounded-md hover:bg-gray-300 transition-colors focus:ring-2 focus:ring-gray-400 focus:outline-none': {},
+                        },
+                        '.card': {
+                            '@apply bg-white rounded-lg shadow-md p-6 transition-all duration-300 hover:shadow-lg': {},
+                        },
+                        '.content-auto': {
+                            'content-visibility': 'auto',
+                        },
+                    });
+                },
+            ],
+        }
+    </script>
+    
+    <!-- 自定义样式 -->
+    <style>
+        /* 平滑滚动 */
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        /* 动画效果 */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.6s ease-out forwards;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans">
+    <!-- 导航栏 - 语义化HTML和响应式设计 -->
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <!-- 品牌标识 -->
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-rocket text-primary text-2xl"></i>
+                    <span class="text-xl font-bold text-gray-900">TailwindBestPractices</span>
+                </div>
+                
+                <!-- 桌面端导航 -->
+                <nav class="hidden md:flex items-center space-x-6">
+                    <a href="#" class="text-gray-600 hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors">首页</a>
+                    <a href="#components" class="text-gray-600 hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors">组件</a>
+                    <a href="#responsive" class="text-gray-600 hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors">响应式</a>
+                    <a href="#accessibility" class="text-gray-600 hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors">可访问性</a>
+                    <a href="#performance" class="text-gray-600 hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors">性能</a>
+                </nav>
+                
+                <!-- 移动端菜单按钮 -->
+                <button class="md:hidden text-gray-600 hover:text-primary p-2 rounded-md transition-colors">
+                    <i class="fas fa-bars text-xl"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- 主要内容 -->
+    <main>
+        <!-- 英雄区域 - 清晰的类名顺序 -->
+        <section class="bg-gradient-to-r from-primary to-secondary text-white py-16 md:py-24">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+                    <div class="animate-on-scroll">
+                        <h1 class="text-4xl md:text-5xl font-bold mb-4 leading-tight">
+                            Tailwind CSS 最佳实践
+                        </h1>
+                        <p class="text-lg md:text-xl mb-8 text-white/90 leading-relaxed">
+                            学习如何使用 Tailwind CSS 编写清晰、可维护、高效的代码
+                        </p>
+                        <div class="flex flex-wrap gap-4">
+                            <a href="#components" class="btn-primary">
+                                <i class="fas fa-th-large mr-2"></i> 查看组件
+                            </a>
+                            <a href="#responsive" class="bg-transparent border-2 border-white text-white px-6 py-2 rounded-md font-medium hover:bg-white hover:text-primary transition-all">
+                                <i class="fas fa-mobile-alt mr-2"></i> 响应式设计
+                            </a>
+                        </div>
+                    </div>
+                    <div class="animate-on-scroll">
+                        <img src="https://picsum.photos/600/400?random=10" alt="Tailwind CSS 最佳实践" class="w-full rounded-lg shadow-2xl">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 组件示例 - 原子化组件和自定义工具类 -->
+        <section id="components" class="py-16 md:py-24 bg-white">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-16 animate-on-scroll">
+                    <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">组件设计最佳实践</h2>
+                    <p class="text-lg text-gray-600 max-w-3xl mx-auto">
+                        使用原子化组件和自定义工具类创建可复用的 UI 组件
+                    </p>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- 卡片组件 - 使用自定义工具类 -->
+                    <div class="card animate-on-scroll">
+                        <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4">
+                            <i class="fas fa-card text-primary text-2xl"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold text-gray-900 mb-3">卡片组件</h3>
+                        <p class="text-gray-600 mb-4">
+                            使用自定义的 `.card` 工具类创建一致的卡片样式
+                        </p>
+                        <button class="btn-primary w-full">查看详情</button>
+                    </div>
+                    
+                    <!-- 按钮组件 - 不同变体 -->
+                    <div class="card animate-on-scroll">
+                        <div class="w-16 h-16 bg-secondary/10 rounded-full flex items-center justify-center mb-4">
+                            <i class="fas fa-button text-secondary text-2xl"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold text-gray-900 mb-3">按钮组件</h3>
+                        <p class="text-gray-600 mb-4">
+                            使用不同变体的按钮组件满足不同需求
+                        </p>
+                        <div class="flex flex-wrap gap-2">
+                            <button class="btn-primary">主要按钮</button>
+                            <button class="btn-secondary">次要按钮</button>
+                        </div>
+                    </div>
+                    
+                    <!-- 表单组件 - 良好的可访问性 -->
+                    <div class="card animate-on-scroll">
+                        <div class="w-16 h-16 bg-success/10 rounded-full flex items-center justify-center mb-4">
+                            <i class="fas fa-form text-success text-2xl"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold text-gray-900 mb-3">表单组件</h3>
+                        <p class="text-gray-600 mb-4">
+                            带有适当标签和反馈的表单组件
+                        </p>
+                        <div class="space-y-4">
+                            <div>
+                                <label for="email" class="block text-sm font-medium text-gray-700 mb-1">邮箱</label>
+                                <input type="email" id="email" placeholder="your@email.com" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-transparent transition-colors">
+                            </div>
+                            <button class="btn-primary w-full">提交</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 响应式设计示例 - 移动优先 -->
+        <section id="responsive" class="py-16 md:py-24 bg-gray-50">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-16 animate-on-scroll">
+                    <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">响应式设计最佳实践</h2>
+                    <p class="text-lg text-gray-600 max-w-3xl mx-auto">
+                        采用移动优先的设计理念，适配各种设备
+                    </p>
+                </div>
+                
+                <!-- 响应式网格示例 -->
+                <div class="mb-16 animate-on-scroll">
+                    <h3 class="text-2xl font-semibold text-gray-900 mb-6 text-center">响应式网格布局</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div class="bg-white rounded-lg shadow-md p-4">
+                            <p class="text-center font-medium">1 列 (移动设备)</p>
+                        </div>
+                        <div class="bg-white rounded-lg shadow-md p-4">
+                            <p class="text-center font-medium">2 列 (平板)</p>
+                        </div>
+                        <div class="bg-white rounded-lg shadow-md p-4">
+                            <p class="text-center font-medium">3 列 (笔记本)</p>
+                        </div>
+                        <div class="bg-white rounded-lg shadow-md p-4">
+                            <p class="text-center font-medium">4 列 (桌面)</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 响应式排版示例 -->
+                <div class="animate-on-scroll">
+                    <h3 class="text-2xl font-semibold text-gray-900 mb-6 text-center">响应式排版</h3>
+                    <div class="bg-white rounded-lg shadow-md p-8 text-center">
+                        <h1 class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-2">响应式标题</h1>
+                        <p class="text-base sm:text-lg md:text-xl text-gray-600">响应式段落文本，在不同屏幕尺寸下自动调整大小</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 可访问性示例 - WCAG 标准 -->
+        <section id="accessibility" class="py-16 md:py-24 bg-white">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-16 animate-on-scroll">
+                    <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">可访问性最佳实践</h2>
+                    <p class="text-lg text-gray-600 max-w-3xl mx-auto">
+                        确保网站对所有用户都可访问，包括使用辅助技术的用户
+                    </p>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- 语义化HTML示例 -->
+                    <div class="card animate-on-scroll">
+                        <h3 class="text-xl font-semibold text-gray-900 mb-4">语义化 HTML</h3>
+                        <div class="bg-gray-50 rounded-md p-4 mb-4">
+                            <header class="text-lg font-medium text-gray-900 mb-2">页面头部</header>
+                            <nav class="mb-4">
+                                <ul class="flex space-x-4">
+                                    <li><a href="#" class="text-primary hover:underline">链接1</a></li>
+                                    <li><a href="#" class="text-primary hover:underline">链接2</a></li>
+                                </ul>
+                            </nav>
+                            <main class="mb-4">
+                                <h2 class="text-md font-medium text-gray-900 mb-2">主要内容</h2>
+                                <p class="text-gray-600">这是页面的主要内容区域</p>
+                            </main>
+                            <footer class="text-sm text-gray-500">页面底部</footer>
+                        </div>
+                        <p class="text-gray-600">使用语义化 HTML 元素提高可访问性</p>
+                    </div>
+                    
+                    <!-- 颜色对比度示例 -->
+                    <div class="card animate-on-scroll">
+                        <h3 class="text-xl font-semibold text-gray-900 mb-4">颜色对比度</h3>
+                        <div class="space-y-4">
+                            <div class="bg-white border border-gray-300 rounded-md p-4">
+                                <p class="text-gray-900 font-medium mb-1">良好的对比度</p>
+                                <p class="text-gray-900 bg-white">黑色文本在白色背景上</p>
+                                <p class="text-white bg-primary">白色文本在深蓝色背景上</p>
+                            </div>
+                            <div class="bg-white border border-gray-300 rounded-md p-4">
+                                <p class="text-gray-900 font-medium mb-1">不良的对比度</p>
+                                <p class="text-gray-400 bg-white">浅灰色文本在白色背景上</p>
+                                <p class="text-yellow-300 bg-white">浅黄色文本在白色背景上</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 键盘可访问性示例 -->
+                    <div class="card animate-on-scroll">
+                        <h3 class="text-xl font-semibold text-gray-900 mb-4">键盘可访问性</h3>
+                        <div class="space-y-3">
+                            <button class="btn-primary w-full focus:ring-2 focus:ring-primary/50 focus:outline-none">
+                                可通过键盘聚焦的按钮 (Tab键)
+                            </button>
+                            <a href="#" class="block text-center btn-secondary focus:ring-2 focus:ring-gray-400 focus:outline-none">
+                                可通过键盘聚焦的链接 (Tab键)
+                            </a>
+                            <div class="bg-gray-50 rounded-md p-4">
+                                <p class="text-sm text-gray-600">
+                                    <i class="fas fa-info-circle text-primary mr-2"></i>
+                                    所有交互元素都应支持键盘访问
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- ARIA 属性示例 -->
+                    <div class="card animate-on-scroll">
+                        <h3 class="text-xl font-semibold text-gray-900 mb-4">ARIA 属性</h3>
+                        <div role="dialog" aria-modal="true" aria-labelledby="modal-title" class="bg-gray-100 rounded-md p-4">
+                            <h4 id="modal-title" class="text-lg font-medium text-gray-900 mb-2">模态框标题</h4>
+                            <p class="text-gray-600 mb-3">这是一个带有 ARIA 属性的模态框示例</p>
+                            <button class="btn-primary" aria-label="关闭模态框">
+                                <i class="fas fa-times mr-2"></i> 关闭
+                            </button>
+                        </div>
+                        <p class="text-sm text-gray-600 mt-4">
+                            使用 ARIA 属性提高复杂组件的可访问性
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 性能优化示例 -->
+        <section id="performance" class="py-16 md:py-24 bg-gray-50">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-16 animate-on-scroll">
+                    <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">性能优化最佳实践</h2>
+                    <p class="text-lg text-gray-600 max-w-3xl mx-auto">
+                        优化 Tailwind CSS 应用的性能，提供更好的用户体验
+                    </p>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <!-- 内容可见性优化 -->
+                    <div class="card animate-on-scroll">
+                        <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4">
+                            <i class="fas fa-eye text-primary text-2xl"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold text-gray-900 mb-3">内容可见性</h3>
+                        <p class="text-gray-600 mb-4">
+                            使用 `content-visibility: auto` 优化长页面的渲染性能
+                        </p>
+                        <div class="bg-gray-50 rounded-md p-4">
+                            <p class="text-sm font-mono">.content-auto {</p>
+                            <p class="text-sm font-mono ml-4">content-visibility: auto;</p>
+                            <p class="text-sm font-mono">}</p>
+                        </div>
+                    </div>
+                    
+                    <!-- JIT 编译模式 -->
+                    <div class="card animate-on-scroll">
+                        <div class="w-16 h-16 bg-secondary/10 rounded-full flex items-center justify-center mb-4">
+                            <i class="fas fa-bolt text-secondary text-2xl"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold text-gray-900 mb-3">JIT 编译模式</h3>
+                        <p class="text-gray-600 mb-4">
+                            使用 JIT 编译模式只生成实际使用的工具类
+                        </p>
+                        <div class="bg-gray-50 rounded-md p-4">
+                            <p class="text-sm font-mono">// tailwind.config.js</p>
+                            <p class="text-sm font-mono">module.exports = {</p>
+                            <p class="text-sm font-mono ml-4">mode: 'jit',</p>
+                            <p class="text-sm font-mono ml-4">content: ['./src/**/*.{html,js}'],</p>
+                            <p class="text-sm font-mono">};</p>
+                        </div>
+                    </div>
+                    
+                    <!-- 响应式图片 -->
+                    <div class="card animate-on-scroll">
+                        <div class="w-16 h-16 bg-success/10 rounded-full flex items-center justify-center mb-4">
+                            <i class="fas fa-image text-success text-2xl"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold text-gray-900 mb-3">响应式图片</h3>
+                        <p class="text-gray-600 mb-4">
+                            使用响应式图片优化加载性能
+                        </p>
+                        <img src="https://picsum.photos/600/400?random=20" alt="响应式图片示例" class="w-full h-48 object-cover rounded-md">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 最佳实践总结 -->
+        <section class="py-16 md:py-24 bg-white">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-16 animate-on-scroll">
+                    <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">最佳实践总结</h2>
+                    <p class="text-lg text-gray-600 max-w-3xl mx-auto">
+                        总结 Tailwind CSS 开发中的核心最佳实践
+                    </p>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="bg-gray-50 rounded-lg p-6 animate-on-scroll">
+                        <h3 class="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+                            <i class="fas fa-code text-primary mr-2"></i>
+                            代码组织
+                        </h3>
+                        <ul class="space-y-3">
+                            <li class="flex items-start">
+                                <i class="fas fa-check text-green-500 mt-1 mr-3"></i>
+                                <span>保持一致的类名顺序</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-check text-green-500 mt-1 mr-3"></i>
+                                <span>使用分组和注释提高可读性</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-check text-green-500 mt-1 mr-3"></i>
+                                <span>提取重复的类组合为自定义工具类</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-check text-green-500 mt-1 mr-3"></i>
+                                <span>遵循移动优先的设计理念</span>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <div class="bg-gray-50 rounded-lg p-6 animate-on-scroll">
+                        <h3 class="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+                            <i class="fas fa-puzzle-piece text-secondary mr-2"></i>
+                            组件设计
+                        </h3>
+                        <ul class="space-y-3">
+                            <li class="flex items-start">
+                                <i class="fas fa-check text-green-500 mt-1 mr-3"></i>
+                                <span>创建原子化、可复用的组件</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-check text-green-500 mt-1 mr-3"></i>
+                                <span>使用状态变量管理组件状态</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-check text-green-500 mt-1 mr-3"></i>
+                                <span>保持组件的可配置性</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-check text-green-500 mt-1 mr-3"></i>
+                                <span>使用语义化 HTML 结构</span>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <div class="bg-gray-50 rounded-lg p-6 animate-on-scroll">
+                        <h3 class="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+                            <i class="fas fa-mobile-alt text-success mr-2"></i>
+                            响应式设计
+                        </h3>
+                        <ul class="space-y-3">
+                            <li class="flex items-start">
+                                <i class="fas fa-check text-green-500 mt-1 mr-3"></i>
+                                <span>采用移动优先的设计理念</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-check text-green-500 mt-1 mr-3"></i>
+                                <span>合理使用响应式断点</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-check text-green-500 mt-1 mr-3"></i>
+                                <span>使用响应式工具类适配不同屏幕</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-check text-green-500 mt-1 mr-3"></i>
+                                <span>测试在各种设备上的显示效果</span>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <div class="bg-gray-50 rounded-lg p-6 animate-on-scroll">
+                        <h3 class="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+                            <i class="fas fa-users text-danger mr-2"></i>
+                            可访问性
+                        </h3>
+                        <ul class="space-y-3">
+                            <li class="flex items-start">
+                                <i class="fas fa-check text-green-500 mt-1 mr-3"></i>
+                                <span>使用语义化 HTML 元素</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-check text-green-500 mt-1 mr-3"></i>
+                                <span>确保足够的颜色对比度</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-check text-green-500 mt-1 mr-3"></i>
+                                <span>提供适当的 ARIA 属性</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-check text-green-500 mt-1 mr-3"></i>
+                                <span>确保键盘可访问性</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 行动召唤 -->
+        <section class="py-16 md:py-24 bg-gradient-to-r from-primary to-secondary text-white">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center animate-on-scroll">
+                <h2 class="text-3xl md:text-4xl font-bold mb-4">开始使用 Tailwind CSS 最佳实践</h2>
+                <p class="text-lg md:text-xl mb-8 max-w-3xl mx-auto">
+                    将这些最佳实践应用到您的项目中，提高代码质量和用户体验
+                </p>
+                <a href="https://tailwindcss.com/docs" target="_blank" class="inline-block bg-white text-primary px-8 py-4 rounded-md font-medium hover:bg-opacity-90 transition-all transform hover:scale-105">
+                    <i class="fas fa-book mr-2"></i> 查看官方文档
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <!-- 页脚 - 语义化HTML -->
+    <footer class="bg-gray-800 text-white py-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div>
+                    <div class="flex items-center mb-4">
+                        <i class="fas fa-rocket text-primary text-2xl mr-2"></i>
+                        <span class="text-xl font-bold">TailwindBestPractices</span>
+                    </div>
+                    <p class="text-gray-400">学习和应用 Tailwind CSS 最佳实践，构建现代、高效的 Web 应用。</p>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">快速链接</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">首页</a></li>
+                        <li><a href="#components" class="text-gray-400 hover:text-white transition-colors">组件</a></li>
+                        <li><a href="#responsive" class="text-gray-400 hover:text-white transition-colors">响应式</a></li>
+                        <li><a href="#accessibility" class="text-gray-400 hover:text-white transition-colors">可访问性</a></li>
+                        <li><a href="#performance" class="text-gray-400 hover:text-white transition-colors">性能</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">资源</h3>
+                    <ul class="space-y-2">
+                        <li><a href="https://tailwindcss.com" target="_blank" class="text-gray-400 hover:text-white transition-colors">官方网站</a></li>
+                        <li><a href="https://tailwindcss.com/docs" target="_blank" class="text-gray-400 hover:text-white transition-colors">文档</a></li>
+                        <li><a href="https://github.com/tailwindlabs/tailwindcss" target="_blank" class="text-gray-400 hover:text-white transition-colors">GitHub</a></li>
+                        <li><a href="https://tailwindui.com" target="_blank" class="text-gray-400 hover:text-white transition-colors">Tailwind UI</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400">
+                <p>&copy; 2023 TailwindBestPractices. 保留所有权利.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript 代码 -->
+    <script>
+        // 页面加载完成后执行
+        document.addEventListener('DOMContentLoaded', function() {
+            // 添加滚动事件监听
+            window.addEventListener('scroll', handleScroll);
+            
+            // 初始化页面
+            initPage();
+        });
+        
+        // 处理滚动事件
+        function handleScroll() {
+            // 导航栏滚动效果
+            const header = document.querySelector('header');
+            if (window.scrollY > 50) {
+                header.classList.add('shadow-lg');
+            } else {
+                header.classList.remove('shadow-lg');
+            }
+            
+            // 元素进入视口时添加动画
+            const elements = document.querySelectorAll('.animate-on-scroll');
+            elements.forEach(element => {
+                const elementTop = element.getBoundingClientRect().top;
+                const elementVisible = 150;
+                if (elementTop < window.innerHeight - elementVisible) {
+                    element.classList.add('fade-in');
+                }
+            });
+        }
+        
+        // 初始化页面
+        function initPage() {
+            // 这里可以添加页面初始化逻辑
+        }
+    </script>
+</body>
+</html>

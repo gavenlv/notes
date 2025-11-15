@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tailwind CSS 性能优化示例</title>
+    
+    <!-- 使用 Tailwind CSS v3 CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- 引入 Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- 自定义 Tailwind 配置 -->
+    <script>
+        tailwind.config = {
+            content: [
+                "./index.html",
+                // 实际项目中应该包含所有需要扫描的文件
+            ],
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3b82f6',
+                        secondary: '#8b5cf6',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                    spacing: {
+                        '18': '4.5rem',
+                        '88': '22rem',
+                    },
+                },
+            },
+            plugins: [
+                // 自定义工具类插件
+                function({ addUtilities }) {
+                    const newUtilities = {
+                        '.content-auto': {
+                            'content-visibility': 'auto',
+                        },
+                        '.backdrop-blur': {
+                            'backdrop-filter': 'blur(8px)',
+                        },
+                    }
+                    addUtilities(newUtilities)
+                }
+            ],
+            // 禁用不需要的核心插件以减少 CSS 大小
+            corePlugins: {
+                preflight: false, // 禁用 Preflight
+                container: false, // 禁用容器插件
+                float: false, // 禁用浮动插件
+                clear: false, // 禁用清除浮动插件
+            }
+        }
+    </script>
+    
+    <!-- 内联关键 CSS -->
+    <style type="text/tailwindcss">
+        @layer utilities {
+            /* 自定义工具类 */
+            .text-shadow {
+                text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            }
+            .content-balance {
+                text-wrap: balance;
+            }
+        }
+    </style>
+    
+    <!-- 非关键 CSS 延迟加载 -->
+    <link rel="stylesheet" href="non-critical.css" media="print" onload="this.media='all'">
+</head>
+<body class="bg-gray-50 font-sans">
+    <!-- 头部 -->
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <i class="fas fa-rocket text-primary text-2xl mr-2"></i>
+                    <span class="text-xl font-bold text-gray-900">性能优化示例</span>
+                </div>
+                <nav class="flex items-center space-x-4">
+                    <a href="#optimization" class="text-gray-600 hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors">优化技术</a>
+                    <a href="#examples" class="text-gray-600 hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors">示例</a>
+                    <a href="#monitoring" class="text-gray-600 hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors">监控</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- 主要内容 -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- 英雄区域 -->
+        <section class="bg-gradient-to-r from-primary to-secondary text-white rounded-lg shadow-lg p-8 mb-12">
+            <h1 class="text-4xl md:text-5xl font-bold mb-4 content-balance">Tailwind CSS 性能优化</h1>
+            <p class="text-lg md:text-xl mb-8 opacity-90 content-balance">
+                学习如何优化 Tailwind CSS 应用的性能，从编译时到运行时的全面优化策略
+            </p>
+            <div class="flex flex-wrap gap-4">
+                <a href="#optimization" class="bg-white text-primary px-6 py-3 rounded-md font-medium hover:bg-opacity-90 transition-all transform hover:scale-105">
+                    <i class="fas fa-cogs mr-2"></i> 优化技术
+                </a>
+                <a href="#examples" class="bg-transparent border-2 border-white text-white px-6 py-3 rounded-md font-medium hover:bg-white hover:text-primary transition-all">
+                    <i class="fas fa-code mr-2"></i> 代码示例
+                </a>
+            </div>
+        </section>
+
+        <!-- 优化技术部分 -->
+        <section id="optimization" class="mb-16">
+            <h2 class="text-3xl font-bold text-gray-900 mb-8 flex items-center">
+                <i class="fas fa-cogs text-primary mr-3"></i>
+                核心优化技术
+            </h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- 编译时优化 -->
+                <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-primary">
+                    <h3 class="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+                        <i class="fas fa-compress-alt text-primary mr-2"></i>
+                        编译时优化
+                    </h3>
+                    <ul class="space-y-3">
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                            <span><strong>JIT 编译模式</strong>：只生成实际使用的工具类</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                            <span><strong>精确的内容配置</strong>：只扫描必要的文件</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                            <span><strong>核心插件优化</strong>：禁用不需要的插件</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                            <span><strong>树摇优化</strong>：消除未使用的 CSS</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                            <span><strong>安全列表配置</strong>：处理动态生成的类名</span>
+                        </li>
+                    </ul>
+                </div>
+                
+                <!-- 运行时优化 -->
+                <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-secondary">
+                    <h3 class="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+                        <i class="fas fa-bolt text-secondary mr-2"></i>
+                        运行时优化
+                    </h3>
+                    <ul class="space-y-3">
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                            <span><strong>CSS 拆分</strong>：按需加载 CSS</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                            <span><strong>关键 CSS 提取</strong>：优先加载关键样式</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                            <span><strong>减少重绘重排</strong>：使用 transform 和 opacity</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                            <span><strong>图片优化</strong>：响应式图片和懒加载</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                            <span><strong>浏览器缓存</strong>：利用缓存减少请求</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- 代码示例部分 -->
+        <section id="examples" class="mb-16">
+            <h2 class="text-3xl font-bold text-gray-900 mb-8 flex items-center">
+                <i class="fas fa-code text-primary mr-3"></i>
+                性能优化代码示例
+            </h2>
+            
+            <!-- 动态类名处理 -->
+            <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+                <h3 class="text-xl font-semibold text-gray-900 mb-4">动态类名处理</h3>
+                <div class="bg-gray-800 text-green-400 p-4 rounded-md font-mono text-sm mb-4 overflow-x-auto">
+                    <pre>// tailwind.config.js
+export default {
+  content: ["./src/**/*.{js,ts,jsx,tsx}"],
+  safelist: [
+    // 特定的工具类
+    'bg-blue-500',
+    'text-white',
+    // 使用模式匹配
+    { 
+      pattern: /bg-(red|green|blue)-(100|200|300|400|500)/,
+      variants: ['hover']
+    }
+  ]
+}</pre>
+                </div>
+                <div class="flex flex-wrap gap-4">
+                    <button id="dynamicBtn" class="px-4 py-2 rounded-md font-medium transition-all transform hover:scale-105">
+                        动态样式按钮
+                    </button>
+                </div>
+            </div>
+
+            <!-- 响应式图片 -->
+            <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+                <h3 class="text-xl font-semibold text-gray-900 mb-4">响应式图片优化</h3>
+                <div class="bg-gray-800 text-green-400 p-4 rounded-md font-mono text-sm mb-4 overflow-x-auto">
+                    <pre>&lt;picture&gt;
+  &lt;source type="image/avif" srcset="image.avif"&gt;
+  &lt;source type="image/webp" srcset="image.webp"&gt;
+  &lt;img src="image.jpg" alt="示例图片" 
+       class="w-full h-auto" 
+       loading="lazy"&gt;
+&lt;/picture&gt;</pre>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <picture>
+                        <source type="image/webp" srcset="https://picsum.photos/800/600.webp">
+                        <img src="https://picsum.photos/800/600" alt="示例图片 1" class="w-full h-auto rounded-md shadow-sm" loading="lazy">
+                    </picture>
+                    <picture>
+                        <source type="image/webp" srcset="https://picsum.photos/800/600?random=2.webp">
+                        <img src="https://picsum.photos/800/600?random=2" alt="示例图片 2" class="w-full h-auto rounded-md shadow-sm" loading="lazy">
+                    </picture>
+                </div>
+            </div>
+
+            <!-- 动画优化 -->
+            <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+                <h3 class="text-xl font-semibold text-gray-900 mb-4">动画性能优化</h3>
+                <div class="bg-gray-800 text-green-400 p-4 rounded-md font-mono text-sm mb-4 overflow-x-auto">
+                    <pre>&lt;!-- 好的做法：使用 transform 进行动画 --&gt;
+&lt;div class="transition-transform duration-300 hover:scale-105 will-change-transform"&gt;
+  动画元素
+&lt;/div&gt;</pre>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="bg-primary text-white p-6 rounded-lg shadow-md text-center transition-transform duration-300 hover:scale-105 will-change-transform">
+                        <i class="fas fa-bolt text-3xl mb-2"></i>
+                        <p>快速</p>
+                    </div>
+                    <div class="bg-secondary text-white p-6 rounded-lg shadow-md text-center transition-transform duration-300 hover:scale-105 will-change-transform">
+                        <i class="fas fa-rocket text-3xl mb-2"></i>
+                        <p>高效</p>
+                    </div>
+                    <div class="bg-green-500 text-white p-6 rounded-lg shadow-md text-center transition-transform duration-300 hover:scale-105 will-change-transform">
+                        <i class="fas fa-tachometer-alt text-3xl mb-2"></i>
+                        <p>流畅</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 内容可见性优化 -->
+            <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+                <h3 class="text-xl font-semibold text-gray-900 mb-4">内容可见性优化</h3>
+                <div class="bg-gray-800 text-green-400 p-4 rounded-md font-mono text-sm mb-4 overflow-x-auto">
+                    <pre>&lt;!-- 使用 content-visibility 提高渲染性能 --&gt;
+&lt;div class="content-auto p-4 border rounded-md"&gt;
+  长内容区域
+&lt;/div&gt;</pre>
+                </div>
+                <div class="space-y-4">
+                    <div class="content-auto p-4 border border-gray-200 rounded-md">
+                        <h4 class="font-semibold mb-2">内容区域 1</h4>
+                        <p class="text-gray-600">这是一个使用 content-auto 优化的内容区域。content-visibility 是一个 CSS 属性，可以控制元素的渲染过程，提高页面的初始加载性能。</p>
+                    </div>
+                    <div class="content-auto p-4 border border-gray-200 rounded-md">
+                        <h4 class="font-semibold mb-2">内容区域 2</h4>
+                        <p class="text-gray-600">这是一个使用 content-auto 优化的内容区域。content-visibility 是一个 CSS 属性，可以控制元素的渲染过程，提高页面的初始加载性能。</p>
+                    </div>
+                    <div class="content-auto p-4 border border-gray-200 rounded-md">
+                        <h4 class="font-semibold mb-2">内容区域 3</h4>
+                        <p class="text-gray-600">这是一个使用 content-auto 优化的内容区域。content-visibility 是一个 CSS 属性，可以控制元素的渲染过程，提高页面的初始加载性能。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 性能监控部分 -->
+        <section id="monitoring" class="mb-16">
+            <h2 class="text-3xl font-bold text-gray-900 mb-8 flex items-center">
+                <i class="fas fa-chart-line text-primary mr-3"></i>
+                性能监控与分析
+            </h2>
+            
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Lighthouse -->
+                    <div class="border border-gray-200 rounded-lg p-4 text-center">
+                        <i class="fas fa-search text-4xl text-primary mb-4"></i>
+                        <h3 class="text-lg font-semibold text-gray-900 mb-2">Lighthouse</h3>
+                        <p class="text-gray-600 mb-4">综合性性能分析工具，评估性能、可访问性、最佳实践等。</p>
+                        <a href="https://developers.google.com/web/tools/lighthouse" target="_blank" class="text-primary hover:underline">
+                            了解更多
+                        </a>
+                    </div>
+                    
+                    <!-- Chrome DevTools -->
+                    <div class="border border-gray-200 rounded-lg p-4 text-center">
+                        <i class="fas fa-code text-4xl text-secondary mb-4"></i>
+                        <h3 class="text-lg font-semibold text-gray-900 mb-2">Chrome DevTools</h3>
+                        <p class="text-gray-600 mb-4">提供强大的性能分析工具，包括 Performance、Network 等面板。</p>
+                        <a href="https://developer.chrome.com/docs/devtools/" target="_blank" class="text-primary hover:underline">
+                            了解更多
+                        </a>
+                    </div>
+                    
+                    <!-- Web Vitals -->
+                    <div class="border border-gray-200 rounded-lg p-4 text-center">
+                        <i class="fas fa-chart-bar text-4xl text-green-500 mb-4"></i>
+                        <h3 class="text-lg font-semibold text-gray-900 mb-2">Web Vitals</h3>
+                        <p class="text-gray-600 mb-4">一组关键性能指标，包括 LCP、FID、CLS，用于衡量用户体验。</p>
+                        <a href="https://web.dev/vitals/" target="_blank" class="text-primary hover:underline">
+                            了解更多
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 最佳实践总结 -->
+        <section class="mb-16">
+            <h2 class="text-3xl font-bold text-gray-900 mb-8 flex items-center">
+                <i class="fas fa-lightbulb text-primary mr-3"></i>
+                最佳实践总结
+            </h2>
+            
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <h3 class="text-xl font-semibold text-gray-900 mb-4">编译时最佳实践</h3>
+                        <ul class="space-y-2">
+                            <li class="flex items-start">
+                                <i class="fas fa-check text-green-500 mt-1 mr-2"></i>
+                                <span>始终启用 JIT 模式</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-check text-green-500 mt-1 mr-2"></i>
+                                <span>精确配置 content 路径</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-check text-green-500 mt-1 mr-2"></i>
+                                <span>根据需要启用/禁用核心插件</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-check text-green-500 mt-1 mr-2"></i>
+                                <span>使用 safelist 处理动态内容</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-check text-green-500 mt-1 mr-2"></i>
+                                <span>避免重复定义自定义工具类</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-semibold text-gray-900 mb-4">运行时最佳实践</h3>
+                        <ul class="space-y-2">
+                            <li class="flex items-start">
+                                <i class="fas fa-check text-green-500 mt-1 mr-2"></i>
+                                <span>拆分 CSS 并按需加载</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-check text-green-500 mt-1 mr-2"></i>
+                                <span>提取关键 CSS</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-check text-green-500 mt-1 mr-2"></i>
+                                <span>使用 transform 和 opacity 进行动画</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-check text-green-500 mt-1 mr-2"></i>
+                                <span>优化图片和媒体资源</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-check text-green-500 mt-1 mr-2"></i>
+                                <span>利用浏览器缓存</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="bg-gray-800 text-white py-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="mb-4 md:mb-0">
+                    <div class="flex items-center">
+                        <i class="fas fa-rocket text-primary text-2xl mr-2"></i>
+                        <span class="text-xl font-bold">Tailwind CSS 性能优化</span>
+                    </div>
+                    <p class="text-gray-400 mt-2">构建高性能的 Web 应用</p>
+                </div>
+                <div class="flex space-x-6">
+                    <a href="#optimization" class="text-gray-400 hover:text-white transition-colors">
+                        <i class="fas fa-cogs text-xl"></i>
+                    </a>
+                    <a href="#examples" class="text-gray-400 hover:text-white transition-colors">
+                        <i class="fas fa-code text-xl"></i>
+                    </a>
+                    <a href="#monitoring" class="text-gray-400 hover:text-white transition-colors">
+                        <i class="fas fa-chart-line text-xl"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400">
+                <p>&copy; 2023 Tailwind CSS 性能优化示例. 保留所有权利.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript 示例代码 -->
+    <script>
+        // 动态类名示例
+        const colors = ['red', 'green', 'blue', 'yellow', 'purple'];
+        const dynamicBtn = document.getElementById('dynamicBtn');
+        
+        dynamicBtn.addEventListener('click', () => {
+            // 随机选择颜色
+            const randomColor = colors[Math.floor(Math.random() * colors.length)];
+            // 动态更新类名
+            dynamicBtn.className = `bg-${randomColor}-500 text-white px-4 py-2 rounded-md font-medium transition-all transform hover:scale-105`;
+        });
+        
+        // 初始设置按钮样式
+        dynamicBtn.className = 'bg-blue-500 text-white px-4 py-2 rounded-md font-medium transition-all transform hover:scale-105';
+        
+        // 滚动性能优化
+        let ticking = false;
+        
+        function updateScroll() {
+            // 处理滚动事件
+            ticking = false;
+        }
+        
+        function requestTick() {
+            if (!ticking) {
+                requestAnimationFrame(updateScroll);
+                ticking = true;
+            }
+        }
+        
+        window.addEventListener('scroll', requestTick);
+    </script>
+</body>
+</html>

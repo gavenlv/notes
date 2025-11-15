@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ModernApp - 现代应用平台</title>
+    
+    <!-- 使用 Tailwind CSS v3 CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- 引入 Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- 自定义 Tailwind 配置 -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3b82f6',
+                        secondary: '#8b5cf6',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                },
+            },
+        }
+    </script>
+    
+    <!-- 自定义工具类 -->
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .text-shadow {
+                text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            }
+        }
+    </style>
+    
+    <!-- 自定义样式 -->
+    <style>
+        /* 自定义滚动条 */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+        
+        /* 平滑滚动 */
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        /* 动画效果 */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.6s ease-out forwards;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans">
+    <!-- 导航栏 -->
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <i class="fas fa-rocket text-primary text-2xl mr-2"></i>
+                    <span class="text-xl font-bold text-gray-900">ModernApp</span>
+                </div>
+                <nav class="flex items-center space-x-4">
+                    <a href="#" class="text-gray-600 hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors">首页</a>
+                    <a href="#about" class="text-gray-600 hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors">关于我们</a>
+                    <a href="#features" class="text-gray-600 hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors">功能特性</a>
+                    <a href="#pricing" class="text-gray-600 hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors">价格方案</a>
+                    <a href="#contact" class="bg-primary text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-primary/90 transition-colors">联系我们</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- 主要内容 -->
+    <main>
+        <!-- 英雄区域 -->
+        <section class="bg-gradient-to-r from-primary to-secondary text-white py-16 md:py-24">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+                    <div class="animate-on-scroll">
+                        <h1 class="text-4xl md:text-5xl font-bold mb-4 leading-tight">
+                            构建现代、高效的 Web 应用
+                        </h1>
+                        <p class="text-lg md:text-xl mb-8 text-white/90 leading-relaxed">
+                            ModernApp 提供一站式解决方案，帮助您快速构建美观、响应式的 Web 应用，提升用户体验和开发效率。
+                        </p>
+                        <div class="flex flex-wrap gap-4">
+                            <a href="#features" class="bg-white text-primary px-6 py-3 rounded-md font-medium hover:bg-opacity-90 transition-all transform hover:scale-105">
+                                <i class="fas fa-rocket mr-2"></i> 开始使用
+                            </a>
+                            <a href="#pricing" class="bg-transparent border-2 border-white text-white px-6 py-3 rounded-md font-medium hover:bg-white hover:text-primary transition-all">
+                                <i class="fas fa-tag mr-2"></i> 查看价格
+                            </a>
+                        </div>
+                    </div>
+                    <div class="animate-on-scroll">
+                        <div class="relative">
+                            <img src="https://picsum.photos/600/400?random=1" alt="ModernApp 展示" class="w-full rounded-lg shadow-2xl">
+                            <div class="absolute -top-6 -right-6 bg-white rounded-lg shadow-lg p-4">
+                                <div class="flex items-center">
+                                    <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mr-4">
+                                        <i class="fas fa-check text-green-500 text-xl"></i>
+                                    </div>
+                                    <div>
+                                        <p class="font-semibold">易于使用</p>
+                                        <p class="text-sm text-gray-500">快速上手，无需复杂配置</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="absolute -bottom-6 -left-6 bg-white rounded-lg shadow-lg p-4">
+                                <div class="flex items-center">
+                                    <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mr-4">
+                                        <i class="fas fa-mobile-alt text-blue-500 text-xl"></i>
+                                    </div>
+                                    <div>
+                                        <p class="font-semibold">响应式设计</p>
+                                        <p class="text-sm text-gray-500">完美适配各种设备</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 关于我们 -->
+        <section id="about" class="py-16 md:py-24 bg-white">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+                    <div class="animate-on-scroll">
+                        <img src="https://picsum.photos/600/400?random=2" alt="关于我们" class="w-full rounded-lg shadow-xl">
+                    </div>
+                    <div class="animate-on-scroll">
+                        <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">关于 ModernApp</h2>
+                        <p class="text-gray-600 mb-6 leading-relaxed">
+                            ModernApp 是一家专注于提供现代 Web 应用解决方案的技术公司。我们的团队由一群充满激情和创造力的开发者组成，致力于为客户提供高质量、高性能的 Web 应用。
+                        </p>
+                        <p class="text-gray-600 mb-8 leading-relaxed">
+                            我们相信技术的力量可以改变世界，因此我们不断探索和创新，将最新的技术应用到我们的产品中，为客户创造更大的价值。
+                        </p>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="flex items-center">
+                                <div class="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center mr-3">
+                                    <i class="fas fa-users text-primary"></i>
+                                </div>
+                                <div>
+                                    <p class="font-semibold text-gray-900">50+</p>
+                                    <p class="text-sm text-gray-500">专业团队</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center">
+                                <div class="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center mr-3">
+                                    <i class="fas fa-project-diagram text-primary"></i>
+                                </div>
+                                <div>
+                                    <p class="font-semibold text-gray-900">200+</p>
+                                    <p class="text-sm text-gray-500">成功项目</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center">
+                                <div class="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center mr-3">
+                                    <i class="fas fa-globe text-primary"></i>
+                                </div>
+                                <div>
+                                    <p class="font-semibold text-gray-900">50+</p>
+                                    <p class="text-sm text-gray-500">全球客户</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center">
+                                <div class="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center mr-3">
+                                    <i class="fas fa-award text-primary"></i>
+                                </div>
+                                <div>
+                                    <p class="font-semibold text-gray-900">10+</p>
+                                    <p class="text-sm text-gray-500">行业奖项</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 功能特性 -->
+        <section id="features" class="py-16 md:py-24 bg-gray-50">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-16 animate-on-scroll">
+                    <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">核心功能特性</h2>
+                    <p class="text-lg text-gray-600 max-w-3xl mx-auto">
+                        ModernApp 提供一系列强大的功能，帮助您构建现代化的 Web 应用
+                    </p>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <!-- 功能 1 -->
+                    <div class="bg-white rounded-lg shadow-md p-6 border-t-4 border-primary animate-on-scroll">
+                        <div class="w-14 h-14 bg-primary/10 rounded-full flex items-center justify-center mb-4">
+                            <i class="fas fa-paint-brush text-primary text-2xl"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold text-gray-900 mb-3">现代设计</h3>
+                        <p class="text-gray-600">
+                            采用最新的设计趋势，创建视觉吸引力强、用户友好的界面
+                        </p>
+                    </div>
+                    
+                    <!-- 功能 2 -->
+                    <div class="bg-white rounded-lg shadow-md p-6 border-t-4 border-secondary animate-on-scroll">
+                        <div class="w-14 h-14 bg-secondary/10 rounded-full flex items-center justify-center mb-4">
+                            <i class="fas fa-mobile-alt text-secondary text-2xl"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold text-gray-900 mb-3">响应式布局</h3>
+                        <p class="text-gray-600">
+                            完美适配各种设备，从移动电话到桌面电脑
+                        </p>
+                    </div>
+                    
+                    <!-- 功能 3 -->
+                    <div class="bg-white rounded-lg shadow-md p-6 border-t-4 border-green-500 animate-on-scroll">
+                        <div class="w-14 h-14 bg-green-100 rounded-full flex items-center justify-center mb-4">
+                            <i class="fas fa-bolt text-green-500 text-2xl"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold text-gray-900 mb-3">高性能</h3>
+                        <p class="text-gray-600">
+                            优化的代码和资源加载，确保快速的页面加载速度
+                        </p>
+                    </div>
+                    
+                    <!-- 功能 4 -->
+                    <div class="bg-white rounded-lg shadow-md p-6 border-t-4 border-yellow-500 animate-on-scroll">
+                        <div class="w-14 h-14 bg-yellow-100 rounded-full flex items-center justify-center mb-4">
+                            <i class="fas fa-cogs text-yellow-500 text-2xl"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold text-gray-900 mb-3">易于扩展</h3>
+                        <p class="text-gray-600">
+                            灵活的架构设计，便于扩展和定制功能
+                        </p>
+                    </div>
+                    
+                    <!-- 功能 5 -->
+                    <div class="bg-white rounded-lg shadow-md p-6 border-t-4 border-red-500 animate-on-scroll">
+                        <div class="w-14 h-14 bg-red-100 rounded-full flex items-center justify-center mb-4">
+                            <i class="fas fa-shield-alt text-red-500 text-2xl"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold text-gray-900 mb-3">安全可靠</h3>
+                        <p class="text-gray-600">
+                            内置安全功能，保护您的数据和用户信息
+                        </p>
+                    </div>
+                    
+                    <!-- 功能 6 -->
+                    <div class="bg-white rounded-lg shadow-md p-6 border-t-4 border-indigo-500 animate-on-scroll">
+                        <div class="w-14 h-14 bg-indigo-100 rounded-full flex items-center justify-center mb-4">
+                            <i class="fas fa-users text-indigo-500 text-2xl"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold text-gray-900 mb-3">团队协作</h3>
+                        <p class="text-gray-600">
+                            支持团队协作，提高开发效率
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 价格方案 -->
+        <section id="pricing" class="py-16 md:py-24 bg-white">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-16 animate-on-scroll">
+                    <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">灵活的价格方案</h2>
+                    <p class="text-lg text-gray-600 max-w-3xl mx-auto">
+                        选择适合您需求的价格方案，开始构建您的现代 Web 应用
+                    </p>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <!-- 基础版 -->
+                    <div class="bg-gray-50 rounded-lg shadow-md overflow-hidden animate-on-scroll">
+                        <div class="p-6">
+                            <h3 class="text-xl font-semibold text-gray-900 mb-2">基础版</h3>
+                            <p class="text-gray-600 mb-4">适合个人和小型项目</p>
+                            <div class="mb-6">
+                                <span class="text-4xl font-bold text-gray-900">¥99</span>
+                                <span class="text-gray-500">/月</span>
+                            </div>
+                            <ul class="space-y-3 mb-8">
+                                <li class="flex items-start">
+                                    <i class="fas fa-check text-green-500 mt-1 mr-2"></i>
+                                    <span>10GB 存储空间</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="fas fa-check text-green-500 mt-1 mr-2"></i>
+                                    <span>每月 100,000 次请求</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="fas fa-check text-green-500 mt-1 mr-2"></i>
+                                    <span>基础支持</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="fas fa-check text-green-500 mt-1 mr-2"></i>
+                                    <span>所有核心功能</span>
+                                </li>
+                            </ul>
+                            <a href="#" class="block w-full text-center bg-gray-200 text-gray-900 px-6 py-3 rounded-md font-medium hover:bg-gray-300 transition-colors">
+                                选择基础版
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <!-- 专业版 -->
+                    <div class="bg-white rounded-lg shadow-lg overflow-hidden border-2 border-primary transform scale-105 relative animate-on-scroll">
+                        <div class="absolute top-0 right-0 bg-primary text-white px-4 py-1 text-sm font-medium">
+                            推荐
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-xl font-semibold text-gray-900 mb-2">专业版</h3>
+                            <p class="text-gray-600 mb-4">适合中小型企业</p>
+                            <div class="mb-6">
+                                <span class="text-4xl font-bold text-gray-900">¥299</span>
+                                <span class="text-gray-500">/月</span>
+                            </div>
+                            <ul class="space-y-3 mb-8">
+                                <li class="flex items-start">
+                                    <i class="fas fa-check text-green-500 mt-1 mr-2"></i>
+                                    <span>100GB 存储空间</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="fas fa-check text-green-500 mt-1 mr-2"></i>
+                                    <span>每月 1,000,000 次请求</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="fas fa-check text-green-500 mt-1 mr-2"></i>
+                                    <span>优先支持</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="fas fa-check text-green-500 mt-1 mr-2"></i>
+                                    <span>所有核心功能</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="fas fa-check text-green-500 mt-1 mr-2"></i>
+                                    <span>高级分析</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="fas fa-check text-green-500 mt-1 mr-2"></i>
+                                    <span>API 访问</span>
+                                </li>
+                            </ul>
+                            <a href="#" class="block w-full text-center bg-primary text-white px-6 py-3 rounded-md font-medium hover:bg-primary/90 transition-colors">
+                                选择专业版
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <!-- 企业版 -->
+                    <div class="bg-gray-50 rounded-lg shadow-md overflow-hidden animate-on-scroll">
+                        <div class="p-6">
+                            <h3 class="text-xl font-semibold text-gray-900 mb-2">企业版</h3>
+                            <p class="text-gray-600 mb-4">适合大型企业和团队</p>
+                            <div class="mb-6">
+                                <span class="text-4xl font-bold text-gray-900">¥999</span>
+                                <span class="text-gray-500">/月</span>
+                            </div>
+                            <ul class="space-y-3 mb-8">
+                                <li class="flex items-start">
+                                    <i class="fas fa-check text-green-500 mt-1 mr-2"></i>
+                                    <span>无限存储空间</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="fas fa-check text-green-500 mt-1 mr-2"></i>
+                                    <span>无限请求</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="fas fa-check text-green-500 mt-1 mr-2"></i>
+                                    <span>24/7 专属支持</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="fas fa-check text-green-500 mt-1 mr-2"></i>
+                                    <span>所有核心功能</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="fas fa-check text-green-500 mt-1 mr-2"></i>
+                                    <span>高级分析</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="fas fa-check text-green-500 mt-1 mr-2"></i>
+                                    <span>API 访问</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="fas fa-check text-green-500 mt-1 mr-2"></i>
+                                    <span>定制开发</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="fas fa-check text-green-500 mt-1 mr-2"></i>
+                                    <span>单点登录</span>
+                                </li>
+                            </ul>
+                            <a href="#" class="block w-full text-center bg-gray-200 text-gray-900 px-6 py-3 rounded-md font-medium hover:bg-gray-300 transition-colors">
+                                选择企业版
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 客户评价 -->
+        <section class="py-16 md:py-24 bg-gray-50">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-16 animate-on-scroll">
+                    <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">客户评价</h2>
+                    <p class="text-lg text-gray-600 max-w-3xl mx-auto">
+                        听听我们的客户怎么说
+                    </p>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <!-- 评价 1 -->
+                    <div class="bg-white rounded-lg shadow-md p-6 animate-on-scroll">
+                        <div class="flex items-center mb-4">
+                            <div class="flex text-yellow-400">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                        </div>
+                        <p class="text-gray-600 mb-6">
+                            "ModernApp 帮助我们快速构建了一个现代化的网站，极大地提高了我们的开发效率。界面美观，功能强大，非常推荐！"
+                        </p>
+                        <div class="flex items-center">
+                            <img src="https://picsum.photos/50/50?random=10" alt="客户头像" class="w-12 h-12 rounded-full mr-4">
+                            <div>
+                                <p class="font-semibold text-gray-900">张三</p>
+                                <p class="text-sm text-gray-500">技术总监，科技公司</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 评价 2 -->
+                    <div class="bg-white rounded-lg shadow-md p-6 animate-on-scroll">
+                        <div class="flex items-center mb-4">
+                            <div class="flex text-yellow-400">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                        </div>
+                        <p class="text-gray-600 mb-6">
+                            "使用 ModernApp 后，我们的网站加载速度明显提升，用户体验得到了极大的改善。团队的技术支持也非常到位。"
+                        </p>
+                        <div class="flex items-center">
+                            <img src="https://picsum.photos/50/50?random=11" alt="客户头像" class="w-12 h-12 rounded-full mr-4">
+                            <div>
+                                <p class="font-semibold text-gray-900">李四</p>
+                                <p class="text-sm text-gray-500">产品经理，互联网公司</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 评价 3 -->
+                    <div class="bg-white rounded-lg shadow-md p-6 animate-on-scroll">
+                        <div class="flex items-center mb-4">
+                            <div class="flex text-yellow-400">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star-half-alt"></i>
+                            </div>
+                        </div>
+                        <p class="text-gray-600 mb-6">
+                            "ModernApp 的响应式设计非常出色，我们的网站在各种设备上都能完美展示。自定义功能也很强大，可以满足我们的特殊需求。"
+                        </p>
+                        <div class="flex items-center">
+                            <img src="https://picsum.photos/50/50?random=12" alt="客户头像" class="w-12 h-12 rounded-full mr-4">
+                            <div>
+                                <p class="font-semibold text-gray-900">王五</p>
+                                <p class="text-sm text-gray-500">CEO，创业公司</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 联系我们 -->
+        <section id="contact" class="py-16 md:py-24 bg-white">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-16 animate-on-scroll">
+                    <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">联系我们</h2>
+                    <p class="text-lg text-gray-600 max-w-3xl mx-auto">
+                        我们随时为您提供帮助，欢迎通过以下方式联系我们
+                    </p>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+                    <!-- 联系信息 -->
+                    <div class="animate-on-scroll">
+                        <div class="space-y-6">
+                            <div class="flex items-start">
+                                <div class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mr-4">
+                                    <i class="fas fa-map-marker-alt text-primary text-xl"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-semibold text-gray-900 mb-1">地址</h3>
+                                    <p class="text-gray-600">北京市朝阳区科技园区88号</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-start">
+                                <div class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mr-4">
+                                    <i class="fas fa-phone text-primary text-xl"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-semibold text-gray-900 mb-1">电话</h3>
+                                    <p class="text-gray-600">400-123-4567</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-start">
+                                <div class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mr-4">
+                                    <i class="fas fa-envelope text-primary text-xl"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-semibold text-gray-900 mb-1">邮箱</h3>
+                                    <p class="text-gray-600">info@modernapp.com</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-start">
+                                <div class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mr-4">
+                                    <i class="fas fa-clock text-primary text-xl"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-semibold text-gray-900 mb-1">工作时间</h3>
+                                    <p class="text-gray-600">周一至周五: 9:00 - 18:00</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-12">
+                            <h3 class="font-semibold text-gray-900 mb-4">关注我们</h3>
+                            <div class="flex space-x-4">
+                                <a href="#" class="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center hover:bg-primary hover:text-white transition-colors">
+                                    <i class="fab fa-weixin"></i>
+                                </a>
+                                <a href="#" class="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center hover:bg-primary hover:text-white transition-colors">
+                                    <i class="fab fa-weibo"></i>
+                                </a>
+                                <a href="#" class="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center hover:bg-primary hover:text-white transition-colors">
+                                    <i class="fab fa-github"></i>
+                                </a>
+                                <a href="#" class="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center hover:bg-primary hover:text-white transition-colors">
+                                    <i class="fab fa-linkedin"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 联系表单 -->
+                    <div class="animate-on-scroll">
+                        <form class="space-y-4">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label for="name" class="block text-sm font-medium text-gray-700 mb-1">姓名</label>
+                                    <input type="text" id="name" name="name" required class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-transparent transition-colors">
+                                </div>
+                                <div>
+                                    <label for="email" class="block text-sm font-medium text-gray-700 mb-1">邮箱</label>
+                                    <input type="email" id="email" name="email" required class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-transparent transition-colors">
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <label for="subject" class="block text-sm font-medium text-gray-700 mb-1">主题</label>
+                                <input type="text" id="subject" name="subject" required class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-transparent transition-colors">
+                            </div>
+                            
+                            <div>
+                                <label for="message" class="block text-sm font-medium text-gray-700 mb-1">消息</label>
+                                <textarea id="message" name="message" rows="5" required class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-transparent transition-colors"></textarea>
+                            </div>
+                            
+                            <button type="submit" class="w-full bg-primary text-white px-6 py-3 rounded-md font-medium hover:bg-primary/90 transition-colors transform hover:scale-105">
+                                <i class="fas fa-paper-plane mr-2"></i> 发送消息
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 行动召唤 -->
+        <section class="py-16 md:py-24 bg-gradient-to-r from-primary to-secondary text-white">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center animate-on-scroll">
+                <h2 class="text-3xl md:text-4xl font-bold mb-4">准备好开始了吗？</h2>
+                <p class="text-lg md:text-xl mb-8 max-w-3xl mx-auto">
+                    立即注册 ModernApp，开始构建您的现代 Web 应用
+                </p>
+                <div class="flex flex-wrap justify-center gap-4">
+                    <a href="#" class="bg-white text-primary px-8 py-4 rounded-md font-medium hover:bg-opacity-90 transition-all transform hover:scale-105">
+                        <i class="fas fa-user-plus mr-2"></i> 立即注册
+                    </a>
+                    <a href="#" class="bg-transparent border-2 border-white text-white px-8 py-4 rounded-md font-medium hover:bg-white hover:text-primary transition-all">
+                        <i class="fas fa-play mr-2"></i> 观看演示
+                    </a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="bg-gray-800 text-white py-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <div class="flex items-center mb-4">
+                        <i class="fas fa-rocket text-primary text-2xl mr-2"></i>
+                        <span class="text-xl font-bold">ModernApp</span>
+                    </div>
+                    <p class="text-gray-400">现代应用平台，为您提供高效、便捷的解决方案。</p>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">快速链接</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">首页</a></li>
+                        <li><a href="#about" class="text-gray-400 hover:text-white transition-colors">关于我们</a></li>
+                        <li><a href="#features" class="text-gray-400 hover:text-white transition-colors">功能特性</a></li>
+                        <li><a href="#pricing" class="text-gray-400 hover:text-white transition-colors">价格方案</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">联系我们</h3>
+                    <ul class="space-y-2">
+                        <li class="flex items-center"><i class="fas fa-map-marker-alt text-primary mr-2"></i> <span class="text-gray-400">北京市朝阳区科技园区</span></li>
+                        <li class="flex items-center"><i class="fas fa-phone text-primary mr-2"></i> <span class="text-gray-400">400-123-4567</span></li>
+                        <li class="flex items-center"><i class="fas fa-envelope text-primary mr-2"></i> <span class="text-gray-400">info@modernapp.com</span></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">关注我们</h3>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors"><i class="fab fa-weixin text-xl"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors"><i class="fab fa-weibo text-xl"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors"><i class="fab fa-github text-xl"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors"><i class="fab fa-linkedin text-xl"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400">
+                <p>&copy; 2023 ModernApp. 保留所有权利.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript 代码 -->
+    <script>
+        // 页面加载完成后执行
+        document.addEventListener('DOMContentLoaded', function() {
+            // 添加滚动事件监听
+            window.addEventListener('scroll', handleScroll);
+            
+            // 初始化页面
+            initPage();
+        });
+        
+        // 处理滚动事件
+        function handleScroll() {
+            // 导航栏滚动效果
+            const header = document.querySelector('header');
+            if (window.scrollY > 50) {
+                header.classList.add('shadow-md');
+            } else {
+                header.classList.remove('shadow-md');
+            }
+            
+            // 元素进入视口时添加动画
+            const elements = document.querySelectorAll('.animate-on-scroll');
+            elements.forEach(element => {
+                const elementTop = element.getBoundingClientRect().top;
+                const elementVisible = 150;
+                if (elementTop < window.innerHeight - elementVisible) {
+                    element.classList.add('fade-in');
+                }
+            });
+        }
+        
+        // 初始化页面
+        function initPage() {
+            // 初始化表单验证
+            initFormValidation();
+        }
+        
+        // 初始化表单验证
+        function initFormValidation() {
+            const forms = document.querySelectorAll('form');
+            forms.forEach(form => {
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    // 表单验证逻辑
+                    if (validateForm(this)) {
+                        // 提交表单
+                        submitForm(this);
+                    }
+                });
+            });
+        }
+        
+        // 验证表单
+        function validateForm(form) {
+            let isValid = true;
+            const inputs = form.querySelectorAll('input[required], textarea[required]');
+            
+            inputs.forEach(input => {
+                if (!input.value.trim()) {
+                    isValid = false;
+                    input.classList.add('border-red-500');
+                } else {
+                    input.classList.remove('border-red-500');
+                }
+            });
+            
+            return isValid;
+        }
+        
+        // 提交表单
+        function submitForm(form) {
+            // 模拟表单提交
+            const submitBtn = form.querySelector('button[type="submit"]');
+            const originalText = submitBtn.textContent;
+            
+            submitBtn.textContent = '提交中...';
+            submitBtn.disabled = true;
+            
+            setTimeout(() => {
+                submitBtn.textContent = '提交成功!';
+                setTimeout(() => {
+                    submitBtn.textContent = originalText;
+                    submitBtn.disabled = false;
+                    form.reset();
+                }, 2000);
+            }, 1500);
+        }
+    </script>
+</body>
+</html>

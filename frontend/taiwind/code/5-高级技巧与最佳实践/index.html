@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tailwind CSS 高级技巧与最佳实践</title>
+    <!-- 引入 Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入 Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- 配置 Tailwind CSS -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    // 自定义颜色
+                    colors: {
+                        primary: '#3B82F6',
+                        secondary: '#10B981',
+                        accent: '#F59E0B',
+                    },
+                    // 自定义字体
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                        display: ['"Playfair Display"', 'serif'],
+                    },
+                    // 自定义间距
+                    spacing: {
+                        '18': '4.5rem',
+                        '88': '22rem',
+                        '100': '25rem',
+                    },
+                    // 流体字体大小
+                    fontSize: {
+                        'fluid-sm': 'clamp(0.875rem, 2vw, 1rem)',
+                        'fluid-base': 'clamp(1rem, 4vw, 1.25rem)',
+                        'fluid-lg': 'clamp(1.25rem, 6vw, 1.75rem)',
+                        'fluid-xl': 'clamp(1.5rem, 8vw, 2.5rem)',
+                    },
+                },
+            },
+            plugins: [
+                // 自定义插件
+                function({ addUtilities }) {
+                    const newUtilities = {
+                        '.content-auto': {
+                            'content-visibility': 'auto',
+                        },
+                        '.backdrop-blur': {
+                            'backdrop-filter': 'blur(8px)',
+                        },
+                        '.text-shadow': {
+                            'text-shadow': '0 2px 4px rgba(0, 0, 0, 0.1)',
+                        },
+                        '.text-shadow-lg': {
+                            'text-shadow': '0 4px 8px rgba(0, 0, 0, 0.2)',
+                        },
+                        '.bg-gradient-blue': {
+                            'background': 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
+                        },
+                    }
+                    addUtilities(newUtilities)
+                }
+            ],
+        }
+    </script>
+    <!-- 自定义工具类 -->
+    <style type="text/tailwindcss">
+        @layer base {
+            h1 {
+                @apply text-fluid-xl font-bold;
+            }
+            h2 {
+                @apply text-fluid-lg font-bold;
+            }
+            h3 {
+                @apply text-lg font-semibold;
+            }
+        }
+        
+        @layer components {
+            .btn {
+                @apply px-4 py-2 rounded-md font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2;
+            }
+            
+            .btn-primary {
+                @apply bg-primary text-white hover:bg-primary/90 focus:ring-primary;
+            }
+            
+            .btn-secondary {
+                @apply bg-secondary text-white hover:bg-secondary/90 focus:ring-secondary;
+            }
+            
+            .btn-accent {
+                @apply bg-accent text-white hover:bg-accent/90 focus:ring-accent;
+            }
+            
+            .btn-outline {
+                @apply border border-gray-300 text-gray-700 hover:bg-gray-50 focus:ring-gray-500;
+            }
+            
+            .btn-sm {
+                @apply px-3 py-1 text-sm;
+            }
+            
+            .btn-lg {
+                @apply px-6 py-3 text-lg;
+            }
+            
+            .card {
+                @apply bg-white rounded-lg shadow-md overflow-hidden transition-all duration-300 hover:shadow-lg;
+            }
+            
+            .card-header {
+                @apply p-4 border-b border-gray-200;
+            }
+            
+            .card-body {
+                @apply p-4;
+            }
+            
+            .card-footer {
+                @apply p-4 border-t border-gray-200 bg-gray-50;
+            }
+            
+            .nav-link {
+                @apply px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-primary hover:bg-gray-100 transition-colors;
+            }
+            
+            .nav-link.active {
+                @apply text-primary bg-blue-50;
+            }
+        }
+        
+        @layer utilities {
+            .clip-path-polygon {
+                clip-path: polygon(0 0, 100% 0, 100% 80%, 0 100%);
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans text-gray-800">
+    <!-- 导航栏 -->
+    <nav class="bg-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo -->
+                <div class="flex items-center">
+                    <span class="text-xl font-bold text-primary">Tailwind 高级技巧</span>
+                </div>
+                
+                <!-- 桌面端导航 -->
+                <div class="hidden md:flex space-x-4">
+                    <a href="#config" class="nav-link active">配置优化</a>
+                    <a href="#responsive" class="nav-link">响应式设计</a>
+                    <a href="#components" class="nav-link">组件设计</a>
+                    <a href="#performance" class="nav-link">性能优化</a>
+                    <a href="#accessibility" class="nav-link">可访问性</a>
+                </div>
+                
+                <!-- 移动端菜单按钮 -->
+                <div class="md:hidden">
+                    <button id="mobile-menu-btn" class="inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:text-primary hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary">
+                        <span class="sr-only">打开主菜单</span>
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 移动端菜单 -->
+        <div id="mobile-menu" class="md:hidden hidden">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white border-t">
+                <a href="#config" class="nav-link active block">配置优化</a>
+                <a href="#responsive" class="nav-link block">响应式设计</a>
+                <a href="#components" class="nav-link block">组件设计</a>
+                <a href="#performance" class="nav-link block">性能优化</a>
+                <a href="#accessibility" class="nav-link block">可访问性</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 英雄区 -->
+    <section class="bg-gradient-blue text-white py-16 md:py-24">
+        <div class="container mx-auto px-4 text-center">
+            <h1 class="text-shadow-lg mb-4">Tailwind CSS 高级技巧与最佳实践</h1>
+            <p class="text-lg md:text-xl max-w-3xl mx-auto mb-8 text-white/90">
+                掌握 Tailwind CSS 的高级用法，创建更专业、可维护的现代 Web 界面
+            </p>
+            <div class="flex flex-col sm:flex-row justify-center gap-4">
+                <a href="#config" class="btn btn-accent btn-lg">开始学习</a>
+                <a href="#components" class="btn btn-outline bg-white/20 border-white/30 text-white hover:bg-white/30">查看示例</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- 配置优化部分 -->
+    <section id="config" class="py-12 md:py-16">
+        <div class="container mx-auto px-4">
+            <h2 class="text-center mb-10">配置优化与智能提示</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- 配置文件示例 -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3>优化的配置文件</h3>
+                    </div>
+                    <div class="card-body">
+                        <pre class="bg-gray-800 text-gray-100 p-4 rounded-md overflow-x-auto text-sm">
+<code>// tailwind.config.js
+module.exports = {
+  mode: 'jit',
+  content: [
+    './src/**/*.{html,js,jsx,ts,tsx}',
+  ],
+  theme: {
+    extend: {
+      colors: {
+        primary: '#3B82F6',
+        secondary: '#10B981',
+      },
+      fontFamily: {
+        sans: ['Inter', 'system-ui'],
+      },
+      fontSize: {
+        'fluid-lg': 'clamp(1.25rem, 6vw, 1.75rem)',
+      },
+    },
+  },
+  plugins: [
+    require('@tailwindcss/typography'),
+    require('@tailwindcss/forms'),
+  ],
+}</code></pre>
+                    </div>
+                </div>
+                
+                <!-- VS Code 配置示例 -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3>智能提示配置</h3>
+                    </div>
+                    <div class="card-body">
+                        <pre class="bg-gray-800 text-gray-100 p-4 rounded-md overflow-x-auto text-sm">
+<code>// .vscode/settings.json
+{
+  "tailwindCSS.includeLanguages": {
+    "html": "html",
+    "javascript": "javascript",
+    "javascriptreact": "javascriptreact",
+    "typescript": "typescript",
+    "typescriptreact": "typescriptreact"
+  },
+  "tailwindCSS.experimental.classRegex": [
+    ["classnames\\(([^)]*)\\)", "(['\\"])([^'\\"]*)['\\"]"],
+    ["clsx\\(([^)]*)\\)", "(['\\"])([^'\\"]*)['\\"]"]
+  ],
+  "editor.quickSuggestions": {
+    "strings": true
+  }
+}</code></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 响应式设计高级技巧 -->
+    <section id="responsive" class="py-12 md:py-16 bg-gray-100">
+        <div class="container mx-auto px-4">
+            <h2 class="text-center mb-10">响应式设计高级技巧</h2>
+            
+            <!-- 流体排版示例 -->
+            <div class="card mb-8">
+                <div class="card-header">
+                    <h3>流体排版</h3>
+                </div>
+                <div class="card-body">
+                    <div class="space-y-4">
+                        <h1 class="text-fluid-xl font-bold">这是一个流体标题</h1>
+                        <h2 class="text-fluid-lg font-bold">这是一个流体副标题</h2>
+                        <p class="text-fluid-base">这是流体正文文本，会根据视口大小自动调整字体大小，提供更好的阅读体验。</p>
+                        <p class="text-fluid-sm">这是流体小号文本，同样会根据视口大小自适应调整。</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 响应式栅格示例 -->
+            <div class="card mb-8">
+                <div class="card-header">
+                    <h3>响应式栅格布局</h3>
+                </div>
+                <div class="card-body">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                        <div class="bg-primary/10 p-4 rounded-lg text-center">
+                            <i class="fas fa-mobile-alt text-3xl text-primary mb-2"></i>
+                            <h4 class="font-medium">移动端</h4>
+                            <p class="text-sm text-gray-600">1列布局</p>
+                        </div>
+                        <div class="bg-primary/10 p-4 rounded-lg text-center">
+                            <i class="fas fa-tablet-alt text-3xl text-primary mb-2"></i>
+                            <h4 class="font-medium">平板</h4>
+                            <p class="text-sm text-gray-600">2列布局</p>
+                        </div>
+                        <div class="bg-primary/10 p-4 rounded-lg text-center">
+                            <i class="fas fa-laptop text-3xl text-primary mb-2"></i>
+                            <h4 class="font-medium">笔记本</h4>
+                            <p class="text-sm text-gray-600">3列布局</p>
+                        </div>
+                        <div class="bg-primary/10 p-4 rounded-lg text-center">
+                            <i class="fas fa-desktop text-3xl text-primary mb-2"></i>
+                            <h4 class="font-medium">桌面端</h4>
+                            <p class="text-sm text-gray-600">4列布局</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 响应式导航示例 -->
+            <div class="card">
+                <div class="card-header">
+                    <h3>响应式导航菜单</h3>
+                </div>
+                <div class="card-body">
+                    <nav class="bg-white shadow-md">
+                        <div class="container mx-auto px-4">
+                            <div class="flex justify-between items-center h-16">
+                                <div class="flex items-center">
+                                    <span class="text-xl font-bold text-primary">Logo</span>
+                                </div>
+                                
+                                <!-- 桌面端导航 -->
+                                <div class="hidden md:flex space-x-4">
+                                    <a href="#" class="nav-link active">首页</a>
+                                    <a href="#" class="nav-link">关于</a>
+                                    <a href="#" class="nav-link">服务</a>
+                                    <a href="#" class="nav-link">联系</a>
+                                </div>
+                                
+                                <!-- 移动端菜单按钮 -->
+                                <div class="md:hidden">
+                                    <button class="inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:text-primary hover:bg-gray-100">
+                                        <i class="fas fa-bars text-xl"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </nav>
+                    <p class="mt-4 text-sm text-gray-600">
+                        导航菜单在桌面端显示完整导航链接，在移动端显示汉堡菜单图标。
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 组件设计最佳实践 -->
+    <section id="components" class="py-12 md:py-16">
+        <div class="container mx-auto px-4">
+            <h2 class="text-center mb-10">组件设计最佳实践</h2>
+            
+            <!-- 按钮组件示例 -->
+            <div class="card mb-8">
+                <div class="card-header">
+                    <h3>按钮组件</h3>
+                </div>
+                <div class="card-body">
+                    <div class="flex flex-wrap gap-4 items-center justify-center">
+                        <button class="btn btn-primary">主要按钮</button>
+                        <button class="btn btn-secondary">次要按钮</button>
+                        <button class="btn btn-accent">强调按钮</button>
+                        <button class="btn btn-outline">轮廓按钮</button>
+                        <button class="btn btn-primary btn-sm">小按钮</button>
+                        <button class="btn btn-primary btn-lg">大按钮</button>
+                        <button class="btn btn-primary" disabled>禁用按钮</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 卡片组件示例 -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+                <div class="card">
+                    <div class="h-48 bg-gradient-to-r from-primary to-blue-600 flex items-center justify-center">
+                        <i class="fas fa-code text-5xl text-white/90"></i>
+                    </div>
+                    <div class="card-body">
+                        <h3 class="mb-2">代码示例</h3>
+                        <p class="text-gray-600 mb-4">这是一个代码示例卡片，展示了如何使用 Tailwind CSS 创建美观的界面。</p>
+                        <a href="#" class="text-primary font-medium flex items-center gap-1">
+                            查看详情 <i class="fas fa-arrow-right text-xs"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="h-48 bg-gradient-to-r from-secondary to-green-600 flex items-center justify-center">
+                        <i class="fas fa-mobile-alt text-5xl text-white/90"></i>
+                    </div>
+                    <div class="card-body">
+                        <h3 class="mb-2">响应式设计</h3>
+                        <p class="text-gray-600 mb-4">这是一个响应式设计卡片，展示了如何创建在各种设备上都能良好显示的界面。</p>
+                        <a href="#" class="text-primary font-medium flex items-center gap-1">
+                            查看详情 <i class="fas fa-arrow-right text-xs"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="h-48 bg-gradient-to-r from-accent to-yellow-600 flex items-center justify-center">
+                        <i class="fas fa-palette text-5xl text-white/90"></i>
+                    </div>
+                    <div class="card-body">
+                        <h3 class="mb-2">自定义主题</h3>
+                        <p class="text-gray-600 mb-4">这是一个自定义主题卡片，展示了如何定制 Tailwind CSS 的主题和样式。</p>
+                        <a href="#" class="text-primary font-medium flex items-center gap-1">
+                            查看详情 <i class="fas fa-arrow-right text-xs"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 表单组件示例 -->
+            <div class="card">
+                <div class="card-header">
+                    <h3>表单组件</h3>
+                </div>
+                <div class="card-body">
+                    <form class="max-w-md mx-auto space-y-4">
+                        <div>
+                            <label for="name" class="block text-sm font-medium text-gray-700 mb-1">姓名</label>
+                            <input type="text" id="name" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                        </div>
+                        <div>
+                            <label for="email" class="block text-sm font-medium text-gray-700 mb-1">邮箱</label>
+                            <input type="email" id="email" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                        </div>
+                        <div>
+                            <label for="message" class="block text-sm font-medium text-gray-700 mb-1">留言</label>
+                            <textarea id="message" rows="4" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"></textarea>
+                        </div>
+                        <div class="flex items-center">
+                            <input type="checkbox" id="subscribe" class="w-4 h-4 text-primary focus:ring-primary border-gray-300 rounded">
+                            <label for="subscribe" class="ml-2 block text-sm text-gray-700">订阅我们的 newsletter</label>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-full">提交表单</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 性能优化部分 -->
+    <section id="performance" class="py-12 md:py-16 bg-gray-100">
+        <div class="container mx-auto px-4">
+            <h2 class="text-center mb-10">性能优化技巧</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="flex items-center gap-2">
+                            <i class="fas fa-bolt text-yellow-500"></i> JIT 编译
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <p class="text-gray-600">启用 JIT 编译模式，只生成实际使用的 CSS 类，显著减少 CSS 文件大小。</p>
+                        <pre class="bg-gray-800 text-gray-100 p-3 rounded-md overflow-x-auto text-xs mt-3">
+<code>// tailwind.config.js
+module.exports = {
+  mode: 'jit',
+  content: [
+    './src/**/*.{html,js,jsx,ts,tsx}',
+  ],
+}</code></pre>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="flex items-center gap-2">
+                            <i class="fas fa-compress text-blue-500"></i> 按需加载
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <p class="text-gray-600">结合代码分割功能，按需加载 Tailwind 样式，减少初始加载时间。</p>
+                        <pre class="bg-gray-800 text-gray-100 p-3 rounded-md overflow-x-auto text-xs mt-3">
+<code>// React 中按需导入
+import './styles/tailwind.css';
+
+// 或者使用 CSS-in-JS
+import { tw } from 'twind';
+
+const Component = () => {
+  return &lt;div className={tw`bg-blue-500`}&gt;Hello&lt;/div&gt;;
+};</code></pre>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="flex items-center gap-2">
+                            <i class="fas fa-image text-green-500"></i> 图片优化
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <p class="text-gray-600">使用响应式图片和延迟加载技术，减少带宽消耗和加载时间。</p>
+                        <pre class="bg-gray-800 text-gray-100 p-3 rounded-md overflow-x-auto text-xs mt-3">
+<code>&lt;img src="small.jpg"
+     srcset="small.jpg 640w, medium.jpg 1280w"
+     sizes="(max-width: 640px) 100vw, 50vw"
+     loading="lazy"
+     alt="响应式图片"&gt;</code></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 可访问性部分 -->
+    <section id="accessibility" class="py-12 md:py-16">
+        <div class="container mx-auto px-4">
+            <h2 class="text-center mb-10">可访问性最佳实践</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h3>语义化 HTML</h3>
+                    </div>
+                    <div class="card-body">
+                        <p class="text-gray-600 mb-4">使用适当的语义化 HTML 标签，提高屏幕阅读器的可访问性。</p>
+                        <pre class="bg-gray-800 text-gray-100 p-4 rounded-md overflow-x-auto text-sm">
+<code>&lt;!-- 语义化导航 --&gt;
+&lt;nav aria-label="主导航"&gt;
+  &lt;ul&gt;
+    &lt;li&gt;&lt;a href="#" aria-current="page"&gt;首页&lt;/a&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a href="#"&gt;关于&lt;/a&gt;&lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/nav&gt;
+
+&lt;!-- 语义化卡片 --&gt;
+&lt;article class="card"&gt;
+  &lt;header&gt;&lt;h2&gt;卡片标题&lt;/h2&gt;&lt;/header&gt;
+  &lt;div&gt;卡片内容&lt;/div&gt;
+  &lt;footer&gt;卡片页脚&lt;/footer&gt;
+&lt;/article&gt;</code></pre>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <h3>颜色对比度与键盘导航</h3>
+                    </div>
+                    <div class="card-body">
+                        <p class="text-gray-600 mb-4">确保文本和背景之间有足够的对比度，并支持键盘导航。</p>
+                        <pre class="bg-gray-800 text-gray-100 p-4 rounded-md overflow-x-auto text-sm">
+<code>&lt;!-- 好的对比度 --&gt;
+&lt;div class="bg-white text-gray-800 p-4"&gt;
+  易于阅读的文本
+&lt;/div&gt;
+
+&lt;!-- 支持键盘导航 --&gt;
+&lt;button 
+  class="btn btn-primary"
+  tabindex="0"
+  aria-label="主要按钮"
+&gt;
+  主要按钮
+&lt;/button&gt;</code></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 页脚 -->
+    <footer class="bg-gray-800 text-white py-12">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div>
+                    <h3 class="text-xl font-bold mb-4">Tailwind CSS 高级技巧</h3>
+                    <p class="text-gray-400">掌握 Tailwind CSS 的高级用法，创建更专业、可维护的现代 Web 界面。</p>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">章节导航</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#config" class="text-gray-400 hover:text-white transition-colors">配置优化</a></li>
+                        <li><a href="#responsive" class="text-gray-400 hover:text-white transition-colors">响应式设计</a></li>
+                        <li><a href="#components" class="text-gray-400 hover:text-white transition-colors">组件设计</a></li>
+                        <li><a href="#performance" class="text-gray-400 hover:text-white transition-colors">性能优化</a></li>
+                        <li><a href="#accessibility" class="text-gray-400 hover:text-white transition-colors">可访问性</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">资源链接</h3>
+                    <ul class="space-y-2">
+                        <li><a href="https://tailwindcss.com/" target="_blank" rel="noopener noreferrer" class="text-gray-400 hover:text-white transition-colors flex items-center gap-1">
+                            <i class="fas fa-external-link-alt text-xs"></i> Tailwind CSS 官方文档
+                        </a></li>
+                        <li><a href="https://github.com/tailwindlabs/tailwindcss" target="_blank" rel="noopener noreferrer" class="text-gray-400 hover:text-white transition-colors flex items-center gap-1">
+                            <i class="fab fa-github text-xs"></i> GitHub 仓库
+                        </a></li>
+                        <li><a href="https://tailwindcss.com/docs" target="_blank" rel="noopener noreferrer" class="text-gray-400 hover:text-white transition-colors flex items-center gap-1">
+                            <i class="fas fa-book text-xs"></i> 学习资源
+                        </a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="mt-12 pt-8 border-t border-gray-700 text-center text-gray-400">
+                <p>&copy; 2023 Tailwind CSS 高级技巧与最佳实践. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script>
+        // 移动端菜单切换
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        
+        mobileMenuBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+        
+        // 平滑滚动
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                
+                const targetId = this.getAttribute('href');
+                const targetElement = document.querySelector(targetId);
+                
+                if (targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 80, // 考虑导航栏高度
+                        behavior: 'smooth'
+                    });
+                    
+                    // 关闭移动端菜单
+                    mobileMenu.classList.add('hidden');
+                    
+                    // 更新激活状态
+                    document.querySelectorAll('.nav-link').forEach(link => {
+                        link.classList.remove('active');
+                    });
+                    this.classList.add('active');
+                }
+            });
+        });
+        
+        // 导航栏滚动效果
+        window.addEventListener('scroll', () => {
+            const nav = document.querySelector('nav');
+            if (window.scrollY > 100) {
+                nav.classList.add('shadow-lg');
+            } else {
+                nav.classList.remove('shadow-lg');
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tailwind CSS 与框架集成示例</title>
+    <!-- 引入 Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入 Font Awesome -->
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <!-- 自定义 Tailwind 配置 -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3B82F6',
+                        secondary: '#10B981',
+                        accent: '#F59E0B',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                },
+            },
+            plugins: [
+                // 自定义插件：添加 content-auto 工具类
+                function({ addUtilities }) {
+                    addUtilities({
+                        '.content-auto': {
+                            'content-visibility': 'auto',
+                        },
+                        '.backdrop-blur': {
+                            'backdrop-filter': 'blur(8px)',
+                        },
+                    })
+                }
+            ]
+        }
+    </script>
+    <!-- 自定义工具类 -->
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .text-shadow {
+                text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            }
+        }
+        
+        @layer components {
+            .btn-primary {
+                @apply bg-primary hover:bg-primary/90 text-white font-medium py-2 px-4 rounded-md transition-colors;
+            }
+            
+            .btn-secondary {
+                @apply bg-secondary hover:bg-secondary/90 text-white font-medium py-2 px-4 rounded-md transition-colors;
+            }
+            
+            .card {
+                @apply bg-white rounded-lg shadow-md p-6;
+            }
+        }
+    </style>
+    <!-- 基础样式 -->
+    <style>
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+        }
+        
+        /* React 示例样式 */
+        #react-example {
+            display: none;
+        }
+        
+        /* Vue 示例样式 */
+        #vue-example {
+            display: none;
+        }
+        
+        /* Angular 示例样式 */
+        #angular-example {
+            display: none;
+        }
+        
+        /* 示例卡片激活状态 */
+        .example-card.active {
+            border-2 border-primary;
+            shadow-lg;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+    <!-- 导航栏 -->
+    <nav class="bg-white shadow-sm sticky top-0 z-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <i class="fa fa-code text-primary text-2xl mr-2"></i>
+                    <span class="text-xl font-bold text-gray-800">Tailwind CSS 与框架集成</span>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button id="react-tab" class="example-tab btn-primary">React</button>
+                    <button id="vue-tab" class="example-tab btn-secondary">Vue</button>
+                    <button id="angular-tab" class="example-tab bg-accent hover:bg-accent/90 text-white font-medium py-2 px-4 rounded-md transition-colors">Angular</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主内容区 -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- 介绍部分 -->
+        <section class="mb-12">
+            <div class="text-center">
+                <h1 class="text-4xl font-bold text-gray-900 mb-4">Tailwind CSS 与框架集成示例</h1>
+                <p class="text-lg text-gray-600 max-w-3xl mx-auto">
+                    本示例展示了 Tailwind CSS 如何与 React、Vue 和 Angular 三大主流前端框架集成。
+                    使用顶部的按钮切换不同框架的示例代码和效果。
+                </p>
+            </div>
+        </section>
+
+        <!-- React 示例 -->
+        <section id="react-example" class="example-section">
+            <div class="card mb-8">
+                <h2 class="text-2xl font-bold text-gray-900 mb-4 flex items-center">
+                    <i class="fa fa-react text-blue-500 mr-2"></i>
+                    React 集成示例
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- 示例效果 -->
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-800 mb-3">效果展示</h3>
+                        <div id="react-app" class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                            <!-- React 应用将在这里渲染 -->
+                        </div>
+                    </div>
+                    <!-- 示例代码 -->
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-800 mb-3">核心代码</h3>
+                        <pre class="bg-gray-800 text-white p-4 rounded-lg overflow-x-auto">
+<code>import React, { useState } from 'react';
+
+function App() {
+  const [count, setCount] = useState(0);
+
+  return (
+    <div className="min-h-screen bg-gray-50 p-6">
+      <div className="card">
+        <h1 className="text-2xl font-bold text-gray-800 mb-4">
+          React + Tailwind CSS
+        </h1>
+        <div className="flex items-center justify-center space-x-4 mb-4">
+          <button 
+            className="btn-primary"
+            onClick={() => setCount(count - 1)}
+          >
+            -
+          </button>
+          <span className="text-3xl font-bold text-gray-800">{count}</span>
+          <button 
+            className="btn-primary"
+            onClick={() => setCount(count + 1)}
+          >
+            +
+          </button>
+        </div>
+        <p className="text-gray-600 text-center">
+          这是一个使用 React 和 Tailwind CSS 构建的计数器应用
+        </p>
+      </div>
+    </div>
+  );
+}</code>
+                        </pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Vue 示例 -->
+        <section id="vue-example" class="example-section">
+            <div class="card mb-8">
+                <h2 class="text-2xl font-bold text-gray-900 mb-4 flex items-center">
+                    <i class="fa fa-vuejs text-green-500 mr-2"></i>
+                    Vue 集成示例
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- 示例效果 -->
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-800 mb-3">效果展示</h3>
+                        <div id="vue-app" class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                            <!-- Vue 应用将在这里渲染 -->
+                        </div>
+                    </div>
+                    <!-- 示例代码 -->
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-800 mb-3">核心代码</h3>
+                        <pre class="bg-gray-800 text-white p-4 rounded-lg overflow-x-auto">
+<code>&lt;template&gt;
+  &lt;div class="min-h-screen bg-gray-50 p-6"&gt;
+    &lt;div class="card"&gt;
+      &lt;h1 class="text-2xl font-bold text-gray-800 mb-4"&gt;
+        Vue + Tailwind CSS
+      &lt;/h1&gt;
+      &lt;div class="flex items-center justify-center space-x-4 mb-4"&gt;
+        &lt;button 
+          class="btn-primary"
+          @click="count--"
+        &gt;
+          -
+        &lt;/button&gt;
+        &lt;span class="text-3xl font-bold text-gray-800"&gt;{{ count }}&lt;/span&gt;
+        &lt;button 
+          class="btn-primary"
+          @click="count++"
+        &gt;
+          +
+        &lt;/button&gt;
+      &lt;/div&gt;
+      &lt;p class="text-gray-600 text-center"&gt;
+        这是一个使用 Vue 和 Tailwind CSS 构建的计数器应用
+      &lt;/p&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/template&gt;
+
+&lt;script setup&gt;
+import { ref } from 'vue'
+
+const count = ref(0)
+&lt;/script&gt;</code>
+                        </pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Angular 示例 -->
+        <section id="angular-example" class="example-section">
+            <div class="card mb-8">
+                <h2 class="text-2xl font-bold text-gray-900 mb-4 flex items-center">
+                    <i class="fa fa-angular text-red-500 mr-2"></i>
+                    Angular 集成示例
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- 示例效果 -->
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-800 mb-3">效果展示</h3>
+                        <div id="angular-app" class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                            <!-- Angular 应用将在这里渲染 -->
+                            <div class="min-h-screen bg-gray-50 p-6">
+                                <div class="card">
+                                    <h1 class="text-2xl font-bold text-gray-800 mb-4">
+                                        Angular + Tailwind CSS
+                                    </h1>
+                                    <div class="flex items-center justify-center space-x-4 mb-4">
+                                        <button 
+                                            class="btn-primary"
+                                            (click)="count--"
+                                        >
+                                            -
+                                        </button>
+                                        <span class="text-3xl font-bold text-gray-800">{{ 0 }}</span>
+                                        <button 
+                                            class="btn-primary"
+                                            (click)="count++"
+                                        >
+                                            +
+                                        </button>
+                                    </div>
+                                    <p class="text-gray-600 text-center">
+                                        这是一个使用 Angular 和 Tailwind CSS 构建的计数器应用
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 示例代码 -->
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-800 mb-3">核心代码</h3>
+                        <pre class="bg-gray-800 text-white p-4 rounded-lg overflow-x-auto">
+<code>&lt;!-- app.component.html --&gt;
+&lt;div class="min-h-screen bg-gray-50 p-6"&gt;
+  &lt;div class="card"&gt;
+    &lt;h1 class="text-2xl font-bold text-gray-800 mb-4"&gt;
+      Angular + Tailwind CSS
+    &lt;/h1&gt;
+    &lt;div class="flex items-center justify-center space-x-4 mb-4"&gt;
+      &lt;button 
+        class="btn-primary"
+        (click)="count--"
+      &gt;
+        -
+      &lt;/button&gt;
+      &lt;span class="text-3xl font-bold text-gray-800"&gt;{{ count }}&lt;/span&gt;
+      &lt;button 
+        class="btn-primary"
+        (click)="count++"
+      &gt;
+        +
+      &lt;/button&gt;
+    &lt;/div&gt;
+    &lt;p class="text-gray-600 text-center"&gt;
+      这是一个使用 Angular 和 Tailwind CSS 构建的计数器应用
+    &lt;/p&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;!-- app.component.ts --&gt;
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-root',
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.css']
+})
+export class AppComponent {
+  count = 0;
+}</code>
+                        </pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 集成指南 -->
+        <section class="mb-12">
+            <div class="card">
+                <h2 class="text-2xl font-bold text-gray-900 mb-4">集成指南</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- React 集成步骤 -->
+                    <div class="bg-blue-50 p-4 rounded-lg">
+                        <h3 class="text-lg font-semibold text-blue-800 mb-2 flex items-center">
+                            <i class="fa fa-react text-blue-500 mr-2"></i>
+                            React 集成步骤
+                        </h3>
+                        <ol class="list-decimal list-inside text-gray-700 space-y-1">
+                            <li>使用 Vite 创建 React 项目</li>
+                            <li>安装 Tailwind CSS 及其依赖</li>
+                            <li>初始化 Tailwind 配置</li>
+                            <li>配置内容路径</li>
+                            <li>导入 Tailwind 指令</li>
+                            <li>在组件中使用 Tailwind 类</li>
+                        </ol>
+                    </div>
+                    <!-- Vue 集成步骤 -->
+                    <div class="bg-green-50 p-4 rounded-lg">
+                        <h3 class="text-lg font-semibold text-green-800 mb-2 flex items-center">
+                            <i class="fa fa-vuejs text-green-500 mr-2"></i>
+                            Vue 集成步骤
+                        </h3>
+                        <ol class="list-decimal list-inside text-gray-700 space-y-1">
+                            <li>使用 Vite 创建 Vue 项目</li>
+                            <li>安装 Tailwind CSS 及其依赖</li>
+                            <li>初始化 Tailwind 配置</li>
+                            <li>配置内容路径</li>
+                            <li>导入 Tailwind 指令</li>
+                            <li>在组件中使用 Tailwind 类</li>
+                        </ol>
+                    </div>
+                    <!-- Angular 集成步骤 -->
+                    <div class="bg-red-50 p-4 rounded-lg">
+                        <h3 class="text-lg font-semibold text-red-800 mb-2 flex items-center">
+                            <i class="fa fa-angular text-red-500 mr-2"></i>
+                            Angular 集成步骤
+                        </h3>
+                        <ol class="list-decimal list-inside text-gray-700 space-y-1">
+                            <li>使用 Angular CLI 创建项目</li>
+                            <li>安装 Tailwind CSS 及其依赖</li>
+                            <li>初始化 Tailwind 配置</li>
+                            <li>配置 PostCSS</li>
+                            <li>导入 Tailwind 指令</li>
+                            <li>在组件中使用 Tailwind 类</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 最佳实践 -->
+        <section>
+            <div class="card">
+                <h2 class="text-2xl font-bold text-gray-900 mb-4">最佳实践</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-800 mb-2">组件设计</h3>
+                        <ul class="list-disc list-inside text-gray-700 space-y-1">
+                            <li>保持组件结构清晰，样式与逻辑分离</li>
+                            <li>使用语义化 HTML 标签</li>
+                            <li>遵循单一职责原则</li>
+                            <li>提取可复用的组件类</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-800 mb-2">样式管理</h3>
+                        <ul class="list-disc list-inside text-gray-700 space-y-1">
+                            <li>使用 @layer 指令组织样式</li>
+                            <li>自定义主题保持设计一致性</li>
+                            <li>避免内联样式，优先使用 Tailwind 类</li>
+                            <li>启用 JIT 模式提高性能</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="bg-gray-800 text-white py-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center">
+                <p class="text-gray-400">Tailwind CSS 与框架集成示例</p>
+                <p class="text-gray-500 text-sm mt-2">
+                    使用 React、Vue 和 Angular 构建现代化 Web 应用
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- 示例切换逻辑 -->
+    <script>
+        // 初始化：显示第一个示例
+        document.addEventListener('DOMContentLoaded', () => {
+            // 显示 React 示例
+            const reactExample = document.getElementById('react-example');
+            const reactTab = document.getElementById('react-tab');
+            if (reactExample && reactTab) {
+                reactExample.style.display = 'block';
+                reactTab.classList.add('active');
+            }
+            
+            // 渲染 React 示例
+            renderReactExample();
+            
+            // 渲染 Vue 示例
+            renderVueExample();
+        });
+        
+        // 切换示例
+        const exampleTabs = document.querySelectorAll('.example-tab');
+        const exampleSections = document.querySelectorAll('.example-section');
+        
+        exampleTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                // 移除所有激活状态
+                exampleTabs.forEach(t => {
+                    t.classList.remove('active');
+                });
+                exampleSections.forEach(s => {
+                    s.style.display = 'none';
+                });
+                
+                // 添加当前激活状态
+                tab.classList.add('active');
+                const tabId = tab.id;
+                const exampleId = tabId.replace('-tab', '-example');
+                const example = document.getElementById(exampleId);
+                if (example) {
+                    example.style.display = 'block';
+                }
+            });
+        });
+        
+        // 渲染 React 示例
+        function renderReactExample() {
+            // 简单的 React 模拟实现
+            const reactApp = document.getElementById('react-app');
+            if (reactApp) {
+                let count = 0;
+                
+                function updateCount(newCount) {
+                    count = newCount;
+                    render();
+                }
+                
+                function render() {
+                    reactApp.innerHTML = `
+                        <div class="min-h-screen bg-gray-50 p-6">
+                            <div class="card">
+                                <h1 class="text-2xl font-bold text-gray-800 mb-4">
+                                    React + Tailwind CSS
+                                </h1>
+                                <div class="flex items-center justify-center space-x-4 mb-4">
+                                    <button 
+                                        class="btn-primary"
+                                        onclick="updateCount(${count} - 1)"
+                                    >
+                                        -
+                                    </button>
+                                    <span class="text-3xl font-bold text-gray-800">${count}</span>
+                                    <button 
+                                        class="btn-primary"
+                                        onclick="updateCount(${count} + 1)"
+                                    >
+                                        +
+                                    </button>
+                                </div>
+                                <p class="text-gray-600 text-center">
+                                    这是一个使用 React 和 Tailwind CSS 构建的计数器应用
+                                </p>
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                render();
+            }
+        }
+        
+        // 渲染 Vue 示例
+        function renderVueExample() {
+            // 简单的 Vue 模拟实现
+            const vueApp = document.getElementById('vue-app');
+            if (vueApp) {
+                let count = 0;
+                
+                function updateCount(newCount) {
+                    count = newCount;
+                    render();
+                }
+                
+                function render() {
+                    vueApp.innerHTML = `
+                        <div class="min-h-screen bg-gray-50 p-6">
+                            <div class="card">
+                                <h1 class="text-2xl font-bold text-gray-800 mb-4">
+                                    Vue + Tailwind CSS
+                                </h1>
+                                <div class="flex items-center justify-center space-x-4 mb-4">
+                                    <button 
+                                        class="btn-primary"
+                                        onclick="updateCount(${count} - 1)"
+                                    >
+                                        -
+                                    </button>
+                                    <span class="text-3xl font-bold text-gray-800">${count}</span>
+                                    <button 
+                                        class="btn-primary"
+                                        onclick="updateCount(${count} + 1)"
+                                    >
+                                        +
+                                    </button>
+                                </div>
+                                <p class="text-gray-600 text-center">
+                                    这是一个使用 Vue 和 Tailwind CSS 构建的计数器应用
+                                </p>
+                            </div>
+                        </div>
+                    `;
+                    
+                    // 重新绑定事件
+                    const buttons = vueApp.querySelectorAll('button');
+                    buttons[0].onclick = () => updateCount(count - 1);
+                    buttons[1].onclick = () => updateCount(count + 1);
+                }
+                
+                render();
+            }
+        }
+    </script>
+</body>
+</html>
