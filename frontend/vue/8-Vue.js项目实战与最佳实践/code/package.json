@@ -1,0 +1,23 @@
+{
+  "name": "chapter8-vue-project",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build",
+    "lint": "vue-cli-service lint",
+    "test:unit": "vue-cli-service test:unit"
+  },
+  "dependencies": {
+    "vue": "^3.2.0",
+    "vue-router": "^4.0.0",
+    "pinia": "^2.0.0",
+    "axios": "^0.27.0",
+    "element-plus": "^2.2.0"
+  },
+  "devDependencies": {
+    "@vue/cli-service": "~5.0.0",
+    "@vue/test-utils": "^2.0.0",
+    "jest": "^27.0.0"
+  }
+}

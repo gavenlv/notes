@@ -1,0 +1,56 @@
+{
+  "name": "vue-ecosystem-integration",
+  "version": "1.0.0",
+  "description": "Vue.js生态系统与其他工具集成示例项目",
+  "main": "src/main.js",
+  "scripts": {
+    "dev": "vite",
+    "dev:mock": "concurrently \"node mock-server.js\" \"vite\"",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test:unit": "vitest",
+    "test:e2e": "playwright test",
+    "coverage": "vitest run --coverage",
+    "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore"
+  },
+  "dependencies": {
+    "axios": "^1.4.0",
+    "echarts": "^5.4.0",
+    "element-plus": "^2.3.0",
+    "pinia": "^2.1.0",
+    "vant": "^4.6.0",
+    "vue": "^3.3.0",
+    "vue-router": "^4.2.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.33.0",
+    "@types/node": "^20.1.0",
+    "@vitejs/plugin-vue": "^4.2.0",
+    "@vitejs/plugin-vue-jsx": "^3.0.0",
+    "@vue/test-utils": "^2.3.0",
+    "concurrently": "^9.2.1",
+    "cors": "^2.8.5",
+    "eslint": "^8.39.0",
+    "eslint-plugin-vue": "^9.11.0",
+    "express": "^5.1.0",
+    "jsdom": "^20.0.3",
+    "typescript": "^5.0.0",
+    "vite": "^4.3.0",
+    "vitest": "^0.31.0",
+    "vue-tsc": "^1.6.0"
+  },
+  "keywords": [
+    "vue",
+    "vue3",
+    "ecosystem",
+    "integration",
+    "typescript",
+    "vite",
+    "ssr",
+    "nuxt",
+    "mobile",
+    "testing"
+  ],
+  "author": "Your Name",
+  "license": "MIT"
+}
