@@ -1,0 +1,31 @@
+{
+  "name": "npm-basics-example",
+  "version": "1.0.0",
+  "description": "NPM基础入门示例项目",
+  "main": "chapter1-examples.js",
+  "scripts": {
+    "start": "node chapter1-examples.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "example": "node chapter1-examples.js"
+  },
+  "keywords": [
+    "npm",
+    "node",
+    "javascript",
+    "tutorial"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "dependencies": {
+    "lodash": "^4.17.21"
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yourusername/npm-basics-example.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/npm-basics-example/issues"
+  },
+  "homepage": "https://github.com/yourusername/npm-basics-example#readme"
+}

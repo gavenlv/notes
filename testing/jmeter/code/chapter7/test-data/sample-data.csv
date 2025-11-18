@@ -1,0 +1,11 @@
+username,password,email,product_id,category
+user1,pass123,user1@example.com,1001,electronics
+user2,pass456,user2@example.com,1002,books
+user3,pass789,user3@example.com,1003,clothing
+user4,pass101,user4@example.com,1004,home
+user5,pass112,user5@example.com,1005,sports
+user6,pass131,user6@example.com,1006,electronics
+user7,pass415,user7@example.com,1007,books
+user8,pass161,user8@example.com,1008,clothing
+user9,pass718,user9@example.com,1009,home
+user10,pass192,user10@example.com,1010,sports
