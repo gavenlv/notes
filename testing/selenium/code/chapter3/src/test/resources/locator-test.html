@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>元素定位测试页面</title>
+    <style>
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+        }
+        .section {
+            margin-bottom: 30px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .highlight {
+            background-color: #ffffcc;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, select, textarea {
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+        }
+        button {
+            padding: 8px 15px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .notification {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            display: none;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>元素定位测试页面</h1>
+        <p>此页面用于演示Selenium的各种元素定位方式。</p>
+        
+        <!-- 基本元素定位 -->
+        <div class="section" id="basic-locators">
+            <h2>基本元素定位</h2>
+            
+            <div id="by-id">通过ID定位的元素</div>
+            
+            <p class="highlight">通过类名定位的元素</p>
+            
+            <p name="by-name" data-test="locator-test">通过name属性定位的元素</p>
+            
+            <div class="tag-name">通过标签名定位的元素</div>
+            
+            <a href="https://www.example.com" title="链接示例">通过链接文本定位的元素</a>
+            
+            <a href="https://www.selenium.dev" title="Selenium官网">通过部分链接文本定位的元素</a>
+            
+            <div css-selector="special">通过CSS选择器定位的元素</div>
+            
+            <div>xpath-test="/html/body/div[2]/h2[1]">通过XPath定位的元素</div>
+        </div>
+        
+        <!-- 表单元素 -->
+        <div class="section" id="form-elements">
+            <h2>表单元素</h2>
+            
+            <form id="test-form">
+                <div class="form-group">
+                    <label for="username">用户名:</label>
+                    <input type="text" id="username" name="username" placeholder="请输入用户名">
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">密码:</label>
+                    <input type="password" id="password" name="password" placeholder="请输入密码">
+                </div>
+                
+                <div class="form-group">
+                    <label for="email">邮箱:</label>
+                    <input type="email" id="email" name="email" placeholder="请输入邮箱">
+                </div>
+                
+                <div class="form-group">
+                    <label>性别:</label>
+                    <input type="radio" id="male" name="gender" value="male">
+                    <label for="male">男</label>
+                    <input type="radio" id="female" name="gender" value="female">
+                    <label for="female">女</label>
+                </div>
+                
+                <div class="form-group">
+                    <label>兴趣:</label>
+                    <input type="checkbox" id="reading" name="interests" value="reading">
+                    <label for="reading">阅读</label>
+                    <input type="checkbox" id="sports" name="interests" value="sports">
+                    <label for="sports">运动</label>
+                    <input type="checkbox" id="music" name="interests" value="music">
+                    <label for="music">音乐</label>
+                </div>
+                
+                <div class="form-group">
+                    <label for="country">国家:</label>
+                    <select id="country" name="country">
+                        <option value="">请选择</option>
+                        <option value="china">中国</option>
+                        <option value="usa">美国</option>
+                        <option value="uk">英国</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="message">留言:</label>
+                    <textarea id="message" name="message" rows="4" cols="50"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <button type="button" id="submit-btn">提交</button>
+                    <button type="button" id="reset-btn">重置</button>
+                    <button type="button" id="cancel-btn">取消</button>
+                </div>
+            </form>
+        </div>
+        
+        <!-- 表格元素 -->
+        <div class="section" id="table-elements">
+            <h2>表格元素</h2>
+            
+            <table id="data-table">
+                <thead>
+                    <tr>
+                        <th>姓名</th>
+                        <th>年龄</th>
+                        <th>城市</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr id="row1">
+                        <td>张三</td>
+                        <td>28</td>
+                        <td>北京</td>
+                        <td><button class="edit-btn">编辑</button> <button class="delete-btn">删除</button></td>
+                    </tr>
+                    <tr id="row2">
+                        <td>李四</td>
+                        <td>32</td>
+                        <td>上海</td>
+                        <td><button class="edit-btn">编辑</button> <button class="delete-btn">删除</button></td>
+                    </tr>
+                    <tr id="row3">
+                        <td>王五</td>
+                        <td>25</td>
+                        <td>广州</td>
+                        <td><button class="edit-btn">编辑</button> <button class="delete-btn">删除</button></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- 相对定位测试 -->
+        <div class="section" id="relative-locators">
+            <h2>相对定位测试</h2>
+            
+            <div>
+                <span id="reference-element">参考元素</span>
+                <p>参考元素上方的元素</p>
+                <p>参考元素</p>
+                <p>参考元素下方的元素</p>
+                <div>
+                    <span>参考元素左侧的元素</span>
+                    <span>参考元素</span>
+                    <span>参考元素右侧的元素</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 隐藏和动态元素 -->
+        <div class="section" id="dynamic-elements">
+            <h2>隐藏和动态元素</h2>
+            
+            <div>
+                <button id="show-hidden-btn" onclick="document.getElementById('hidden-element').style.display='block'">显示隐藏元素</button>
+                <div id="hidden-element" style="display: none;">这是初始隐藏的元素</div>
+            </div>
+            
+            <div>
+                <button id="add-element-btn" onclick="addElement()">添加动态元素</button>
+                <div id="dynamic-container"></div>
+            </div>
+        </div>
+        
+        <!-- 通知消息 -->
+        <div id="notification" class="notification"></div>
+    </div>
+    
+    <script>
+        // 添加动态元素
+        function addElement() {
+            const container = document.getElementById('dynamic-container');
+            const newElement = document.createElement('div');
+            newElement.className = 'dynamic-element';
+            newElement.textContent = '动态添加的元素: ' + new Date().toLocaleTimeString();
+            container.appendChild(newElement);
+            
+            showNotification('已添加新元素');
+        }
+        
+        // 表单提交
+        document.getElementById('submit-btn').addEventListener('click', function() {
+            const username = document.getElementById('username').value;
+            if (username) {
+                showNotification('表单提交成功: ' + username, 'success');
+            } else {
+                showNotification('请填写用户名');
+            }
+        });
+        
+        // 表单重置
+        document.getElementById('reset-btn').addEventListener('click', function() {
+            document.getElementById('test-form').reset();
+            showNotification('表单已重置');
+        });
+        
+        // 表单取消
+        document.getElementById('cancel-btn').addEventListener('click', function() {
+            showNotification('操作已取消');
+        });
+        
+        // 显示通知
+        function showNotification(message, type = 'info') {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = 'notification ' + type;
+            notification.style.display = 'block';
+            
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 3000);
+        }
+        
+        // 表格操作
+        document.querySelectorAll('.edit-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const row = this.closest('tr');
+                const name = row.querySelector('td:first-child').textContent;
+                showNotification('编辑: ' + name);
+            });
+        });
+        
+        document.querySelectorAll('.delete-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const row = this.closest('tr');
+                const name = row.querySelector('td:first-child').textContent;
+                showNotification('删除: ' + name);
+                row.style.display = 'none';
+            });
+        });
+        
+        // 页面加载完成
+        document.addEventListener('DOMContentLoaded', function() {
+            showNotification('页面加载完成', 'success');
+        });
+    </script>
+</body>
+</html>
