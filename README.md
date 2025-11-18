@@ -1,261 +1,84 @@
 # 学习笔记仓库
 
-本仓库包含各种技术学习笔记和文档，涵盖云原生、数据工程、商业智能、前端开发、测试、运维等多个技术领域。
+这是一个全面的技术学习笔记仓库，涵盖了多个技术领域的学习资料，从基础入门到高级实战，适合不同水平的学习者参考。
 
-## 📁 目录结构总览
+## 📚 目录结构
 
 ### 🎯 面试相关 (Interview)
-- [base](Interview/base/) - 基础面试题
-  - [docker_k8s.md](Interview/base/docker_k8s.md) - Docker和Kubernetes面试题
-- [bi](Interview/bi/) - 商业智能面试题
-- [clickhouse](Interview/clickhouse/) - ClickHouse数据库面试题
-  - [clickhouse_monitor.md](Interview/clickhouse/clickhouse_monitor.md) - 监控相关
-  - [clickhouse_operation.md](Interview/clickhouse/clickhouse_operation.md) - 运维相关
-  - [clickhouse_product_best_practice.md](Interview/clickhouse/clickhouse_product_best_practice.md) - 产品最佳实践
-  - [clickouse_dba.md](Interview/clickhouse/clickouse_dba.md) - DBA相关
-- [frontend](Interview/frontend/) - 前端面试题
-  - [react.md](Interview/frontend/react.md) - React面试题
-- [frontend-interview](Interview/frontend-interview/) - 前端面试题扩展
-  - [README.md](Interview/frontend-interview/README.md) - 前端面试题概览
-  - [advanced-interview-questions.md](Interview/frontend-interview/advanced-interview-questions.md) - 高级面试题
-  - [coding-challenges.md](Interview/frontend-interview/coding-challenges.md) - 编码挑战
-  - [core-knowledge.md](Interview/frontend-interview/core-knowledge.md) - 核心知识
-- [java](Interview/java/) - Java面试题
-  - [java_advance.md](Interview/java/java_advance.md) - Java高级面试题
-- [python](Interview/python/) - Python面试题
-  - [python.md](Interview/python/python.md) - Python基础面试题
-  - [python_flask.md](Interview/python/python_flask.md) - Flask框架面试题
-  - [python_project.md](Interview/python/python_project.md) - 项目相关面试题
-- [softskill](Interview/softskill/) - 软技能面试题
-  - [problem_solving.md](Interview/softskill/problem_solving.md) - 问题解决能力
-- [README.md](Interview/README.md) - 面试相关文档总览
+- [README.md](Interview/README.md) - 面试相关学习笔记概览
+- [base](Interview/base/) - 基础面试知识
+- [bi](Interview/bi/) - 商业智能面试
+- [clickhouse](Interview/clickhouse/) - ClickHouse数据库面试
+- [frontend](Interview/frontend/) - 前端开发面试
+- [frontend-interview](Interview/frontend-interview/) - 前端面试专题
+- [java](Interview/java/) - Java编程面试
+- [python](Interview/python/) - Python编程面试
+- [softskill](Interview/softskill/) - 软技能面试
 
-### 📊 商业智能 (BI)
+### 📊 商业智能 (bi)
 - [birt](bi/birt/) - BIRT报表工具
-  - [README.md](bi/birt/README.md) - BIRT学习笔记
 - [jasper](bi/jasper/) - JasperReports报表工具
-  - [README.md](bi/jasper/README.md) - JasperReports学习笔记
-- [metabase](bi/metabase/) - Metabase数据分析工具
-  - [README.md](bi/metabase/README.md) - Metabase学习笔记
-- [qlik_sense](bi/qlik_sense/) - Qlik Sense商业智能平台
-  - [README.md](bi/qlik_sense/README.md) - Qlik Sense学习笔记
-  - [1-Qlik_Sense概述与环境搭建.md](bi/qlik_sense/1-Qlik_Sense概述与环境搭建.md) - 概述与环境搭建
-  - [2-数据加载基础.md](bi/qlik_sense/2-数据加载基础.md) - 数据加载基础
-  - [3-数据模型设计.md](bi/qlik_sense/3-数据模型设计.md) - 数据模型设计
-  - [4-脚本编程深入.md](bi/qlik_sense/4-脚本编程深入.md) - 脚本编程深入
-  - [5-数据转换与清洗.md](bi/qlik_sense/5-数据转换与清洗.md) - 数据转换与清洗
-  - [6-可视化设计.md](bi/qlik_sense/6-可视化设计.md) - 可视化设计
-  - [7-表达式与集合分析.md](bi/qlik_sense/7-表达式与集合分析.md) - 表达式与集合分析
-  - [8-高级分析技术.md](bi/qlik_sense/8-高级分析技术.md) - 高级分析技术
-  - [9-性能优化与架构.md](bi/qlik_sense/9-性能优化与架构.md) - 性能优化与架构
-  - [10-安全与治理.md](bi/qlik_sense/10-安全与治理.md) - 安全与治理
-  - [11-企业级应用开发.md](bi/qlik_sense/11-企业级应用开发.md) - 企业级应用开发
-  - [12-实战项目.md](bi/qlik_sense/12-实战项目.md) - 实战项目
+- [metabase](bi/metabase/) - Metabase商业智能平台
+- [qlik_sense](bi/qlik_sense/) - Qlik Sense数据分析平台
 - [superset](bi/superset/) - Apache Superset数据可视化平台
-  - [README.md](bi/superset/README.md) - Superset学习笔记
-  - [day01-installation.md](bi/superset/day01-installation.md) - 安装指南
-  - [day02-introduction.md](bi/superset/day02-introduction.md) - 功能介绍
-  - [day03-configuration.md](bi/superset/day03-configuration.md) - 配置详解
-  - [day04-security.md](bi/superset/day04-security.md) - 安全配置
-  - [day05-dashboards.md](bi/superset/day05-dashboards.md) - 仪表板创建
-  - [day06-charts.md](bi/superset/day06-charts.md) - 图表制作
-  - [day07-sql-lab.md](bi/superset/day07-sql-lab.md) - SQL实验室
-  - [day08-data-sources.md](bi/superset/day08-data-sources.md) - 数据源配置
-  - [day09-advanced-analytics.md](bi/superset/day09-advanced-analytics.md) - 高级分析
-  - [day10-performance-optimization.md](bi/superset/day10-performance-optimization.md) - 性能优化
-  - [day11-caching-query-optimization.md](bi/superset/day11-caching-query-optimization.md) - 缓存与查询优化
-  - [day12-alerts-notifications.md](bi/superset/day12-alerts-notifications.md) - 告警通知
-  - [day13-custom-visualizations.md](bi/superset/day13-custom-visualizations.md) - 自定义可视化
-  - [day14-e2e-testing.md](bi/superset/day14-e2e-testing.md) - 端到端测试
-  - [day15-plugin-development.md](bi/superset/day15-plugin-development.md) - 插件开发
-  - [superset-enhancement.md](bi/superset/superset-enhancement.md) - 功能增强
-  - [superset-enhancement-english.md](bi/superset/superset-enhancement-english.md) - 功能增强(英文版)
-- [superset_zh](bi/superset_zh/) - Apache Superset中文文档
-  - [README.md](bi/superset_zh/README.md) - Superset中文文档
-  - [day01-installation.md](bi/superset_zh/day01-installation.md) - 安装指南
-  - [day02-introduction.md](bi/superset_zh/day02-introduction.md) - 功能介绍
-  - [day03-configuration.md](bi/superset_zh/day03-configuration.md) - 配置详解
-  - [day04-security.md](bi/superset_zh/day04-security.md) - 安全配置
-  - [day05-dashboards.md](bi/superset_zh/day05-dashboards.md) - 仪表板创建
-  - [day06-charts.md](bi/superset_zh/day06-charts.md) - 图表制作
-  - [day07-sql-lab.md](bi/superset_zh/day07-sql-lab.md) - SQL实验室
-  - [day08-data-connections.md](bi/superset_zh/day08-data-connections.md) - 数据连接
-  - [day12-alerts-notifications.md](bi/superset_zh/day12-alerts-notifications.md) - 告警通知
-  - [day13-deployment-strategy.md](bi/superset_zh/day13-deployment-strategy.md) - 部署策略
-  - [day14-monitoring-logging.md](bi/superset_zh/day14-monitoring-logging.md) - 监控日志
-  - [day15-backup-recovery.md](bi/superset_zh/day15-backup-recovery.md) - 备份恢复
-  - [day16-best-practices-case-studies.md](bi/superset_zh/day16-best-practices-case-studies.md) - 最佳实践案例
-- [tableau](bi/tableau/) - Tableau数据可视化工具
-  - [README.md](bi/tableau/README.md) - Tableau学习笔记
+- [superset_zh](bi/superset_zh/) - Superset中文资源
+- [tableau](bi/tableau/) - Tableau数据可视化
 
 ### 📝 博客文章 (blogs)
 - [README.md](blogs/README.md) - 博客文章概览
 - [clickhouse-tiering-storage.md](blogs/clickhouse-tiering-storage.md) - ClickHouse分层存储方案
 
+### 💼 业务知识 (business-knowledge)
+- [banking](business-knowledge/banking/) - 银行业务知识
+- [cfa](business-knowledge/cfa/) - CFA金融分析师知识
+
+### 🗄️ ClickHouse数据库 (clickhouse)
+- [clickhouse_monitor.md](clickhouse/clickhouse_monitor.md) - ClickHouse监控
+- [clickhouse_operation.md](clickhouse/clickhouse_operation.md) - ClickHouse运维
+- [clickhouse_product_best_practice.md](clickhouse/clickhouse_product_best_practice.md) - ClickHouse产品最佳实践
+- [clickouse_dba.md](clickhouse/clickouse_dba.md) - ClickHouse DBA指南
+
 ### ☁️ 云原生技术 (cloud)
 - [bigquery](cloud/bigquery/) - Google BigQuery数据仓库
-  - [README.md](cloud/bigquery/README.md) - BigQuery学习笔记
-  - [00-overview.md](cloud/bigquery/00-overview.md) - 概述
-  - [01-getting-started.md](cloud/bigquery/01-getting-started.md) - 入门指南
-  - [02-working-principles.md](cloud/bigquery/02-working-principles.md) - 工作原理
-  - [03-best-practices.md](cloud/bigquery/03-best-practices.md) - 最佳实践
-  - [04-cost-optimization.md](cloud/bigquery/04-cost-optimization.md) - 成本优化
-  - [05-practical-examples.md](cloud/bigquery/05-practical-examples.md) - 实践案例
 - [devContainer](cloud/devContainer/) - 开发容器环境
-  - [README.md](cloud/devContainer/README.md) - 开发容器学习笔记
-  - [01-基础概念.md](cloud/devContainer/01-基础概念.md) - 基础概念
-  - [02-配置文件详解.md](cloud/devContainer/02-配置文件详解.md) - 配置文件详解
-  - [03-多语言开发环境配置.md](cloud/devContainer/03-多语言开发环境配置.md) - 多语言环境配置
-  - [04-高级特性和最佳实践.md](cloud/devContainer/04-高级特性和最佳实践.md) - 高级特性与最佳实践
-  - [05-实战项目案例.md](cloud/devContainer/05-实战项目案例.md) - 实战项目案例
-  - [SUMMARY.md](cloud/devContainer/SUMMARY.md) - 内容总结
 - [docker](cloud/docker/) - Docker容器技术
-  - [README.md](cloud/docker/README.md) - Docker学习笔记
-  - [CHAPTERS_OUTLINE.md](cloud/docker/CHAPTERS_OUTLINE.md) - 章节大纲
-  - [COMPLETION_SUMMARY.md](cloud/docker/COMPLETION_SUMMARY.md) - 完成总结
-  - [INDEX.md](cloud/docker/INDEX.md) - 索引
-  - [PROJECT_STATUS.md](cloud/docker/PROJECT_STATUS.md) - 项目状态
-  - [QUICK_START.md](cloud/docker/QUICK_START.md) - 快速开始
 - [gcp](cloud/gcp/) - Google Cloud Platform
-  - [README.md](cloud/gcp/README.md) - GCP学习笔记
-  - [01-基础概念与平台介绍.md](cloud/gcp/01-基础概念与平台介绍.md) - 基础概念
-  - [02-核心计算服务详解.md](cloud/gcp/02-核心计算服务详解.md) - 计算服务
-  - [03-存储与数据库服务.md](cloud/gcp/03-存储与数据库服务.md) - 存储与数据库
-  - [04-网络与安全服务.md](cloud/gcp/04-网络与安全服务.md) - 网络与安全
-  - [05-数据与机器学习服务.md](cloud/gcp/05-数据与机器学习服务.md) - 数据与机器学习
-- [helm](cloud/helm/) - Kubernetes包管理工具
-  - [README.md](cloud/helm/README.md) - Helm学习笔记
-  - [01-基础概念.md](cloud/helm/01-基础概念.md) - 基础概念
-  - [02-Chart开发详解.md](cloud/helm/02-Chart开发详解.md) - Chart开发
-  - [03-高级特性与模板引擎.md](cloud/helm/03-高级特性与模板引擎.md) - 高级特性
-  - [04-Helm部署策略.md](cloud/helm/04-Helm部署策略.md) - 部署策略
-  - [05-企业级最佳实践.md](cloud/helm/05-企业级最佳实践.md) - 企业级最佳实践
-  - [SUMMARY.md](cloud/helm/SUMMARY.md) - 内容总结
-- [kubernetes](cloud/kubernetes/) - Kubernetes容器编排平台
-  - [README.md](cloud/kubernetes/README.md) - Kubernetes学习笔记
-  - [GITHUB_PUSH_GUIDE.md](cloud/kubernetes/GITHUB_PUSH_GUIDE.md) - GitHub推送指南
-  - [GITHUB_REPO.md](cloud/kubernetes/GITHUB_REPO.md) - GitHub仓库说明
-  - [SAMPLE_CODE.md](cloud/kubernetes/SAMPLE_CODE.md) - 示例代码
-  - [SUMMARY.md](cloud/kubernetes/SUMMARY.md) - 内容总结
+- [helm](cloud/helm/) - Helm包管理器
+- [kubernetes](cloud/kubernetes/) - Kubernetes容器编排
 
 ### 🔧 通用工具 (common)
 - [json](common/json/) - JSON数据处理
-  - [README.md](common/json/README.md) - JSON学习笔记
 - [xpath](common/xpath/) - XPath查询语言
-  - [README.md](common/xpath/README.md) - XPath学习笔记
-  - [1-XPath简介与基础语法.md](common/xpath/1-XPath简介与基础语法.md) - 简介与基础语法
-  - [2-XPath路径表达式.md](common/xpath/2-XPath路径表达式.md) - 路径表达式
-  - [3-XPath轴与节点测试.md](common/xpath/3-XPath轴与节点测试.md) - 轴与节点测试
-  - [4-XPath函数详解.md](common/xpath/4-XPath函数详解.md) - 函数详解
-  - [5-XPath高级应用.md](common/xpath/5-XPath高级应用.md) - 高级应用
-  - [6-XPath在不同语言中的应用.md](common/xpath/6-XPath在不同语言中的应用.md) - 多语言应用
-  - [7-XPath性能优化与最佳实践.md](common/xpath/7-XPath性能优化与最佳实践.md) - 性能优化
-  - [8-XPath实战案例.md](common/xpath/8-XPath实战案例.md) - 实战案例
-  - [QUICK_START.md](common/xpath/QUICK_START.md) - 快速开始
-- [yml](common/yml/) - YAML配置语言
-  - [README.md](common/yml/README.md) - YAML学习笔记
-  - [1-基础入门.md](common/yml/1-基础入门.md) - 基础入门
-  - [2-数据类型与结构.md](common/yml/2-数据类型与结构.md) - 数据类型
-  - [3-高级特性.md](common/yml/3-高级特性.md) - 高级特性
-  - [4-实战应用.md](common/yml/4-实战应用.md) - 实战应用
-  - [resources.md](common/yml/resources.md) - 资源列表
+- [yml](common/yml/) - YAML配置文件
 
-### 📊 数据管理 (data-management)
+### 📋 数据管理 (data-management)
 - [governance](data-management/governance/) - 数据治理
 - [lineage](data-management/lineage/) - 数据血缘
 - [metadata](data-management/metadata/) - 元数据管理
 - [modeling](data-management/modeling/) - 数据建模
-  - [1-数据建模基础概念与入门.md](data-management/modeling/1-数据建模基础概念与入门.md) - 基础概念
-  - [2-数据建模方法论与设计原则.md](data-management/modeling/2-数据建模方法论与设计原则.md) - 方法论与设计原则
-  - [3-关系型数据建模.md](data-management/modeling/3-关系型数据建模.md) - 关系型数据建模
-  - [4-非关系型数据建模.md](data-management/modeling/4-非关系型数据建模.md) - 非关系型数据建模
-  - [5-数据仓库建模.md](data-management/modeling/5-数据仓库建模.md) - 数据仓库建模
-  - [6-数据湖与湖仓一体建模.md](data-management/modeling/6-数据湖与湖仓一体建模.md) - 数据湖与湖仓一体
-  - [7-实时数据建模.md](data-management/modeling/7-实时数据建模.md) - 实时数据建模
-  - [8-数据建模工具与实践.md](data-management/modeling/8-数据建模工具与实践.md) - 工具与实践
-  - [9-数据建模最佳实践与性能优化.md](data-management/modeling/9-数据建模最佳实践与性能优化.md) - 最佳实践与优化
 - [quality](data-management/quality/) - 数据质量
-  - [README.md](data-management/quality/README.md) - 数据质量学习笔记
-  - [1-数据质量基础概念与重要性.md](data-management/quality/1-数据质量基础概念与重要性.md) - 基础概念
-  - [2-数据质量问题识别与分类.md](data-management/quality/2-数据质量问题识别与分类.md) - 问题识别与分类
-  - [3-数据质量评估指标与测量方法.md](data-management/quality/3-数据质量评估指标与测量方法.md) - 评估指标与方法
-  - [4-数据清洗与预处理技术.md](data-management/quality/4-数据清洗与预处理技术.md) - 数据清洗与预处理
-  - [5-数据验证与质量规则.md](data-management/quality/5-数据验证与质量规则.md) - 验证与规则
-  - [6-数据质量监控与告警机制.md](data-management/quality/6-数据质量监控与告警机制.md) - 监控与告警
-  - [7-数据质量工具与平台选型.md](data-management/quality/7-数据质量工具与平台选型.md) - 工具与平台选型
-  - [8-数据质量最佳实践与案例研究.md](data-management/quality/8-数据质量最佳实践与案例研究.md) - 最佳实践与案例
-  - [9-数据质量治理与组织架构.md](data-management/quality/9-数据质量治理与组织架构.md) - 治理与组织架构
-  - [10-数据质量未来趋势与新技术.md](data-management/quality/10-数据质量未来趋势与新技术.md) - 未来趋势与新技术
-  - [data_quality_learning_path.md](data-management/quality/data_quality_learning_path.md) - 学习路径
-  - [PROJECT_COMPLETION_REPORT.md](data-management/quality/PROJECT_COMPLETION_REPORT.md) - 项目完成报告
-  - [PROJECT_STRUCTURE_REPORT.csv](data-management/quality/PROJECT_STRUCTURE_REPORT.csv) - 项目结构报告
-  - [PROJECT_SUMMARY.md](data-management/quality/PROJECT_SUMMARY.md) - 项目总结
 
-### 🔄 数据处理 (data-processing)
-- [目录为空，待完善]
+### ⚙️ 数据处理 (data-processing)
 
-### 📈 数据工程 (data)
-- [airflow](data/airflow/) - Apache Airflow工作流管理
-  - [README.md](data/airflow/README.md) - Airflow学习笔记
-  - [PROGRESS.md](data/airflow/PROGRESS.md) - 进度跟踪
+### 🗃️ 数据技术 (data)
+- [airflow](data/airflow/) - Apache Airflow工作流调度
 - [clickhouse](data/clickhouse/) - ClickHouse列式数据库
-  - [README.md](data/clickhouse/README.md) - ClickHouse学习笔记
 - [data-management](data/data-management/) - 数据管理
-  - [README.md](data/data-management/README.md) - 数据管理学习笔记
-- [data-quality](data/data-quality/) - 数据质量管理
-  - [README.md](data/data-quality/README.md) - 数据质量学习笔记
-  - [CLEANUP_SUMMARY.md](data/data-quality/CLEANUP_SUMMARY.md) - 清理总结
-  - [QUICK_START.md](data/data-quality/QUICK_START.md) - 快速开始
-  - [REFACTOR_SUMMARY.md](data/data-quality/REFACTOR_SUMMARY.md) - 重构总结
-  - [SECURITY_AND_TABLE_RULES_ENHANCEMENT.md](data/data-quality/SECURITY_AND_TABLE_RULES_ENHANCEMENT.md) - 安全与表规则增强
-- [dolphinscheduler](data/dolphinscheduler/) - Apache DolphinScheduler工作流调度
-  - [README.md](data/dolphinscheduler/README.md) - DolphinScheduler学习笔记
-  - [1-DolphinScheduler简介与安装.md](data/dolphinscheduler/1-DolphinScheduler简介与安装.md) - 简介与安装
-  - [2-系统架构与核心概念.md](data/dolphinscheduler/2-系统架构与核心概念.md) - 架构与概念
-  - [3-安装与部署指南.md](data/dolphinscheduler/3-安装与部署指南.md) - 安装部署
-  - [4-项目管理与权限控制.md](data/dolphinscheduler/4-项目管理与权限控制.md) - 项目管理
-  - [5-工作流设计与任务配置.md](data/dolphinscheduler/5-工作流设计与任务配置.md) - 工作流设计
-  - [6-任务调度与监控.md](data/dolphinscheduler/6-任务调度与监控.md) - 任务调度
-  - [7-数据源管理与资源中心.md](data/dolphinscheduler/7-数据源管理与资源中心.md) - 数据源管理
-  - [8-API使用与扩展开发.md](data/dolphinscheduler/8-API使用与扩展开发.md) - API与扩展开发
+- [data-quality](data/data-quality/) - 数据质量
+- [dolphinscheduler](data/dolphinscheduler/) - Apache DolphinScheduler调度系统
 - [doris](data/doris/) - Apache Doris分析型数据库
-- [flink](data/flink/) - Apache Flink流处理框架
-  - [README.md](data/flink/README.md) - Flink学习笔记
+- [flink](data/flink/) - Apache Flink流处理
 - [kafka](data/kafka/) - Apache Kafka消息队列
-  - [README.md](data/kafka/README.md) - Kafka学习笔记
-- [mongodb](data/mongodb/) - MongoDB文档数据库
-  - [README.md](data/mongodb/README.md) - MongoDB学习笔记
+- [mongodb-notes](data/mongodb-notes/) - MongoDB文档数据库
 - [mysql](data/mysql/) - MySQL关系型数据库
-  - [README.md](data/mysql/README.md) - MySQL学习笔记
 - [postgresql](data/postgresql/) - PostgreSQL关系型数据库
-  - [README.md](data/postgresql/README.md) - PostgreSQL学习笔记
 - [python-data-quality](data/python-data-quality/) - Python数据质量工具
-  - [README.md](data/python-data-quality/README.md) - Python数据质量工具
-  - [QUICK_START.md](data/python-data-quality/QUICK_START.md) - 快速开始
-  - [RULES_GUIDE.md](data/python-data-quality/RULES_GUIDE.md) - 规则指南
-  - [USAGE_EXAMPLES.md](data/python-data-quality/USAGE_EXAMPLES.md) - 使用示例
-- [rabbitmq](data/rabbitmq/) - RabbitMQ消息代理
-  - [README.md](data/rabbitmq/README.md) - RabbitMQ学习笔记
+- [rabbitmq](data/rabbitmq/) - RabbitMQ消息中间件
 - [redis](data/redis/) - Redis内存数据库
-  - [README.md](data/redis/README.md) - Redis学习笔记
-  - [1-Redis简介与安装.md](data/redis/1-Redis简介与安装.md) - 简介与安装
-  - [2-Redis数据结构与命令.md](data/redis/2-Redis数据结构与命令.md) - 数据结构与命令
-  - [3-Redis持久化与复制.md](data/redis/3-Redis持久化与复制.md) - 持久化与复制
-  - [4-Redis高级特性与事务.md](data/redis/4-Redis高级特性与事务.md) - 高级特性与事务
-  - [5-Redis集群与高可用.md](data/redis/5-Redis集群与高可用.md) - 集群与高可用
-  - [6-Redis性能优化与监控.md](data/redis/6-Redis性能优化与监控.md) - 性能优化与监控
-  - [7-Redis性能优化与监控.md](data/redis/7-Redis性能优化与监控.md) - 性能优化与监控(补充)
-  - [8-Redis应用场景与最佳实践.md](data/redis/8-Redis应用场景与最佳实践.md) - 应用场景与最佳实践
-  - [9-Redis经典场景实现.md](data/redis/9-Redis经典场景实现.md) - 经典场景实现
-- [soda-data-quality](data/soda-data-quality/) - Soda数据质量工具
-  - [README.md](data/soda-data-quality/README.md) - Soda数据质量工具
-  - [CLICKHOUSE_SSL_GUIDE.md](data/soda-data-quality/CLICKHOUSE_SSL_GUIDE.md) - ClickHouse SSL指南
-  - [COMPREHENSIVE_DOCUMENTATION.md](data/soda-data-quality/COMPREHENSIVE_DOCUMENTATION.md) - 完整文档
-  - [EXTENDING_DATABASE_SUPPORT.md](data/soda-data-quality/EXTENDING_DATABASE_SUPPORT.md) - 扩展数据库支持
-- [spark](data/spark/) - Apache Spark分布式计算框架
-  - [README.md](data/spark/README.md) - Spark学习笔记
+- [soda-data-quality](data/soda-data-quality/) - Soda数据质量
+- [spark](data/spark/) - Apache Spark大数据处理
   - [1-Spark简介与生态系统.md](data/spark/1-Spark简介与生态系统.md) - 简介与生态系统
-  - [2-Spark核心概念与架构.md](data/spark/2-Spark核心概念与架构.md) - 核心概念与架构
+  - [2-Spark运行架构与部署模式.md](data/spark/2-Spark运行架构与部署模式.md) - 运行架构与部署模式
   - [3-Spark安装与环境配置.md](data/spark/3-Spark安装与环境配置.md) - 安装与环境配置
   - [4-Spark Core编程基础.md](data/spark/4-Spark%20Core%E7%BC%96%E7%A8%8B%E5%9F%BA%E7%A1%80.md) - Core编程基础
   - [5-Spark SQL与结构化数据处理.md](data/spark/5-Spark SQL与结构化数据处理.md) - SQL与结构化数据
@@ -296,10 +119,18 @@
 - [es6](frontend/es6/) - ES6+ JavaScript特性
   - [README.md](frontend/es6/README.md) - ES6学习笔记
 - [javascript](frontend/javascript/) - JavaScript编程语言
-- [npm_yarn](frontend/npm_yarn/) - 包管理工具
+- [npm](frontend/npm/) - NPM包管理器
 - [react](frontend/react/) - React框架
   - [README.md](frontend/react/README.md) - React学习笔记
   - [1-basics/README.md](frontend/react/1-basics/README.md) - React基础知识
+- [nexus](frontend/nexus/) - Nexus内部仓库配置
+  - [README.md](frontend/nexus/README.md) - Nexus配置专题概览
+  - [1-Nexus基础概念与架构.md](frontend/nexus/1-Nexus基础概念与架构.md) - 基础概念与架构
+  - [2-多Nexus仓库配置指南.md](frontend/nexus/2-多Nexus仓库配置指南.md) - 多仓库配置指南
+  - [3-安全密码管理方案.md](frontend/nexus/3-安全密码管理方案.md) - 安全密码管理方案
+  - [code/](frontend/nexus/code/) - 配置代码示例
+    - [README.md](frontend/nexus/code/README.md) - 代码示例说明
+    - [nexus-config-examples.js](frontend/nexus/code/nexus-config-examples.js) - 配置示例代码
 - [taiwind](frontend/taiwind/) - Tailwind CSS框架
   - [2-核心概念与使用方法.md](frontend/taiwind/2-核心概念与使用方法.md) - 核心概念与使用方法
   - [3-响应式设计.md](frontend/taiwind/3-响应式设计.md) - 响应式设计
@@ -452,8 +283,19 @@
   - [5-Gatling数据处理与断言.md](testing/gatling/5-Gatling数据处理与断言.md) - 数据处理与断言
   - [6-Gatling报告与结果分析.md](testing/gatling/6-Gatling报告与结果分析.md) - 报告与结果分析
   - [7-Gatling性能优化与调试.md](testing/gatling/7-Gatling性能优化与调试.md) - 性能优化与调试
+  - [8-Gatling CI_CD集成与企业级应用.md](testing/gatling/8-Gatling CI_CD集成与企业级应用.md) - CI/CD集成与企业级应用
   - [Gatling学习资源汇总.md](testing/gatling/Gatling学习资源汇总.md) - 学习资源汇总
 - [jmeter](testing/jmeter/) - JMeter性能测试工具
+  - [README.md](testing/jmeter/README.md) - JMeter学习笔记
+  - [1-JMeter简介与环境搭建.md](testing/jmeter/1-JMeter简介与环境搭建.md) - 简介与环境搭建
+  - [2-JMeter基础概念与核心组件.md](testing/jmeter/2-JMeter基础概念与核心组件.md) - 基础概念与核心组件
+  - [3-JMeter测试计划与元素.md](testing/jmeter/3-JMeter测试计划与元素.md) - 测试计划与元素
+  - [4-JMeter高级测试场景设计.md](testing/jmeter/4-JMeter高级测试场景设计.md) - 高级测试场景设计
+  - [5-JMeter性能测试与监控.md](testing/jmeter/5-JMeter性能测试与监控.md) - 性能测试与监控
+  - [6-JMeter分布式测试.md](testing/jmeter/6-JMeter分布式测试.md) - 分布式测试
+  - [7-JMeter最佳实践与优化.md](testing/jmeter/7-JMeter最佳实践与优化.md) - 最佳实践与优化
+  - [学习资源汇总.md](testing/jmeter/学习资源汇总.md) - 学习资源汇总
+  - [项目总结.md](testing/jmeter/项目总结.md) - 项目总结
 - [k6](testing/k6/) - k6性能测试工具
   - [README.md](testing/k6/README.md) - k6学习笔记
   - [SUMMARY.md](testing/k6/SUMMARY.md) - 内容总结
@@ -480,10 +322,52 @@
   - [7-测试框架设计与组织.md](testing/rest-assured/7-测试框架设计与组织.md) - 测试框架设计与组织
   - [8-高级特性与最佳实践.md](testing/rest-assured/8-高级特性与最佳实践.md) - 高级特性与最佳实践
 - [selenium](testing/selenium/) - Selenium Web自动化测试
+  - [README.md](testing/selenium/README.md) - Selenium学习笔记
+  - [1-Selenium简介与环境搭建.md](testing/selenium/1-Selenium简介与环境搭建.md) - 简介与环境搭建
+  - [2-Selenium基础概念与WebDriver%20API.md](testing/selenium/2-Selenium基础概念与WebDriver%20API.md) - 基础概念与WebDriver API
+  - [3-Selenium元素定位与交互操作.md](testing/selenium/3-Selenium元素定位与交互操作.md) - 元素定位与交互操作
+  - [4-Selenium高级操作与窗口管理.md](testing/selenium/4-Selenium高级操作与窗口管理.md) - 高级操作与窗口管理
+  - [code/](testing/selenium/code/) - Selenium代码示例
+    - [chapter1/README.md](testing/selenium/code/chapter1/README.md) - 第1章代码示例
+    - [chapter2/README.md](testing/selenium/code/chapter2/README.md) - 第2章代码示例
 - [strategy](testing/strategy/) - 测试策略
+  - [README.md](testing/strategy/README.md) - 测试策略学习笔记
   - [1-测试基础概念.md](testing/strategy/1-测试基础概念.md) - 测试基础概念
-- [unit_test](testing/unit_test/) - 单元测试
-  - [README.md](testing/unit_test/README.md) - 单元测试学习笔记
+  - [2-测试类型与方法.md](testing/strategy/2-测试类型与方法.md) - 测试类型与方法
+  - [3-测试策略与最佳实践.md](testing/strategy/3-测试策略与最佳实践.md) - 测试策略与最佳实践
+  - [4-自动化测试框架.md](testing/strategy/4-自动化测试框架.md) - 自动化测试框架
+  - [5-测试驱动开发(TDD).md](testing/strategy/5-测试驱动开发(TDD).md) - 测试驱动开发(TDD)
+  - [6-性能测试.md](testing/strategy/6-性能测试.md) - 性能测试
+  - [7-安全测试.md](testing/strategy/7-安全测试.md) - 安全测试
+  - [8-持续集成与持续测试.md](testing/strategy/8-持续集成与持续测试.md) - 持续集成与持续测试
+  - [学习资源汇总.md](testing/strategy/学习资源汇总.md) - 学习资源汇总
+- [unit-test](testing/unit-test/) - 单元测试
+  - [README.md](testing/unit-test/README.md) - 单元测试学习笔记
+  - [1-章节-介绍.md](testing/unit-test/1-章节-介绍.md) - 介绍
+  - [2-章节-组织与断言.md](testing/unit-test/2-章节-组织与断言.md) - 组织与断言
+  - [3-章节-隔离与生命周期.md](testing/unit-test/3-章节-隔离与生命周期.md) - 隔离与生命周期
+  - [4-章节-参数化.md](testing/unit-test/4-章节-参数化.md) - 参数化
+  - [5-章节-mock依赖.md](testing/unit-test/5-章节-mock依赖.md) - mock依赖
+  - [6-章节-TDD与测试设计.md](testing/unit-test/6-章节-TDD与测试设计.md) - TDD与测试设计
+  - [7-章节-flaky与性能.md](testing/unit-test/7-章节-flaky与性能.md) - flaky与性能
+  - [8-章节-覆盖率与质量门.md](testing/unit-test/8-章节-覆盖率与质量门.md) - 覆盖率与质量门
+  - [9-章节-高级主题.md](testing/unit-test/9-章节-高级主题.md) - 高级主题
+  - [10-章节-CI与最佳实践.md](testing/unit-test/10-章节-CI与最佳实践.md) - CI与最佳实践
+- [unit-test-java](testing/unit-test-java/) - Java单元测试
+  - [README.md](testing/unit-test-java/README.md) - Java单元测试学习笔记
+  - [1-Java单元测试简介与环境搭建.md](testing/unit-test-java/1-Java单元测试简介与环境搭建.md) - 简介与环境搭建
+  - [2-JUnit基础概念与核心注解.md](testing/unit-test-java/2-JUnit基础概念与核心注解.md) - 基础概念与核心注解
+  - [3-JUnit断言与验证机制.md](testing/unit-test-java/3-JUnit断言与验证机制.md) - 断言与验证机制
+  - [4-JUnit测试生命周期与钩子方法.md](testing/unit-test-java/4-JUnit测试生命周期与钩子方法.md) - 测试生命周期与钩子方法
+  - [5-Mockito框架与模拟对象.md](testing/unit-test-java/5-Mockito框架与模拟对象.md) - Mockito框架与模拟对象
+  - [6-参数化测试与测试套件.md](testing/unit-test-java/6-参数化测试与测试套件.md) - 参数化测试与测试套件
+  - [7-测试驱动开发TDD实践.md](testing/unit-test-java/7-测试驱动开发TDD实践.md) - 测试驱动开发TDD实践
+  - [8-Java单元测试最佳实践与代码质量.md](testing/unit-test-java/8-Java单元测试最佳实践与代码质量.md) - 最佳实践与代码质量
+  - [学习资源汇总.md](testing/unit-test-java/学习资源汇总.md) - 学习资源汇总
+  - [项目总结.md](testing/unit-test-java/项目总结.md) - 项目总结
+  - [code/](testing/unit-test-java/code/) - Java单元测试代码示例
+    - [chapter1/README.md](testing/unit-test-java/code/chapter1/README.md) - 第1章代码示例
+    - [chapter2/README.md](testing/unit-test-java/code/chapter2/README.md) - 第2章代码示例
 
 ## 📊 仓库统计
 
@@ -505,3 +389,15 @@
 - **进阶**: 关注高级特性和最佳实践
 - **实战**: 查看实战项目案例，巩固学习成果
 - **面试**: 参考面试相关目录，准备技术面试
+
+## 📄 许可证
+
+本仓库采用 [MIT 许可证](LICENSE)。
+
+## 🤝 贡献
+
+欢迎提交 Issue 和 Pull Request 来完善学习笔记内容。
+
+---
+
+> 持续学习，持续进步！
