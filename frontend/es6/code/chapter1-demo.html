@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ES6示例 - 第1章</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .container {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        .example-section {
+            margin-bottom: 30px;
+        }
+        .example-title {
+            color: #2980b9;
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        .output {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 10px;
+            margin-top: 10px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            min-height: 20px;
+        }
+        .note {
+            background-color: #e7f3fe;
+            border-left: 6px solid #2196F3;
+            padding: 10px;
+            margin: 15px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>ES6示例 - 第1章：ES6介绍与环境搭建</h1>
+    
+    <div class="container">
+        <div class="note">
+            <strong>注意：</strong> 打开浏览器控制台查看所有示例的输出结果。
+        </div>
+        
+        <div class="example-section">
+            <div class="example-title">基础ES6示例</div>
+            <button onclick="runBasicExample()">运行示例</button>
+            <div id="basic-output" class="output"></div>
+        </div>
+        
+        <div class="example-section">
+            <div class="example-title">let和const示例</div>
+            <button onclick="runLetConstExample()">运行示例</button>
+            <div id="let-const-output" class="output"></div>
+        </div>
+        
+        <div class="example-section">
+            <div class="example-title">箭头函数示例</div>
+            <button onclick="runArrowFunctionExample()">运行示例</button>
+            <div id="arrow-function-output" class="output"></div>
+        </div>
+        
+        <div class="example-section">
+            <div class="example-title">模板字符串示例</div>
+            <button onclick="runTemplateStringExample()">运行示例</button>
+            <div id="template-string-output" class="output"></div>
+        </div>
+        
+        <div class="example-section">
+            <div class="example-title">解构赋值示例</div>
+            <button onclick="runDestructuringExample()">运行示例</button>
+            <div id="destructuring-output" class="output"></div>
+        </div>
+        
+        <div class="example-section">
+            <div class="example-title">对象字面量增强示例</div>
+            <button onclick="runObjectLiteralExample()">运行示例</button>
+            <div id="object-literal-output" class="output"></div>
+        </div>
+        
+        <div class="example-section">
+            <div class="example-title">类示例</div>
+            <button onclick="runClassExample()">运行示例</button>
+            <div id="class-output" class="output"></div>
+        </div>
+        
+        <div class="example-section">
+            <div class="example-title">数组方法示例</div>
+            <button onclick="runArrayMethodsExample()">运行示例</button>
+            <div id="array-methods-output" class="output"></div>
+        </div>
+        
+        <div class="example-section">
+            <div class="example-title">Promise示例</div>
+            <button onclick="runPromiseExample()">运行示例</button>
+            <div id="promise-output" class="output"></div>
+        </div>
+        
+        <div class="example-section">
+            <div class="example-title">展开运算符示例</div>
+            <button onclick="runSpreadExample()">运行示例</button>
+            <div id="spread-output" class="output"></div>
+        </div>
+        
+        <div class="example-section">
+            <div class="example-title">默认参数示例</div>
+            <button onclick="runDefaultParamsExample()">运行示例</button>
+            <div id="default-params-output" class="output"></div>
+        </div>
+        
+        <div class="example-section">
+            <div class="example-title">剩余参数示例</div>
+            <button onclick="runRestParamsExample()">运行示例</button>
+            <div id="rest-params-output" class="output"></div>
+        </div>
+    </div>
+
+    <script>
+        // 辅助函数：将输出显示在指定的div中
+        function showOutput(elementId, message) {
+            const outputElement = document.getElementById(elementId);
+            outputElement.textContent = message;
+            console.log(message);
+        }
+        
+        // 基础ES6示例
+        function runBasicExample() {
+            const greeting = (name) => `Hello, ${name}!`;
+            showOutput('basic-output', greeting('World'));
+        }
+        
+        // let和const示例
+        function runLetConstExample() {
+            let counter = 0;
+            const PI = 3.14159;
+            
+            counter++;
+            const message = `Counter: ${counter}, PI: ${PI}`;
+            showOutput('let-const-output', message);
+        }
+        
+        // 箭头函数示例
+        function runArrowFunctionExample() {
+            const numbers = [1, 2, 3, 4, 5];
+            const doubled = numbers.map(num => num * 2);
+            showOutput('arrow-function-output', `Original: [${numbers.join(', ')}]\nDoubled: [${doubled.join(', ')}]`);
+        }
+        
+        // 模板字符串示例
+        function runTemplateStringExample() {
+            const user = {
+                name: 'Alice',
+                age: 30,
+                occupation: 'Developer'
+            };
+            
+            const userInfo = `
+Name: ${user.name}
+Age: ${user.age}
+Occupation: ${user.occupation}
+`;
+            showOutput('template-string-output', userInfo);
+        }
+        
+        // 解构赋值示例
+        function runDestructuringExample() {
+            const user = {
+                name: 'Alice',
+                age: 30,
+                email: 'alice@example.com'
+            };
+            
+            const { name, age } = user;
+            showOutput('destructuring-output', `Name: ${name}, Age: ${age}`);
+        }
+        
+        // 对象字面量增强示例
+        function runObjectLiteralExample() {
+            const id = 123;
+            const createUser = (name, email) => ({
+                id,
+                name,
+                email,
+                getInfo() {
+                    return `${this.name} (${this.email})`;
+                }
+            });
+            
+            const newUser = createUser('Bob', 'bob@example.com');
+            showOutput('object-literal-output', newUser.getInfo());
+        }
+        
+        // 类示例
+        function runClassExample() {
+            class Person {
+                constructor(name, age) {
+                    this.name = name;
+                    this.age = age;
+                }
+                
+                introduce() {
+                    return `Hi, I'm ${this.name} and I'm ${this.age} years old.`;
+                }
+                
+                static compareAge(person1, person2) {
+                    return person1.age - person2.age;
+                }
+            }
+            
+            const alice = new Person('Alice', 30);
+            const bob = new Person('Bob', 25);
+            const ageDiff = Person.compareAge(alice, bob);
+            
+            showOutput('class-output', `${alice.introduce()}\n${bob.introduce()}\nAge difference: ${ageDiff} years`);
+        }
+        
+        // 数组方法示例
+        function runArrayMethodsExample() {
+            const fruits = ['apple', 'banana', 'orange'];
+            const hasApple = fruits.includes('apple');
+            const firstLongFruit = fruits.find(fruit => fruit.length > 5);
+            
+            showOutput('array-methods-output', `Fruits: [${fruits.join(', ')}]\nHas apple: ${hasApple}\nFirst long fruit: ${firstLongFruit}`);
+        }
+        
+        // Promise示例
+        function runPromiseExample() {
+            const fetchUserData = (userId) => {
+                return new Promise((resolve, reject) => {
+                    setTimeout(() => {
+                        if (userId > 0) {
+                            resolve({
+                                id: userId,
+                                name: `User ${userId}`,
+                                email: `user${userId}@example.com`
+                            });
+                        } else {
+                            reject(new Error('Invalid user ID'));
+                        }
+                    }, 500); // 减少延迟时间以便更快看到结果
+                });
+            };
+            
+            const outputElement = document.getElementById('promise-output');
+            outputElement.textContent = 'Fetching user data...';
+            
+            fetchUserData(1)
+                .then(user => {
+                    const message = `User data: ${JSON.stringify(user, null, 2)}`;
+                    showOutput('promise-output', message);
+                    return fetchUserData(2);
+                })
+                .then(user => {
+                    const currentOutput = outputElement.textContent;
+                    const newMessage = `\nSecond user data: ${JSON.stringify(user, null, 2)}`;
+                    showOutput('promise-output', currentOutput + newMessage);
+                })
+                .catch(error => {
+                    showOutput('promise-output', `Error: ${error.message}`);
+                });
+        }
+        
+        // 展开运算符示例
+        function runSpreadExample() {
+            const arr1 = [1, 2, 3];
+            const arr2 = [4, 5, 6];
+            const combined = [...arr1, ...arr2];
+            
+            const originalUser = { name: 'Alice', age: 30 };
+            const updatedUser = { ...originalUser, email: 'alice@example.com' };
+            
+            const message = `Combined array: [${combined.join(', ')}]\nOriginal user: ${JSON.stringify(originalUser)}\nUpdated user: ${JSON.stringify(updatedUser)}`;
+            showOutput('spread-output', message);
+        }
+        
+        // 默认参数示例
+        function runDefaultParamsExample() {
+            const greet = (name = 'Guest', greeting = 'Hello') => {
+                return `${greeting}, ${name}!`;
+            };
+            
+            const output = `${greet()}\n${greet('Bob')}\n${greet('Charlie', 'Hi')}`;
+            showOutput('default-params-output', output);
+        }
+        
+        // 剩余参数示例
+        function runRestParamsExample() {
+            const sum = (...numbers) => {
+                return numbers.reduce((total, num) => total + num, 0);
+            };
+            
+            const result = sum(1, 2, 3, 4, 5);
+            showOutput('rest-params-output', `Sum of 1, 2, 3, 4, 5: ${result}`);
+        }
+        
+        // 页面加载时运行一个示例
+        window.onload = function() {
+            console.log('ES6示例页面已加载。点击按钮查看不同ES6特性的示例。');
+        };
+    </script>
+</body>
+</html>

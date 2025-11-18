@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>第8章：模块化与导入导出 - 演示</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background-color: #2c3e50;
+            color: white;
+            border-radius: 8px;
+        }
+        
+        h1 {
+            margin: 0;
+            font-size: 2.5em;
+        }
+        
+        h2 {
+            color: #2c3e50;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+            margin-top: 30px;
+        }
+        
+        h3 {
+            color: #3498db;
+            margin-top: 25px;
+        }
+        
+        .demo-section {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .code-block {
+            background-color: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 15px 0;
+            font-family: 'Courier New', Courier, monospace;
+            white-space: pre-wrap;
+            overflow-x: auto;
+        }
+        
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 5px;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: #2980b9;
+        }
+        
+        .result {
+            background-color: #e8f4fc;
+            border: 1px solid #bde0f5;
+            border-radius: 4px;
+            padding: 10px;
+            margin: 10px 0;
+            min-height: 20px;
+        }
+        
+        .error {
+            background-color: #ffeaea;
+            border: 1px solid #ffb5b5;
+            color: #d9534f;
+        }
+        
+        .success {
+            background-color: #eaffea;
+            border: 1px solid #b5ffb5;
+            color: #5cb85c;
+        }
+        
+        .exercise {
+            background-color: #f0f7ff;
+            border-left: 4px solid #3498db;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        
+        .exercise h3 {
+            margin-top: 0;
+            color: #2980b9;
+        }
+        
+        input, select, textarea {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin: 5px 0;
+            width: 100%;
+            max-width: 300px;
+        }
+        
+        .input-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .tab-container {
+            margin: 20px 0;
+        }
+        
+        .tab-buttons {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .tab-button {
+            background-color: #f1f1f1;
+            border: 1px solid #ddd;
+            border-bottom: none;
+            padding: 10px 15px;
+            cursor: pointer;
+            margin-right: 5px;
+        }
+        
+        .tab-button.active {
+            background-color: white;
+            border-bottom: 1px solid white;
+            margin-bottom: -1px;
+        }
+        
+        .tab-content {
+            display: none;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-top: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>第8章：模块化与导入导出</h1>
+        <p>ES6模块系统的全面解析与实践</p>
+    </header>
+
+    <main>
+        <!-- 模块化的必要性 -->
+        <section class="demo-section">
+            <h2>模块化的必要性</h2>
+            <p>ES6模块系统解决了传统JavaScript开发中的许多问题，如全局命名空间污染、依赖关系管理困难等。</p>
+            
+            <div class="tab-container">
+                <div class="tab-buttons">
+                    <div class="tab-button active" onclick="showTab('traditional-problems')">传统问题</div>
+                    <div class="tab-button" onclick="showTab('module-advantages')">模块优势</div>
+                </div>
+                
+                <div id="traditional-problems" class="tab-content active">
+                    <h3>传统JavaScript的问题</h3>
+                    <div class="code-block">// script1.js
+var data = { name: "Alice", age: 30 };
+function processData() {
+  console.log("Processing data:", data);
+}
+
+// script2.js
+var data = { name: "Bob", age: 25 }; // 覆盖了script1.js中的data变量
+function processData() {
+  console.log("Different processing:", data);
+}</div>
+                    <button onclick="demonstrateTraditionalProblems()">演示问题</button>
+                    <div id="traditional-problems-result" class="result"></div>
+                </div>
+                
+                <div id="module-advantages" class="tab-content">
+                    <h3>模块化的优势</h3>
+                    <ul>
+                        <li><strong>作用域隔离</strong>：每个模块有自己的作用域，不会污染全局命名空间</li>
+                        <li><strong>明确的依赖关系</strong>：通过导入导出语句明确声明模块间的依赖</li>
+                        <li><strong>代码复用性</strong>：模块可以在不同项目中轻松复用</li>
+                        <li><strong>静态分析</strong>：模块系统支持静态分析，便于工具优化</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- 导入导出语法 -->
+        <section class="demo-section">
+            <h2>导入导出语法</h2>
+            
+            <div class="tab-container">
+                <div class="tab-buttons">
+                    <div class="tab-button active" onclick="showTab('named-exports')">命名导出</div>
+                    <div class="tab-button" onclick="showTab('default-exports')">默认导出</div>
+                    <div class="tab-button" onclick="showTab('import-syntax')">导入语法</div>
+                    <div class="tab-button" onclick="showTab('re-exports')">重新导出</div>
+                </div>
+                
+                <div id="named-exports" class="tab-content active">
+                    <h3>命名导出</h3>
+                    <div class="code-block">// math.js - 导出多个函数
+export function add(a, b) {
+  return a + b;
+}
+
+export function subtract(a, b) {
+  return a - b;
+}
+
+export const PI = 3.14159;</div>
+                    <button onclick="demonstrateNamedExports()">演示命名导出</button>
+                    <div id="named-exports-result" class="result"></div>
+                </div>
+                
+                <div id="default-exports" class="tab-content">
+                    <h3>默认导出</h3>
+                    <div class="code-block">// config.js
+export default {
+  apiUrl: 'https://api.example.com',
+  timeout: 5000,
+  retries: 3
+};
+
+// httpClient.js
+export default class HttpClient {
+  constructor(baseUrl) {
+    this.baseUrl = baseUrl;
+  }
+  
+  get(url) {
+    // GET请求逻辑
+  }
+}</div>
+                    <button onclick="demonstrateDefaultExports()">演示默认导出</button>
+                    <div id="default-exports-result" class="result"></div>
+                </div>
+                
+                <div id="import-syntax" class="tab-content">
+                    <h3>导入语法</h3>
+                    <div class="code-block">// 导入命名导出
+import { add, subtract, PI } from './math.js';
+
+// 导入默认导出
+import config from './config.js';
+
+// 混合导入
+import defaultExport, { namedExport1, namedExport2 } from './module.js';
+
+// 导入所有内容到命名空间
+import * as math from './math.js';</div>
+                    <button onclick="demonstrateImportSyntax()">演示导入语法</button>
+                    <div id="import-syntax-result" class="result"></div>
+                </div>
+                
+                <div id="re-exports" class="tab-content">
+                    <h3>重新导出</h3>
+                    <div class="code-block">// utils/index.js
+export { formatDate, validateEmail } from './dateUtils.js';
+export { API_URL } from './config.js';
+export default from './logger.js';
+
+// 或者重新导出所有内容
+export * from './dateUtils.js';
+export * from './stringUtils.js';</div>
+                    <button onclick="demonstrateReExports()">演示重新导出</button>
+                    <div id="re-exports-result" class="result"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 默认导出与命名导出 -->
+        <section class="demo-section">
+            <h2>默认导出与命名导出</h2>
+            <p>了解何时使用默认导出和命名导出，以及如何混合使用它们。</p>
+            
+            <div class="tab-container">
+                <div class="tab-buttons">
+                    <div class="tab-button active" onclick="showTab('when-default')">何时使用默认导出</div>
+                    <div class="tab-button" onclick="showTab('when-named')">何时使用命名导出</div>
+                    <div class="tab-button" onclick="showTab('mixed-usage')">混合使用</div>
+                </div>
+                
+                <div id="when-default" class="tab-content active">
+                    <h3>何时使用默认导出</h3>
+                    <p>默认导出适用于以下情况：</p>
+                    <ul>
+                        <li>模块的主要功能</li>
+                        <li>类库</li>
+                        <li>配置对象</li>
+                    </ul>
+                    <div class="code-block">// axios.js - 主要功能是提供HTTP客户端
+export default class Axios {
+  // 实现细节
+}</div>
+                </div>
+                
+                <div id="when-named" class="tab-content">
+                    <h3>何时使用命名导出</h3>
+                    <p>命名导出适用于以下情况：</p>
+                    <ul>
+                        <li>工具函数库</li>
+                        <li>常量集合</li>
+                        <li>API接口</li>
+                    </ul>
+                    <div class="code-block">// math.js - 提供多个数学函数
+export function add(a, b) { /* ... */ }
+export function subtract(a, b) { /* ... */ }
+export function multiply(a, b) { /* ... */ }
+export function divide(a, b) { /* ... */ }</div>
+                </div>
+                
+                <div id="mixed-usage" class="tab-content">
+                    <h3>混合使用</h3>
+                    <p>一个模块可以同时包含默认导出和命名导出：</p>
+                    <div class="code-block">// http.js
+export default class HttpClient {
+  // 主要功能
+}
+
+export function get(url, options) {
+  // 辅助函数
+}
+
+export function post(url, data, options) {
+  // 辅助函数
+}</div>
+                    <button onclick="demonstrateMixedUsage()">演示混合使用</button>
+                    <div id="mixed-usage-result" class="result"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 动态导入 -->
+        <section class="demo-section">
+            <h2>动态导入</h2>
+            <p>动态导入使用`import()`函数，它返回一个Promise，解析为模块对象。</p>
+            
+            <div class="tab-container">
+                <div class="tab-buttons">
+                    <div class="tab-button active" onclick="showTab('dynamic-basic')">基本语法</div>
+                    <div class="tab-button" onclick="showTab('dynamic-scenarios')">应用场景</div>
+                    <div class="tab-button" onclick="showTab('dynamic-comparison')">与静态导入对比</div>
+                </div>
+                
+                <div id="dynamic-basic" class="tab-content active">
+                    <h3>基本语法</h3>
+                    <div class="code-block">// 动态导入模块
+import('./math.js')
+  .then(math => {
+    console.log(math.add(5, 3)); // 8
+  })
+  .catch(error => {
+    console.error('Failed to load module:', error);
+  });
+
+// 使用async/await语法
+async function loadMathModule() {
+  try {
+    const math = await import('./math.js');
+    console.log(math.add(5, 3)); // 8
+  } catch (error) {
+    console.error('Failed to load module:', error);
+  }
+}</div>
+                    <button onclick="demonstrateDynamicImport()">演示动态导入</button>
+                    <div id="dynamic-import-result" class="result"></div>
+                </div>
+                
+                <div id="dynamic-scenarios" class="tab-content">
+                    <h3>应用场景</h3>
+                    <ul>
+                        <li><strong>条件加载</strong>：根据条件加载不同模块</li>
+                        <li><strong>懒加载</strong>：延迟加载非关键资源</li>
+                        <li><strong>代码分割</strong>：将代码分割成多个块，按需加载</li>
+                    </ul>
+                    <div class="code-block">// 条件加载
+async function loadTheme(theme) {
+  if (theme === 'dark') {
+    const { applyDarkTheme } = await import('./themes/dark.js');
+    applyDarkTheme();
+  } else {
+    const { applyLightTheme } = await import('./themes/light.js');
+    applyLightTheme();
+  }
+}</div>
+                    <button onclick="demonstrateDynamicScenarios()">演示应用场景</button>
+                    <div id="dynamic-scenarios-result" class="result"></div>
+                </div>
+                
+                <div id="dynamic-comparison" class="tab-content">
+                    <h3>动态导入与静态导入的区别</h3>
+                    <table style="width: 100%; border-collapse: collapse; margin-top: 15px;">
+                        <thead>
+                            <tr style="background-color: #f2f2f2;">
+                                <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">特性</th>
+                                <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">静态导入</th>
+                                <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">动态导入</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="border: 1px solid #ddd; padding: 8px;">语法</td>
+                                <td style="border: 1px solid #ddd; padding: 8px;">import module from './module.js'</td>
+                                <td style="border: 1px solid #ddd; padding: 8px;">import('./module.js')</td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid #ddd; padding: 8px;">执行时机</td>
+                                <td style="border: 1px solid #ddd; padding: 8px;">编译时解析，运行前加载</td>
+                                <td style="border: 1px solid #ddd; padding: 8px;">运行时按需加载</td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid #ddd; padding: 8px;">返回值</td>
+                                <td style="border: 1px solid #ddd; padding: 8px;">直接获取导出的值</td>
+                                <td style="border: 1px solid #ddd; padding: 8px;">返回Promise，解析为模块对象</td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid #ddd; padding: 8px;">使用位置</td>
+                                <td style="border: 1px solid #ddd; padding: 8px;">只能在模块顶层使用</td>
+                                <td style="border: 1px solid #ddd; padding: 8px;">可以在任何地方使用</td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid #ddd; padding: 8px;">条件导入</td>
+                                <td style="border: 1px solid #ddd; padding: 8px;">不支持</td>
+                                <td style="border: 1px solid #ddd; padding: 8px;">支持</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- 实际应用场景 -->
+        <section class="demo-section">
+            <h2>实际应用场景</h2>
+            <p>模块化在实际开发中的应用场景和最佳实践。</p>
+            
+            <div class="tab-container">
+                <div class="tab-buttons">
+                    <div class="tab-button active" onclick="showTab('large-apps')">构建大型应用</div>
+                    <div class="tab-button" onclick="showTab('component-libraries')">创建可复用组件库</div>
+                    <div class="tab-button" onclick="showTab('config-management')">配置管理</div>
+                </div>
+                
+                <div id="large-apps" class="tab-content active">
+                    <h3>构建大型应用</h3>
+                    <div class="code-block">// app.js - 应用入口
+import Router from './router/Router.js';
+import { UserService } from './services/UserService.js';
+import { AuthService } from './services/AuthService.js';
+
+// 初始化应用
+const router = new Router();
+const userService = new UserService();
+const authService = new AuthService();
+
+// 配置路由
+router.addRoute('/login', () => import('./views/Login.js'));
+router.addRoute('/dashboard', () => import('./views/Dashboard.js'));</div>
+                </div>
+                
+                <div id="component-libraries" class="tab-content">
+                    <h3>创建可复用组件库</h3>
+                    <div class="code-block">// components/Button.js
+export default class Button {
+  constructor(text, onClick) {
+    this.text = text;
+    this.onClick = onClick;
+  }
+  
+  render() {
+    const button = document.createElement('button');
+    button.textContent = this.text;
+    button.addEventListener('click', this.onClick);
+    return button;
+  }
+}
+
+// components/index.js - 组件库入口
+import Button from './Button.js';
+import Modal from './Modal.js';
+
+export { Button, Modal };
+export default { Button, Modal };</div>
+                </div>
+                
+                <div id="config-management" class="tab-content">
+                    <h3>配置管理</h3>
+                    <div class="code-block">// config/index.js
+import development from './development.js';
+import production from './production.js';
+
+const environment = process.env.NODE_ENV || 'development';
+
+export default environment === 'production' ? production : development;</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 实践练习 -->
+        <section class="demo-section">
+            <h2>实践练习</h2>
+            
+            <div class="exercise">
+                <h3>练习1：创建数学工具库</h3>
+                <p>创建一个数学工具库，包含基本运算函数和常量。</p>
+                <div class="input-group">
+                    <label>运算类型：</label>
+                    <select id="math-operation">
+                        <option value="add">加法</option>
+                        <option value="subtract">减法</option>
+                        <option value="multiply">乘法</option>
+                        <option value="divide">除法</option>
+                        <option value="circleArea">圆面积</option>
+                        <option value="factorial">阶乘</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>第一个数：</label>
+                    <input type="number" id="math-input1" value="5">
+                    <label>第二个数：</label>
+                    <input type="number" id="math-input2" value="3">
+                </div>
+                <button onclick="calculateMath()">计算</button>
+                <div id="math-result" class="result"></div>
+            </div>
+            
+            <div class="exercise">
+                <h3>练习2：实现动态加载的图片库</h3>
+                <p>创建一个图片库，支持动态加载不同格式的图片处理模块。</p>
+                <div class="input-group">
+                    <label>图片格式：</label>
+                    <select id="image-format">
+                        <option value="jpeg">JPEG</option>
+                        <option value="png">PNG</option>
+                        <option value="gif">GIF</option>
+                    </select>
+                </div>
+                <button onclick="processImage()">处理图片</button>
+                <div id="image-result" class="result"></div>
+            </div>
+            
+            <div class="exercise">
+                <h3>练习3：创建支持多语言的国际化库</h3>
+                <p>创建一个支持多语言的国际化库，可以动态加载不同语言包。</p>
+                <div class="input-group">
+                    <label>选择语言：</label>
+                    <select id="language-select">
+                        <option value="en">English</option>
+                        <option value="zh">中文</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>选择文本：</label>
+                    <select id="text-key">
+                        <option value="greeting">问候语</option>
+                        <option value="farewell">告别语</option>
+                        <option value="thankYou">感谢</option>
+                        <option value="welcome">欢迎</option>
+                    </select>
+                </div>
+                <button onclick="translateText()">翻译</button>
+                <div id="translation-result" class="result"></div>
+            </div>
+        </section>
+    </main>
+
+    <script type="module">
+        // 模拟数学工具库
+        const mathUtils = {
+            add: (a, b) => a + b,
+            subtract: (a, b) => a - b,
+            multiply: (a, b) => a * b,
+            divide: (a, b) => {
+                if (b === 0) throw new Error('Division by zero');
+                return a / b;
+            },
+            PI: 3.14159,
+            circleArea: (radius) => mathUtils.PI * radius * radius,
+            factorial: (n) => {
+                if (n <= 1) return 1;
+                return n * mathUtils.factorial(n - 1);
+            }
+        };
+
+        // 模拟图片处理器
+        const imageProcessors = {
+            jpeg: class JpegProcessor {
+                process(imageData) {
+                    return `Processing JPEG image: ${imageData}`;
+                }
+            },
+            png: class PngProcessor {
+                process(imageData) {
+                    return `Processing PNG image: ${imageData}`;
+                }
+            },
+            gif: class GifProcessor {
+                process(imageData) {
+                    return `Processing GIF image: ${imageData}`;
+                }
+            }
+        };
+
+        // 模拟国际化库
+        const i18nData = {
+            en: {
+                greeting: 'Hello',
+                farewell: 'Goodbye',
+                thankYou: 'Thank you',
+                welcome: 'Welcome to our application'
+            },
+            zh: {
+                greeting: '你好',
+                farewell: '再见',
+                thankYou: '谢谢',
+                welcome: '欢迎使用我们的应用'
+            }
+        };
+
+        // 标签页切换功能
+        window.showTab = function(tabId) {
+            // 隐藏所有标签内容
+            const tabContents = document.querySelectorAll('.tab-content');
+            tabContents.forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // 移除所有标签按钮的活动状态
+            const tabButtons = document.querySelectorAll('.tab-button');
+            tabButtons.forEach(button => {
+                button.classList.remove('active');
+            });
+            
+            // 显示选中的标签内容
+            document.getElementById(tabId).classList.add('active');
+            
+            // 设置对应标签按钮为活动状态
+            event.target.classList.add('active');
+        };
+
+        // 演示传统JavaScript问题
+        window.demonstrateTraditionalProblems = function() {
+            const resultDiv = document.getElementById('traditional-problems-result');
+            
+            // 模拟传统JavaScript的问题
+            let data = { name: "Alice", age: 30 };
+            function processData() {
+                return `Processing data: ${JSON.stringify(data)}`;
+            }
+            
+            let firstResult = processData();
+            
+            // 模拟第二个脚本覆盖第一个脚本的变量
+            data = { name: "Bob", age: 25 };
+            function processData() {
+                return `Different processing: ${JSON.stringify(data)}`;
+            }
+            
+            let secondResult = processData();
+            
+            resultDiv.innerHTML = `
+                <div class="error">
+                    <strong>传统JavaScript的问题：</strong><br>
+                    第一个脚本结果: ${firstResult}<br>
+                    第二个脚本结果: ${secondResult}<br>
+                    <em>注意：变量和函数被覆盖了</em>
+                </div>
+            `;
+        };
+
+        // 演示命名导出
+        window.demonstrateNamedExports = function() {
+            const resultDiv = document.getElementById('named-exports-result');
+            
+            // 模拟命名导出的使用
+            const { add, subtract, PI } = mathUtils;
+            
+            const result1 = add(5, 3);
+            const result2 = subtract(10, 4);
+            const piValue = PI;
+            
+            resultDiv.innerHTML = `
+                <div class="success">
+                    <strong>命名导出演示：</strong><br>
+                    add(5, 3) = ${result1}<br>
+                    subtract(10, 4) = ${result2}<br>
+                    PI = ${piValue}
+                </div>
+            `;
+        };
+
+        // 演示默认导出
+        window.demonstrateDefaultExports = function() {
+            const resultDiv = document.getElementById('default-exports-result');
+            
+            // 模拟默认导出的使用
+            const config = {
+                apiUrl: 'https://api.example.com',
+                timeout: 5000,
+                retries: 3
+            };
+            
+            const HttpClient = class {
+                constructor(baseUrl) {
+                    this.baseUrl = baseUrl;
+                }
+                
+                get(url) {
+                    return `GET request to ${this.baseUrl}${url}`;
+                }
+            };
+            
+            const client = new HttpClient(config.apiUrl);
+            const requestResult = client.get('/users');
+            
+            resultDiv.innerHTML = `
+                <div class="success">
+                    <strong>默认导出演示：</strong><br>
+                    配置对象: ${JSON.stringify(config)}<br>
+                    HTTP客户端请求: ${requestResult}
+                </div>
+            `;
+        };
+
+        // 演示导入语法
+        window.demonstrateImportSyntax = function() {
+            const resultDiv = document.getElementById('import-syntax-result');
+            
+            // 模拟不同导入语法的使用
+            const namedImports = `import { add, subtract, PI } from './math.js';`;
+            const defaultImport = `import config from './config.js';`;
+            const mixedImport = `import defaultExport, { namedExport1, namedExport2 } from './module.js';`;
+            const namespaceImport = `import * as math from './math.js';`;
+            
+            resultDiv.innerHTML = `
+                <div class="success">
+                    <strong>导入语法演示：</strong><br>
+                    <div class="code-block">
+${namedImports}
+
+${defaultImport}
+
+${mixedImport}
+
+${namespaceImport}
+                    </div>
+                    <p>这些是ES6模块系统中常用的导入语法。</p>
+                </div>
+            `;
+        };
+
+        // 演示重新导出
+        window.demonstrateReExports = function() {
+            const resultDiv = document.getElementById('re-exports-result');
+            
+            const reExportSyntax = `// utils/index.js
+export { formatDate, validateEmail } from './dateUtils.js';
+export { API_URL } from './config.js';
+export default from './logger.js';
+
+// 或者重新导出所有内容
+export * from './dateUtils.js';
+export * from './stringUtils.js';`;
+            
+            resultDiv.innerHTML = `
+                <div class="success">
+                    <strong>重新导出演示：</strong><br>
+                    <div class="code-block">${reExportSyntax}</div>
+                    <p>重新导出允许一个模块将另一个模块的导出内容再次导出，这对于创建模块索引或聚合模块非常有用。</p>
+                </div>
+            `;
+        };
+
+        // 演示混合使用
+        window.demonstrateMixedUsage = function() {
+            const resultDiv = document.getElementById('mixed-usage-result');
+            
+            // 模拟混合使用默认导出和命名导出
+            const HttpClient = class {
+                constructor(baseUrl) {
+                    this.baseUrl = baseUrl;
+                }
+                
+                get(url) {
+                    return `GET request to ${this.baseUrl}${url}`;
+                }
+            };
+            
+            const get = (url, options = {}) => {
+                return `GET request to ${url} with options: ${JSON.stringify(options)}`;
+            };
+            
+            const post = (url, data, options = {}) => {
+                return `POST request to ${url} with data: ${JSON.stringify(data)} and options: ${JSON.stringify(options)}`;
+            };
+            
+            const METHODS = {
+                GET: 'GET',
+                POST: 'POST',
+                PUT: 'PUT',
+                DELETE: 'DELETE'
+            };
+            
+            const client = new HttpClient('https://api.example.com');
+            const clientResult = client.get('/users');
+            const getResult = get('/api/data', { method: METHODS.GET });
+            const postResult = post('/api/data', { name: 'John' }, { method: METHODS.POST });
+            
+            resultDiv.innerHTML = `
+                <div class="success">
+                    <strong>混合使用演示：</strong><br>
+                    使用默认导出的HTTP客户端: ${clientResult}<br>
+                    使用命名导出的GET函数: ${getResult}<br>
+                    使用命名导出的POST函数: ${postResult}<br>
+                    使用命名导出的HTTP方法: ${METHODS.GET}, ${METHODS.POST}
+                </div>
+            `;
+        };
+
+        // 演示动态导入
+        window.demonstrateDynamicImport = function() {
+            const resultDiv = document.getElementById('dynamic-import-result');
+            
+            // 模拟动态导入
+            resultDiv.innerHTML = `<div class="result">正在动态导入模块...</div>`;
+            
+            // 使用setTimeout模拟异步加载
+            setTimeout(() => {
+                const math = mathUtils;
+                const result1 = math.add(5, 3);
+                const result2 = math.subtract(10, 4);
+                
+                resultDiv.innerHTML = `
+                    <div class="success">
+                        <strong>动态导入成功：</strong><br>
+                        add(5, 3) = ${result1}<br>
+                        subtract(10, 4) = ${result2}
+                    </div>
+                `;
+            }, 1000);
+        };
+
+        // 演示动态导入应用场景
+        window.demonstrateDynamicScenarios = function() {
+            const resultDiv = document.getElementById('dynamic-scenarios-result');
+            
+            // 模拟条件加载
+            const theme = 'dark';
+            
+            resultDiv.innerHTML = `<div class="result">根据条件加载主题模块...</div>`;
+            
+            setTimeout(() => {
+                let themeResult;
+                
+                if (theme === 'dark') {
+                    themeResult = 'Dark theme applied successfully';
+                } else {
+                    themeResult = 'Light theme applied successfully';
+                }
+                
+                resultDiv.innerHTML = `
+                    <div class="success">
+                        <strong>条件加载演示：</strong><br>
+                        ${themeResult}
+                    </div>
+                `;
+            }, 1000);
+        };
+
+        // 数学工具库练习
+        window.calculateMath = function() {
+            const operation = document.getElementById('math-operation').value;
+            const input1 = parseFloat(document.getElementById('math-input1').value);
+            const input2 = parseFloat(document.getElementById('math-input2').value);
+            const resultDiv = document.getElementById('math-result');
+            
+            let result;
+            try {
+                switch (operation) {
+                    case 'add':
+                        result = mathUtils.add(input1, input2);
+                        break;
+                    case 'subtract':
+                        result = mathUtils.subtract(input1, input2);
+                        break;
+                    case 'multiply':
+                        result = mathUtils.multiply(input1, input2);
+                        break;
+                    case 'divide':
+                        result = mathUtils.divide(input1, input2);
+                        break;
+                    case 'circleArea':
+                        result = mathUtils.circleArea(input1);
+                        break;
+                    case 'factorial':
+                        result = mathUtils.factorial(input1);
+                        break;
+                    default:
+                        result = '未知操作';
+                }
+                
+                resultDiv.innerHTML = `
+                    <div class="success">
+                        <strong>计算结果：</strong> ${result}
+                    </div>
+                `;
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="error">
+                        <strong>错误：</strong> ${error.message}
+                    </div>
+                `;
+            }
+        };
+
+        // 图片处理练习
+        window.processImage = function() {
+            const format = document.getElementById('image-format').value;
+            const resultDiv = document.getElementById('image-result');
+            
+            // 模拟动态导入图片处理器
+            resultDiv.innerHTML = `<div class="result">正在加载${format.toUpperCase()}处理器...</div>`;
+            
+            setTimeout(() => {
+                try {
+                    const Processor = imageProcessors[format];
+                    if (!Processor) {
+                        throw new Error(`Unsupported image format: ${format}`);
+                    }
+                    
+                    const processor = new Processor();
+                    const result = processor.process(`sample-image-data.${format}`);
+                    
+                    resultDiv.innerHTML = `
+                        <div class="success">
+                            <strong>处理结果：</strong> ${result}
+                        </div>
+                    `;
+                } catch (error) {
+                    resultDiv.innerHTML = `
+                        <div class="error">
+                            <strong>错误：</strong> ${error.message}
+                        </div>
+                    `;
+                }
+            }, 1000);
+        };
+
+        // 国际化练习
+        window.translateText = function() {
+            const language = document.getElementById('language-select').value;
+            const textKey = document.getElementById('text-key').value;
+            const resultDiv = document.getElementById('translation-result');
+            
+            // 模拟动态加载语言包
+            resultDiv.innerHTML = `<div class="result">正在加载${language === 'en' ? '英语' : '中文'}语言包...</div>`;
+            
+            setTimeout(() => {
+                try {
+                    const messages = i18nData[language];
+                    if (!messages) {
+                        throw new Error(`Language not supported: ${language}`);
+                    }
+                    
+                    const translation = messages[textKey] || textKey;
+                    
+                    resultDiv.innerHTML = `
+                        <div class="success">
+                            <strong>翻译结果：</strong> ${translation}
+                        </div>
+                    `;
+                } catch (error) {
+                    resultDiv.innerHTML = `
+                        <div class="error">
+                            <strong>错误：</strong> ${error.message}
+                        </div>
+                    `;
+                }
+            }, 500);
+        };
+    </script>
+</body>
+</html>

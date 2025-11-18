@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>第3章：箭头函数与函数增强 - 演示</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        h2 {
+            color: #3498db;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+        }
+        .demo-section {
+            margin-bottom: 30px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #fafafa;
+        }
+        .code-block {
+            background-color: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 10px 0;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 14px;
+            overflow-x: auto;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        .output {
+            background-color: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 10px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 14px;
+            white-space: pre-wrap;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .input-group {
+            margin: 10px 0;
+        }
+        input, select {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-right: 10px;
+        }
+        .two-column {
+            display: flex;
+            gap: 20px;
+        }
+        .column {
+            flex: 1;
+        }
+        .highlight {
+            background-color: #fff3cd;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+        .note {
+            background-color: #e8f4fd;
+            border-left: 4px solid #3498db;
+            padding: 10px 15px;
+            margin: 15px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>第3章：箭头函数与函数增强 - 演示</h1>
+        
+        <div class="demo-section">
+            <h2>1. 传统函数与箭头函数的对比</h2>
+            <div class="code-block">
+// 传统函数声明
+function add(a, b) {
+  return a + b;
+}
+
+// 箭头函数
+const subtract = (a, b) => a - b;
+            </div>
+            <button onclick="demo1()">运行示例</button>
+            <div id="output1" class="output"></div>
+        </div>
+        
+        <div class="demo-section">
+            <h2>2. 箭头函数中的this绑定</h2>
+            <div class="code-block">
+const person = {
+  name: 'Alice',
+  
+  // 传统函数中的this
+  sayNameTraditional: function() {
+    setTimeout(function() {
+      console.log(this.name); // undefined
+    }, 10);
+  },
+  
+  // 箭头函数中的this
+  sayNameArrow: function() {
+    setTimeout(() => {
+      console.log(this.name); // 'Alice'
+    }, 20);
+  }
+};
+            </div>
+            <button onclick="demo2()">运行示例</button>
+            <div id="output2" class="output"></div>
+        </div>
+        
+        <div class="demo-section">
+            <h2>3. 默认参数</h2>
+            <div class="code-block">
+function greet(name = 'Guest', age = 0) {
+  return `Hello, ${name}! You are ${age} years old.`;
+}
+            </div>
+            <div class="input-group">
+                <input type="text" id="nameInput" placeholder="输入姓名（可选）">
+                <input type="number" id="ageInput" placeholder="输入年龄（可选）">
+                <button onclick="demo3()">运行示例</button>
+            </div>
+            <div id="output3" class="output"></div>
+        </div>
+        
+        <div class="demo-section">
+            <h2>4. 剩余参数</h2>
+            <div class="code-block">
+function sum(...numbers) {
+  return numbers.reduce((total, num) => total + num, 0);
+}
+            </div>
+            <div class="input-group">
+                <input type="text" id="numbersInput" placeholder="输入数字，用逗号分隔（如：1,2,3,4）">
+                <button onclick="demo4()">计算总和</button>
+            </div>
+            <div id="output4" class="output"></div>
+        </div>
+        
+        <div class="demo-section">
+            <h2>5. 扩展运算符</h2>
+            <div class="two-column">
+                <div class="column">
+                    <h3>数组操作</h3>
+                    <div class="code-block">
+const arr1 = [1, 2, 3];
+const arr2 = [4, 5, 6];
+const combined = [...arr1, ...arr2];
+                    </div>
+                    <button onclick="demo5a()">合并数组</button>
+                    <div id="output5a" class="output"></div>
+                </div>
+                <div class="column">
+                    <h3>对象操作</h3>
+                    <div class="code-block">
+const person = { name: 'Alice', age: 30 };
+const employee = { ...person, position: 'Developer' };
+                    </div>
+                    <button onclick="demo5b()">合并对象</button>
+                    <div id="output5b" class="output"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="demo-section">
+            <h2>6. 实际应用：数组方法与箭头函数</h2>
+            <div class="code-block">
+const users = [
+  { id: 1, name: 'Alice', age: 30 },
+  { id: 2, name: 'Bob', age: 25 },
+  { id: 3, name: 'Charlie', age: 35 }
+];
+
+// 使用箭头函数和数组方法
+const userNames = users.map(user => user.name);
+const olderUsers = users.filter(user => user.age > 30);
+            </div>
+            <button onclick="demo6()">运行示例</button>
+            <div id="output6" class="output"></div>
+        </div>
+        
+        <div class="demo-section">
+            <h2>7. 实际应用：解决回调中的this问题</h2>
+            <div class="note">
+                <p>这个示例展示了如何使用箭头函数解决回调函数中的this绑定问题。</p>
+            </div>
+            <div class="code-block">
+const counter = {
+  count: 0,
+  start: function() {
+    // 使用箭头函数确保this指向counter对象
+    setInterval(() => {
+      this.count++;
+      console.log(`Count: ${this.count}`);
+    }, 1000);
+  }
+};
+            </div>
+            <button onclick="demo7()">启动计数器（运行3次）</button>
+            <div id="output7" class="output"></div>
+        </div>
+        
+        <div class="demo-section">
+            <h2>8. 实际应用：使用对象参数处理多个可选参数</h2>
+            <div class="code-block">
+function createUser(options = {}) {
+  const {
+    name = 'Anonymous',
+    age = 0,
+    email = null,
+    isActive = true
+  } = options;
+  
+  return { name, age, email, isActive };
+}
+            </div>
+            <div class="input-group">
+                <input type="text" id="userName" placeholder="姓名">
+                <input type="number" id="userAge" placeholder="年龄">
+                <input type="email" id="userEmail" placeholder="邮箱">
+                <button onclick="demo8()">创建用户</button>
+            </div>
+            <div id="output8" class="output"></div>
+        </div>
+    </div>
+
+    <script>
+        // 辅助函数：将输出添加到指定的元素
+        function appendOutput(elementId, message) {
+            const outputElement = document.getElementById(elementId);
+            outputElement.textContent += message + '\n';
+        }
+        
+        // 清空输出
+        function clearOutput(elementId) {
+            document.getElementById(elementId).textContent = '';
+        }
+        
+        // 演示1：传统函数与箭头函数的对比
+        function demo1() {
+            clearOutput('output1');
+            
+            // 传统函数声明
+            function add(a, b) {
+                return a + b;
+            }
+            
+            // 箭头函数
+            const subtract = (a, b) => a - b;
+            
+            appendOutput('output1', 'add(5, 3): ' + add(5, 3));
+            appendOutput('output1', 'subtract(5, 3): ' + subtract(5, 3));
+            
+            // 单参数箭头函数
+            const double = x => x * 2;
+            appendOutput('output1', 'double(5): ' + double(5));
+            
+            // 无参数箭头函数
+            const getRandom = () => Math.random();
+            appendOutput('output1', 'getRandom(): ' + getRandom().toFixed(4));
+        }
+        
+        // 演示2：箭头函数中的this绑定
+        function demo2() {
+            clearOutput('output2');
+            
+            const person = {
+                name: 'Alice',
+                
+                // 传统函数中的this
+                sayNameTraditional: function() {
+                    appendOutput('output2', '传统函数中的this:');
+                    appendOutput('output2', '外层函数: ' + this.name);
+                    
+                    setTimeout(function() {
+                        appendOutput('output2', '回调函数中的this: ' + this.name);
+                    }, 10);
+                },
+                
+                // 箭头函数中的this
+                sayNameArrow: function() {
+                    setTimeout(() => {
+                        appendOutput('output2', '箭头函数回调中的this: ' + this.name);
+                    }, 20);
+                }
+            };
+            
+            person.sayNameTraditional();
+            person.sayNameArrow();
+        }
+        
+        // 演示3：默认参数
+        function demo3() {
+            clearOutput('output3');
+            
+            const nameInput = document.getElementById('nameInput').value;
+            const ageInput = document.getElementById('ageInput').value;
+            
+            function greet(name = 'Guest', age = 0) {
+                return `Hello, ${name}! You are ${age} years old.`;
+            }
+            
+            // 根据输入情况调用函数
+            let result;
+            if (nameInput && ageInput) {
+                result = greet(nameInput, parseInt(ageInput));
+            } else if (nameInput) {
+                result = greet(nameInput);
+            } else {
+                result = greet();
+            }
+            
+            appendOutput('output3', '结果: ' + result);
+            appendOutput('output3', '输入的姓名: ' + (nameInput || '未输入（使用默认值）'));
+            appendOutput('output3', '输入的年龄: ' + (ageInput || '未输入（使用默认值）'));
+        }
+        
+        // 演示4：剩余参数
+        function demo4() {
+            clearOutput('output4');
+            
+            const numbersInput = document.getElementById('numbersInput').value;
+            
+            function sum(...numbers) {
+                return numbers.reduce((total, num) => total + num, 0);
+            }
+            
+            let result;
+            if (numbersInput) {
+                const numbers = numbersInput.split(',').map(n => parseFloat(n.trim()));
+                result = sum(...numbers);
+                appendOutput('output4', '输入的数字: [' + numbers.join(', ') + ']');
+                appendOutput('output4', '总和: ' + result);
+                appendOutput('output4', '平均值: ' + (result / numbers.length).toFixed(2));
+            } else {
+                result = sum();
+                appendOutput('output4', '没有输入数字，使用空参数');
+                appendOutput('output4', '总和: ' + result);
+            }
+        }
+        
+        // 演示5a：扩展运算符 - 数组操作
+        function demo5a() {
+            clearOutput('output5a');
+            
+            const arr1 = [1, 2, 3];
+            const arr2 = [4, 5, 6];
+            const combined = [...arr1, ...arr2];
+            
+            appendOutput('output5a', '原始数组1: [' + arr1.join(', ') + ']');
+            appendOutput('output5a', '原始数组2: [' + arr2.join(', ') + ']');
+            appendOutput('output5a', '合并后数组: [' + combined.join(', ') + ']');
+            
+            // 在数组中间插入元素
+            const withElement = [0, ...arr1, 7, 8, 9];
+            appendOutput('output5a', '插入元素后: [' + withElement.join(', ') + ']');
+        }
+        
+        // 演示5b：扩展运算符 - 对象操作
+        function demo5b() {
+            clearOutput('output5b');
+            
+            const person = { name: 'Alice', age: 30 };
+            const employee = { ...person, position: 'Developer' };
+            const updatedPerson = { ...person, age: 31 };
+            
+            appendOutput('output5b', '原始对象: ' + JSON.stringify(person));
+            appendOutput('output5b', '添加属性后: ' + JSON.stringify(employee));
+            appendOutput('output5b', '更新属性后: ' + JSON.stringify(updatedPerson));
+            
+            // 合并多个对象
+            const obj1 = { a: 1, b: 2 };
+            const obj2 = { c: 3, d: 4 };
+            const obj3 = { b: 5, e: 6 }; // b会覆盖obj1中的b
+            const merged = { ...obj1, ...obj2, ...obj3 };
+            appendOutput('output5b', '合并多个对象: ' + JSON.stringify(merged));
+        }
+        
+        // 演示6：数组方法与箭头函数
+        function demo6() {
+            clearOutput('output6');
+            
+            const users = [
+                { id: 1, name: 'Alice', age: 30 },
+                { id: 2, name: 'Bob', age: 25 },
+                { id: 3, name: 'Charlie', age: 35 }
+            ];
+            
+            // 使用箭头函数和数组方法
+            const userNames = users.map(user => user.name);
+            const olderUsers = users.filter(user => user.age > 30);
+            const userById = users.reduce((obj, user) => {
+                obj[user.id] = user;
+                return obj;
+            }, {});
+            
+            appendOutput('output6', '原始用户数据:');
+            users.forEach(user => {
+                appendOutput('output6', `  ID: ${user.id}, 姓名: ${user.name}, 年龄: ${user.age}`);
+            });
+            
+            appendOutput('output6', '\n所有用户名: [' + userNames.join(', ') + ']');
+            
+            appendOutput('output6', '\n年龄大于30的用户:');
+            olderUsers.forEach(user => {
+                appendOutput('output6', `  ID: ${user.id}, 姓名: ${user.name}, 年龄: ${user.age}`);
+            });
+            
+            appendOutput('output6', '\n按ID索引的用户对象:');
+            appendOutput('output6', JSON.stringify(userById, null, 2));
+        }
+        
+        // 演示7：解决回调中的this问题
+        function demo7() {
+            clearOutput('output7');
+            
+            const counter = {
+                count: 0,
+                
+                start: function() {
+                    appendOutput('output7', '启动计数器...');
+                    
+                    // 使用箭头函数确保this指向counter对象
+                    const intervalId = setInterval(() => {
+                        this.count++;
+                        appendOutput('output7', `Count: ${this.count}`);
+                        
+                        // 运行3次后停止
+                        if (this.count >= 3) {
+                            clearInterval(intervalId);
+                            appendOutput('output7', '计数器已停止');
+                        }
+                    }, 1000);
+                }
+            };
+            
+            counter.start();
+        }
+        
+        // 演示8：使用对象参数处理多个可选参数
+        function demo8() {
+            clearOutput('output8');
+            
+            const userName = document.getElementById('userName').value;
+            const userAge = document.getElementById('userAge').value;
+            const userEmail = document.getElementById('userEmail').value;
+            
+            function createUser(options = {}) {
+                const {
+                    name = 'Anonymous',
+                    age = 0,
+                    email = null,
+                    isActive = true
+                } = options;
+                
+                return { name, age, email, isActive };
+            }
+            
+            // 构建选项对象
+            const options = {};
+            if (userName) options.name = userName;
+            if (userAge) options.age = parseInt(userAge);
+            if (userEmail) options.email = userEmail;
+            
+            const user = createUser(options);
+            
+            appendOutput('output8', '创建的用户对象:');
+            appendOutput('output8', JSON.stringify(user, null, 2));
+            
+            appendOutput('output8', '\n输入值:');
+            appendOutput('output8', '姓名: ' + (userName || '未输入（使用默认值）'));
+            appendOutput('output8', '年龄: ' + (userAge || '未输入（使用默认值）'));
+            appendOutput('output8', '邮箱: ' + (userEmail || '未输入（使用默认值）'));
+        }
+    </script>
+</body>
+</html>

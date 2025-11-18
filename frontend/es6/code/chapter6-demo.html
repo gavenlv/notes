@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>第6章：对象与数组的增强 - 演示</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f7fa;
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: #3498db;
+            margin-top: 30px;
+        }
+        .demo-section {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .code-block {
+            background-color: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 4px;
+            padding: 15px;
+            margin-bottom: 15px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 14px;
+            overflow-x: auto;
+        }
+        .button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s;
+        }
+        .button:hover {
+            background-color: #2980b9;
+        }
+        .output {
+            background-color: #2c3e50;
+            color: #f8f9fa;
+            border-radius: 4px;
+            padding: 15px;
+            margin-top: 10px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 14px;
+            white-space: pre-wrap;
+            min-height: 20px;
+        }
+        .exercise {
+            background-color: #e8f4fc;
+            border-left: 4px solid #3498db;
+            padding: 15px;
+            margin-top: 20px;
+        }
+        .exercise h3 {
+            margin-top: 0;
+            color: #2980b9;
+        }
+        .input-group {
+            margin-bottom: 15px;
+        }
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .input-group input, .input-group textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .two-column {
+            display: flex;
+            gap: 20px;
+        }
+        .two-column > div {
+            flex: 1;
+        }
+    </style>
+</head>
+<body>
+    <h1>第6章：对象与数组的增强 - 演示</h1>
+
+    <!-- 6.1 对象字面量增强 -->
+    <div class="demo-section">
+        <h2>6.1 对象字面量增强</h2>
+        
+        <h3>6.1.1 属性简写</h3>
+        <div class="code-block">
+const name = 'Alice';
+const age = 25;
+
+// ES5
+const personES5 = {
+  name: name,
+  age: age
+};
+
+// ES6
+const personES6 = {
+  name,  // 属性名与变量名相同，可简写
+  age
+};
+        </div>
+        <button class="button" onclick="demoPropertyShorthand()">运行代码</button>
+        <div id="propertyShorthandOutput" class="output"></div>
+        
+        <h3>6.1.2 方法简写</h3>
+        <div class="code-block">
+// ES5
+const calculatorES5 = {
+  add: function(a, b) {
+    return a + b;
+  }
+};
+
+// ES6
+const calculatorES6 = {
+  add(a, b) {
+    return a + b;
+  }
+};
+        </div>
+        <button class="button" onclick="demoMethodShorthand()">运行代码</button>
+        <div id="methodShorthandOutput" class="output"></div>
+        
+        <h3>6.1.3 计算属性名</h3>
+        <div class="code-block">
+const prop = 'name';
+const prefix = 'user';
+
+const person = {
+  [prop]: 'Alice',
+  [`${prefix}Id`]: 123,
+  ['full' + 'Name']: 'Alice Smith'
+};
+        </div>
+        <button class="button" onclick="demoComputedProperty()">运行代码</button>
+        <div id="computedPropertyOutput" class="output"></div>
+    </div>
+
+    <!-- 6.2 数组新增方法 -->
+    <div class="demo-section">
+        <h2>6.2 数组新增方法</h2>
+        
+        <h3>6.2.1 Array.from()</h3>
+        <div class="code-block">
+// 从类数组对象创建数组
+const arrayLike = {
+  0: 'a',
+  1: 'b',
+  2: 'c',
+  length: 3
+};
+const arr1 = Array.from(arrayLike);
+
+// 从字符串创建数组
+const str = 'hello';
+const arr2 = Array.from(str);
+
+// 使用映射函数
+const arr3 = Array.from([1, 2, 3], x => x * 2);
+        </div>
+        <button class="button" onclick="demoArrayFrom()">运行代码</button>
+        <div id="arrayFromOutput" class="output"></div>
+        
+        <h3>6.2.2 Array.of()</h3>
+        <div class="code-block">
+// Array构造函数的问题
+const arr1 = new Array(3); // 创建一个长度为3的空数组
+
+// Array.of解决了这个问题
+const arr2 = Array.of(3); // 创建包含3的数组
+        </div>
+        <button class="button" onclick="demoArrayOf()">运行代码</button>
+        <div id="arrayOfOutput" class="output"></div>
+        
+        <h3>6.2.3 find() 和 findIndex()</h3>
+        <div class="code-block">
+const numbers = [5, 12, 8, 130, 44];
+
+// find示例
+const found = numbers.find(element => element > 10);
+
+// findIndex示例
+const foundIndex = numbers.findIndex(element => element > 10);
+        </div>
+        <button class="button" onclick="demoFindAndFindIndex()">运行代码</button>
+        <div id="findAndFindIndexOutput" class="output"></div>
+        
+        <h3>6.2.4 fill()</h3>
+        <div class="code-block">
+const arr1 = [1, 2, 3, 4];
+arr1.fill(0);
+
+const arr2 = [1, 2, 3, 4];
+arr2.fill(0, 1, 3); // 从索引1开始，到索引3（不包括3）结束
+        </div>
+        <button class="button" onclick="demoFill()">运行代码</button>
+        <div id="fillOutput" class="output"></div>
+        
+        <h3>6.2.5 entries(), keys(), values()</h3>
+        <div class="code-block">
+const arr = ['a', 'b', 'c'];
+
+// entries() 返回键值对迭代器
+for (const [index, value] of arr.entries()) {
+  console.log(index, value);
+}
+
+// keys() 返回键迭代器
+for (const key of arr.keys()) {
+  console.log(key);
+}
+
+// values() 返回值迭代器
+for (const value of arr.values()) {
+  console.log(value);
+}
+        </div>
+        <button class="button" onclick="demoEntriesKeysValues()">运行代码</button>
+        <div id="entriesKeysValuesOutput" class="output"></div>
+        
+        <h3>6.2.6 includes()</h3>
+        <div class="code-block">
+const arr = [1, 2, 3, NaN];
+
+console.log(arr.includes(2)); // true
+console.log(arr.includes(4)); // false
+
+// 与indexOf的区别：includes能正确识别NaN
+console.log(arr.includes(NaN)); // true
+console.log(arr.indexOf(NaN)); // -1
+        </div>
+        <button class="button" onclick="demoIncludes()">运行代码</button>
+        <div id="includesOutput" class="output"></div>
+    </div>
+
+    <!-- 6.3 对象新增方法 -->
+    <div class="demo-section">
+        <h2>6.3 对象新增方法</h2>
+        
+        <h3>6.3.1 Object.assign()</h3>
+        <div class="code-block">
+const target = { a: 1, b: 2 };
+const source = { b: 3, c: 4 };
+
+const merged = Object.assign(target, source);
+// 结果: { a: 1, b: 3, c: 4 }
+
+// 不修改原始对象
+const merged2 = Object.assign({}, target, source);
+        </div>
+        <button class="button" onclick="demoObjectAssign()">运行代码</button>
+        <div id="objectAssignOutput" class="output"></div>
+        
+        <h3>6.3.2 Object.is()</h3>
+        <div class="code-block">
+console.log(Object.is(0, -0)); // false
+console.log(0 === -0); // true
+
+console.log(Object.is(NaN, NaN)); // true
+console.log(NaN === NaN); // false
+        </div>
+        <button class="button" onclick="demoObjectIs()">运行代码</button>
+        <div id="objectIsOutput" class="output"></div>
+        
+        <h3>6.3.3 Object.keys(), Object.values(), Object.entries()</h3>
+        <div class="code-block">
+const obj = {
+  a: 1,
+  b: 2,
+  c: 3
+};
+
+// Object.keys() - 获取键数组
+const keys = Object.keys(obj);
+
+// Object.values() - 获取值数组
+const values = Object.values(obj);
+
+// Object.entries() - 获取键值对数组
+const entries = Object.entries(obj);
+        </div>
+        <button class="button" onclick="demoObjectKeysValuesEntries()">运行代码</button>
+        <div id="objectKeysValuesEntriesOutput" class="output"></div>
+    </div>
+
+    <!-- 6.4 迭代器与for...of循环 -->
+    <div class="demo-section">
+        <h2>6.4 迭代器与for...of循环</h2>
+        
+        <h3>6.4.1 自定义迭代器</h3>
+        <div class="code-block">
+// 创建一个可迭代对象
+const myIterable = {
+  data: ['a', 'b', 'c'],
+  [Symbol.iterator]() {
+    let index = 0;
+    const data = this.data;
+    
+    return {
+      next() {
+        if (index < data.length) {
+          return { value: data[index++], done: false };
+        } else {
+          return { done: true };
+        }
+      }
+    };
+  }
+};
+
+// 使用for...of遍历
+for (const item of myIterable) {
+  console.log(item);
+}
+
+// 使用扩展运算符
+console.log([...myIterable]);
+        </div>
+        <button class="button" onclick="demoCustomIterator()">运行代码</button>
+        <div id="customIteratorOutput" class="output"></div>
+        
+        <h3>6.4.2 for...of循环</h3>
+        <div class="code-block">
+// 遍历数组
+const arr = ['a', 'b', 'c'];
+
+// 遍历字符串
+const str = 'hello';
+
+// 遍历Map
+const map = new Map([
+  ['a', 1],
+  ['b', 2],
+  ['c', 3]
+]);
+
+// 遍历Set
+const set = new Set(['a', 'b', 'c']);
+        </div>
+        <button class="button" onclick="demoForOf()">运行代码</button>
+        <div id="forOfOutput" class="output"></div>
+    </div>
+
+    <!-- 6.5 实际应用场景 -->
+    <div class="demo-section">
+        <h2>6.5 实际应用场景</h2>
+        
+        <h3>6.5.1 配置合并</h3>
+        <div class="code-block">
+const defaultConfig = {
+  apiUrl: 'https://api.example.com',
+  timeout: 5000,
+  retries: 3,
+  headers: {
+    'Content-Type': 'application/json'
+  }
+};
+
+const userConfig = {
+  timeout: 10000,
+  headers: {
+    'Authorization': 'Bearer token123'
+  }
+};
+
+// 使用Object.assign合并配置
+const config = Object.assign({}, defaultConfig, userConfig);
+        </div>
+        <button class="button" onclick="demoConfigMerge()">运行代码</button>
+        <div id="configMergeOutput" class="output"></div>
+        
+        <h3>6.5.2 数据处理</h3>
+        <div class="code-block">
+const users = [
+  { id: 1, name: 'Alice', age: 25, active: true },
+  { id: 2, name: 'Bob', age: 30, active: false },
+  { id: 3, name: 'Charlie', age: 35, active: true },
+  { id: 4, name: 'David', age: 28, active: true }
+];
+
+// 使用find查找特定用户
+const activeUser = users.find(user => user.id === 3);
+
+// 使用findIndex查找特定用户的索引
+const bobIndex = users.findIndex(user => user.name === 'Bob');
+
+// 使用includes检查是否存在特定用户
+const userIds = users.map(user => user.id);
+const hasUserWithId3 = userIds.includes(3);
+        </div>
+        <button class="button" onclick="demoDataProcessing()">运行代码</button>
+        <div id="dataProcessingOutput" class="output"></div>
+    </div>
+
+    <!-- 6.6 实践练习 -->
+    <div class="demo-section">
+        <h2>6.6 实践练习</h2>
+        
+        <div class="exercise">
+            <h3>练习1：对象字面量增强</h3>
+            <p>创建一个函数<code>createPerson(name, age, job)</code>，使用对象字面量增强特性返回一个包含以下内容的对象：</p>
+            <ul>
+                <li><code>name</code>和<code>age</code>属性使用属性简写</li>
+                <li><code>job</code>属性</li>
+                <li><code>introduce</code>方法使用方法简写，返回介绍字符串</li>
+                <li><code>id</code>属性使用计算属性名，值为<code>person_${name}_${age}</code></li>
+            </ul>
+            
+            <div class="two-column">
+                <div>
+                    <div class="input-group">
+                        <label for="personName">姓名:</label>
+                        <input type="text" id="personName" value="Alice">
+                    </div>
+                    <div class="input-group">
+                        <label for="personAge">年龄:</label>
+                        <input type="number" id="personAge" value="30">
+                    </div>
+                    <div class="input-group">
+                        <label for="personJob">职业:</label>
+                        <input type="text" id="personJob" value="developer">
+                    </div>
+                </div>
+                <div>
+                    <button class="button" onclick="exercise1()">创建人物</button>
+                    <div id="exercise1Output" class="output"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="exercise">
+            <h3>练习2：数组方法应用</h3>
+            <p>给定一个包含学生对象的数组，使用数组方法完成以下任务：</p>
+            <ul>
+                <li>找到第一个活跃且分数大于80的学生</li>
+                <li>找到分数最高的学生的索引</li>
+                <li>检查是否存在id为5的学生</li>
+                <li>创建一个包含所有活跃学生分数的数组</li>
+            </ul>
+            
+            <button class="button" onclick="exercise2()">执行数组操作</button>
+            <div id="exercise2Output" class="output"></div>
+        </div>
+        
+        <div class="exercise">
+            <h3>练习3：自定义迭代器</h3>
+            <p>创建一个可迭代对象<code>PrimeNumbers</code>，用于迭代指定范围内的所有质数。</p>
+            
+            <div class="input-group">
+                <label for="primeLimit">上限:</label>
+                <input type="number" id="primeLimit" value="20">
+            </div>
+            
+            <button class="button" onclick="exercise3()">生成质数</button>
+            <div id="exercise3Output" class="output"></div>
+        </div>
+    </div>
+
+    <script>
+        // 辅助函数：将输出显示在指定的div中
+        function showOutput(elementId, content) {
+            const outputElement = document.getElementById(elementId);
+            outputElement.textContent = typeof content === 'object' ? JSON.stringify(content, null, 2) : content;
+        }
+
+        // 6.1.1 属性简写
+        function demoPropertyShorthand() {
+            const name = 'Alice';
+            const age = 25;
+            
+            // ES5
+            const personES5 = {
+                name: name,
+                age: age
+            };
+            
+            // ES6
+            const personES6 = {
+                name,  // 属性名与变量名相同，可简写
+                age
+            };
+            
+            showOutput('propertyShorthandOutput', 
+                `ES5方式: ${JSON.stringify(personES5)}\n\n` +
+                `ES6方式: ${JSON.stringify(personES6)}`
+            );
+        }
+
+        // 6.1.2 方法简写
+        function demoMethodShorthand() {
+            // ES5
+            const calculatorES5 = {
+                add: function(a, b) {
+                    return a + b;
+                },
+                subtract: function(a, b) {
+                    return a - b;
+                }
+            };
+            
+            // ES6
+            const calculatorES6 = {
+                add(a, b) {
+                    return a + b;
+                },
+                subtract(a, b) {
+                    return a - b;
+                }
+            };
+            
+            showOutput('methodShorthandOutput', 
+                `ES5加法: ${calculatorES5.add(5, 3)}\n` +
+                `ES6加法: ${calculatorES6.add(5, 3)}\n` +
+                `ES5减法: ${calculatorES5.subtract(5, 3)}\n` +
+                `ES6减法: ${calculatorES6.subtract(5, 3)}`
+            );
+        }
+
+        // 6.1.3 计算属性名
+        function demoComputedProperty() {
+            const prop = 'name';
+            const prefix = 'user';
+            
+            const person = {
+                [prop]: 'Alice',
+                [`${prefix}Id`]: 123,
+                ['full' + 'Name']: 'Alice Smith'
+            };
+            
+            showOutput('computedPropertyOutput', JSON.stringify(person, null, 2));
+        }
+
+        // 6.2.1 Array.from()
+        function demoArrayFrom() {
+            // 从类数组对象创建数组
+            const arrayLike = {
+                0: 'a',
+                1: 'b',
+                2: 'c',
+                length: 3
+            };
+            const arr1 = Array.from(arrayLike);
+            
+            // 从字符串创建数组
+            const str = 'hello';
+            const arr2 = Array.from(str);
+            
+            // 使用映射函数
+            const arr3 = Array.from([1, 2, 3], x => x * 2);
+            
+            showOutput('arrayFromOutput', 
+                `从类数组对象创建数组: ${JSON.stringify(arr1)}\n` +
+                `从字符串创建数组: ${JSON.stringify(arr2)}\n` +
+                `使用映射函数: ${JSON.stringify(arr3)}`
+            );
+        }
+
+        // 6.2.2 Array.of()
+        function demoArrayOf() {
+            // Array构造函数的问题
+            const arr1 = new Array(3); // 创建一个长度为3的空数组
+            
+            // Array.of解决了这个问题
+            const arr2 = Array.of(3); // 创建包含3的数组
+            
+            showOutput('arrayOfOutput', 
+                `new Array(3): ${JSON.stringify(arr1)}\n` +
+                `Array.of(3): ${JSON.stringify(arr2)}`
+            );
+        }
+
+        // 6.2.3 find() 和 findIndex()
+        function demoFindAndFindIndex() {
+            const numbers = [5, 12, 8, 130, 44];
+            
+            // find示例
+            const found = numbers.find(element => element > 10);
+            
+            // findIndex示例
+            const foundIndex = numbers.findIndex(element => element > 10);
+            
+            showOutput('findAndFindIndexOutput', 
+                `find()结果: ${found}\n` +
+                `findIndex()结果: ${foundIndex}`
+            );
+        }
+
+        // 6.2.4 fill()
+        function demoFill() {
+            const arr1 = [1, 2, 3, 4];
+            const arr1Copy = [...arr1];
+            arr1Copy.fill(0);
+            
+            const arr2 = [1, 2, 3, 4];
+            const arr2Copy = [...arr2];
+            arr2Copy.fill(0, 1, 3); // 从索引1开始，到索引3（不包括3）结束
+            
+            showOutput('fillOutput', 
+                `原始数组: [${arr1.join(', ')}]\n` +
+                `fill(0): [${arr1Copy.join(', ')}]\n\n` +
+                `原始数组: [${arr2.join(', ')}]\n` +
+                `fill(0, 1, 3): [${arr2Copy.join(', ')}]`
+            );
+        }
+
+        // 6.2.5 entries(), keys(), values()
+        function demoEntriesKeysValues() {
+            const arr = ['a', 'b', 'c'];
+            
+            let output = '';
+            
+            // entries() 返回键值对迭代器
+            output += 'entries():\n';
+            for (const [index, value] of arr.entries()) {
+                output += `  ${index}: ${value}\n`;
+            }
+            
+            // keys() 返回键迭代器
+            output += '\nkeys():\n';
+            for (const key of arr.keys()) {
+                output += `  ${key}\n`;
+            }
+            
+            // values() 返回值迭代器
+            output += '\nvalues():\n';
+            for (const value of arr.values()) {
+                output += `  ${value}\n`;
+            }
+            
+            showOutput('entriesKeysValuesOutput', output);
+        }
+
+        // 6.2.6 includes()
+        function demoIncludes() {
+            const arr = [1, 2, 3, NaN];
+            
+            const includes2 = arr.includes(2);
+            const includes4 = arr.includes(4);
+            const includesNaN = arr.includes(NaN);
+            const indexOfNaN = arr.indexOf(NaN);
+            
+            showOutput('includesOutput', 
+                `arr.includes(2): ${includes2}\n` +
+                `arr.includes(4): ${includes4}\n\n` +
+                `arr.includes(NaN): ${includesNaN}\n` +
+                `arr.indexOf(NaN): ${indexOfNaN}`
+            );
+        }
+
+        // 6.3.1 Object.assign()
+        function demoObjectAssign() {
+            const target = { a: 1, b: 2 };
+            const source = { b: 3, c: 4 };
+            
+            // 修改原始对象
+            const merged1 = Object.assign(target, source);
+            
+            // 不修改原始对象
+            const target2 = { a: 1, b: 2 };
+            const merged2 = Object.assign({}, target2, source);
+            
+            showOutput('objectAssignOutput', 
+                `原始目标对象: ${JSON.stringify({ a: 1, b: 2 })}\n` +
+                `源对象: ${JSON.stringify(source)}\n\n` +
+                `修改原始对象: ${JSON.stringify(merged1)}\n` +
+                `目标对象被修改: ${JSON.stringify(target)}\n\n` +
+                `不修改原始对象: ${JSON.stringify(merged2)}\n` +
+                `目标对象保持不变: ${JSON.stringify(target2)}`
+            );
+        }
+
+        // 6.3.2 Object.is()
+        function demoObjectIs() {
+            const is0Minus0 = Object.is(0, -0);
+            const eq0Minus0 = 0 === -0;
+            
+            const isNaNNaN = Object.is(NaN, NaN);
+            const eqNaNNaN = NaN === NaN;
+            
+            showOutput('objectIsOutput', 
+                `Object.is(0, -0): ${is0Minus0}\n` +
+                `0 === -0: ${eq0Minus0}\n\n` +
+                `Object.is(NaN, NaN): ${isNaNNaN}\n` +
+                `NaN === NaN: ${eqNaNNaN}`
+            );
+        }
+
+        // 6.3.3 Object.keys(), Object.values(), Object.entries()
+        function demoObjectKeysValuesEntries() {
+            const obj = {
+                a: 1,
+                b: 2,
+                c: 3
+            };
+            
+            // Object.keys() - 获取键数组
+            const keys = Object.keys(obj);
+            
+            // Object.values() - 获取值数组
+            const values = Object.values(obj);
+            
+            // Object.entries() - 获取键值对数组
+            const entries = Object.entries(obj);
+            
+            showOutput('objectKeysValuesEntriesOutput', 
+                `Object.keys(): ${JSON.stringify(keys)}\n` +
+                `Object.values(): ${JSON.stringify(values)}\n` +
+                `Object.entries(): ${JSON.stringify(entries)}`
+            );
+        }
+
+        // 6.4.1 自定义迭代器
+        function demoCustomIterator() {
+            // 创建一个可迭代对象
+            const myIterable = {
+                data: ['a', 'b', 'c'],
+                [Symbol.iterator]() {
+                    let index = 0;
+                    const data = this.data;
+                    
+                    return {
+                        next() {
+                            if (index < data.length) {
+                                return { value: data[index++], done: false };
+                            } else {
+                                return { done: true };
+                            }
+                        }
+                    };
+                }
+            };
+            
+            let output = '';
+            
+            // 使用for...of遍历
+            output += '使用for...of遍历:\n';
+            for (const item of myIterable) {
+                output += `  ${item}\n`;
+            }
+            
+            // 使用扩展运算符
+            output += '\n使用扩展运算符:\n';
+            output += `  ${JSON.stringify([...myIterable])}`;
+            
+            showOutput('customIteratorOutput', output);
+        }
+
+        // 6.4.2 for...of循环
+        function demoForOf() {
+            // 遍历数组
+            const arr = ['a', 'b', 'c'];
+            
+            // 遍历字符串
+            const str = 'hello';
+            
+            // 遍历Map
+            const map = new Map([
+                ['a', 1],
+                ['b', 2],
+                ['c', 3]
+            ]);
+            
+            // 遍历Set
+            const set = new Set(['a', 'b', 'c']);
+            
+            let output = '';
+            
+            // 遍历数组
+            output += '遍历数组:\n';
+            for (const item of arr) {
+                output += `  ${item}\n`;
+            }
+            
+            // 遍历字符串
+            output += '\n遍历字符串:\n';
+            for (const char of str) {
+                output += `  ${char}\n`;
+            }
+            
+            // 遍历Map
+            output += '\n遍历Map:\n';
+            for (const [key, value] of map) {
+                output += `  ${key}: ${value}\n`;
+            }
+            
+            // 遍历Set
+            output += '\n遍历Set:\n';
+            for (const item of set) {
+                output += `  ${item}\n`;
+            }
+            
+            showOutput('forOfOutput', output);
+        }
+
+        // 6.5.1 配置合并
+        function demoConfigMerge() {
+            const defaultConfig = {
+                apiUrl: 'https://api.example.com',
+                timeout: 5000,
+                retries: 3,
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            };
+            
+            const userConfig = {
+                timeout: 10000,
+                headers: {
+                    'Authorization': 'Bearer token123'
+                }
+            };
+            
+            // 使用Object.assign合并配置
+            const config = Object.assign({}, defaultConfig, userConfig);
+            
+            showOutput('configMergeOutput', 
+                `默认配置: ${JSON.stringify(defaultConfig, null, 2)}\n\n` +
+                `用户配置: ${JSON.stringify(userConfig, null, 2)}\n\n` +
+                `合并后的配置: ${JSON.stringify(config, null, 2)}`
+            );
+        }
+
+        // 6.5.2 数据处理
+        function demoDataProcessing() {
+            const users = [
+                { id: 1, name: 'Alice', age: 25, active: true },
+                { id: 2, name: 'Bob', age: 30, active: false },
+                { id: 3, name: 'Charlie', age: 35, active: true },
+                { id: 4, name: 'David', age: 28, active: true }
+            ];
+            
+            // 使用find查找特定用户
+            const activeUser = users.find(user => user.id === 3);
+            
+            // 使用findIndex查找特定用户的索引
+            const bobIndex = users.findIndex(user => user.name === 'Bob');
+            
+            // 使用includes检查是否存在特定用户
+            const userIds = users.map(user => user.id);
+            const hasUserWithId3 = userIds.includes(3);
+            
+            showOutput('dataProcessingOutput', 
+                `查找ID为3的用户: ${JSON.stringify(activeUser)}\n\n` +
+                `Bob的索引: ${bobIndex}\n\n` +
+                `是否存在ID为3的用户: ${hasUserWithId3}`
+            );
+        }
+
+        // 练习1：对象字面量增强
+        function exercise1() {
+            const name = document.getElementById('personName').value;
+            const age = parseInt(document.getElementById('personAge').value);
+            const job = document.getElementById('personJob').value;
+            
+            function createPerson(name, age, job) {
+                const id = `person_${name}_${age}`;
+                
+                return {
+                    name,  // 属性简写
+                    age,   // 属性简写
+                    job,
+                    introduce() {  // 方法简写
+                        return `Hi, I'm ${this.name}, ${this.age} years old, and I work as a ${this.job}.`;
+                    },
+                    [id]: true  // 计算属性名
+                };
+            }
+            
+            const person = createPerson(name, age, job);
+            const introduction = person.introduce();
+            
+            showOutput('exercise1Output', 
+                `创建的人物: ${JSON.stringify(person, null, 2)}\n\n` +
+                `介绍: ${introduction}`
+            );
+        }
+
+        // 练习2：数组方法应用
+        function exercise2() {
+            const students = [
+                { id: 1, name: 'Alice', score: 85, active: true },
+                { id: 2, name: 'Bob', score: 92, active: false },
+                { id: 3, name: 'Charlie', score: 78, active: true },
+                { id: 4, name: 'David', score: 95, active: true },
+                { id: 5, name: 'Eve', score: 88, active: false }
+            ];
+            
+            // 1. 找到第一个活跃且分数大于80的学生
+            const activeHighScoreStudent = students.find(student => student.active && student.score > 80);
+            
+            // 2. 找到分数最高的学生的索引
+            const highestScoreIndex = students.findIndex(student => 
+                student.score === Math.max(...students.map(s => s.score))
+            );
+            
+            // 3. 检查是否存在id为5的学生
+            const hasStudentWithId5 = students.some(student => student.id === 5);
+            
+            // 4. 创建一个包含所有活跃学生分数的数组
+            const activeStudentScores = students
+                .filter(student => student.active)
+                .map(student => student.score);
+            
+            showOutput('exercise2Output', 
+                `第一个活跃且分数大于80的学生: ${JSON.stringify(activeHighScoreStudent)}\n\n` +
+                `分数最高的学生的索引: ${highestScoreIndex}\n\n` +
+                `是否存在id为5的学生: ${hasStudentWithId5}\n\n` +
+                `所有活跃学生的分数: [${activeStudentScores.join(', ')}]`
+            );
+        }
+
+        // 练习3：自定义迭代器
+        function exercise3() {
+            const limit = parseInt(document.getElementById('primeLimit').value);
+            
+            class PrimeNumbers {
+                constructor(max) {
+                    this.max = max;
+                }
+                
+                [Symbol.iterator]() {
+                    let current = 2;
+                    
+                    return {
+                        next: () => {
+                            // 找到下一个质数
+                            while (current <= this.max && !this.isPrime(current)) {
+                                current++;
+                            }
+                            
+                            if (current <= this.max) {
+                                return { value: current++, done: false };
+                            } else {
+                                return { done: true };
+                            }
+                        }
+                    };
+                }
+                
+                isPrime(num) {
+                    if (num <= 1) return false;
+                    if (num <= 3) return true;
+                    
+                    if (num % 2 === 0 || num % 3 === 0) return false;
+                    
+                    for (let i = 5; i * i <= num; i += 6) {
+                        if (num % i === 0 || num % (i + 2) === 0) return false;
+                    }
+                    
+                    return true;
+                }
+            }
+            
+            const primes = new PrimeNumbers(limit);
+            const primesArray = [...primes];
+            
+            showOutput('exercise3Output', 
+                `${limit}以内的质数: [${primesArray.join(', ')}]`
+            );
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ES6示例 - 第2章：变量声明与作用域</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .container {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        .example-section {
+            margin-bottom: 30px;
+        }
+        .example-title {
+            color: #2980b9;
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        .output {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 10px;
+            margin-top: 10px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            min-height: 20px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .note {
+            background-color: #e7f3fe;
+            border-left: 6px solid #2196F3;
+            padding: 10px;
+            margin: 15px 0;
+        }
+        .warning {
+            background-color: #fffde7;
+            border-left: 6px solid #fbc02d;
+            padding: 10px;
+            margin: 15px 0;
+        }
+        .error {
+            background-color: #ffebee;
+            border-left: 6px solid #f44336;
+            padding: 10px;
+            margin: 15px 0;
+        }
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 10px;
+        }
+        .tab {
+            padding: 10px 15px;
+            cursor: pointer;
+            background-color: #f1f1f1;
+            border: 1px solid #ddd;
+            border-bottom: none;
+            margin-right: 5px;
+        }
+        .tab.active {
+            background-color: white;
+            border-bottom: 1px solid white;
+            margin-bottom: -1px;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <h1>ES6示例 - 第2章：变量声明与作用域</h1>
+    
+    <div class="container">
+        <div class="note">
+            <strong>注意：</strong> 打开浏览器控制台查看所有示例的输出结果。某些示例可能会抛出错误，这是正常的，用于演示ES6的特性。
+        </div>
+        
+        <div class="example-section">
+            <div class="example-title">let与var的区别</div>
+            <button onclick="runVarVsLetExample()">运行示例</button>
+            <div id="var-vs-let-output" class="output"></div>
+        </div>
+        
+        <div class="example-section">
+            <div class="example-title">const与对象操作</div>
+            <button onclick="runConstWithObjectsExample()">运行示例</button>
+            <div id="const-with-objects-output" class="output"></div>
+        </div>
+        
+        <div class="example-section">
+            <div class="example-title">块级作用域与TDZ</div>
+            <button onclick="runScopeAndTDZExample()">运行示例</button>
+            <div id="scope-and-tdz-output" class="output"></div>
+        </div>
+        
+        <div class="example-section">
+            <div class="example-title">暂时性死区</div>
+            <button onclick="runTDZExample()">运行示例</button>
+            <div id="tdz-output" class="output"></div>
+        </div>
+        
+        <div class="example-section">
+            <div class="example-title">变量提升对比</div>
+            <button onclick="runHoistingExample()">运行示例</button>
+            <div id="hoisting-output" class="output"></div>
+        </div>
+        
+        <div class="example-section">
+            <div class="example-title">全局变量与全局对象</div>
+            <button onclick="runGlobalVariablesExample()">运行示例</button>
+            <div id="global-variables-output" class="output"></div>
+        </div>
+        
+        <div class="example-section">
+            <div class="example-title">重复声明测试</div>
+            <button onclick="runRedeclarationExample()">运行示例</button>
+            <div id="redeclaration-output" class="output"></div>
+        </div>
+        
+        <div class="example-section">
+            <div class="example-title">对象冻结与不可变性</div>
+            <button onclick="runImmutabilityExample()">运行示例</button>
+            <div id="immutability-output" class="output"></div>
+        </div>
+        
+        <div class="example-section">
+            <div class="example-title">运行所有示例</div>
+            <button onclick="runAllExamples()">运行所有示例</button>
+            <div id="all-examples-output" class="output"></div>
+        </div>
+    </div>
+
+    <script>
+        // 辅助函数：将输出显示在指定的div中
+        function showOutput(elementId, message) {
+            const outputElement = document.getElementById(elementId);
+            outputElement.textContent += message + '\n';
+            console.log(message);
+        }
+        
+        function clearOutput(elementId) {
+            const outputElement = document.getElementById(elementId);
+            outputElement.textContent = '';
+        }
+        
+        // 1. let与var的区别
+        function runVarVsLetExample() {
+            clearOutput('var-vs-let-output');
+            showOutput('var-vs-let-output', '=== let与var的区别 ===');
+            
+            // 使用var的循环
+            showOutput('var-vs-let-output', '使用var的循环:');
+            for (var i = 0; i < 3; i++) {
+                setTimeout(() => {
+                    showOutput('var-vs-let-output', `var: ${i}`);
+                }, 100);
+            }
+            
+            // 使用let的循环
+            setTimeout(() => {
+                showOutput('var-vs-let-output', '使用let的循环:');
+                for (let j = 0; j < 3; j++) {
+                    setTimeout(() => {
+                        showOutput('var-vs-let-output', `let: ${j}`);
+                    }, 100);
+                }
+            }, 400);
+        }
+        
+        // 2. const与对象操作
+        function runConstWithObjectsExample() {
+            clearOutput('const-with-objects-output');
+            showOutput('const-with-objects-output', '=== const与对象操作 ===');
+            
+            const person = {
+                name: 'Alice',
+                age: 30
+            };
+            
+            showOutput('const-with-objects-output', '原始对象: ' + JSON.stringify(person));
+            
+            // 修改对象属性 - 允许
+            person.age = 31;
+            showOutput('const-with-objects-output', '修改年龄后: ' + JSON.stringify(person));
+            
+            // 添加新属性 - 允许
+            person.email = 'alice@example.com';
+            showOutput('const-with-objects-output', '添加邮箱后: ' + JSON.stringify(person));
+            
+            // 尝试重新赋值整个对象 - 不允许
+            try {
+                person = { name: 'Bob', age: 25 };
+            } catch (error) {
+                showOutput('const-with-objects-output', '重新赋值错误: ' + error.message);
+            }
+        }
+        
+        // 3. 块级作用域与TDZ
+        function runScopeAndTDZExample() {
+            clearOutput('scope-and-tdz-output');
+            showOutput('scope-and-tdz-output', '=== 块级作用域与TDZ ===');
+            
+            let outer = 'outer';
+            showOutput('scope-and-tdz-output', '外层变量: ' + outer);
+            
+            {
+                showOutput('scope-and-tdz-output', '块内访问外层变量: ' + outer);
+                
+                let inner = 'inner';
+                showOutput('scope-and-tdz-output', '块内变量: ' + inner);
+                
+                {
+                    showOutput('scope-and-tdz-output', '嵌套块内访问外层变量: ' + outer);
+                    showOutput('scope-and-tdz-output', '嵌套块内访问块内变量: ' + inner);
+                    
+                    let deepest = 'deepest';
+                    showOutput('scope-and-tdz-output', '最深层变量: ' + deepest);
+                }
+                
+                // 尝试访问deepest - 不允许
+                try {
+                    showOutput('scope-and-tdz-output', '尝试访问deepest: ' + deepest);
+                } catch (error) {
+                    showOutput('scope-and-tdz-output', '访问deepest错误: ' + error.message);
+                }
+            }
+            
+            // 尝试访问inner - 不允许
+            try {
+                showOutput('scope-and-tdz-output', '尝试访问inner: ' + inner);
+            } catch (error) {
+                showOutput('scope-and-tdz-output', '访问inner错误: ' + error.message);
+            }
+        }
+        
+        // 4. 暂时性死区
+        function runTDZExample() {
+            clearOutput('tdz-output');
+            showOutput('tdz-output', '=== 暂时性死区 ===');
+            
+            // 1. 基本TDZ
+            try {
+                showOutput('tdz-output', '尝试访问未声明的变量x:');
+                showOutput('tdz-output', typeof x);
+                let x = 10;
+            } catch (error) {
+                showOutput('tdz-output', '基本TDZ错误: ' + error.message);
+            }
+            
+            // 2. 函数参数中的TDZ
+            try {
+                showOutput('tdz-output', '测试函数参数中的TDZ:');
+                // 使用eval来避免语法错误
+                eval(`
+                    function testParams(x = y, y = 10) {
+                        return x + y;
+                    }
+                    testParams();
+                `);
+            } catch (error) {
+                showOutput('tdz-output', '函数参数TDZ错误: ' + error.message);
+            }
+            
+            // 3. 正确的参数默认值
+            function correctParams(x = 10, y = x) {
+                return x + y;
+            }
+            showOutput('tdz-output', '正确的参数默认值结果: ' + correctParams());
+            
+            // 4. typeof与TDZ
+            showOutput('tdz-output', 'typeof与未声明变量: ' + typeof notDeclared);
+            
+            // 演示TDZ中的typeof
+            try {
+                eval(`
+                    {
+                        // 以下代码会导致错误
+                        console.log(typeof myLet);
+                        let myLet = 10;
+                    }
+                `);
+            } catch (error) {
+                showOutput('tdz-output', 'typeof与TDZ错误: ' + error.message);
+            }
+        }
+        
+        // 5. 变量提升对比
+        function runHoistingExample() {
+            clearOutput('hoisting-output');
+            showOutput('hoisting-output', '=== 变量提升对比 ===');
+            
+            // var的变量提升
+            showOutput('hoisting-output', 'var的变量提升:');
+            function testVarHoisting() {
+                showOutput('hoisting-output', '访问提升的var变量: ' + x);
+                var x = 10;
+                showOutput('hoisting-output', '赋值后的var变量: ' + x);
+            }
+            testVarHoisting();
+            
+            // let/const的TDZ
+            showOutput('hoisting-output', 'let/const的TDZ:');
+            try {
+                function testLetTDZ() {
+                    showOutput('hoisting-output', '尝试访问let变量: ' + y);
+                    let y = 10;
+                    showOutput('hoisting-output', '赋值后的let变量: ' + y);
+                }
+                testLetTDZ();
+            } catch (error) {
+                showOutput('hoisting-output', 'let TDZ错误: ' + error.message);
+            }
+            
+            // 函数声明提升
+            showOutput('hoisting-output', '函数声明提升:');
+            testHoistedFunction(); // 可以正常调用
+            
+            function testHoistedFunction() {
+                showOutput('hoisting-output', '函数声明被提升了');
+            }
+            
+            // 函数表达式不提升
+            showOutput('hoisting-output', '函数表达式不提升:');
+            try {
+                testExpression(); // TypeError
+                var testExpression = function() {
+                    showOutput('hoisting-output', '函数表达式');
+                };
+            } catch (error) {
+                showOutput('hoisting-output', '函数表达式错误: ' + error.message);
+            }
+        }
+        
+        // 6. 全局变量与全局对象
+        function runGlobalVariablesExample() {
+            clearOutput('global-variables-output');
+            showOutput('global-variables-output', '=== 全局变量与全局对象 ===');
+            
+            // 使用var声明全局变量
+            var globalVar = 'I am global with var';
+            showOutput('global-variables-output', 'window.globalVar: ' + window.globalVar);
+            
+            // 使用let声明全局变量
+            let globalLet = 'I am global with let';
+            showOutput('global-variables-output', 'window.globalLet: ' + window.globalLet);
+            
+            // 使用const声明全局变量
+            const globalConst = 'I am global with const';
+            showOutput('global-variables-output', 'window.globalConst: ' + window.globalConst);
+        }
+        
+        // 7. 重复声明测试
+        function runRedeclarationExample() {
+            clearOutput('redeclaration-output');
+            showOutput('redeclaration-output', '=== 重复声明测试 ===');
+            
+            // var允许重复声明
+            var redeclaredVar = 'first';
+            var redeclaredVar = 'second';
+            showOutput('redeclaration-output', 'var重复声明: ' + redeclaredVar);
+            
+            // let/const不允许重复声明
+            try {
+                let redeclaredLet = 'first';
+                let redeclaredLet = 'second';
+            } catch (error) {
+                showOutput('redeclaration-output', 'let重复声明错误: ' + error.message);
+            }
+            
+            try {
+                const redeclaredConst = 'first';
+                const redeclaredConst = 'second';
+            } catch (error) {
+                showOutput('redeclaration-output', 'const重复声明错误: ' + error.message);
+            }
+            
+            // 不同作用域中的同名变量
+            let sameName = 'outer';
+            showOutput('redeclaration-output', '外层sameName: ' + sameName);
+            
+            {
+                let sameName = 'inner';
+                showOutput('redeclaration-output', '内层sameName: ' + sameName);
+            }
+            
+            showOutput('redeclaration-output', '外层sameName: ' + sameName);
+        }
+        
+        // 8. 对象冻结与不可变性
+        function runImmutabilityExample() {
+            clearOutput('immutability-output');
+            showOutput('immutability-output', '=== 对象冻结与不可变性 ===');
+            
+            // 普通const对象
+            const normalObject = { name: 'Alice', age: 30 };
+            normalObject.age = 31;
+            showOutput('immutability-output', '修改const对象属性: ' + JSON.stringify(normalObject));
+            
+            // 冻结对象
+            const frozenObject = Object.freeze({ name: 'Bob', age: 25 });
+            
+            // 尝试修改冻结对象
+            try {
+                frozenObject.age = 26;
+                showOutput('immutability-output', '修改冻结对象属性: ' + JSON.stringify(frozenObject));
+            } catch (error) {
+                showOutput('immutability-output', '修改冻结对象错误: ' + error.message);
+            }
+            
+            // 深度冻结
+            function deepFreeze(obj) {
+                Object.getOwnPropertyNames(obj).forEach(prop => {
+                    if (obj[prop] !== null && typeof obj[prop] === 'object') {
+                        deepFreeze(obj[prop]);
+                    }
+                });
+                return Object.freeze(obj);
+            }
+            
+            const nestedObject = {
+                user: { name: 'Charlie', age: 35 },
+                settings: { theme: 'dark' }
+            };
+            
+            const deeplyFrozenObject = deepFreeze(nestedObject);
+            
+            try {
+                deeplyFrozenObject.user.age = 36;
+                showOutput('immutability-output', '修改深度冻结对象: ' + JSON.stringify(deeplyFrozenObject));
+            } catch (error) {
+                showOutput('immutability-output', '修改深度冻结对象错误: ' + error.message);
+            }
+        }
+        
+        // 运行所有示例
+        function runAllExamples() {
+            clearOutput('all-examples-output');
+            showOutput('all-examples-output', '=== 运行所有示例 ===');
+            
+            runVarVsLetExample();
+            setTimeout(() => {
+                runConstWithObjectsExample();
+                runScopeAndTDZExample();
+                runTDZExample();
+                runHoistingExample();
+                runGlobalVariablesExample();
+                runRedeclarationExample();
+                runImmutabilityExample();
+                showOutput('all-examples-output', '所有示例运行完成！');
+            }, 1000);
+        }
+        
+        // 页面加载时的提示
+        window.onload = function() {
+            console.log('ES6变量声明与作用域示例页面已加载。点击按钮查看不同特性的示例。');
+        };
+    </script>
+</body>
+</html>

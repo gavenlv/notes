@@ -1,0 +1,1221 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>第7章：类与继承 - 演示</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: #2980b9;
+            margin-top: 30px;
+        }
+        .demo-section {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .code-block {
+            background-color: #f4f5f7;
+            border-radius: 6px;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            margin: 15px 0;
+            overflow-x: auto;
+            border-left: 4px solid #3498db;
+        }
+        .output {
+            background-color: #e8f4f8;
+            border-radius: 6px;
+            padding: 15px;
+            margin: 15px 0;
+            border-left: 4px solid #2ecc71;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        .input-group {
+            margin: 15px 0;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .exercise {
+            background-color: #f9f9f9;
+            border: 1px dashed #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 30px;
+        }
+        .exercise h3 {
+            color: #e74c3c;
+            margin-top: 0;
+        }
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 20px;
+        }
+        .tab {
+            padding: 10px 15px;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s;
+        }
+        .tab.active {
+            border-bottom-color: #3498db;
+            color: #3498db;
+            font-weight: bold;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .game-board {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            max-width: 300px;
+            margin: 20px auto;
+        }
+        .game-cell {
+            width: 80px;
+            height: 80px;
+            background-color: #ecf0f1;
+            border: 1px solid #bdc3c7;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .game-cell:hover {
+            background-color: #d5dbdb;
+        }
+        .game-info {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .character-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+            background-color: #f8f9fa;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .character-name {
+            font-weight: bold;
+            font-size: 18px;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+        .character-stats {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        .health-bar {
+            height: 10px;
+            background-color: #e74c3c;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+        .health-bar::after {
+            content: '';
+            display: block;
+            height: 100%;
+            background-color: #2ecc71;
+            border-radius: 5px;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .action-button {
+            flex: 1;
+            padding: 8px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        .action-button:hover {
+            background-color: #2980b9;
+        }
+        .action-button:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+    <h1>第7章：类与继承 - 演示</h1>
+    
+    <div class="tabs">
+        <div class="tab active" onclick="showTab('basic-syntax')">基本语法</div>
+        <div class="tab" onclick="showTab('inheritance')">继承</div>
+        <div class="tab" onclick="showTab('static-methods')">静态方法与属性</div>
+        <div class="tab" onclick="showTab('private-fields')">私有字段与方法</div>
+        <div class="tab" onclick="showTab('exercises')">实践练习</div>
+    </div>
+    
+    <!-- 基本语法标签页 -->
+    <div id="basic-syntax" class="tab-content active">
+        <div class="demo-section">
+            <h2>类的基本语法</h2>
+            <div class="code-block">
+class Person {
+  constructor(name, age) {
+    this.name = name;
+    this.age = age;
+  }
+
+  sayHello() {
+    return `Hello, my name is ${this.name} and I'm ${this.age} years old.`;
+  }
+}
+
+const alice = new Person('Alice', 30);
+console.log(alice.sayHello()); // "Hello, my name is Alice and I'm 30 years old."
+            </div>
+            <button onclick="runBasicSyntaxDemo()">运行示例</button>
+            <div id="basic-syntax-output" class="output" style="display:none;"></div>
+        </div>
+        
+        <div class="demo-section">
+            <h2>类声明与类表达式</h2>
+            <div class="code-block">
+// 类声明
+class PersonDeclaration {
+  constructor(name, age) {
+    this.name = name;
+    this.age = age;
+  }
+}
+
+// 类表达式（匿名）
+const PersonExpression = class {
+  constructor(name, age) {
+    this.name = name;
+    this.age = age;
+  }
+};
+
+// 类表达式（命名）
+const PersonNamedExpression = class PersonClass {
+  constructor(name, age) {
+    this.name = name;
+    this.age = age;
+  }
+  
+  getClassName() {
+    return PersonClass.name;
+  }
+};
+            </div>
+            <button onclick="runClassExpressionDemo()">运行示例</button>
+            <div id="class-expression-output" class="output" style="display:none;"></div>
+        </div>
+    </div>
+    
+    <!-- 继承标签页 -->
+    <div id="inheritance" class="tab-content">
+        <div class="demo-section">
+            <h2>基本继承语法</h2>
+            <div class="code-block">
+class Animal {
+  constructor(name) {
+    this.name = name;
+  }
+  
+  speak() {
+    return `${this.name} makes a noise.`;
+  }
+}
+
+class Dog extends Animal {
+  speak() {
+    return `${this.name} barks.`;
+  }
+}
+
+const dog = new Dog('Rex');
+console.log(dog.speak()); // "Rex barks."
+            </div>
+            <button onclick="runBasicInheritanceDemo()">运行示例</button>
+            <div id="basic-inheritance-output" class="output" style="display:none;"></div>
+        </div>
+        
+        <div class="demo-section">
+            <h2>super关键字</h2>
+            <div class="code-block">
+class AnimalSuper {
+  constructor(name) {
+    this.name = name;
+  }
+  
+  speak() {
+    return `${this.name} makes a noise.`;
+  }
+}
+
+class DogSuper extends AnimalSuper {
+  constructor(name, breed) {
+    super(name); // 调用父类的构造函数
+    this.breed = breed;
+  }
+  
+  speak() {
+    // 调用父类的speak方法
+    return `${super.speak()} It's a ${this.breed}.`;
+  }
+  
+  fetch() {
+    return `${this.name} is fetching.`;
+  }
+}
+            </div>
+            <button onclick="runSuperDemo()">运行示例</button>
+            <div id="super-output" class="output" style="display:none;"></div>
+        </div>
+        
+        <div class="demo-section">
+            <h2>继承中的方法覆盖</h2>
+            <div class="code-block">
+class Vehicle {
+  constructor(speed) {
+    this.speed = speed;
+  }
+  
+  accelerate(amount) {
+    this.speed += amount;
+    return `Speed increased to ${this.speed} km/h.`;
+  }
+  
+  brake(amount) {
+    this.speed = Math.max(0, this.speed - amount);
+    return `Speed decreased to ${this.speed} km/h.`;
+  }
+}
+
+class Car extends Vehicle {
+  constructor(speed, fuel) {
+    super(speed);
+    this.fuel = fuel;
+  }
+  
+  accelerate(amount) {
+    // 检查燃料是否足够
+    if (this.fuel <= 0) {
+      return "Cannot accelerate: no fuel!";
+    }
+    
+    // 调用父类的accelerate方法
+    const result = super.accelerate(amount);
+    
+    // 消耗燃料
+    this.fuel -= amount * 0.1;
+    
+    return `${result} Fuel remaining: ${this.fuel.toFixed(1)}L.`;
+  }
+}
+            </div>
+            <button onclick="runMethodOverrideDemo()">运行示例</button>
+            <div id="method-override-output" class="output" style="display:none;"></div>
+        </div>
+    </div>
+    
+    <!-- 静态方法与属性标签页 -->
+    <div id="static-methods" class="tab-content">
+        <div class="demo-section">
+            <h2>静态方法</h2>
+            <div class="code-block">
+class MathUtils {
+  static add(a, b) {
+    return a + b;
+  }
+  
+  static multiply(a, b) {
+    return a * b;
+  }
+  
+  // 静态方法可以调用其他静态方法
+  static power(base, exponent) {
+    let result = 1;
+    for (let i = 0; i < exponent; i++) {
+      result = this.multiply(result, base);
+    }
+    return result;
+  }
+}
+
+console.log(MathUtils.add(5, 3)); // 8
+console.log(MathUtils.multiply(4, 6)); // 24
+console.log(MathUtils.power(2, 3)); // 8
+            </div>
+            <button onclick="runStaticMethodsDemo()">运行示例</button>
+            <div id="static-methods-output" class="output" style="display:none;"></div>
+        </div>
+        
+        <div class="demo-section">
+            <h2>静态属性</h2>
+            <div class="code-block">
+class Counter {
+  static count = 0;
+  
+  constructor() {
+    Counter.count++;
+  }
+  
+  static getCount() {
+    return Counter.count;
+  }
+  
+  static reset() {
+    Counter.count = 0;
+  }
+}
+
+const counter1 = new Counter();
+const counter2 = new Counter();
+const counter3 = new Counter();
+
+console.log(Counter.getCount()); // 3
+console.log(Counter.count); // 3
+            </div>
+            <button onclick="runStaticPropertiesDemo()">运行示例</button>
+            <div id="static-properties-output" class="output" style="display:none;"></div>
+        </div>
+    </div>
+    
+    <!-- 私有字段与方法标签页 -->
+    <div id="private-fields" class="tab-content">
+        <div class="demo-section">
+            <h2>私有字段</h2>
+            <div class="code-block">
+class BankAccount {
+  #balance = 0; // 私有字段
+  #transactions = []; // 私有字段
+  
+  constructor(initialBalance) {
+    if (initialBalance > 0) {
+      this.#balance = initialBalance;
+    }
+  }
+  
+  deposit(amount) {
+    if (amount <= 0) {
+      throw new Error('Deposit amount must be positive');
+    }
+    
+    this.#balance += amount;
+    this.#transactions.push({
+      type: 'deposit',
+      amount,
+      timestamp: new Date()
+    });
+    
+    return this.#balance;
+  }
+  
+  withdraw(amount) {
+    if (amount <= 0) {
+      throw new Error('Withdrawal amount must be positive');
+    }
+    
+    if (amount > this.#balance) {
+      throw new Error('Insufficient funds');
+    }
+    
+    this.#balance -= amount;
+    this.#transactions.push({
+      type: 'withdrawal',
+      amount,
+      timestamp: new Date()
+    });
+    
+    return this.#balance;
+  }
+  
+  getBalance() {
+    return this.#balance;
+  }
+  
+  getTransactionHistory() {
+    // 返回交易历史的副本，防止外部修改
+    return [...this.#transactions];
+  }
+}
+            </div>
+            <button onclick="runPrivateFieldsDemo()">运行示例</button>
+            <div id="private-fields-output" class="output" style="display:none;"></div>
+        </div>
+        
+        <div class="demo-section">
+            <h2>私有方法</h2>
+            <div class="code-block">
+class DataProcessor {
+  #data = [];
+  #errors = [];
+  
+  constructor(data) {
+    this.#data = data;
+  }
+  
+  process() {
+    try {
+      this.#validate();
+      this.#transform();
+      this.#save();
+      return { success: true, data: this.#data };
+    } catch (error) {
+      this.#errors.push(error);
+      return { success: false, errors: this.#errors };
+    }
+  }
+  
+  // 私有方法：验证数据
+  #validate() {
+    if (!Array.isArray(this.#data)) {
+      throw new Error('Data must be an array');
+    }
+    
+    if (this.#data.length === 0) {
+      throw new Error('Data array cannot be empty');
+    }
+  }
+  
+  // 私有方法：转换数据
+  #transform() {
+    this.#data = this.#data.map(item => {
+      if (typeof item === 'string') {
+        return item.trim().toLowerCase();
+      }
+      return item;
+    });
+  }
+  
+  // 私有方法：保存数据
+  #save() {
+    // 模拟保存操作
+    console.log('Data saved successfully');
+  }
+}
+            </div>
+            <button onclick="runPrivateMethodsDemo()">运行示例</button>
+            <div id="private-methods-output" class="output" style="display:none;"></div>
+        </div>
+    </div>
+    
+    <!-- 实践练习标签页 -->
+    <div id="exercises" class="tab-content">
+        <div class="demo-section">
+            <h2>练习1：游戏角色系统</h2>
+            <p>创建一个简单的游戏角色系统，包括角色类和战士子类，实现战斗逻辑。</p>
+            
+            <div class="game-info">
+                <h3>游戏状态</h3>
+                <div id="game-status">游戏开始！选择你的行动。</div>
+            </div>
+            
+            <div class="character-card">
+                <div class="character-name">英雄</div>
+                <div class="character-stats">
+                    <span>生命值: <span id="hero-health">100</span>/100</span>
+                    <span>攻击力: <span id="hero-attack">20</span></span>
+                </div>
+                <div class="health-bar" style="width: 100%"></div>
+                <div class="action-buttons">
+                    <button class="action-button" onclick="heroAttack()">攻击</button>
+                    <button class="action-button" onclick="heroDefend()">防御</button>
+                    <button class="action-button" onclick="heroHeal()">治疗</button>
+                </div>
+            </div>
+            
+            <div class="character-card">
+                <div class="character-name">怪物</div>
+                <div class="character-stats">
+                    <span>生命值: <span id="monster-health">80</span>/80</span>
+                    <span>攻击力: <span id="monster-attack">15</span></span>
+                </div>
+                <div class="health-bar" style="width: 100%"></div>
+                <div class="action-buttons">
+                    <button class="action-button" onclick="monsterAttack()">怪物攻击</button>
+                    <button class="action-button" onclick="resetGame()">重置游戏</button>
+                </div>
+            </div>
+            
+            <button onclick="runGameDemo()">运行游戏逻辑</button>
+            <div id="game-output" class="output" style="display:none;"></div>
+        </div>
+        
+        <div class="demo-section">
+            <h2>练习2：表单验证器</h2>
+            <p>创建一个表单验证器类，支持自定义验证规则。</p>
+            
+            <div class="input-group">
+                <label for="email">邮箱:</label>
+                <input type="text" id="email" placeholder="请输入邮箱">
+            </div>
+            
+            <div class="input-group">
+                <label for="password">密码:</label>
+                <input type="password" id="password" placeholder="请输入密码">
+            </div>
+            
+            <button onclick="validateForm()">验证表单</button>
+            <div id="form-output" class="output" style="display:none;"></div>
+        </div>
+        
+        <div class="demo-section">
+            <h2>练习3：数据缓存系统</h2>
+            <p>创建一个简单的数据缓存类，支持TTL和LRU策略。</p>
+            
+            <div class="input-group">
+                <label for="cache-key">缓存键:</label>
+                <input type="text" id="cache-key" placeholder="请输入缓存键">
+            </div>
+            
+            <div class="input-group">
+                <label for="cache-value">缓存值:</label>
+                <input type="text" id="cache-value" placeholder="请输入缓存值">
+            </div>
+            
+            <div class="input-group">
+                <label for="cache-ttl">过期时间(秒):</label>
+                <input type="number" id="cache-ttl" value="5" min="1">
+            </div>
+            
+            <div class="action-buttons">
+                <button onclick="setCache()">设置缓存</button>
+                <button onclick="getCache()">获取缓存</button>
+                <button onclick="clearCache()">清空缓存</button>
+            </div>
+            
+            <div id="cache-output" class="output" style="display:none;"></div>
+        </div>
+    </div>
+    
+    <script>
+        // 标签页切换功能
+        function showTab(tabName) {
+            // 隐藏所有标签内容
+            const tabContents = document.querySelectorAll('.tab-content');
+            tabContents.forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // 移除所有标签的active类
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // 显示选中的标签内容
+            document.getElementById(tabName).classList.add('active');
+            
+            // 为选中的标签添加active类
+            event.target.classList.add('active');
+        }
+        
+        // 基本语法演示
+        function runBasicSyntaxDemo() {
+            const output = document.getElementById('basic-syntax-output');
+            output.style.display = 'block';
+            output.innerHTML = '';
+            
+            class Person {
+                constructor(name, age) {
+                    this.name = name;
+                    this.age = age;
+                }
+
+                sayHello() {
+                    return `Hello, my name is ${this.name} and I'm ${this.age} years old.`;
+                }
+            }
+
+            const alice = new Person('Alice', 30);
+            output.innerHTML += `<p>${alice.sayHello()}</p>`;
+        }
+        
+        // 类表达式演示
+        function runClassExpressionDemo() {
+            const output = document.getElementById('class-expression-output');
+            output.style.display = 'block';
+            output.innerHTML = '';
+            
+            // 类表达式（命名）
+            const PersonNamedExpression = class PersonClass {
+                constructor(name, age) {
+                    this.name = name;
+                    this.age = age;
+                }
+                
+                getClassName() {
+                    return PersonClass.name;
+                }
+            };
+            
+            const personNamed = new PersonNamedExpression('Bob', 25);
+            output.innerHTML += `<p>类名: ${personNamed.getClassName()}</p>`;
+            output.innerHTML += `<p>实例名: ${personNamed.name}</p>`;
+            output.innerHTML += `<p>实例年龄: ${personNamed.age}</p>`;
+        }
+        
+        // 基本继承演示
+        function runBasicInheritanceDemo() {
+            const output = document.getElementById('basic-inheritance-output');
+            output.style.display = 'block';
+            output.innerHTML = '';
+            
+            class Animal {
+                constructor(name) {
+                    this.name = name;
+                }
+                
+                speak() {
+                    return `${this.name} makes a noise.`;
+                }
+            }
+
+            class Dog extends Animal {
+                speak() {
+                    return `${this.name} barks.`;
+                }
+            }
+
+            const dog = new Dog('Rex');
+            output.innerHTML += `<p>${dog.speak()}</p>`;
+        }
+        
+        // super关键字演示
+        function runSuperDemo() {
+            const output = document.getElementById('super-output');
+            output.style.display = 'block';
+            output.innerHTML = '';
+            
+            class AnimalSuper {
+                constructor(name) {
+                    this.name = name;
+                }
+                
+                speak() {
+                    return `${this.name} makes a noise.`;
+                }
+            }
+
+            class DogSuper extends AnimalSuper {
+                constructor(name, breed) {
+                    super(name); // 调用父类的构造函数
+                    this.breed = breed;
+                }
+                
+                speak() {
+                    // 调用父类的speak方法
+                    return `${super.speak()} It's a ${this.breed}.`;
+                }
+                
+                fetch() {
+                    return `${this.name} is fetching.`;
+                }
+            }
+            
+            const dogSuper = new DogSuper('Rex', 'Golden Retriever');
+            output.innerHTML += `<p>${dogSuper.speak()}</p>`;
+            output.innerHTML += `<p>${dogSuper.fetch()}</p>`;
+        }
+        
+        // 方法覆盖演示
+        function runMethodOverrideDemo() {
+            const output = document.getElementById('method-override-output');
+            output.style.display = 'block';
+            output.innerHTML = '';
+            
+            class Vehicle {
+                constructor(speed) {
+                    this.speed = speed;
+                }
+                
+                accelerate(amount) {
+                    this.speed += amount;
+                    return `Speed increased to ${this.speed} km/h.`;
+                }
+                
+                brake(amount) {
+                    this.speed = Math.max(0, this.speed - amount);
+                    return `Speed decreased to ${this.speed} km/h.`;
+                }
+            }
+
+            class Car extends Vehicle {
+                constructor(speed, fuel) {
+                    super(speed);
+                    this.fuel = fuel;
+                }
+                
+                accelerate(amount) {
+                    // 检查燃料是否足够
+                    if (this.fuel <= 0) {
+                        return "Cannot accelerate: no fuel!";
+                    }
+                    
+                    // 调用父类的accelerate方法
+                    const result = super.accelerate(amount);
+                    
+                    // 消耗燃料
+                    this.fuel -= amount * 0.1;
+                    
+                    return `${result} Fuel remaining: ${this.fuel.toFixed(1)}L.`;
+                }
+            }
+            
+            const car = new Car(0, 50);
+            output.innerHTML += `<p>${car.accelerate(20)}</p>`;
+            output.innerHTML += `<p>${car.accelerate(30)}</p>`;
+            output.innerHTML += `<p>${car.brake(10)}</p>`;
+        }
+        
+        // 静态方法演示
+        function runStaticMethodsDemo() {
+            const output = document.getElementById('static-methods-output');
+            output.style.display = 'block';
+            output.innerHTML = '';
+            
+            class MathUtils {
+                static add(a, b) {
+                    return a + b;
+                }
+                
+                static multiply(a, b) {
+                    return a * b;
+                }
+                
+                // 静态方法可以调用其他静态方法
+                static power(base, exponent) {
+                    let result = 1;
+                    for (let i = 0; i < exponent; i++) {
+                        result = this.multiply(result, base);
+                    }
+                    return result;
+                }
+            }
+            
+            output.innerHTML += `<p>MathUtils.add(5, 3) = ${MathUtils.add(5, 3)}</p>`;
+            output.innerHTML += `<p>MathUtils.multiply(4, 6) = ${MathUtils.multiply(4, 6)}</p>`;
+            output.innerHTML += `<p>MathUtils.power(2, 3) = ${MathUtils.power(2, 3)}</p>`;
+        }
+        
+        // 静态属性演示
+        function runStaticPropertiesDemo() {
+            const output = document.getElementById('static-properties-output');
+            output.style.display = 'block';
+            output.innerHTML = '';
+            
+            class Counter {
+                static count = 0;
+                
+                constructor() {
+                    Counter.count++;
+                }
+                
+                static getCount() {
+                    return Counter.count;
+                }
+                
+                static reset() {
+                    Counter.count = 0;
+                }
+            }
+            
+            const counter1 = new Counter();
+            const counter2 = new Counter();
+            const counter3 = new Counter();
+            
+            output.innerHTML += `<p>创建了3个Counter实例</p>`;
+            output.innerHTML += `<p>Counter.getCount() = ${Counter.getCount()}</p>`;
+            output.innerHTML += `<p>Counter.count = ${Counter.count}</p>`;
+            
+            Counter.reset();
+            output.innerHTML += `<p>重置后 Counter.getCount() = ${Counter.getCount()}</p>`;
+        }
+        
+        // 私有字段演示
+        function runPrivateFieldsDemo() {
+            const output = document.getElementById('private-fields-output');
+            output.style.display = 'block';
+            output.innerHTML = '';
+            
+            class BankAccount {
+                #balance = 0; // 私有字段
+                #transactions = []; // 私有字段
+                
+                constructor(initialBalance) {
+                    if (initialBalance > 0) {
+                        this.#balance = initialBalance;
+                    }
+                }
+                
+                deposit(amount) {
+                    if (amount <= 0) {
+                        throw new Error('Deposit amount must be positive');
+                    }
+                    
+                    this.#balance += amount;
+                    this.#transactions.push({
+                        type: 'deposit',
+                        amount,
+                        timestamp: new Date()
+                    });
+                    
+                    return this.#balance;
+                }
+                
+                withdraw(amount) {
+                    if (amount <= 0) {
+                        throw new Error('Withdrawal amount must be positive');
+                    }
+                    
+                    if (amount > this.#balance) {
+                        throw new Error('Insufficient funds');
+                    }
+                    
+                    this.#balance -= amount;
+                    this.#transactions.push({
+                        type: 'withdrawal',
+                        amount,
+                        timestamp: new Date()
+                    });
+                    
+                    return this.#balance;
+                }
+                
+                getBalance() {
+                    return this.#balance;
+                }
+                
+                getTransactionHistory() {
+                    // 返回交易历史的副本，防止外部修改
+                    return [...this.#transactions];
+                }
+            }
+            
+            const account = new BankAccount(100);
+            account.deposit(50);
+            account.withdraw(30);
+            
+            output.innerHTML += `<p>账户余额: ${account.getBalance()}</p>`;
+            output.innerHTML += `<p>交易历史: ${JSON.stringify(account.getTransactionHistory())}</p>`;
+        }
+        
+        // 私有方法演示
+        function runPrivateMethodsDemo() {
+            const output = document.getElementById('private-methods-output');
+            output.style.display = 'block';
+            output.innerHTML = '';
+            
+            class DataProcessor {
+                #data = [];
+                #errors = [];
+                
+                constructor(data) {
+                    this.#data = data;
+                }
+                
+                process() {
+                    try {
+                        this.#validate();
+                        this.#transform();
+                        this.#save();
+                        return { success: true, data: this.#data };
+                    } catch (error) {
+                        this.#errors.push(error);
+                        return { success: false, errors: this.#errors };
+                    }
+                }
+                
+                // 私有方法：验证数据
+                #validate() {
+                    if (!Array.isArray(this.#data)) {
+                        throw new Error('Data must be an array');
+                    }
+                    
+                    if (this.#data.length === 0) {
+                        throw new Error('Data array cannot be empty');
+                    }
+                }
+                
+                // 私有方法：转换数据
+                #transform() {
+                    this.#data = this.#data.map(item => {
+                        if (typeof item === 'string') {
+                            return item.trim().toLowerCase();
+                        }
+                        return item;
+                    });
+                }
+                
+                // 私有方法：保存数据
+                #save() {
+                    // 模拟保存操作
+                    console.log('Data saved successfully');
+                }
+            }
+            
+            const processor = new DataProcessor(['  Item 1  ', 'ITEM 2', 'Item 3']);
+            const result = processor.process();
+            
+            output.innerHTML += `<p>处理结果: ${JSON.stringify(result)}</p>`;
+        }
+        
+        // 游戏角色系统
+        let hero = {
+            health: 100,
+            maxHealth: 100,
+            attack: 20,
+            defense: 5
+        };
+        
+        let monster = {
+            health: 80,
+            maxHealth: 80,
+            attack: 15,
+            defense: 3
+        };
+        
+        function updateHealthBars() {
+            document.getElementById('hero-health').textContent = hero.health;
+            document.getElementById('monster-health').textContent = monster.health;
+            
+            const heroHealthPercent = (hero.health / hero.maxHealth) * 100;
+            const monsterHealthPercent = (monster.health / monster.maxHealth) * 100;
+            
+            document.querySelectorAll('.health-bar')[0].style.width = `${heroHealthPercent}%`;
+            document.querySelectorAll('.health-bar')[1].style.width = `${monsterHealthPercent}%`;
+        }
+        
+        function updateGameStatus(message) {
+            document.getElementById('game-status').textContent = message;
+        }
+        
+        function heroAttack() {
+            if (hero.health <= 0 || monster.health <= 0) {
+                updateGameStatus('游戏已结束！');
+                return;
+            }
+            
+            const damage = Math.max(1, hero.attack - monster.defense);
+            monster.health = Math.max(0, monster.health - damage);
+            updateHealthBars();
+            updateGameStatus(`英雄攻击造成 ${damage} 点伤害！`);
+            
+            if (monster.health <= 0) {
+                updateGameStatus('英雄获胜！');
+            }
+        }
+        
+        function heroDefend() {
+            if (hero.health <= 0 || monster.health <= 0) {
+                updateGameStatus('游戏已结束！');
+                return;
+            }
+            
+            hero.defense += 2;
+            updateGameStatus(`英雄防御，防御力提升到 ${hero.defense}！`);
+        }
+        
+        function heroHeal() {
+            if (hero.health <= 0 || monster.health <= 0) {
+                updateGameStatus('游戏已结束！');
+                return;
+            }
+            
+            const healAmount = 20;
+            hero.health = Math.min(hero.maxHealth, hero.health + healAmount);
+            updateHealthBars();
+            updateGameStatus(`英雄治疗，恢复 ${healAmount} 点生命值！`);
+        }
+        
+        function monsterAttack() {
+            if (hero.health <= 0 || monster.health <= 0) {
+                updateGameStatus('游戏已结束！');
+                return;
+            }
+            
+            const damage = Math.max(1, monster.attack - hero.defense);
+            hero.health = Math.max(0, hero.health - damage);
+            updateHealthBars();
+            updateGameStatus(`怪物攻击造成 ${damage} 点伤害！`);
+            
+            if (hero.health <= 0) {
+                updateGameStatus('怪物获胜！');
+            }
+        }
+        
+        function resetGame() {
+            hero = {
+                health: 100,
+                maxHealth: 100,
+                attack: 20,
+                defense: 5
+            };
+            
+            monster = {
+                health: 80,
+                maxHealth: 80,
+                attack: 15,
+                defense: 3
+            };
+            
+            updateHealthBars();
+            updateGameStatus('游戏重置！选择你的行动。');
+        }
+        
+        function runGameDemo() {
+            const output = document.getElementById('game-output');
+            output.style.display = 'block';
+            output.innerHTML = '<p>游戏角色系统已初始化！使用上方的按钮进行游戏。</p>';
+        }
+        
+        // 表单验证器
+        function validateForm() {
+            const output = document.getElementById('form-output');
+            output.style.display = 'block';
+            output.innerHTML = '';
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            const errors = [];
+            
+            // 验证邮箱
+            if (!email) {
+                errors.push('邮箱是必填项');
+            } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                errors.push('邮箱格式不正确');
+            }
+            
+            // 验证密码
+            if (!password) {
+                errors.push('密码是必填项');
+            } else if (password.length < 8) {
+                errors.push('密码长度至少为8位');
+            }
+            
+            if (errors.length > 0) {
+                output.innerHTML = '<p>表单验证失败：</p><ul>';
+                errors.forEach(error => {
+                    output.innerHTML += `<li>${error}</li>`;
+                });
+                output.innerHTML += '</ul>';
+            } else {
+                output.innerHTML = '<p style="color: green;">表单验证通过！</p>';
+            }
+        }
+        
+        // 数据缓存系统
+        const cache = new Map();
+        
+        function setCache() {
+            const output = document.getElementById('cache-output');
+            output.style.display = 'block';
+            
+            const key = document.getElementById('cache-key').value;
+            const value = document.getElementById('cache-value').value;
+            const ttl = parseInt(document.getElementById('cache-ttl').value) * 1000; // 转换为毫秒
+            
+            if (!key || !value) {
+                output.innerHTML = '<p style="color: red;">请输入缓存键和值！</p>';
+                return;
+            }
+            
+            const expiresAt = Date.now() + ttl;
+            cache.set(key, {
+                value,
+                expiresAt
+            });
+            
+            output.innerHTML = `<p>缓存设置成功！键: ${key}, 值: ${value}, 过期时间: ${ttl/1000}秒</p>`;
+        }
+        
+        function getCache() {
+            const output = document.getElementById('cache-output');
+            output.style.display = 'block';
+            
+            const key = document.getElementById('cache-key').value;
+            
+            if (!key) {
+                output.innerHTML = '<p style="color: red;">请输入缓存键！</p>';
+                return;
+            }
+            
+            if (!cache.has(key)) {
+                output.innerHTML = `<p>缓存中不存在键: ${key}</p>`;
+                return;
+            }
+            
+            const item = cache.get(key);
+            
+            // 检查是否过期
+            if (Date.now() > item.expiresAt) {
+                cache.delete(key);
+                output.innerHTML = `<p>缓存已过期: ${key}</p>`;
+                return;
+            }
+            
+            const remainingTime = Math.round((item.expiresAt - Date.now()) / 1000);
+            output.innerHTML = `<p>缓存值: ${item.value}, 剩余时间: ${remainingTime}秒</p>`;
+        }
+        
+        function clearCache() {
+            const output = document.getElementById('cache-output');
+            output.style.display = 'block';
+            
+            cache.clear();
+            output.innerHTML = '<p>缓存已清空！</p>';
+        }
+    </script>
+</body>
+</html>

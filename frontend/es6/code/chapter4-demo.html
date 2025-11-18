@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>第4章：解构赋值与扩展运算符 - 演示</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        h2 {
+            color: #3498db;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .demo-section {
+            margin-bottom: 30px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        .code-block {
+            background-color: #f8f8f8;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 10px;
+            margin: 10px 0;
+            font-family: 'Courier New', Courier, monospace;
+            white-space: pre-wrap;
+            overflow-x: auto;
+        }
+        .button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+            transition: background-color 0.3s;
+        }
+        .button:hover {
+            background-color: #2980b9;
+        }
+        .output {
+            background-color: #2c3e50;
+            color: #1abc9c;
+            border: 1px solid #2c3e50;
+            border-radius: 4px;
+            padding: 10px;
+            margin: 10px 0;
+            font-family: 'Courier New', Courier, monospace;
+            white-space: pre-wrap;
+            min-height: 20px;
+        }
+        .note {
+            background-color: #fff9e6;
+            border-left: 4px solid #f39c12;
+            padding: 10px;
+            margin: 10px 0;
+        }
+        .exercise {
+            background-color: #e8f5e9;
+            border-left: 4px solid #4caf50;
+            padding: 10px;
+            margin: 10px 0;
+        }
+        .input-group {
+            margin: 10px 0;
+        }
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .input-group input, .input-group textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>第4章：解构赋值与扩展运算符 - 演示</h1>
+        
+        <div class="demo-section">
+            <h2>4.1 数组解构</h2>
+            <div class="code-block">
+// 基本数组解构
+const [x, y, z] = [1, 2, 3];
+console.log(x, y, z); // 1 2 3
+
+// 跳过某些元素
+const [first, , third] = [1, 2, 3, 4];
+console.log(first, third); // 1 3
+
+// 使用剩余元素
+const [head, ...tail] = [1, 2, 3, 4, 5];
+console.log(head); // 1
+console.log(tail); // [2, 3, 4, 5]
+
+// 设置默认值
+const [a = 10, b = 20] = [1];
+console.log(a, b); // 1 20
+            </div>
+            <button class="button" onclick="runArrayDestructuring()">运行代码</button>
+            <div id="array-output" class="output">点击"运行代码"查看结果</div>
+        </div>
+
+        <div class="demo-section">
+            <h2>4.2 对象解构</h2>
+            <div class="code-block">
+// 基本对象解构
+const person = {
+  name: 'Alice',
+  age: 30,
+  city: 'New York'
+};
+
+const { name, age } = person;
+console.log(name, age); // 'Alice' 30
+
+// 重命名变量
+const { name: userName, age: userAge } = person;
+console.log(userName, userAge); // 'Alice' 30
+
+// 设置默认值
+const { name: personName, country = 'USA' } = person;
+console.log(personName, country); // 'Alice' 'USA'
+
+// 嵌套对象解构
+const employee = {
+  id: 123,
+  personal: {
+    name: 'Charlie',
+    contact: {
+      email: 'charlie@example.com'
+    }
+  }
+};
+
+const { 
+  personal: { 
+    name: empName, 
+    contact: { email } 
+  } 
+} = employee;
+console.log(empName, email); // 'Charlie' 'charlie@example.com'
+            </div>
+            <button class="button" onclick="runObjectDestructuring()">运行代码</button>
+            <div id="object-output" class="output">点击"运行代码"查看结果</div>
+        </div>
+
+        <div class="demo-section">
+            <h2>4.3 函数参数解构</h2>
+            <div class="code-block">
+// 函数参数解构
+function displayPerson({ name, age, city = 'Unknown' }) {
+  console.log(`Name: ${name}, Age: ${age}, City: ${city}`);
+}
+
+displayPerson({ name: 'David', age: 40, city: 'New York' });
+displayPerson({ name: 'Eve', age: 35 }); // 使用默认城市
+
+// 带默认值的解构参数
+function createUser({ name = 'Anonymous', age = 0, isActive = true } = {}) {
+  console.log(`Created user: ${name}, Age: ${age}, Active: ${isActive}`);
+}
+
+createUser(); // 使用所有默认值
+createUser({ name: 'Frank' }); // 只覆盖name
+            </div>
+            <button class="button" onclick="runFunctionDestructuring()">运行代码</button>
+            <div id="function-output" class="output">点击"运行代码"查看结果</div>
+        </div>
+
+        <div class="demo-section">
+            <h2>4.4 数组扩展运算符</h2>
+            <div class="code-block">
+// 数组合并
+const arr1 = [1, 2, 3];
+const arr2 = [4, 5, 6];
+const combined = [...arr1, ...arr2];
+console.log(combined); // [1, 2, 3, 4, 5, 6]
+
+// 在数组中间插入元素
+const parts = ['shoulders', 'knees'];
+const body = ['head', ...parts, 'and', 'toes'];
+console.log(body); // ['head', 'shoulders', 'knees', 'and', 'toes']
+
+// 数组复制
+const original = [1, 2, 3];
+const copy = [...original];
+console.log(copy); // [1, 2, 3]
+console.log(original === copy); // false (不同的数组对象)
+
+// 函数调用中的扩展运算符
+function add(a, b, c) {
+  return a + b + c;
+}
+const numbers = [1, 2, 3];
+console.log(add(...numbers)); // 6
+            </div>
+            <button class="button" onclick="runArraySpread()">运行代码</button>
+            <div id="array-spread-output" class="output">点击"运行代码"查看结果</div>
+        </div>
+
+        <div class="demo-section">
+            <h2>4.5 对象扩展运算符</h2>
+            <div class="code-block">
+// 对象合并
+const obj1 = { a: 1, b: 2 };
+const obj2 = { c: 3, d: 4 };
+const merged = { ...obj1, ...obj2 };
+console.log(merged); // { a: 1, b: 2, c: 3, d: 4 }
+
+// 覆盖属性
+const base = { a: 1, b: 2, c: 3 };
+const override = { ...base, b: 20, c: 30 };
+console.log(override); // { a: 1, b: 20, c: 30 }
+
+// 添加新属性
+const extended = { ...base, d: 4, e: 5 };
+console.log(extended); // { a: 1, b: 2, c: 3, d: 4, e: 5 }
+
+// 结合解构和扩展运算符
+const { a, ...rest } = { a: 1, b: 2, c: 3, d: 4 };
+console.log(a); // 1
+console.log(rest); // { b: 2, c: 3, d: 4 }
+            </div>
+            <button class="button" onclick="runObjectSpread()">运行代码</button>
+            <div id="object-spread-output" class="output">点击"运行代码"查看结果</div>
+        </div>
+
+        <div class="demo-section">
+            <h2>4.6 实际应用场景</h2>
+            <h3>配置对象合并</h3>
+            <div class="input-group">
+                <label for="user-theme">主题:</label>
+                <input type="text" id="user-theme" placeholder="例如: dark">
+            </div>
+            <div class="input-group">
+                <label for="user-language">语言:</label>
+                <input type="text" id="user-language" placeholder="例如: zh-CN">
+            </div>
+            <div class="input-group">
+                <label for="user-font-size">字体大小:</label>
+                <input type="number" id="user-font-size" placeholder="例如: 18">
+            </div>
+            <button class="button" onclick="mergeConfig()">合并配置</button>
+            <div id="config-output" class="output">点击"合并配置"查看结果</div>
+
+            <h3>数组操作</h3>
+            <div class="input-group">
+                <label for="array-input">输入数组(逗号分隔):</label>
+                <input type="text" id="array-input" placeholder="例如: 1,2,3,2,4,5,1,6">
+            </div>
+            <button class="button" onclick="processArray()">处理数组</button>
+            <div id="array-process-output" class="output">点击"处理数组"查看结果</div>
+        </div>
+
+        <div class="demo-section">
+            <h2>4.7 交互练习</h2>
+            <div class="exercise">
+                <h3>练习1：数组解构</h3>
+                <p>给定数组 ['red', 'green', 'blue', 'yellow', 'purple']，解构出第一个和第三个颜色</p>
+                <div class="input-group">
+                    <label for="exercise1-input">你的代码:</label>
+                    <textarea id="exercise1-input" rows="3" placeholder="const colors = ['red', 'green', 'blue', 'yellow', 'purple'];
+// 在这里添加你的解构代码
+console.log(firstColor, thirdColor);"></textarea>
+                </div>
+                <button class="button" onclick="checkExercise1()">检查答案</button>
+                <div id="exercise1-output" class="output">点击"检查答案"查看结果</div>
+            </div>
+
+            <div class="exercise">
+                <h3>练习2：对象解构</h3>
+                <p>给定对象 { name: 'Alice', age: 30, city: 'New York' }，解构出name和age，并为city设置默认值'Unknown'</p>
+                <div class="input-group">
+                    <label for="exercise2-input">你的代码:</label>
+                    <textarea id="exercise2-input" rows="3" placeholder="const user = { name: 'Alice', age: 30 };
+// 在这里添加你的解构代码
+console.log(name, age, city);"></textarea>
+                </div>
+                <button class="button" onclick="checkExercise2()">检查答案</button>
+                <div id="exercise2-output" class="output">点击"检查答案"查看结果</div>
+            </div>
+
+            <div class="exercise">
+                <h3>练习3：扩展运算符</h3>
+                <p>使用扩展运算符合并两个数组 [1, 2, 3] 和 [4, 5, 6]，并在中间插入元素 'a', 'b'</p>
+                <div class="input-group">
+                    <label for="exercise3-input">你的代码:</label>
+                    <textarea id="exercise3-input" rows="3" placeholder="const arr1 = [1, 2, 3];
+const arr2 = [4, 5, 6];
+// 在这里添加你的代码
+console.log(result);"></textarea>
+                </div>
+                <button class="button" onclick="checkExercise3()">检查答案</button>
+                <div id="exercise3-output" class="output">点击"检查答案"查看结果</div>
+            </div>
+        </div>
+
+        <div class="note">
+            <h3>提示</h3>
+            <p>1. 解构赋值可以大大简化代码，提高可读性</p>
+            <p>2. 扩展运算符(...)可以用于数组和对象，实现复制、合并等操作</p>
+            <p>3. 在函数参数中使用解构可以使函数签名更加清晰</p>
+            <p>4. 注意扩展运算符只进行浅拷贝，对于嵌套对象需要特别处理</p>
+        </div>
+    </div>
+
+    <script>
+        // 数组解构演示
+        function runArrayDestructuring() {
+            const output = document.getElementById('array-output');
+            let result = '';
+
+            // 基本数组解构
+            const [x, y, z] = [1, 2, 3];
+            result += `基本解构: ${x}, ${y}, ${z}\n`;
+
+            // 跳过某些元素
+            const [first, , third] = [1, 2, 3, 4];
+            result += `跳过元素: ${first}, ${third}\n`;
+
+            // 使用剩余元素
+            const [head, ...tail] = [1, 2, 3, 4, 5];
+            result += `剩余元素: ${head}, [${tail.join(', ')}]\n`;
+
+            // 设置默认值
+            const [a = 10, b = 20] = [1];
+            result += `默认值: ${a}, ${b}`;
+
+            output.textContent = result;
+        }
+
+        // 对象解构演示
+        function runObjectDestructuring() {
+            const output = document.getElementById('object-output');
+            let result = '';
+
+            // 基本对象解构
+            const person = {
+                name: 'Alice',
+                age: 30,
+                city: 'New York'
+            };
+
+            const { name, age } = person;
+            result += `基本解构: ${name}, ${age}\n`;
+
+            // 重命名变量
+            const { name: userName, age: userAge } = person;
+            result += `重命名变量: ${userName}, ${userAge}\n`;
+
+            // 设置默认值
+            const { name: personName, country = 'USA' } = person;
+            result += `默认值: ${personName}, ${country}\n`;
+
+            // 嵌套对象解构
+            const employee = {
+                id: 123,
+                personal: {
+                    name: 'Charlie',
+                    contact: {
+                        email: 'charlie@example.com'
+                    }
+                }
+            };
+
+            const { 
+                personal: { 
+                    name: empName, 
+                    contact: { email } 
+                } 
+            } = employee;
+            result += `嵌套解构: ${empName}, ${email}`;
+
+            output.textContent = result;
+        }
+
+        // 函数参数解构演示
+        function runFunctionDestructuring() {
+            const output = document.getElementById('function-output');
+            let result = '';
+
+            // 函数参数解构
+            function displayPerson({ name, age, city = 'Unknown' }) {
+                result += `Name: ${name}, Age: ${age}, City: ${city}\n`;
+            }
+
+            displayPerson({ name: 'David', age: 40, city: 'New York' });
+            displayPerson({ name: 'Eve', age: 35 }); // 使用默认城市
+
+            // 带默认值的解构参数
+            function createUser({ name = 'Anonymous', age = 0, isActive = true } = {}) {
+                result += `Created user: ${name}, Age: ${age}, Active: ${isActive}\n`;
+            }
+
+            createUser(); // 使用所有默认值
+            createUser({ name: 'Frank' }); // 只覆盖name
+
+            output.textContent = result;
+        }
+
+        // 数组扩展运算符演示
+        function runArraySpread() {
+            const output = document.getElementById('array-spread-output');
+            let result = '';
+
+            // 数组合并
+            const arr1 = [1, 2, 3];
+            const arr2 = [4, 5, 6];
+            const combined = [...arr1, ...arr2];
+            result += `数组合并: [${combined.join(', ')}]\n`;
+
+            // 在数组中间插入元素
+            const parts = ['shoulders', 'knees'];
+            const body = ['head', ...parts, 'and', 'toes'];
+            result += `插入元素: [${body.join(', ')}]\n`;
+
+            // 数组复制
+            const original = [1, 2, 3];
+            const copy = [...original];
+            result += `数组复制: [${copy.join(', ')}], 是不同对象: ${original !== copy}\n`;
+
+            // 函数调用中的扩展运算符
+            function add(a, b, c) {
+                return a + b + c;
+            }
+            const numbers = [1, 2, 3];
+            const sum = add(...numbers);
+            result += `函数调用: add(...numbers) = ${sum}`;
+
+            output.textContent = result;
+        }
+
+        // 对象扩展运算符演示
+        function runObjectSpread() {
+            const output = document.getElementById('object-spread-output');
+            let result = '';
+
+            // 对象合并
+            const obj1 = { a: 1, b: 2 };
+            const obj2 = { c: 3, d: 4 };
+            const merged = { ...obj1, ...obj2 };
+            result += `对象合并: ${JSON.stringify(merged)}\n`;
+
+            // 覆盖属性
+            const base = { a: 1, b: 2, c: 3 };
+            const override = { ...base, b: 20, c: 30 };
+            result += `覆盖属性: ${JSON.stringify(override)}\n`;
+
+            // 添加新属性
+            const extended = { ...base, d: 4, e: 5 };
+            result += `添加属性: ${JSON.stringify(extended)}\n`;
+
+            // 结合解构和扩展运算符
+            const { a, ...rest } = { a: 1, b: 2, c: 3, d: 4 };
+            result += `解构与扩展: a=${a}, rest=${JSON.stringify(rest)}`;
+
+            output.textContent = result;
+        }
+
+        // 配置对象合并
+        function mergeConfig() {
+            const output = document.getElementById('config-output');
+            
+            // 默认配置
+            const defaultConfig = {
+                theme: 'light',
+                language: 'en',
+                fontSize: 16,
+                showNotifications: true,
+                autoSave: false
+            };
+
+            // 用户配置
+            const userTheme = document.getElementById('user-theme').value;
+            const userLanguage = document.getElementById('user-language').value;
+            const userFontSize = document.getElementById('user-font-size').value;
+
+            const userConfig = {};
+            if (userTheme) userConfig.theme = userTheme;
+            if (userLanguage) userConfig.language = userLanguage;
+            if (userFontSize) userConfig.fontSize = parseInt(userFontSize);
+
+            // 合并配置
+            const finalConfig = { ...defaultConfig, ...userConfig };
+            
+            output.textContent = `默认配置: ${JSON.stringify(defaultConfig, null, 2)}\n\n` +
+                                `用户配置: ${JSON.stringify(userConfig, null, 2)}\n\n` +
+                                `最终配置: ${JSON.stringify(finalConfig, null, 2)}`;
+        }
+
+        // 数组处理
+        function processArray() {
+            const output = document.getElementById('array-process-output');
+            const input = document.getElementById('array-input').value;
+            
+            if (!input) {
+                output.textContent = '请输入数组内容';
+                return;
+            }
+
+            try {
+                // 将输入字符串转换为数组
+                const array = input.split(',').map(item => {
+                    const num = parseInt(item.trim());
+                    return isNaN(num) ? item.trim() : num;
+                });
+
+                // 数组去重
+                const uniqueArray = [...new Set(array)];
+                
+                // 数组排序
+                const sortedArray = [...array].sort((a, b) => {
+                    if (typeof a === 'number' && typeof b === 'number') {
+                        return a - b;
+                    }
+                    return String(a).localeCompare(String(b));
+                });
+
+                // 数组分块
+                function chunk(arr, size) {
+                    const chunks = [];
+                    for (let i = 0; i < arr.length; i += size) {
+                        chunks.push(arr.slice(i, i + size));
+                    }
+                    return chunks;
+                }
+                const chunkedArray = chunk(array, 3);
+
+                output.textContent = `原始数组: [${array.join(', ')}]\n\n` +
+                                    `去重数组: [${uniqueArray.join(', ')}]\n\n` +
+                                    `排序数组: [${sortedArray.join(', ')}]\n\n` +
+                                    `分块数组(大小为3): ${JSON.stringify(chunkedArray)}`;
+            } catch (error) {
+                output.textContent = `处理错误: ${error.message}`;
+            }
+        }
+
+        // 练习1检查
+        function checkExercise1() {
+            const output = document.getElementById('exercise1-output');
+            const code = document.getElementById('exercise1-input').value;
+            
+            try {
+                // 创建一个安全的执行环境
+                const func = new Function(code);
+                const console = { log: (...args) => output.textContent += args.join(' ') + '\n' };
+                
+                output.textContent = '输出结果:\n';
+                func.call({ console });
+                
+                // 检查是否包含期望的输出
+                if (output.textContent.includes('red') && output.textContent.includes('blue')) {
+                    output.textContent += '\n✅ 答案正确！';
+                } else {
+                    output.textContent += '\n❌ 答案不正确，请再试一次。';
+                }
+            } catch (error) {
+                output.textContent = `代码错误: ${error.message}`;
+            }
+        }
+
+        // 练习2检查
+        function checkExercise2() {
+            const output = document.getElementById('exercise2-output');
+            const code = document.getElementById('exercise2-input').value;
+            
+            try {
+                // 创建一个安全的执行环境
+                const func = new Function(code);
+                const console = { log: (...args) => output.textContent += args.join(' ') + '\n' };
+                
+                output.textContent = '输出结果:\n';
+                func.call({ console });
+                
+                // 检查是否包含期望的输出
+                if (output.textContent.includes('Alice') && output.textContent.includes('30')) {
+                    if (output.textContent.includes('Unknown')) {
+                        output.textContent += '\n✅ 答案正确！';
+                    } else {
+                        output.textContent += '\n⚠️ 部分正确，但可能没有为city设置默认值。';
+                    }
+                } else {
+                    output.textContent += '\n❌ 答案不正确，请再试一次。';
+                }
+            } catch (error) {
+                output.textContent = `代码错误: ${error.message}`;
+            }
+        }
+
+        // 练习3检查
+        function checkExercise3() {
+            const output = document.getElementById('exercise3-output');
+            const code = document.getElementById('exercise3-input').value;
+            
+            try {
+                // 创建一个安全的执行环境
+                const func = new Function(code);
+                const console = { log: (...args) => output.textContent += args.join(' ') + '\n' };
+                
+                output.textContent = '输出结果:\n';
+                func.call({ console });
+                
+                // 检查是否包含期望的输出
+                if (output.textContent.includes('1') && output.textContent.includes('6')) {
+                    if (output.textContent.includes('a') && output.textContent.includes('b')) {
+                        output.textContent += '\n✅ 答案正确！';
+                    } else {
+                        output.textContent += '\n⚠️ 部分正确，但可能没有插入字母。';
+                    }
+                } else {
+                    output.textContent += '\n❌ 答案不正确，请再试一次。';
+                }
+            } catch (error) {
+                output.textContent = `代码错误: ${error.message}`;
+            }
+        }
+    </script>
+</body>
+</html>

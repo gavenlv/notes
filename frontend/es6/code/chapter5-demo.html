@@ -1,0 +1,1246 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>第5章：模板字符串与字符串增强 - 演示</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+        
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        h2 {
+            color: #3498db;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+            margin-top: 30px;
+        }
+        
+        .demo-section {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .demo-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .demo-row {
+            display: flex;
+            gap: 20px;
+            align-items: flex-start;
+        }
+        
+        .code-column {
+            flex: 1;
+        }
+        
+        .result-column {
+            flex: 1;
+        }
+        
+        .code-block {
+            background-color: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 4px;
+            padding: 15px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 14px;
+            white-space: pre;
+            overflow-x: auto;
+        }
+        
+        .result-block {
+            background-color: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 4px;
+            padding: 15px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 14px;
+            min-height: 50px;
+            white-space: pre-wrap;
+        }
+        
+        .button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s;
+        }
+        
+        .button:hover {
+            background-color: #2980b9;
+        }
+        
+        .input-group {
+            margin-bottom: 15px;
+        }
+        
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        .input-group input, .input-group select, .input-group textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .exercise {
+            background-color: #e8f4fc;
+            border-left: 4px solid #3498db;
+            padding: 15px;
+            margin-top: 20px;
+        }
+        
+        .exercise h3 {
+            margin-top: 0;
+            color: #2980b9;
+        }
+        
+        .interactive-demo {
+            display: flex;
+            gap: 20px;
+            margin-top: 15px;
+        }
+        
+        .interactive-demo > div {
+            flex: 1;
+        }
+        
+        .tab-container {
+            margin-top: 15px;
+        }
+        
+        .tab-buttons {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .tab-button {
+            padding: 10px 15px;
+            background-color: #f1f1f1;
+            border: 1px solid #ddd;
+            border-bottom: none;
+            cursor: pointer;
+            margin-right: 5px;
+        }
+        
+        .tab-button.active {
+            background-color: #fff;
+            border-bottom: 1px solid #fff;
+            margin-bottom: -1px;
+        }
+        
+        .tab-content {
+            display: none;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-top: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <h1>第5章：模板字符串与字符串增强 - 演示</h1>
+    
+    <!-- 5.1 模板字符串基础 -->
+    <div class="demo-section">
+        <h2>5.1 模板字符串基础</h2>
+        
+        <div class="tab-container">
+            <div class="tab-buttons">
+                <div class="tab-button active" onclick="showTab('basic-strings', 'traditional')">传统字符串</div>
+                <div class="tab-button" onclick="showTab('basic-strings', 'multiline')">多行字符串</div>
+                <div class="tab-button" onclick="showTab('basic-strings', 'interpolation')">字符串插值</div>
+                <div class="tab-button" onclick="showTab('basic-strings', 'expression')">表达式计算</div>
+            </div>
+            
+            <div id="traditional" class="tab-content active">
+                <div class="demo-container">
+                    <div class="demo-row">
+                        <div class="code-column">
+                            <div class="code-block">// 传统字符串
+const traditionalString = 'Hello, world!';
+
+// 模板字符串
+const templateString = `Hello, world!`;</div>
+                        </div>
+                        <div class="result-column">
+                            <div class="result-block" id="traditional-result">点击运行查看结果</div>
+                            <button class="button" onclick="runTraditionalDemo()">运行</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="multiline" class="tab-content">
+                <div class="demo-container">
+                    <div class="demo-row">
+                        <div class="code-column">
+                            <div class="code-block">// 传统方式（不推荐）
+const multiLineTraditional = 'Line 1\n' +
+                            'Line 2\n' +
+                            'Line 3';
+
+// 使用模板字符串
+const multiLineTemplate = `Line 1
+Line 2
+Line 3`;</div>
+                        </div>
+                        <div class="result-column">
+                            <div class="result-block" id="multiline-result">点击运行查看结果</div>
+                            <button class="button" onclick="runMultilineDemo()">运行</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="interpolation" class="tab-content">
+                <div class="demo-container">
+                    <div class="demo-row">
+                        <div class="code-column">
+                            <div class="code-block">const name = 'Alice';
+const age = 30;
+
+// 传统字符串拼接
+const traditionalGreeting = 'Hello, my name is ' + name + ' and I am ' + age + ' years old.';
+
+// 模板字符串插值
+const templateGreeting = `Hello, my name is ${name} and I am ${age} years old.`;</div>
+                        </div>
+                        <div class="result-column">
+                            <div class="result-block" id="interpolation-result">点击运行查看结果</div>
+                            <button class="button" onclick="runInterpolationDemo()">运行</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="expression" class="tab-content">
+                <div class="demo-container">
+                    <div class="demo-row">
+                        <div class="code-column">
+                            <div class="code-block">const price = 19.99;
+const quantity = 3;
+const tax = 0.08;
+
+// 计算表达式
+const total = `Total: $${(price * quantity * (1 + tax)).toFixed(2)}`;
+
+// 使用条件表达式
+const isLoggedIn = true;
+const greeting = `Welcome ${isLoggedIn ? 'back' : 'guest'}!`;</div>
+                        </div>
+                        <div class="result-column">
+                            <div class="result-block" id="expression-result">点击运行查看结果</div>
+                            <button class="button" onclick="runExpressionDemo()">运行</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 5.2 标签模板 -->
+    <div class="demo-section">
+        <h2>5.2 标签模板</h2>
+        
+        <div class="tab-container">
+            <div class="tab-buttons">
+                <div class="tab-button active" onclick="showTab('tagged-templates', 'basic-tag')">基础标签模板</div>
+                <div class="tab-button" onclick="showTab('tagged-templates', 'html-escape')">HTML转义</div>
+                <div class="tab-button" onclick="showTab('tagged-templates', 'uppercase')">大写转换</div>
+            </div>
+            
+            <div id="basic-tag" class="tab-content active">
+                <div class="demo-container">
+                    <div class="demo-row">
+                        <div class="code-column">
+                            <div class="code-block">function simpleTag(strings, ...values) {
+  console.log('Strings:', strings);
+  console.log('Values:', values);
+  return 'Tagged result';
+}
+
+const name = 'Alice';
+const age = 30;
+
+const result = simpleTag`My name is ${name} and I am ${age} years old.`;</div>
+                        </div>
+                        <div class="result-column">
+                            <div class="result-block" id="basic-tag-result">点击运行查看结果</div>
+                            <button class="button" onclick="runBasicTagDemo()">运行</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="html-escape" class="tab-content">
+                <div class="demo-container">
+                    <div class="demo-row">
+                        <div class="code-column">
+                            <div class="code-block">function html(strings, ...values) {
+  let result = '';
+  for (let i = 0; i < values.length; i++) {
+    // 转义HTML特殊字符
+    const escaped = String(values[i])
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+    
+    result += strings[i] + escaped;
+  }
+  result += strings[strings.length - 1];
+  return result;
+}
+
+const userInput = '<script>alert("XSS")</script>';
+const safeHtml = html`<div>${userInput}</div>`;</div>
+                        </div>
+                        <div class="result-column">
+                            <div class="result-block" id="html-escape-result">点击运行查看结果</div>
+                            <button class="button" onclick="runHtmlEscapeDemo()">运行</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="uppercase" class="tab-content">
+                <div class="demo-container">
+                    <div class="demo-row">
+                        <div class="code-column">
+                            <div class="code-block">function uppercase(strings, ...values) {
+  let result = '';
+  for (let i = 0; i < values.length; i++) {
+    result += strings[i] + String(values[i]).toUpperCase();
+  }
+  result += strings[strings.length - 1];
+  return result;
+}
+
+const message = uppercase`Hello ${'world'} and ${'javascript'}!`;</div>
+                        </div>
+                        <div class="result-column">
+                            <div class="result-block" id="uppercase-result">点击运行查看结果</div>
+                            <button class="button" onclick="runUppercaseDemo()">运行</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 5.3 字符串新增方法 -->
+    <div class="demo-section">
+        <h2>5.3 字符串新增方法</h2>
+        
+        <div class="tab-container">
+            <div class="tab-buttons">
+                <div class="tab-button active" onclick="showTab('string-methods', 'includes')">includes()</div>
+                <div class="tab-button" onclick="showTab('string-methods', 'starts-ends')">startsWith()和endsWith()</div>
+                <div class="tab-button" onclick="showTab('string-methods', 'repeat')">repeat()</div>
+                <div class="tab-button" onclick="showTab('string-methods', 'pad')">padStart()和padEnd()</div>
+            </div>
+            
+            <div id="includes" class="tab-content active">
+                <div class="demo-container">
+                    <div class="demo-row">
+                        <div class="code-column">
+                            <div class="code-block">const sentence = 'The quick brown fox jumps over the lazy dog';
+
+console.log(sentence.includes('fox'));      // true
+console.log(sentence.includes('cat'));      // false
+console.log(sentence.includes('the', 10));  // true，从索引10开始搜索
+console.log(sentence.includes('the', 20));  // false，从索引20开始搜索</div>
+                        </div>
+                        <div class="result-column">
+                            <div class="result-block" id="includes-result">点击运行查看结果</div>
+                            <button class="button" onclick="runIncludesDemo()">运行</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="starts-ends" class="tab-content">
+                <div class="demo-container">
+                    <div class="demo-row">
+                        <div class="code-column">
+                            <div class="code-block">const filename = 'document.pdf';
+
+console.log(filename.startsWith('document'));  // true
+console.log(filename.startsWith('image'));     // false
+console.log(filename.endsWith('.pdf'));        // true
+console.log(filename.endsWith('.doc'));        // false
+
+// 可以指定起始位置
+const longString = 'Hello world, welcome to JavaScript';
+console.log(longString.startsWith('world', 6));    // true</div>
+                        </div>
+                        <div class="result-column">
+                            <div class="result-block" id="starts-ends-result">点击运行查看结果</div>
+                            <button class="button" onclick="runStartsEndsDemo()">运行</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="repeat" class="tab-content">
+                <div class="demo-container">
+                    <div class="demo-row">
+                        <div class="code-column">
+                            <div class="code-block">const star = '*';
+console.log(star.repeat(5));     // "*****"
+console.log('abc'.repeat(3));    // "abcabcabc"
+console.log('test'.repeat(0));   // ""
+
+// 应用：创建分隔线
+console.log('='.repeat(30));    // "=============================="
+
+// 应用：填充字符串
+function padLeft(str, width, fillChar = ' ') {
+  if (str.length >= width) return str;
+  const fillCount = width - str.length;
+  return fillChar.repeat(fillCount) + str;
+}
+
+console.log(padLeft('42', 5, '0'));  // "00042"</div>
+                        </div>
+                        <div class="result-column">
+                            <div class="result-block" id="repeat-result">点击运行查看结果</div>
+                            <button class="button" onclick="runRepeatDemo()">运行</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="pad" class="tab-content">
+                <div class="demo-container">
+                    <div class="demo-row">
+                        <div class="code-column">
+                            <div class="code-block">// padStart() - 在开头填充
+console.log('42'.padStart(5, '0'));        // "00042"
+console.log('abc'.padStart(10, '*'));      // "*******abc"
+
+// padEnd() - 在结尾填充
+console.log('42'.padEnd(5, '0'));          // "42000"
+console.log('abc'.padEnd(10, '*'));        // "abc*******"
+
+// 应用：格式化输出
+const items = [
+  { id: 1, name: 'Apple', price: 1.99 },
+  { id: 10, name: 'Banana', price: 0.99 }
+];
+
+console.log('ID'.padEnd(6) + 'Name'.padEnd(10) + 'Price');
+items.forEach(item => {
+  console.log(
+    String(item.id).padEnd(6) + 
+    item.name.padEnd(10) + 
+    '$' + item.price.toFixed(2)
+  );
+});</div>
+                        </div>
+                        <div class="result-column">
+                            <div class="result-block" id="pad-result">点击运行查看结果</div>
+                            <button class="button" onclick="runPadDemo()">运行</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 5.4 Unicode支持增强 -->
+    <div class="demo-section">
+        <h2>5.4 Unicode支持增强</h2>
+        
+        <div class="tab-container">
+            <div class="tab-buttons">
+                <div class="tab-button active" onclick="showTab('unicode', 'code-points')">Unicode码点转义</div>
+                <div class="tab-button" onclick="showTab('unicode', 'code-point-at')">codePointAt()</div>
+                <div class="tab-button" onclick="showTab('unicode', 'iteration')">字符串遍历</div>
+            </div>
+            
+            <div id="code-points" class="tab-content active">
+                <div class="demo-container">
+                    <div class="demo-row">
+                        <div class="code-column">
+                            <div class="code-block">// 基本Unicode字符
+console.log('\u0041'); // "A"
+
+// 使用大括号表示Unicode码点
+console.log('\u{41}');  // "A"
+
+// 表示超过0xFFFF的字符
+console.log('\u{1F600}'); // "😀" (笑脸表情)
+console.log('\u{1F603}'); // "😃" (大笑表情)
+
+// 使用String.fromCodePoint()
+console.log(String.fromCodePoint(0x1F600)); // "😀"
+console.log(String.fromCodePoint(0x41, 0x42, 0x43)); // "ABC"</div>
+                        </div>
+                        <div class="result-column">
+                            <div class="result-block" id="code-points-result">点击运行查看结果</div>
+                            <button class="button" onclick="runCodePointsDemo()">运行</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="code-point-at" class="tab-content">
+                <div class="demo-container">
+                    <div class="demo-row">
+                        <div class="code-column">
+                            <div class="code-block">const emoji = '😀'; // 笑脸表情
+
+console.log(emoji.length);        // 2 (在UTF-16中占用两个代码单元)
+console.log(emoji.charCodeAt(0)); // 55357 (高代理项)
+console.log(emoji.charCodeAt(1)); // 56832 (低代理项)
+console.log(emoji.codePointAt(0)); // 128512 (完整的Unicode码点)
+
+// 处理包含代理对的字符串
+const text = 'Hello 😀 World';
+console.log(text.codePointAt(6)); // 128512 (笑脸表情的码点)</div>
+                        </div>
+                        <div class="result-column">
+                            <div class="result-block" id="code-point-at-result">点击运行查看结果</div>
+                            <button class="button" onclick="runCodeAtDemo()">运行</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="iteration" class="tab-content">
+                <div class="demo-container">
+                    <div class="demo-row">
+                        <div class="code-column">
+                            <div class="code-block">const text = 'Hi 😀!';
+
+// 传统方式（不正确）
+console.log('使用for循环:');
+for (let i = 0; i < text.length; i++) {
+  console.log(text[i]);
+}
+
+// 使用for...of（正确）
+console.log('使用for...of:');
+for (const char of text) {
+  console.log(char);
+}
+
+// 使用展开运算符（正确）
+console.log([...text]);</div>
+                        </div>
+                        <div class="result-column">
+                            <div class="result-block" id="iteration-result">点击运行查看结果</div>
+                            <button class="button" onclick="runIterationDemo()">运行</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 5.5 实际应用场景 -->
+    <div class="demo-section">
+        <h2>5.5 实际应用场景</h2>
+        
+        <div class="tab-container">
+            <div class="tab-buttons">
+                <div class="tab-button active" onclick="showTab('applications', 'html-template')">HTML模板生成</div>
+                <div class="tab-button" onclick="showTab('applications', 'sql-query')">SQL查询构建</div>
+                <div class="tab-button" onclick="showTab('applications', 'i18n')">国际化与本地化</div>
+            </div>
+            
+            <div id="html-template" class="tab-content active">
+                <div class="demo-container">
+                    <div class="demo-row">
+                        <div class="code-column">
+                            <div class="code-block">function generateUserCard(user) {
+  return `
+    <div class="user-card">
+      <img src="${user.avatar}" alt="${user.name}" class="avatar">
+      <div class="user-info">
+        <h3>${user.name}</h3>
+        <p>${user.email}</p>
+        <p>Member since: ${new Date(user.joinDate).toLocaleDateString()}</p>
+        <div class="status ${user.isActive ? 'active' : 'inactive'}">
+          ${user.isActive ? 'Active' : 'Inactive'}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+const user = {
+  name: 'John Doe',
+  email: 'john@example.com',
+  avatar: 'https://picsum.photos/seed/user123/100/100.jpg',
+  joinDate: '2020-01-15',
+  isActive: true
+};</div>
+                        </div>
+                        <div class="result-column">
+                            <div class="result-block" id="html-template-result">点击运行查看结果</div>
+                            <button class="button" onclick="runHtmlTemplateDemo()">运行</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="sql-query" class="tab-content">
+                <div class="demo-container">
+                    <div class="demo-row">
+                        <div class="code-column">
+                            <div class="code-block">function buildQuery(table, conditions = {}, fields = '*', limit = null) {
+  let query = `SELECT ${fields} FROM ${table}`;
+  
+  if (Object.keys(conditions).length > 0) {
+    const whereClause = Object.entries(conditions)
+      .map(([key, value]) => `${key} = '${value}'`)
+      .join(' AND ');
+    query += ` WHERE ${whereClause}`;
+  }
+  
+  if (limit) {
+    query += ` LIMIT ${limit}`;
+  }
+  
+  return query;
+}
+
+const query1 = buildQuery('users', { status: 'active', age: 25 }, 'id, name, email');
+const query2 = buildQuery('products', {}, '*', 10);</div>
+                        </div>
+                        <div class="result-column">
+                            <div class="result-block" id="sql-query-result">点击运行查看结果</div>
+                            <button class="button" onclick="runSqlQueryDemo()">运行</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="i18n" class="tab-content">
+                <div class="demo-container">
+                    <div class="demo-row">
+                        <div class="code-column">
+                            <div class="code-block">const i18n = {
+  en: {
+    greeting: 'Hello, {name}!',
+    farewell: 'Goodbye, {name}!',
+    items: '{count} items'
+  },
+  zh: {
+    greeting: '你好，{name}！',
+    farewell: '再见，{name}！',
+    items: '{count} 件商品'
+  }
+};
+
+function translate(key, locale = 'en', params = {}) {
+  const template = i18n[locale][key] || i18n.en[key] || key;
+  
+  return template.replace(/{(\w+)}/g, (match, param) => {
+    return params[param] !== undefined ? params[param] : match;
+  });
+}</div>
+                        </div>
+                        <div class="result-column">
+                            <div class="result-block" id="i18n-result">点击运行查看结果</div>
+                            <button class="button" onclick="runI18nDemo()">运行</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 5.6 实践练习 -->
+    <div class="demo-section">
+        <h2>5.6 实践练习</h2>
+        
+        <div class="exercise">
+            <h3>练习1：模板字符串应用</h3>
+            <p>使用模板字符串创建一个函数，接收用户信息并生成格式化的用户简介。</p>
+            
+            <div class="interactive-demo">
+                <div>
+                    <div class="input-group">
+                        <label for="user-name">姓名:</label>
+                        <input type="text" id="user-name" value="Alice Johnson">
+                    </div>
+                    <div class="input-group">
+                        <label for="user-age">年龄:</label>
+                        <input type="number" id="user-age" value="28">
+                    </div>
+                    <div class="input-group">
+                        <label for="user-occupation">职业:</label>
+                        <input type="text" id="user-occupation" value="Web Developer">
+                    </div>
+                    <div class="input-group">
+                        <label for="user-hobbies">爱好 (用逗号分隔):</label>
+                        <input type="text" id="user-hobbies" value="coding, reading, hiking">
+                    </div>
+                    <div class="input-group">
+                        <label for="user-joined">加入日期:</label>
+                        <input type="date" id="user-joined" value="2020-05-15">
+                    </div>
+                </div>
+                <div>
+                    <div class="result-block" id="exercise1-result">点击生成查看结果</div>
+                    <button class="button" onclick="generateUserProfile()">生成用户简介</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="exercise">
+            <h3>练习2：标签模板应用</h3>
+            <p>创建一个标签模板函数currency，用于格式化货币值。</p>
+            
+            <div class="interactive-demo">
+                <div>
+                    <div class="input-group">
+                        <label for="currency-value">金额:</label>
+                        <input type="number" id="currency-value" value="1234.567" step="0.01">
+                    </div>
+                    <div class="input-group">
+                        <label for="currency-code">货币代码:</label>
+                        <select id="currency-code">
+                            <option value="USD">USD (美元)</option>
+                            <option value="EUR">EUR (欧元)</option>
+                            <option value="CNY">CNY (人民币)</option>
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <div class="result-block" id="exercise2-result">点击格式化查看结果</div>
+                    <button class="button" onclick="formatCurrency()">格式化货币</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="exercise">
+            <h3>练习3：字符串方法应用</h3>
+            <p>使用ES6字符串方法完成文件类型检查、ID生成和域名提取任务。</p>
+            
+            <div class="interactive-demo">
+                <div>
+                    <div class="input-group">
+                        <label for="check-filename">检查文件名:</label>
+                        <input type="text" id="check-filename" value="photo.jpg">
+                    </div>
+                    <div class="input-group">
+                        <label for="generate-id">生成ID:</label>
+                        <input type="number" id="generate-id" value="123">
+                    </div>
+                    <div class="input-group">
+                        <label for="extract-url">提取域名:</label>
+                        <input type="text" id="extract-url" value="https://www.example.com/path/page">
+                    </div>
+                </div>
+                <div>
+                    <div class="result-block" id="exercise3-result">点击执行查看结果</div>
+                    <button class="button" onclick="runStringMethods()">执行字符串方法</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // 标签页切换功能
+        function showTab(containerId, tabId) {
+            // 隐藏所有标签内容
+            const container = document.getElementById(containerId);
+            const contents = container.querySelectorAll('.tab-content');
+            contents.forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // 移除所有标签按钮的active类
+            const buttons = container.querySelectorAll('.tab-button');
+            buttons.forEach(button => {
+                button.classList.remove('active');
+            });
+            
+            // 显示选中的标签内容
+            document.getElementById(tabId).classList.add('active');
+            
+            // 添加active类到选中的标签按钮
+            event.target.classList.add('active');
+        }
+        
+        // 5.1 模板字符串基础 - 演示函数
+        function runTraditionalDemo() {
+            const resultElement = document.getElementById('traditional-result');
+            
+            // 传统字符串
+            const traditionalString = 'Hello, world!';
+            
+            // 模板字符串
+            const templateString = `Hello, world!`;
+            
+            resultElement.textContent = `传统字符串: ${traditionalString}\n模板字符串: ${templateString}`;
+        }
+        
+        function runMultilineDemo() {
+            const resultElement = document.getElementById('multiline-result');
+            
+            // 传统方式（不推荐）
+            const multiLineTraditional = 'Line 1\nLine 2\nLine 3';
+            
+            // 使用模板字符串
+            const multiLineTemplate = `Line 1
+Line 2
+Line 3`;
+            
+            resultElement.textContent = `传统方式:\n${multiLineTraditional}\n\n模板字符串:\n${multiLineTemplate}`;
+        }
+        
+        function runInterpolationDemo() {
+            const resultElement = document.getElementById('interpolation-result');
+            
+            const name = 'Alice';
+            const age = 30;
+            
+            // 传统字符串拼接
+            const traditionalGreeting = 'Hello, my name is ' + name + ' and I am ' + age + ' years old.';
+            
+            // 模板字符串插值
+            const templateGreeting = `Hello, my name is ${name} and I am ${age} years old.`;
+            
+            resultElement.textContent = `传统拼接: ${traditionalGreeting}\n模板插值: ${templateGreeting}`;
+        }
+        
+        function runExpressionDemo() {
+            const resultElement = document.getElementById('expression-result');
+            
+            const price = 19.99;
+            const quantity = 3;
+            const tax = 0.08;
+            
+            // 计算表达式
+            const total = `Total: $${(price * quantity * (1 + tax)).toFixed(2)}`;
+            
+            // 使用条件表达式
+            const isLoggedIn = true;
+            const greeting = `Welcome ${isLoggedIn ? 'back' : 'guest'}!`;
+            
+            resultElement.textContent = `${total}\n${greeting}`;
+        }
+        
+        // 5.2 标签模板 - 演示函数
+        function runBasicTagDemo() {
+            const resultElement = document.getElementById('basic-tag-result');
+            
+            function simpleTag(strings, ...values) {
+                return `Strings: ${JSON.stringify(strings)}\nValues: ${JSON.stringify(values)}\nResult: Tagged result`;
+            }
+            
+            const name = 'Alice';
+            const age = 30;
+            
+            const result = simpleTag`My name is ${name} and I am ${age} years old.`;
+            
+            resultElement.textContent = result;
+        }
+        
+        function runHtmlEscapeDemo() {
+            const resultElement = document.getElementById('html-escape-result');
+            
+            function html(strings, ...values) {
+                let result = '';
+                for (let i = 0; i < values.length; i++) {
+                    // 转义HTML特殊字符
+                    const escaped = String(values[i])
+                        .replace(/&/g, '&amp;')
+                        .replace(/</g, '&lt;')
+                        .replace(/>/g, '&gt;')
+                        .replace(/"/g, '&quot;')
+                        .replace(/'/g, '&#39;');
+                    
+                    result += strings[i] + escaped;
+                }
+                result += strings[strings.length - 1];
+                return result;
+            }
+            
+            const userInput = '<script>alert("XSS")</script>';
+            const safeHtml = html`<div>${userInput}</div>`;
+            
+            resultElement.textContent = `原始输入: ${userInput}\n转义后: ${safeHtml}`;
+        }
+        
+        function runUppercaseDemo() {
+            const resultElement = document.getElementById('uppercase-result');
+            
+            function uppercase(strings, ...values) {
+                let result = '';
+                for (let i = 0; i < values.length; i++) {
+                    result += strings[i] + String(values[i]).toUpperCase();
+                }
+                result += strings[strings.length - 1];
+                return result;
+            }
+            
+            const message = uppercase`Hello ${'world'} and ${'javascript'}!`;
+            
+            resultElement.textContent = message;
+        }
+        
+        // 5.3 字符串新增方法 - 演示函数
+        function runIncludesDemo() {
+            const resultElement = document.getElementById('includes-result');
+            
+            const sentence = 'The quick brown fox jumps over the lazy dog';
+            
+            const results = [
+                `sentence.includes('fox'): ${sentence.includes('fox')}`,
+                `sentence.includes('cat'): ${sentence.includes('cat')}`,
+                `sentence.includes('the', 10): ${sentence.includes('the', 10)}`,
+                `sentence.includes('the', 20): ${sentence.includes('the', 20)}`
+            ];
+            
+            resultElement.textContent = results.join('\n');
+        }
+        
+        function runStartsEndsDemo() {
+            const resultElement = document.getElementById('starts-ends-result');
+            
+            const filename = 'document.pdf';
+            const longString = 'Hello world, welcome to JavaScript';
+            
+            const results = [
+                `filename.startsWith('document'): ${filename.startsWith('document')}`,
+                `filename.startsWith('image'): ${filename.startsWith('image')}`,
+                `filename.endsWith('.pdf'): ${filename.endsWith('.pdf')}`,
+                `filename.endsWith('.doc'): ${filename.endsWith('.doc')}`,
+                `longString.startsWith('world', 6): ${longString.startsWith('world', 6)}`
+            ];
+            
+            resultElement.textContent = results.join('\n');
+        }
+        
+        function runRepeatDemo() {
+            const resultElement = document.getElementById('repeat-result');
+            
+            const star = '*';
+            const results = [
+                `star.repeat(5): ${star.repeat(5)}`,
+                `'abc'.repeat(3): ${'abc'.repeat(3)}`,
+                `'test'.repeat(0): ${'test'.repeat(0)}`,
+                `'='.repeat(30): ${'='.repeat(30)}`
+            ];
+            
+            // 填充字符串函数
+            function padLeft(str, width, fillChar = ' ') {
+                if (str.length >= width) return str;
+                const fillCount = width - str.length;
+                return fillChar.repeat(fillCount) + str;
+            }
+            
+            results.push(`padLeft('42', 5, '0'): ${padLeft('42', 5, '0')}`);
+            
+            resultElement.textContent = results.join('\n');
+        }
+        
+        function runPadDemo() {
+            const resultElement = document.getElementById('pad-result');
+            
+            const results = [
+                `'42'.padStart(5, '0'): ${'42'.padStart(5, '0')}`,
+                `'abc'.padStart(10, '*'): ${'abc'.padStart(10, '*')}`,
+                `'42'.padEnd(5, '0'): ${'42'.padEnd(5, '0')}`,
+                `'abc'.padEnd(10, '*'): ${'abc'.padEnd(10, '*')}`
+            ];
+            
+            // 应用：格式化输出
+            const items = [
+                { id: 1, name: 'Apple', price: 1.99 },
+                { id: 10, name: 'Banana', price: 0.99 }
+            ];
+            
+            results.push('格式化输出:');
+            results.push('ID'.padEnd(6) + 'Name'.padEnd(10) + 'Price');
+            
+            items.forEach(item => {
+                results.push(
+                    String(item.id).padEnd(6) + 
+                    item.name.padEnd(10) + 
+                    '$' + item.price.toFixed(2)
+                );
+            });
+            
+            resultElement.textContent = results.join('\n');
+        }
+        
+        // 5.4 Unicode支持增强 - 演示函数
+        function runCodePointsDemo() {
+            const resultElement = document.getElementById('code-points-result');
+            
+            const results = [
+                `\\u0041: ${'\u0041'}`,
+                `\\u{41}: ${'\u{41}'}`,
+                `\\u{1F600}: ${'\u{1F600}'}`,
+                `\\u{1F603}: ${'\u{1F603}'}`,
+                `String.fromCodePoint(0x1F600): ${String.fromCodePoint(0x1F600)}`,
+                `String.fromCodePoint(0x41, 0x42, 0x43): ${String.fromCodePoint(0x41, 0x42, 0x43)}`
+            ];
+            
+            resultElement.textContent = results.join('\n');
+        }
+        
+        function runCodeAtDemo() {
+            const resultElement = document.getElementById('code-point-at-result');
+            
+            const emoji = '😀';
+            const text = 'Hello 😀 World';
+            
+            const results = [
+                `emoji.length: ${emoji.length}`,
+                `emoji.charCodeAt(0): ${emoji.charCodeAt(0)}`,
+                `emoji.charCodeAt(1): ${emoji.charCodeAt(1)}`,
+                `emoji.codePointAt(0): ${emoji.codePointAt(0)}`,
+                `text.codePointAt(6): ${text.codePointAt(6)}`
+            ];
+            
+            resultElement.textContent = results.join('\n');
+        }
+        
+        function runIterationDemo() {
+            const resultElement = document.getElementById('iteration-result');
+            
+            const text = 'Hi 😀!';
+            
+            let results = ['使用for循环:'];
+            
+            // 传统方式（不正确）
+            for (let i = 0; i < text.length; i++) {
+                results.push(`  [${i}]: ${text[i]}`);
+            }
+            
+            results.push('\n使用for...of:');
+            
+            // 使用for...of（正确）
+            for (const char of text) {
+                results.push(`  ${char}`);
+            }
+            
+            results.push(`\n使用展开运算符: ${JSON.stringify([...text])}`);
+            
+            resultElement.textContent = results.join('\n');
+        }
+        
+        // 5.5 实际应用场景 - 演示函数
+        function runHtmlTemplateDemo() {
+            const resultElement = document.getElementById('html-template-result');
+            
+            function generateUserCard(user) {
+                return `
+    <div class="user-card">
+      <img src="${user.avatar}" alt="${user.name}" class="avatar">
+      <div class="user-info">
+        <h3>${user.name}</h3>
+        <p>${user.email}</p>
+        <p>Member since: ${new Date(user.joinDate).toLocaleDateString()}</p>
+        <div class="status ${user.isActive ? 'active' : 'inactive'}">
+          ${user.isActive ? 'Active' : 'Inactive'}
+        </div>
+      </div>
+    </div>
+  `;
+            }
+            
+            const user = {
+                name: 'John Doe',
+                email: 'john@example.com',
+                avatar: 'https://picsum.photos/seed/user123/100/100.jpg',
+                joinDate: '2020-01-15',
+                isActive: true
+            };
+            
+            resultElement.textContent = generateUserCard(user);
+        }
+        
+        function runSqlQueryDemo() {
+            const resultElement = document.getElementById('sql-query-result');
+            
+            function buildQuery(table, conditions = {}, fields = '*', limit = null) {
+                let query = `SELECT ${fields} FROM ${table}`;
+                
+                if (Object.keys(conditions).length > 0) {
+                    const whereClause = Object.entries(conditions)
+                        .map(([key, value]) => `${key} = '${value}'`)
+                        .join(' AND ');
+                    query += ` WHERE ${whereClause}`;
+                }
+                
+                if (limit) {
+                    query += ` LIMIT ${limit}`;
+                }
+                
+                return query;
+            }
+            
+            const query1 = buildQuery('users', { status: 'active', age: 25 }, 'id, name, email');
+            const query2 = buildQuery('products', {}, '*', 10);
+            
+            resultElement.textContent = `查询1: ${query1}\n查询2: ${query2}`;
+        }
+        
+        function runI18nDemo() {
+            const resultElement = document.getElementById('i18n-result');
+            
+            const i18n = {
+                en: {
+                    greeting: 'Hello, {name}!',
+                    farewell: 'Goodbye, {name}!',
+                    items: '{count} items'
+                },
+                zh: {
+                    greeting: '你好，{name}！',
+                    farewell: '再见，{name}！',
+                    items: '{count} 件商品'
+                }
+            };
+            
+            function translate(key, locale = 'en', params = {}) {
+                const template = i18n[locale][key] || i18n.en[key] || key;
+                
+                return template.replace(/{(\w+)}/g, (match, param) => {
+                    return params[param] !== undefined ? params[param] : match;
+                });
+            }
+            
+            const results = [
+                `英文问候: ${translate('greeting', 'en', { name: 'Alice' })}`,
+                `中文问候: ${translate('greeting', 'zh', { name: 'Alice' })}`,
+                `英文商品数: ${translate('items', 'en', { count: 5 })}`,
+                `中文商品数: ${translate('items', 'zh', { count: 5 })}`
+            ];
+            
+            resultElement.textContent = results.join('\n');
+        }
+        
+        // 5.6 实践练习 - 函数
+        function generateUserProfile() {
+            const resultElement = document.getElementById('exercise1-result');
+            
+            const name = document.getElementById('user-name').value;
+            const age = parseInt(document.getElementById('user-age').value);
+            const occupation = document.getElementById('user-occupation').value;
+            const hobbies = document.getElementById('user-hobbies').value.split(',').map(h => h.trim());
+            const joined = document.getElementById('user-joined').value;
+            
+            const ageGroup = age < 18 ? '年轻用户' : age <= 30 ? '青年用户' : '成熟用户';
+            const joinDate = new Date(joined).toLocaleDateString('zh-CN');
+            
+            const profile = `
+用户简介
+========
+姓名: ${name}
+年龄: ${age}岁 (${ageGroup})
+职业: ${occupation}
+爱好: ${hobbies.join(', ')}
+加入日期: ${joinDate}
+            `.trim();
+            
+            resultElement.textContent = profile;
+        }
+        
+        function formatCurrency() {
+            const resultElement = document.getElementById('exercise2-result');
+            
+            const value = parseFloat(document.getElementById('currency-value').value);
+            const currencyCode = document.getElementById('currency-code').value;
+            
+            // 格式化数字
+            const formattedValue = value.toLocaleString(undefined, { 
+                minimumFractionDigits: 2, 
+                maximumFractionDigits: 2 
+            });
+            
+            // 添加货币符号
+            let symbol = '';
+            switch (currencyCode) {
+                case 'USD': symbol = '$'; break;
+                case 'EUR': symbol = '€'; break;
+                case 'CNY': symbol = '¥'; break;
+                default: symbol = currencyCode + ' ';
+            }
+            
+            resultElement.textContent = `Price: ${symbol}${formattedValue} ${currencyCode}`;
+        }
+        
+        function runStringMethods() {
+            const resultElement = document.getElementById('exercise3-result');
+            
+            const filename = document.getElementById('check-filename').value;
+            const id = document.getElementById('generate-id').value;
+            const url = document.getElementById('extract-url').value;
+            
+            // 检查文件名是否为图片文件
+            function isImageFile(filename) {
+                const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'];
+                const extension = filename.split('.').pop().toLowerCase();
+                return imageExtensions.includes(extension);
+            }
+            
+            // 生成固定长度的ID
+            function generateId(id, length = 8) {
+                return String(id).padStart(length, '0');
+            }
+            
+            // 从URL中提取域名
+            function extractDomain(url) {
+                try {
+                    const urlObj = new URL(url);
+                    return urlObj.hostname;
+                } catch (e) {
+                    // 简单的URL解析（不处理所有情况）
+                    const match = url.match(/https?:\/\/([^\/]+)/);
+                    return match ? match[1] : '';
+                }
+            }
+            
+            const results = [
+                `isImageFile("${filename}"): ${isImageFile(filename)}`,
+                `generateId(${id}, 8): ${generateId(id, 8)}`,
+                `extractDomain("${url}"): ${extractDomain(url)}`
+            ];
+            
+            resultElement.textContent = results.join('\n');
+        }
+    </script>
+</body>
+</html>
