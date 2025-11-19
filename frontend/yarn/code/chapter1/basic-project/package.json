@@ -1,0 +1,39 @@
+{
+  "name": "yarn-basic-project",
+  "version": "1.0.0",
+  "description": "一个基础的Yarn项目示例，演示基本的项目结构和依赖管理",
+  "main": "dist/index.js",
+  "scripts": {
+    "start": "node dist/index.js",
+    "dev": "node src/index.js",
+    "build": "mkdir -p dist && cp src/index.js dist/",
+    "clean": "rm -rf dist",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "yarn",
+    "example",
+    "basic"
+  ],
+  "author": "Yarn教程",
+  "license": "MIT",
+  "dependencies": {
+    "lodash": "^4.17.21",
+    "moment": "^2.29.4"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.20"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/example/yarn-basic-project.git"
+  },
+  "bugs": {
+    "url": "https://github.com/example/yarn-basic-project/issues"
+  },
+  "homepage": "https://github.com/example/yarn-basic-project#readme",
+  "engines": {
+    "node": ">=14.0.0",
+    "yarn": ">=1.22.0"
+  }
+}
