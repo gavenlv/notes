@@ -1,0 +1,29 @@
+{
+  "name": "typescript-performance-optimization",
+  "version": "1.0.0",
+  "description": "TypeScript性能优化示例",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "tsc && node dist/index.js",
+    "watch": "tsc -w",
+    "dev": "ts-node index.ts",
+    "clean": "rimraf dist",
+    "type-check": "tsc --noEmit",
+    "benchmark": "node dist/benchmark.js"
+  },
+  "type": "module",
+  "keywords": [
+    "typescript",
+    "performance",
+    "optimization"
+  ],
+  "author": "TypeScript Tutorial",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^18.0.0",
+    "typescript": "^4.9.5",
+    "ts-node": "^10.0.0",
+    "rimraf": "^3.0.0"
+  }
+}
