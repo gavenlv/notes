@@ -1,0 +1,26 @@
+{% extends "appbuilder/general/widgets/render.html" %}
+
+{% block widget_content scoped %}
+<div class="row">
+    {% for item in widgets_values %}
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">{{ item.name }}</h3>
+            </div>
+            <div class="card-body">
+                <p>Email: {{ item.email }}</p>
+                <p>Phone: {{ item.phone }}</p>
+                {% if item.avatar %}
+                <img src="{{ item.avatar }}" alt="Avatar" class="img-circle" width="50">
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% if loop.index % 3 == 0 %}
+</div>
+<div class="row">
+    {% endif %}
+    {% endfor %}
+</div>
+{% endblock %}

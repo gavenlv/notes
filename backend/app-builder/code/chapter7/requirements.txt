@@ -1,0 +1,2 @@
+Flask-AppBuilder==4.3.0
+marshmallow==3.19.0

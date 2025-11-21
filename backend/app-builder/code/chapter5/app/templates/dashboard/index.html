@@ -1,0 +1,36 @@
+{% extends "appbuilder/base.html" %}
+
+{% block content %}
+<div class="container">
+    <h1>Dashboard</h1>
+    
+    <div class="row">
+        <div class="col-md-4">
+            <div class="well text-center">
+                <h2>{{ contact_count }}</h2>
+                <p>Total Contacts</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="well text-center">
+                <h2>0</h2>
+                <p>New Messages</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="well text-center">
+                <h2>0</h2>
+                <p>Pending Tasks</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-12">
+            <h2>Quick Actions</h2>
+            <a href="/contactform/add" class="btn btn-primary">Add Contact</a>
+            <a href="/contacts/list/" class="btn btn-default">View Contacts</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

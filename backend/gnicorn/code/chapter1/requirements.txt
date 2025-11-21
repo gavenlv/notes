@@ -1,0 +1,22 @@
+# requirements.txt
+# Gunicorn及其相关依赖
+
+gunicorn==20.1.0
+
+# Flask示例所需的依赖
+flask==2.0.1
+
+# 异步worker类型所需的依赖
+# gevent==21.8.0
+# eventlet==0.33.0
+# greenlet==1.1.1
+
+# Tornado worker类型所需的依赖
+# tornado==6.1
+
+# aiohttp worker类型所需的依赖
+# aiohttp==3.7.4
+
+# 监控和性能分析工具
+# gunicorn-prometheus==0.0.1
+# statsd==3.3.0

@@ -1,0 +1,47 @@
+{% extends "appbuilder/base.html" %}
+{% import 'appbuilder/general/lib.html' as lib %}
+
+{% block content %}
+<div class="container">
+    <div id="loginbox" style="margin-top:50px;" class="mainbox col-md-6 col-md-offset-3 col-sm-8 col-sm-offset-2">
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                <div class="panel-title">{{_("Sign In")}}</div>
+            </div>
+            <div style="padding-top:30px" class="panel-body">
+                <form class="form" action="" method="post" name="login">
+                    {{form.hidden_tag()}}
+                    <div class="help-block">{{_("Enter your login credentials")}}:</div>
+                    <div class="form-group">
+                        <div class="input-group">
+                            <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
+                            {{form.username(class_="form-control", placeholder="Username")}}
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="input-group">
+                            <span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
+                            {{form.password(class_="form-control", placeholder="Password")}}
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="checkbox">
+                            <label>
+                                {{form.remember_me}} {{_("Remember me")}}
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <input type="submit" class="btn btn-primary btn-block" value="{{_('Sign In')}}">
+                    </div>
+                    {% if appbuilder.sm.auth_user_registration %}
+                        <div class="form-group text-center">
+                            <a href="{{url_for('AuthDBView.register')}}">{{_("Register")}}</a>
+                        </div>
+                    {% endif %}
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

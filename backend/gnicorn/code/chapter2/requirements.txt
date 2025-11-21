@@ -1,0 +1,25 @@
+# requirements.txt
+# 第2章所需的依赖
+
+# Gunicorn
+gunicorn==20.1.0
+
+# Flask示例应用
+flask==2.0.1
+
+# 异步Worker所需的依赖
+gevent==21.8.0
+eventlet==0.33.0
+greenlet==1.1.1
+
+# Tornado Worker
+tornado==6.1
+
+# 性能测试工具（需要单独安装）
+# apache2-utils (Ubuntu/Debian)
+# httpd-tools (CentOS/RHEL)
+# apache2 (macOS with Homebrew)
+
+# 附加依赖（可选）
+# gunicorn-prometheus==0.0.1
+# statsd==3.3.0

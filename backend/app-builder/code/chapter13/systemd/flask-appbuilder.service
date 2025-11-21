@@ -1,0 +1,43 @@
+[Unit]
+Description=Flask-AppBuilder Application
+After=network.target postgresql.service redis.service
+
+[Service]
+Type=simple
+User=flaskuser
+Group=flaskuser
+WorkingDirectory=/var/www/flask-appbuilder
+Environment=FLASK_APP=run.py
+Environment=FLASK_CONFIG=production
+Environment=FLASK_ENV=production
+
+# 加载环境变量文件
+EnvironmentFile=/var/www/flask-appbuilder/.env
+
+# Gunicorn 启动命令
+ExecStart=/var/www/flask-appbuilder/venv/bin/gunicorn --config gunicorn.conf.py run:app
+
+# 重启策略
+Restart=always
+RestartSec=10
+
+# 标准输出和错误重定向
+StandardOutput=journal
+StandardError=journal
+
+# 日志级别
+SyslogLevel=info
+
+# 限制资源使用
+LimitNOFILE=65536
+LimitNPROC=4096
+
+# 安全设置
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/log/flask-appbuilder /var/www/flask-appbuilder/uploads
+
+[Install]
+WantedBy=multi-user.target

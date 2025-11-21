@@ -1,0 +1,116 @@
+version: '3.8'
+
+services:
+  # Web应用服务
+  web:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - FLASK_CONFIG=production
+      - DATABASE_URL=postgresql://flaskuser:flaskpass@db:5432/flaskdb
+      - REDIS_URL=redis://redis:6379/0
+      - SECRET_KEY=your-production-secret-key
+    depends_on:
+      - db
+      - redis
+    volumes:
+      - ./logs:/app/logs
+      - ./media:/app/app/static/uploads
+    restart: unless-stopped
+    networks:
+      - app-network
+
+  # 数据库服务
+  db:
+    image: postgres:13
+    environment:
+      - POSTGRES_DB=flaskdb
+      - POSTGRES_USER=flaskuser
+      - POSTGRES_PASSWORD=flaskpass
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+    networks:
+      - app-network
+
+  # Redis缓存服务
+  redis:
+    image: redis:6-alpine
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+    networks:
+      - app-network
+
+  # Nginx反向代理
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+      - ./logs:/var/log/nginx
+      - ./app/static:/app/app/static
+    depends_on:
+      - web
+    restart: unless-stopped
+    networks:
+      - app-network
+
+  # Celery工作进程
+  celery:
+    build: .
+    command: celery -A app.celery worker --loglevel=info
+    environment:
+      - DATABASE_URL=postgresql://flaskuser:flaskpass@db:5432/flaskdb
+      - REDIS_URL=redis://redis:6379/0
+    depends_on:
+      - db
+      - redis
+    volumes:
+      - ./logs:/app/logs
+    restart: unless-stopped
+    networks:
+      - app-network
+
+  # Celery Beat调度器
+  celery-beat:
+    build: .
+    command: celery -A app.celery beat --loglevel=info
+    environment:
+      - DATABASE_URL=postgresql://flaskuser:flaskpass@db:5432/flaskdb
+      - REDIS_URL=redis://redis:6379/0
+    depends_on:
+      - db
+      - redis
+    volumes:
+      - ./logs:/app/logs
+    restart: unless-stopped
+    networks:
+      - app-network
+
+  # Flower监控工具
+  flower:
+    build: .
+    command: celery -A app.celery flower
+    ports:
+      - "5555:5555"
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+    depends_on:
+      - redis
+      - celery
+    restart: unless-stopped
+    networks:
+      - app-network
+
+volumes:
+  postgres_data:
+
+networks:
+  app-network:
+    driver: bridge

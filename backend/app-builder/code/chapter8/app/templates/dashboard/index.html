@@ -1,0 +1,18 @@
+{% extends "appbuilder/base.html" %}
+
+{% block page_content %}
+<div class="row">
+    <div class="col-md-12">
+        <h1>Dashboard</h1>
+        <div class="well">
+            <h2>Total Contacts: {{ total_contacts }}</h2>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        {{ chart_widget() }}
+    </div>
+</div>
+{% endblock %}

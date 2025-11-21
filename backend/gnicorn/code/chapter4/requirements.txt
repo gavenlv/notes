@@ -1,0 +1,25 @@
+# requirements.txt
+# 第4章性能优化所需的依赖
+
+gunicorn==20.1.0
+
+# Flask应用
+flask==2.0.1
+
+# 异步Worker类型
+gevent==21.8.0
+eventlet==0.33.0
+greenlet==1.1.1
+
+# 性能测试工具（需要单独安装）
+# apache2-utils (Ubuntu/Debian)
+# httpd-tools (CentOS/RHEL)
+# apache2 (macOS with Homebrew)
+
+# 性能分析工具
+# py-spy==0.3.12
+# memory-profiler==0.60.0
+# line-profiler==3.3.1
+
+# 缓存依赖
+redis==3.5.3

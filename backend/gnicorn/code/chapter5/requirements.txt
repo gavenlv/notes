@@ -1,0 +1,25 @@
+# requirements.txt
+# 第5章监控与日志管理所需的依赖
+
+gunicorn==20.1.0
+
+# Flask应用
+flask==2.0.1
+
+# 系统监控
+psutil==5.8.0
+
+# 命令行参数解析
+# argparse (Python标准库）
+
+# 监控和指标收集
+# prometheus-client==0.11.0  # 可选，用于Prometheus集成
+# statsd==3.3.0              # 可选，用于StatsD集成
+
+# 日志分析
+# elasticsearch==7.14.0      # 可选，用于ELK集成
+# logstash-async==2.4.0     # 可选，用于Logstash集成
+
+# 告警系统
+# smtplib (Python标准库)     # 邮件发送
+# requests==2.26.0           # HTTP请求
