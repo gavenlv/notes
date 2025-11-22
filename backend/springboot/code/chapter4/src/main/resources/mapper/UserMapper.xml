@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.mybatis.mapper.UserMapper">
+    
+    <resultMap id="UserResultMap" type="com.example.mybatis.entity.User">
+        <id property="id" column="id"/>
+        <result property="username" column="username"/>
+        <result property="email" column="email"/>
+        <result property="createdAt" column="created_at"/>
+    </resultMap>
+    
+    <resultMap id="UserWithOrdersResultMap" type="com.example.mybatis.entity.User">
+        <id property="id" column="id"/>
+        <result property="username" column="username"/>
+        <result property="email" column="email"/>
+        <result property="createdAt" column="created_at"/>
+        <collection property="orders" ofType="com.example.mybatis.entity.Order">
+            <id property="id" column="order_id"/>
+            <result property="userId" column="user_id"/>
+            <result property="productName" column="product_name"/>
+            <result property="price" column="price"/>
+            <result property="quantity" column="quantity"/>
+            <result property="totalAmount" column="total_amount"/>
+            <result property="createdAt" column="order_created_at"/>
+        </collection>
+    </resultMap>
+    
+    <!-- 根据ID查询用户 -->
+    <select id="selectUserById" parameterType="long" resultMap="UserResultMap">
+        SELECT id, username, email, created_at FROM users WHERE id = #{id}
+    </select>
+    
+    <!-- 查询所有用户 -->
+    <select id="selectAllUsers" resultMap="UserResultMap">
+        SELECT id, username, email, created_at FROM users
+    </select>
+    
+    <!-- 根据用户名模糊查询 -->
+    <select id="selectUsersByUsername" parameterType="string" resultMap="UserResultMap">
+        SELECT id, username, email, created_at FROM users WHERE username LIKE CONCAT('%', #{username}, '%')
+    </select>
+    
+    <!-- 动态查询用户 -->
+    <select id="selectUsers" parameterType="com.example.mybatis.entity.User" resultMap="UserResultMap">
+        SELECT id, username, email, created_at FROM users
+        <where>
+            <if test="username != null and username != ''">
+                username LIKE CONCAT('%', #{username}, '%')
+            </if>
+            <if test="email != null and email != ''">
+                AND email = #{email}
+            </if>
+        </where>
+        ORDER BY created_at DESC
+    </select>
+    
+    <!-- 插入用户 -->
+    <insert id="insertUser" parameterType="com.example.mybatis.entity.User" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO users(username, email, created_at) 
+        VALUES(#{username}, #{email}, #{createdAt})
+    </insert>
+    
+    <!-- 更新用户 -->
+    <update id="updateUser" parameterType="com.example.mybatis.entity.User">
+        UPDATE users 
+        <set>
+            <if test="username != null and username != ''">
+                username = #{username},
+            </if>
+            <if test="email != null and email != ''">
+                email = #{email},
+            </if>
+        </set>
+        WHERE id = #{id}
+    </update>
+    
+    <!-- 删除用户 -->
+    <delete id="deleteUser" parameterType="long">
+        DELETE FROM users WHERE id = #{id}
+    </delete>
+    
+    <!-- 批量插入用户 -->
+    <insert id="batchInsertUsers" parameterType="list">
+        INSERT INTO users(username, email, created_at) VALUES
+        <foreach collection="list" item="user" separator=",">
+            (#{user.username}, #{user.email}, #{user.createdAt})
+        </foreach>
+    </insert>
+    
+    <!-- 批量删除用户 -->
+    <delete id="batchDeleteUsers" parameterType="list">
+        DELETE FROM users WHERE id IN
+        <foreach collection="list" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+    <!-- 查询用户及其订单信息 -->
+    <select id="selectUsersWithOrders" resultMap="UserWithOrdersResultMap">
+        SELECT 
+            u.id,
+            u.username,
+            u.email,
+            u.created_at,
+            o.id AS order_id,
+            o.user_id,
+            o.product_name,
+            o.price,
+            o.quantity,
+            o.total_amount,
+            o.created_at AS order_created_at
+        FROM users u
+        LEFT JOIN orders o ON u.id = o.user_id
+        ORDER BY u.created_at DESC, o.created_at DESC
+    </select>
+    
+</mapper>

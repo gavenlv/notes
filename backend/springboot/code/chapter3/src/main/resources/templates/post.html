@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${post.title}">文章标题</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        .post-title { color: #333; }
+        .post-meta { color: #666; font-size: 0.9em; margin-bottom: 20px; }
+        .comment { border-top: 1px solid #eee; padding: 10px 0; }
+        .comment-form textarea { width: 100%; height: 80px; margin: 10px 0; }
+        .comment-form button { padding: 5px 10px; }
+    </style>
+</head>
+<body>
+    <h1 class="post-title" th:text="${post.title}">文章标题</h1>
+    
+    <div class="post-meta">
+        发布时间: <span th:text="${#temporals.format(post.createdAt, 'yyyy-MM-dd HH:mm')}">2023-01-01 12:00</span>
+    </div>
+    
+    <div th:text="${post.content}">文章内容</div>
+    
+    <hr>
+    
+    <h3>评论</h3>
+    
+    <!-- 评论列表 -->
+    <div th:if="${comments != null and !comments.empty}">
+        <div class="comment" th:each="comment : ${comments}">
+            <p th:text="${comment.content}">评论内容</p>
+            <div class="post-meta">
+                评论时间: <span th:text="${#temporals.format(comment.createdAt, 'yyyy-MM-dd HH:mm')}">2023-01-01 12:00</span>
+            </div>
+        </div>
+    </div>
+    
+    <div th:if="${comments == null or comments.empty}">
+        <p>暂无评论。</p>
+    </div>
+    
+    <!-- 添加评论表单 -->
+    <h4>添加评论</h4>
+    <form class="comment-form" th:action="@{'/comment'}" method="post">
+        <input type="hidden" name="postId" th:value="${post.id}">
+        <textarea name="content" placeholder="请输入您的评论..." required></textarea>
+        <br>
+        <button type="submit">提交评论</button>
+    </form>
+    
+    <br>
+    <a href="/">返回首页</a>
+</body>
+</html>

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.mybatis.mapper.OrderMapper">
+    
+    <resultMap id="OrderResultMap" type="com.example.mybatis.entity.Order">
+        <id property="id" column="id"/>
+        <result property="userId" column="user_id"/>
+        <result property="productName" column="product_name"/>
+        <result property="price" column="price"/>
+        <result property="quantity" column="quantity"/>
+        <result property="totalAmount" column="total_amount"/>
+        <result property="createdAt" column="created_at"/>
+    </resultMap>
+    
+    <!-- 根据ID查询订单 -->
+    <select id="selectOrderById" parameterType="long" resultMap="OrderResultMap">
+        SELECT id, user_id, product_name, price, quantity, total_amount, created_at FROM orders WHERE id = #{id}
+    </select>
+    
+    <!-- 根据用户ID查询订单 -->
+    <select id="selectOrdersByUserId" parameterType="long" resultMap="OrderResultMap">
+        SELECT id, user_id, product_name, price, quantity, total_amount, created_at FROM orders WHERE user_id = #{userId}
+    </select>
+    
+    <!-- 查询所有订单 -->
+    <select id="selectAllOrders" resultMap="OrderResultMap">
+        SELECT id, user_id, product_name, price, quantity, total_amount, created_at FROM orders
+    </select>
+    
+    <!-- 插入订单 -->
+    <insert id="insertOrder" parameterType="com.example.mybatis.entity.Order" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO orders(user_id, product_name, price, quantity, total_amount, created_at) 
+        VALUES(#{userId}, #{productName}, #{price}, #{quantity}, #{totalAmount}, #{createdAt})
+    </insert>
+    
+    <!-- 更新订单 -->
+    <update id="updateOrder" parameterType="com.example.mybatis.entity.Order">
+        UPDATE orders 
+        SET product_name = #{productName}, price = #{price}, quantity = #{quantity}, total_amount = #{totalAmount} 
+        WHERE id = #{id}
+    </update>
+    
+    <!-- 删除订单 -->
+    <delete id="deleteOrder" parameterType="long">
+        DELETE FROM orders WHERE id = #{id}
+    </delete>
+    
+    <!-- 根据用户ID删除订单 -->
+    <delete id="deleteOrdersByUserId" parameterType="long">
+        DELETE FROM orders WHERE user_id = #{userId}
+    </delete>
+    
+</mapper>
