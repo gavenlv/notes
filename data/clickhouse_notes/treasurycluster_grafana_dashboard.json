@@ -1,0 +1,308 @@
+{
+  "dashboard": {
+    "title": "ClickHouse Treasury集群监控",
+    "description": "2副本ClickHouse集群treasurycluster的实时监控仪表板",
+    "tags": ["clickhouse", "treasurycluster", "monitoring"],
+    "timezone": "browser",
+    "panels": [
+      {
+        "id": 1,
+        "title": "集群健康状态",
+        "type": "stat",
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 0,
+          "y": 0
+        },
+        "targets": [
+          {
+            "expr": "count(up{job=\"treasurycluster-nodes\"})",
+            "legendFormat": "活跃节点",
+            "refId": "A"
+          },
+          {
+            "expr": "count(treasurycluster_replica_lag_seconds == 0)",
+            "legendFormat": "同步副本",
+            "refId": "B"
+          },
+          {
+            "expr": "count(treasurycluster_replica_lag_seconds > 60)",
+            "legendFormat": "延迟副本",
+            "refId": "C"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "mappings": [],
+            "thresholds": {
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            }
+          },
+          "overrides": []
+        }
+      },
+      {
+        "id": 2,
+        "title": "副本同步延迟",
+        "type": "table",
+        "gridPos": {
+          "h": 10,
+          "w": 12,
+          "x": 12,
+          "y": 0
+        },
+        "targets": [
+          {
+            "expr": "treasurycluster_replica_lag_seconds",
+            "format": "table",
+            "refId": "A"
+          }
+        ],
+        "styles": [
+          {
+            "alias": "数据库",
+            "pattern": "database",
+            "type": "string"
+          },
+          {
+            "alias": "表",
+            "pattern": "table",
+            "type": "string"
+          },
+          {
+            "alias": "副本",
+            "pattern": "replica",
+            "type": "string"
+          },
+          {
+            "alias": "延迟(秒)",
+            "pattern": "Value",
+            "type": "number",
+            "unit": "s",
+            "decimals": 0
+          }
+        ]
+      },
+      {
+        "id": 3,
+        "title": "查询性能",
+        "type": "graph",
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 0,
+          "y": 8
+        },
+        "targets": [
+          {
+            "expr": "rate(treasurycluster_queries_total[5m])",
+            "legendFormat": "QPS",
+            "refId": "A"
+          },
+          {
+            "expr": "histogram_quantile(0.95, rate(clickhouse_query_duration_seconds_bucket[5m]))",
+            "legendFormat": "P95响应时间",
+            "refId": "B"
+          },
+          {
+            "expr": "histogram_quantile(0.50, rate(clickhouse_query_duration_seconds_bucket[5m]))",
+            "legendFormat": "P50响应时间",
+            "refId": "C"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "s"
+          }
+        }
+      },
+      {
+        "id": 4,
+        "title": "内存使用",
+        "type": "gauge",
+        "gridPos": {
+          "h": 6,
+          "w": 6,
+          "x": 12,
+          "y": 10
+        },
+        "targets": [
+          {
+            "expr": "treasurycluster_memory_usage_bytes / node_memory_MemTotal_bytes{job=\"node-exporter\"}",
+            "format": "time_series",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "percentunit",
+            "thresholds": {
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "yellow",
+                  "value": 0.7
+                },
+                {
+                  "color": "red",
+                  "value": 0.85
+                }
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 5,
+        "title": "磁盘使用",
+        "type": "gauge",
+        "gridPos": {
+          "h": 6,
+          "w": 6,
+          "x": 18,
+          "y": 10
+        },
+        "targets": [
+          {
+            "expr": "1 - (node_filesystem_avail_bytes{job=\"node-exporter\",mountpoint=\"/var/lib/clickhouse\"} / node_filesystem_size_bytes{job=\"node-exporter\",mountpoint=\"/var/lib/clickhouse\"})",
+            "format": "time_series",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "percentunit",
+            "thresholds": {
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "yellow",
+                  "value": 0.8
+                },
+                {
+                  "color": "red",
+                  "value": 0.9
+                }
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 6,
+        "title": "CPU使用率",
+        "type": "graph",
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 0,
+          "y": 16
+        },
+        "targets": [
+          {
+            "expr": "100 - (avg by (instance) (rate(node_cpu_seconds_total{job=\"node-exporter\",mode=\"idle\"}[5m])) * 100)",
+            "legendFormat": "{{instance}} CPU使用率",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "percent"
+          }
+        }
+      },
+      {
+        "id": 7,
+        "title": "网络流量",
+        "type": "graph",
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 12,
+          "y": 16
+        },
+        "targets": [
+          {
+            "expr": "rate(node_network_receive_bytes_total{job=\"node-exporter\"}[5m])",
+            "legendFormat": "{{instance}} 接收",
+            "refId": "A"
+          },
+          {
+            "expr": "rate(node_network_transmit_bytes_total{job=\"node-exporter\"}[5m])",
+            "legendFormat": "{{instance}} 发送",
+            "refId": "B"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "Bps"
+          }
+        }
+      },
+      {
+        "id": 8,
+        "title": "慢查询分析",
+        "type": "table",
+        "gridPos": {
+          "h": 10,
+          "w": 12,
+          "x": 0,
+          "y": 24
+        },
+        "targets": [
+          {
+            "expr": "topk(10, rate(clickhouse_query_duration_seconds_sum[5m]) / rate(clickhouse_query_duration_seconds_count[5m]))",
+            "format": "table",
+            "refId": "A"
+          }
+        ]
+      },
+      {
+        "id": 9,
+        "title": "错误查询统计",
+        "type": "graph",
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 12,
+          "y": 24
+        },
+        "targets": [
+          {
+            "expr": "rate(clickhouse_exception_total[5m])",
+            "legendFormat": "异常次数",
+            "refId": "A"
+          }
+        ]
+      }
+    ],
+    "time": {
+      "from": "now-1h",
+      "to": "now"
+    },
+    "timepicker": {},
+    "templating": {
+      "list": []
+    },
+    "refresh": "30s"
+  }
+}

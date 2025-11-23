@@ -1,0 +1,143 @@
+# ClickHouse 2副本集群告警规则 - treasurycluster
+groups:
+- name: treasurycluster-alerts
+  rules:
+  
+  # 集群可用性告警
+  - alert: TreasuryClusterNodeDown
+    expr: count(up{job="treasurycluster-nodes"}) < 2
+    for: 2m
+    labels:
+      severity: critical
+      cluster: 'treasurycluster'
+    annotations:
+      summary: "Treasury集群节点宕机"
+      description: "集群 {{ $labels.cluster }} 有节点不可用，当前活跃节点: {{ $value }}/2"
+
+  # 副本同步延迟告警
+  - alert: TreasuryClusterReplicaLagHigh
+    expr: treasurycluster_replica_lag_seconds > 60
+    for: 3m
+    labels:
+      severity: warning
+      cluster: 'treasurycluster'
+    annotations:
+      summary: "Treasury集群副本同步延迟"
+      description: "表 {{ $labels.database }}.{{ $labels.table }} 的副本 {{ $labels.replica }} 延迟 {{ $value }} 秒"
+
+  - alert: TreasuryClusterReplicaLagCritical
+    expr: treasurycluster_replica_lag_seconds > 300
+    for: 2m
+    labels:
+      severity: critical
+      cluster: 'treasurycluster'
+    annotations:
+      summary: "Treasury集群副本同步严重延迟"
+      description: "表 {{ $labels.database }}.{{ $labels.table }} 的副本 {{ $labels.replica }} 延迟超过5分钟"
+
+  # 内存使用告警
+  - alert: TreasuryClusterMemoryWarning
+    expr: treasurycluster_memory_usage_bytes / (node_memory_MemTotal_bytes{job="node-exporter"}) > 0.7
+    for: 5m
+    labels:
+      severity: warning
+      cluster: 'treasurycluster'
+    annotations:
+      summary: "Treasury集群内存使用警告"
+      description: "集群内存使用率 {{ $value | humanizePercentage }}"
+
+  - alert: TreasuryClusterMemoryCritical
+    expr: treasurycluster_memory_usage_bytes / (node_memory_MemTotal_bytes{job="node-exporter"}) > 0.85
+    for: 3m
+    labels:
+      severity: critical
+      cluster: 'treasurycluster'
+    annotations:
+      summary: "Treasury集群内存使用严重"
+      description: "集群内存使用率 {{ $value | humanizePercentage }}"
+
+  # 磁盘空间告警
+  - alert: TreasuryClusterDiskSpaceWarning
+    expr: (1 - (node_filesystem_avail_bytes{job="node-exporter",mountpoint="/var/lib/clickhouse"} / node_filesystem_size_bytes{job="node-exporter",mountpoint="/var/lib/clickhouse"})) > 0.8
+    for: 5m
+    labels:
+      severity: warning
+      cluster: 'treasurycluster'
+    annotations:
+      summary: "Treasury集群磁盘空间警告"
+      description: "磁盘使用率 {{ $value | humanizePercentage }}"
+
+  - alert: TreasuryClusterDiskSpaceCritical
+    expr: (1 - (node_filesystem_avail_bytes{job="node-exporter",mountpoint="/var/lib/clickhouse"} / node_filesystem_size_bytes{job="node-exporter",mountpoint="/var/lib/clickhouse"})) > 0.9
+    for: 2m
+    labels:
+      severity: critical
+      cluster: 'treasurycluster'
+    annotations:
+      summary: "Treasury集群磁盘空间严重"
+      description: "磁盘使用率 {{ $value | humanizePercentage }}"
+
+  # 查询性能告警
+  - alert: TreasuryClusterQueryPerformanceWarning
+    expr: |
+      (
+        rate(treasurycluster_queries_total[5m]) > 10
+      ) and
+      (
+        histogram_quantile(0.95, rate(clickhouse_query_duration_seconds_bucket[5m])) > 10
+      )
+    for: 5m
+    labels:
+      severity: warning
+      cluster: 'treasurycluster'
+    annotations:
+      summary: "Treasury集群查询性能下降"
+      description: "P95查询响应时间超过10秒"
+
+  # ZooKeeper连接告警
+  - alert: TreasuryClusterZooKeeperIssues
+    expr: rate(clickhouse_zookeeper_request_total{job="treasurycluster-nodes"}[5m]) < 1
+    for: 3m
+    labels:
+      severity: critical
+      cluster: 'treasurycluster'
+    annotations:
+      summary: "Treasury集群ZooKeeper连接异常"
+      description: "ZooKeeper请求率异常"
+
+  # 数据一致性告警
+  - alert: TreasuryClusterDataInconsistency
+    expr: |
+      (
+        # 检查副本间数据行数差异
+        max by (database, table) (treasurycluster_table_rows_total) - 
+        min by (database, table) (treasurycluster_table_rows_total) > 1000
+      )
+    for: 10m
+    labels:
+      severity: warning
+      cluster: 'treasurycluster'
+    annotations:
+      summary: "Treasury集群数据不一致"
+      description: "副本间数据行数差异超过1000行"
+
+  # 节点资源告警
+  - alert: TreasuryClusterCPUHigh
+    expr: rate(node_cpu_seconds_total{job="node-exporter",mode="idle"}[5m]) < 0.2
+    for: 5m
+    labels:
+      severity: warning
+      cluster: 'treasurycluster'
+    annotations:
+      summary: "Treasury集群CPU使用率高"
+      description: "CPU空闲率低于20%"
+
+  - alert: TreasuryClusterNetworkIssues
+    expr: rate(node_network_receive_bytes_total{job="node-exporter"}[5m]) == 0
+    for: 3m
+    labels:
+      severity: critical
+      cluster: 'treasurycluster'
+    annotations:
+      summary: "Treasury集群网络异常"
+      description: "节点网络接收流量为0"

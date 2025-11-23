@@ -3,8 +3,6 @@ package com.example.security;
 import com.example.security.model.ERole;
 import com.example.security.model.Role;
 import com.example.security.model.User;
-import com.example.security.payload.request.LoginRequest;
-import com.example.security.payload.request.SignupRequest;
 import com.example.security.repository.RoleRepository;
 import com.example.security.repository.UserRepository;
 import org.junit.jupiter.api.Test;
@@ -13,8 +11,8 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -25,6 +23,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@Transactional
 public class AuthControllerTests {
 
     @Autowired
@@ -41,11 +40,6 @@ public class AuthControllerTests {
 
     @Test
     public void testRegisterUser() throws Exception {
-        SignupRequest signupRequest = new SignupRequest();
-        signupRequest.setUsername("testuser");
-        signupRequest.setEmail("test@example.com");
-        signupRequest.setPassword("password");
-
         mockMvc.perform(post("/api/auth/signup")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"username\":\"testuser\",\"email\":\"test@example.com\",\"password\":\"password\"}"))
@@ -58,7 +52,12 @@ public class AuthControllerTests {
         // 先创建一个用户
         User user = new User("existinguser", "existing@example.com", passwordEncoder.encode("password"));
         Set<Role> roles = new HashSet<>();
-        roles.add(roleRepository.findByName(ERole.ROLE_USER).get());
+        Role userRole = roleRepository.findByName(ERole.ROLE_USER)
+            .orElseGet(() -> {
+                Role newRole = new Role(ERole.ROLE_USER);
+                return roleRepository.save(newRole);
+            });
+        roles.add(userRole);
         user.setRoles(roles);
         userRepository.save(user);
 
@@ -71,12 +70,11 @@ public class AuthControllerTests {
 
     @Test
     public void testAuthenticateUser() throws Exception {
-        // 先创建一个用户
-        User user = new User("authuser", "auth@example.com", passwordEncoder.encode("password"));
-        Set<Role> roles = new HashSet<>();
-        roles.add(roleRepository.findByName(ERole.ROLE_USER).get());
-        user.setRoles(roles);
-        userRepository.save(user);
+        // 先注册一个用户
+        mockMvc.perform(post("/api/auth/signup")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"username\":\"authuser\",\"email\":\"auth@example.com\",\"password\":\"password\"}"))
+                .andExpect(status().isOk());
 
         mockMvc.perform(post("/api/auth/signin")
                 .contentType(MediaType.APPLICATION_JSON)

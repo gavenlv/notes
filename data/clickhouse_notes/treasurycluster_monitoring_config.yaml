@@ -1,0 +1,82 @@
+# ClickHouse 2副本集群监控配置 - treasurycluster
+# 集群名称: treasurycluster
+# 副本数量: 2
+
+global:
+  scrape_interval: 30s
+  evaluation_interval: 30s
+  external_labels:
+    cluster: 'treasurycluster'
+    environment: 'production'
+    replica_count: '2'
+
+rule_files:
+  - "treasurycluster_alert_rules.yml"
+
+scrape_configs:
+  # ClickHouse节点监控
+  - job_name: 'treasurycluster-nodes'
+    static_configs:
+      - targets: 
+        - 'clickhouse-node1:9363'  # 请替换为实际节点地址
+        - 'clickhouse-node2:9363'  # 请替换为实际节点地址
+    metrics_path: '/metrics'
+    scrape_interval: 30s
+    scrape_timeout: 10s
+    
+  # ClickHouse系统指标查询
+  - job_name: 'treasurycluster-system'
+    static_configs:
+      - targets: ['clickhouse-node1:8123']  # 主节点
+    metrics_path: '/'
+    scrape_interval: 60s
+    params:
+      query:
+        - |
+          SELECT 
+            'treasurycluster_queries_total' as __name__,
+            count() as value,
+            'cluster=treasurycluster' as cluster
+          FROM clusterAllReplicas('treasurycluster', system.query_log)
+          WHERE event_time >= now() - INTERVAL 1 MINUTE
+            AND type = 'QueryFinish'
+        - |
+          SELECT 
+            'treasurycluster_memory_usage_bytes' as __name__,
+            sum(value) as value,
+            'cluster=treasurycluster' as cluster
+          FROM clusterAllReplicas('treasurycluster', system.asynchronous_metrics)
+          WHERE metric = 'MemoryTracking'
+        - |
+          SELECT 
+            'treasurycluster_disk_usage_bytes' as __name__,
+            sum(bytes_on_disk) as value,
+            'cluster=treasurycluster' as cluster
+          FROM clusterAllReplicas('treasurycluster', system.parts)
+          WHERE active = 1
+
+  # 副本同步监控
+  - job_name: 'treasurycluster-replica-lag'
+    static_configs:
+      - targets: ['clickhouse-node1:8123']
+    metrics_path: '/'
+    scrape_interval: 30s
+    params:
+      query:
+        - |
+          SELECT 
+            'treasurycluster_replica_lag_seconds' as __name__,
+            replica_delay as value,
+            concat('database=', database) as database,
+            concat('table=', table) as table,
+            concat('replica=', replica_name) as replica
+          FROM clusterAllReplicas('treasurycluster', system.replicas)
+          WHERE is_active = 1
+
+  # 节点资源监控
+  - job_name: 'node-exporter'
+    static_configs:
+      - targets: 
+        - 'clickhouse-node1:9100'  # node-exporter端口
+        - 'clickhouse-node2:9100'
+    scrape_interval: 30s
