@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>仪表盘应用</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 1rem;
+        }
+        
+        .micro-app {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 1rem;
+            background-color: #fafafa;
+        }
+        
+        .stats {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .stat-card {
+            flex: 1;
+            background: #e9ecef;
+            padding: 1rem;
+            border-radius: 4px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="micro-app">
+        <h2>仪表盘应用</h2>
+        <p>这是通过iframe加载的仪表盘微应用。</p>
+        <p>iframe方案的优点：</p>
+        <ul>
+            <li>天然隔离，样式和JS都不会互相影响</li>
+            <li>实现简单，无需复杂的集成工作</li>
+            <li>各应用技术栈完全独立</li>
+        </ul>
+        <p>iframe方案的缺点：</p>
+        <ul>
+            <li>SEO不友好</li>
+            <li>用户体验较差，页面有明显边框</li>
+            <li>iframe通信复杂</li>
+            <li>URL状态难以同步</li>
+        </ul>
+        
+        <div class="stats">
+            <div class="stat-card">
+                <h3>销售额</h3>
+                <p>¥125,430</p>
+            </div>
+            <div class="stat-card">
+                <h3>订单数</h3>
+                <p>1,243</p>
+            </div>
+            <div class="stat-card">
+                <h3>访客数</h3>
+                <p>5,678</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

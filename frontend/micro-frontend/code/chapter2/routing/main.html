@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>路由分发式微前端示例</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .header {
+            background-color: #333;
+            color: white;
+            padding: 1rem;
+            text-align: center;
+        }
+        
+        .nav {
+            background-color: #f4f4f4;
+            padding: 0.5rem;
+        }
+        
+        .nav a {
+            margin-right: 1rem;
+            text-decoration: none;
+            color: #333;
+            padding: 0.5rem;
+            border-radius: 4px;
+        }
+        
+        .nav a:hover {
+            background-color: #ddd;
+        }
+        
+        .nav a.active {
+            background-color: #007bff;
+            color: white;
+        }
+        
+        .content {
+            padding: 1rem;
+        }
+        
+        .micro-app {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 1rem;
+            margin-top: 1rem;
+            background-color: #fafafa;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>主应用 - 路由分发式微前端</h1>
+    </div>
+    
+    <div class="nav">
+        <a href="/dashboard" class="active">仪表盘</a>
+        <a href="/products">商品管理</a>
+        <a href="/orders">订单管理</a>
+    </div>
+    
+    <div class="content">
+        <h2>仪表盘应用</h2>
+        <div class="micro-app">
+            <h3>欢迎使用仪表盘</h3>
+            <p>这是通过路由分发加载的仪表盘应用。</p>
+            <p>在真实的路由分发方案中，不同的URL路径会由不同的服务器或应用来处理：</p>
+            <ul>
+                <li><code>/dashboard</code> 路径由仪表盘应用处理</li>
+                <li><code>/products</code> 路径由商品管理应用处理</li>
+                <li><code>/orders</code> 路径由订单管理应用处理</li>
+            </ul>
+            <p>这种方案的优点是实现简单，各应用完全独立；缺点是页面跳转时会有刷新，用户体验不够流畅。</p>
+        </div>
+    </div>
+</body>
+</html>

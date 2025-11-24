@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Single-SPA Demo</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+    
+    #nav-container {
+      background-color: #333;
+      padding: 10px;
+    }
+    
+    .nav-link {
+      color: white;
+      text-decoration: none;
+      padding: 10px 15px;
+      margin-right: 10px;
+      border-radius: 4px;
+      background-color: #555;
+    }
+    
+    .nav-link:hover {
+      background-color: #777;
+    }
+    
+    .nav-link.active {
+      background-color: #007bff;
+    }
+    
+    #app-container {
+      padding: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div id="nav-container">
+    <a href="#/react" class="nav-link" id="react-link">React App</a>
+    <a href="#/vue" class="nav-link" id="vue-link">Vue App</a>
+  </div>
+  <div id="app-container"></div>
+  
+  <script src="./main.js"></script>
+</body>
+</html>

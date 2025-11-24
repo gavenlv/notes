@@ -1,0 +1,32 @@
+{
+  "name": "single-spa-demo",
+  "version": "1.0.0",
+  "description": "Single-SPA 微前端示例",
+  "main": "index.js",
+  "scripts": {
+    "start": "webpack serve --mode development",
+    "build": "webpack --mode production"
+  },
+  "keywords": [
+    "single-spa",
+    "micro-frontend"
+  ],
+  "author": "TraeAI",
+  "license": "MIT",
+  "dependencies": {
+    "single-spa": "^5.9.3",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "single-spa-react": "^4.6.1",
+    "vue": "^3.2.31",
+    "single-spa-vue": "^2.5.1"
+  },
+  "devDependencies": {
+    "webpack": "^5.76.0",
+    "webpack-cli": "^4.9.2",
+    "webpack-dev-server": "^4.7.4",
+    "@babel/core": "^7.17.5",
+    "@babel/preset-env": "^7.16.11",
+    "@babel/preset-react": "^7.16.7"
+  }
+}

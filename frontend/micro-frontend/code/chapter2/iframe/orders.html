@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>订单管理应用</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 1rem;
+        }
+        
+        .micro-app {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 1rem;
+            background-color: #fafafa;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+        
+        th, td {
+            border: 1px solid #dee2e6;
+            padding: 0.5rem;
+            text-align: left;
+        }
+        
+        th {
+            background-color: #f8f9fa;
+        }
+        
+        .status-paid {
+            color: green;
+        }
+        
+        .status-pending {
+            color: orange;
+        }
+        
+        .status-unpaid {
+            color: blue;
+        }
+        
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="micro-app">
+        <h2>订单管理应用</h2>
+        <p>这是通过iframe加载的订单管理微应用。</p>
+        <button onclick="createOrder()">创建新订单</button>
+        <table>
+            <thead>
+                <tr>
+                    <th>订单号</th>
+                    <th>客户</th>
+                    <th>金额</th>
+                    <th>状态</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>#ORD-2025-001</td>
+                    <td>张三</td>
+                    <td>¥2,499</td>
+                    <td class="status-paid">已发货</td>
+                </tr>
+                <tr>
+                    <td>#ORD-2025-002</td>
+                    <td>李四</td>
+                    <td>¥1,299</td>
+                    <td class="status-pending">处理中</td>
+                </tr>
+                <tr>
+                    <td>#ORD-2025-003</td>
+                    <td>王五</td>
+                    <td>¥3,899</td>
+                    <td class="status-unpaid">待付款</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        function createOrder() {
+            alert('创建新订单功能演示');
+        }
+    </script>
+</body>
+</html>

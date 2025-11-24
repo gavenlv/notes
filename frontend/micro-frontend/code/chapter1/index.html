@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>微前端概念演示</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .header {
+            background-color: #333;
+            color: white;
+            padding: 1rem;
+            text-align: center;
+        }
+        
+        .container {
+            display: flex;
+            min-height: calc(100vh - 120px);
+        }
+        
+        .sidebar {
+            width: 200px;
+            background-color: #f4f4f4;
+            padding: 1rem;
+        }
+        
+        .main-content {
+            flex: 1;
+            padding: 1rem;
+        }
+        
+        .micro-app {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            background-color: #fafafa;
+        }
+        
+        .footer {
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 1rem;
+        }
+        
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>主应用 - 电商管理系统</h1>
+    </div>
+    
+    <div class="container">
+        <div class="sidebar">
+            <h3>导航菜单</h3>
+            <ul>
+                <li><button onclick="loadApp('dashboard')">仪表盘</button></li>
+                <li><button onclick="loadApp('products')">商品管理</button></li>
+                <li><button onclick="loadApp('orders')">订单管理</button></li>
+                <li><button onclick="loadApp('users')">用户管理</button></li>
+            </ul>
+        </div>
+        
+        <div class="main-content">
+            <h2>主内容区域</h2>
+            <div id="micro-app-container">
+                <div class="micro-app">
+                    <h3>欢迎使用电商管理系统</h3>
+                    <p>请选择左侧菜单加载相应的功能模块。</p>
+                    <p>这个简单的示例展示了微前端的核心概念：</p>
+                    <ul>
+                        <li>主应用负责整体布局和路由协调</li>
+                        <li>各个功能模块（微应用）可以独立开发和维护</li>
+                        <li>通过点击按钮动态加载不同的微应用</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="footer">
+        <p>&copy; 2025 电商管理系统. 所有权利保留.</p>
+    </div>
+
+    <script>
+        // 模拟微应用的内容
+        const microApps = {
+            dashboard: `
+                <div class="micro-app">
+                    <h3>仪表盘微应用</h3>
+                    <p>这是仪表盘模块，显示关键业务指标。</p>
+                    <div style="display: flex; gap: 1rem;">
+                        <div style="flex: 1; background: #e9ecef; padding: 1rem; border-radius: 4px;">
+                            <h4>今日销售额</h4>
+                            <p>¥125,430</p>
+                        </div>
+                        <div style="flex: 1; background: #e9ecef; padding: 1rem; border-radius: 4px;">
+                            <h4>订单数量</h4>
+                            <p>1,243</p>
+                        </div>
+                        <div style="flex: 1; background: #e9ecef; padding: 1rem; border-radius: 4px;">
+                            <h4>访客数量</h4>
+                            <p>5,678</p>
+                        </div>
+                    </div>
+                </div>
+            `,
+            products: `
+                <div class="micro-app">
+                    <h3>商品管理微应用</h3>
+                    <p>这是商品管理模块，用于管理商品信息。</p>
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <thead>
+                            <tr style="background-color: #f8f9fa;">
+                                <th style="border: 1px solid #dee2e6; padding: 0.5rem;">商品名称</th>
+                                <th style="border: 1px solid #dee2e6; padding: 0.5rem;">价格</th>
+                                <th style="border: 1px solid #dee2e6; padding: 0.5rem;">库存</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="border: 1px solid #dee2e6; padding: 0.5rem;">iPhone 15 Pro</td>
+                                <td style="border: 1px solid #dee2e6; padding: 0.5rem;">¥8,999</td>
+                                <td style="border: 1px solid #dee2e6; padding: 0.5rem;">150</td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid #dee2e6; padding: 0.5rem;">MacBook Air M2</td>
+                                <td style="border: 1px solid #dee2e6; padding: 0.5rem;">¥9,499</td>
+                                <td style="border: 1px solid #dee2e6; padding: 0.5rem;">80</td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid #dee2e6; padding: 0.5rem;">iPad Pro</td>
+                                <td style="border: 1px solid #dee2e6; padding: 0.5rem;">¥6,299</td>
+                                <td style="border: 1px solid #dee2e6; padding: 0.5rem;">120</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            `,
+            orders: `
+                <div class="micro-app">
+                    <h3>订单管理微应用</h3>
+                    <p>这是订单管理模块，用于处理客户订单。</p>
+                    <div style="margin-bottom: 1rem;">
+                        <button onclick="createOrder()">创建新订单</button>
+                    </div>
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <thead>
+                            <tr style="background-color: #f8f9fa;">
+                                <th style="border: 1px solid #dee2e6; padding: 0.5rem;">订单号</th>
+                                <th style="border: 1px solid #dee2e6; padding: 0.5rem;">客户</th>
+                                <th style="border: 1px solid #dee2e6; padding: 0.5rem;">金额</th>
+                                <th style="border: 1px solid #dee2e6; padding: 0.5rem;">状态</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="border: 1px solid #dee2e6; padding: 0.5rem;">#ORD-2025-001</td>
+                                <td style="border: 1px solid #dee2e6; padding: 0.5rem;">张三</td>
+                                <td style="border: 1px solid #dee2e6; padding: 0.5rem;">¥2,499</td>
+                                <td style="border: 1px solid #dee2e6; padding: 0.5rem; color: green;">已发货</td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid #dee2e6; padding: 0.5rem;">#ORD-2025-002</td>
+                                <td style="border: 1px solid #dee2e6; padding: 0.5rem;">李四</td>
+                                <td style="border: 1px solid #dee2e6; padding: 0.5rem;">¥1,299</td>
+                                <td style="border: 1px solid #dee2e6; padding: 0.5rem; color: orange;">处理中</td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid #dee2e6; padding: 0.5rem;">#ORD-2025-003</td>
+                                <td style="border: 1px solid #dee2e6; padding: 0.5rem;">王五</td>
+                                <td style="border: 1px solid #dee2e6; padding: 0.5rem;">¥3,899</td>
+                                <td style="border: 1px solid #dee2e6; padding: 0.5rem; color: blue;">待付款</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            `,
+            users: `
+                <div class="micro-app">
+                    <h3>用户管理微应用</h3>
+                    <p>这是用户管理模块，用于管理平台用户。</p>
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <thead>
+                            <tr style="background-color: #f8f9fa;">
+                                <th style="border: 1px solid #dee2e6; padding: 0.5rem;">用户名</th>
+                                <th style="border: 1px solid #dee2e6; padding: 0.5rem;">邮箱</th>
+                                <th style="border: 1px solid #dee2e6; padding: 0.5rem;">注册时间</th>
+                                <th style="border: 1px solid #dee2e6; padding: 0.5rem;">状态</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="border: 1px solid #dee2e6; padding: 0.5rem;">zhangsan</td>
+                                <td style="border: 1px solid #dee2e6; padding: 0.5rem;">zhangsan@example.com</td>
+                                <td style="border: 1px solid #dee2e6; padding: 0.5rem;">2025-01-15</td>
+                                <td style="border: 1px solid #dee2e6; padding: 0.5rem; color: green;">活跃</td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid #dee2e6; padding: 0.5rem;">lisi</td>
+                                <td style="border: 1px solid #dee2e6; padding: 0.5rem;">lisi@example.com</td>
+                                <td style="border: 1px solid #dee2e6; padding: 0.5rem;">2025-01-20</td>
+                                <td style="border: 1px solid #dee2e6; padding: 0.5rem; color: green;">活跃</td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid #dee2e6; padding: 0.5rem;">wangwu</td>
+                                <td style="border: 1px solid #dee2e6; padding: 0.5rem;">wangwu@example.com</td>
+                                <td style="border: 1px solid #dee2e6; padding: 0.5rem;">2025-02-01</td>
+                                <td style="border: 1px solid #dee2e6; padding: 0.5rem; color: red;">禁用</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            `
+        };
+
+        // 加载微应用的函数
+        function loadApp(appName) {
+            const container = document.getElementById('micro-app-container');
+            if (microApps[appName]) {
+                container.innerHTML = microApps[appName];
+            } else {
+                container.innerHTML = '<div class="micro-app"><h3>应用未找到</h3><p>抱歉，您请求的应用不存在。</p></div>';
+            }
+        }
+
+        // 创建订单的模拟函数
+        function createOrder() {
+            alert('创建新订单功能演示');
+        }
+
+        // 页面加载完成后显示欢迎信息
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('微前端概念演示页面已加载');
+        });
+    </script>
+</body>
+</html>

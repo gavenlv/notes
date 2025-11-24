@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Components微前端示例</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .header {
+            background-color: #333;
+            color: white;
+            padding: 1rem;
+            text-align: center;
+        }
+        
+        .nav {
+            background-color: #f4f4f4;
+            padding: 0.5rem;
+        }
+        
+        .nav button {
+            margin-right: 1rem;
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 4px;
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+        }
+        
+        .nav button:hover {
+            background-color: #0056b3;
+        }
+        
+        .content {
+            padding: 1rem;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>主应用 - Web Components微前端</h1>
+    </div>
+    
+    <div class="nav">
+        <button onclick="showTab('dashboard')">仪表盘</button>
+        <button onclick="showTab('products')">商品管理</button>
+        <button onclick="showTab('orders')">订单管理</button>
+    </div>
+    
+    <div class="content">
+        <div id="dashboard" class="tab-content active">
+            <dashboard-widget></dashboard-widget>
+        </div>
+        <div id="products" class="tab-content">
+            <products-widget></products-widget>
+        </div>
+        <div id="orders" class="tab-content">
+            <orders-widget></orders-widget>
+        </div>
+    </div>
+
+    <script>
+        // 显示指定的标签页
+        function showTab(tabName) {
+            // 隐藏所有标签页
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // 显示指定标签页
+            document.getElementById(tabName).classList.add('active');
+        }
+        
+        // 定义仪表盘组件
+        class DashboardWidget extends HTMLElement {
+            constructor() {
+                super();
+                this.attachShadow({mode: 'open'});
+                this.shadowRoot.innerHTML = `
+                    <style>
+                        .widget {
+                            border: 1px solid #ddd;
+                            border-radius: 4px;
+                            padding: 1rem;
+                            background-color: #fafafa;
+                        }
+                        
+                        .stats {
+                            display: flex;
+                            gap: 1rem;
+                            margin-top: 1rem;
+                        }
+                        
+                        .stat-card {
+                            flex: 1;
+                            background: #e9ecef;
+                            padding: 1rem;
+                            border-radius: 4px;
+                            text-align: center;
+                        }
+                    </style>
+                    <div class="widget">
+                        <h2>仪表盘组件</h2>
+                        <p>这是使用Web Components实现的仪表盘微应用。</p>
+                        <p>Web Components方案的优点：</p>
+                        <ul>
+                            <li>标准化，浏览器原生支持</li>
+                            <li>组件化程度高，可复用性强</li>
+                            <li>样式和逻辑天然隔离</li>
+                        </ul>
+                        <p>Web Components方案的缺点：</p>
+                        <ul>
+                            <li>浏览器兼容性问题</li>
+                            <li>生态系统相对不成熟</li>
+                            <li>开发复杂度较高</li>
+                        </ul>
+                        
+                        <div class="stats">
+                            <div class="stat-card">
+                                <h3>销售额</h3>
+                                <p>¥125,430</p>
+                            </div>
+                            <div class="stat-card">
+                                <h3>订单数</h3>
+                                <p>1,243</p>
+                            </div>
+                            <div class="stat-card">
+                                <h3>访客数</h3>
+                                <p>5,678</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+        
+        // 定义商品管理组件
+        class ProductsWidget extends HTMLElement {
+            constructor() {
+                super();
+                this.attachShadow({mode: 'open'});
+                this.shadowRoot.innerHTML = `
+                    <style>
+                        .widget {
+                            border: 1px solid #ddd;
+                            border-radius: 4px;
+                            padding: 1rem;
+                            background-color: #fafafa;
+                        }
+                        
+                        table {
+                            width: 100%;
+                            border-collapse: collapse;
+                            margin-top: 1rem;
+                        }
+                        
+                        th, td {
+                            border: 1px solid #dee2e6;
+                            padding: 0.5rem;
+                            text-align: left;
+                        }
+                        
+                        th {
+                            background-color: #f8f9fa;
+                        }
+                    </style>
+                    <div class="widget">
+                        <h2>商品管理组件</h2>
+                        <p>这是使用Web Components实现的商品管理微应用。</p>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>商品名称</th>
+                                    <th>价格</th>
+                                    <th>库存</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>iPhone 15 Pro</td>
+                                    <td>¥8,999</td>
+                                    <td>150</td>
+                                </tr>
+                                <tr>
+                                    <td>MacBook Air M2</td>
+                                    <td>¥9,499</td>
+                                    <td>80</td>
+                                </tr>
+                                <tr>
+                                    <td>iPad Pro</td>
+                                    <td>¥6,299</td>
+                                    <td>120</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            }
+        }
+        
+        // 定义订单管理组件
+        class OrdersWidget extends HTMLElement {
+            constructor() {
+                super();
+                this.attachShadow({mode: 'open'});
+                this.shadowRoot.innerHTML = `
+                    <style>
+                        .widget {
+                            border: 1px solid #ddd;
+                            border-radius: 4px;
+                            padding: 1rem;
+                            background-color: #fafafa;
+                        }
+                        
+                        table {
+                            width: 100%;
+                            border-collapse: collapse;
+                            margin-top: 1rem;
+                        }
+                        
+                        th, td {
+                            border: 1px solid #dee2e6;
+                            padding: 0.5rem;
+                            text-align: left;
+                        }
+                        
+                        th {
+                            background-color: #f8f9fa;
+                        }
+                        
+                        .status-paid {
+                            color: green;
+                        }
+                        
+                        .status-pending {
+                            color: orange;
+                        }
+                        
+                        .status-unpaid {
+                            color: blue;
+                        }
+                        
+                        button {
+                            background-color: #007bff;
+                            color: white;
+                            border: none;
+                            padding: 0.5rem 1rem;
+                            border-radius: 4px;
+                            cursor: pointer;
+                        }
+                        
+                        button:hover {
+                            background-color: #0056b3;
+                        }
+                    </style>
+                    <div class="widget">
+                        <h2>订单管理组件</h2>
+                        <p>这是使用Web Components实现的订单管理微应用。</p>
+                        <button onclick="this.getRootNode().host.createOrder()">创建新订单</button>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>订单号</th>
+                                    <th>客户</th>
+                                    <th>金额</th>
+                                    <th>状态</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>#ORD-2025-001</td>
+                                    <td>张三</td>
+                                    <td>¥2,499</td>
+                                    <td class="status-paid">已发货</td>
+                                </tr>
+                                <tr>
+                                    <td>#ORD-2025-002</td>
+                                    <td>李四</td>
+                                    <td>¥1,299</td>
+                                    <td class="status-pending">处理中</td>
+                                </tr>
+                                <tr>
+                                    <td>#ORD-2025-003</td>
+                                    <td>王五</td>
+                                    <td>¥3,899</td>
+                                    <td class="status-unpaid">待付款</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            }
+            
+            createOrder() {
+                alert('创建新订单功能演示');
+            }
+        }
+        
+        // 注册自定义元素
+        customElements.define('dashboard-widget', DashboardWidget);
+        customElements.define('products-widget', ProductsWidget);
+        customElements.define('orders-widget', OrdersWidget);
+    </script>
+</body>
+</html>
