@@ -265,6 +265,16 @@
 - [cucumber](testing/cucumber/) - Cucumber BDD测试框架
   - [README.md](testing/cucumber/README.md) - Cucumber学习笔记
   - [SUMMARY.md](testing/cucumber/SUMMARY.md) - 内容总结
+  - [chapter01-bdd-fundamentals/](testing/cucumber/chapter01-bdd-fundamentals/) - BDD基础概念
+  - [chapter02-environment-setup/](testing/cucumber/chapter02-environment-setup/) - 环境搭建
+  - [chapter03-feature-files/](testing/cucumber/chapter03-feature-files/) - 特性文件编写
+  - [chapter04-step-definitions/](testing/cucumber/chapter04-step-definitions/) - 步骤定义
+  - [chapter05-data-driven-testing/](testing/cucumber/chapter05-data-driven-testing/) - 数据驱动测试
+  - [chapter06-cucumber-jvm/](testing/cucumber/chapter06-cucumber-jvm/) - Cucumber JVM
+  - [chapter07-advanced-topics/](testing/cucumber/chapter07-advanced-topics/) - 高级主题
+  - [chapter08-integration/](testing/cucumber/chapter08-integration/) - 集成测试
+  - [chapter09-best-practices/](testing/cucumber/chapter09-best-practices/) - 最佳实践
+  - [code/](testing/cucumber/code/) - Cucumber代码示例
 - [cypress](testing/cypress/) - Cypress端到端测试框架
   - [1-Cypress基础入门.md](testing/cypress/1-Cypress基础入门.md) - 基础入门
   - [2-Cypress核心概念与选择器.md](testing/cypress/2-Cypress核心概念与选择器.md) - 核心概念与选择器
@@ -275,6 +285,7 @@
   - [7-Cypress性能优化与调试.md](testing/cypress/7-Cypress性能优化与调试.md) - 性能优化与调试
   - [8-Cypress CI-CD集成与最佳实践.md](testing/cypress/8-Cypress CI-CD集成与最佳实践.md) - CI/CD集成与最佳实践
   - [学习资源汇总.md](testing/cypress/学习资源汇总.md) - 学习资源汇总
+  - [code/](testing/cypress/code/) - Cypress代码示例
 - [gatling](testing/gatling/) - Gatling性能测试工具
   - [1-Gatling简介与环境搭建.md](testing/gatling/1-Gatling简介与环境搭建.md) - 简介与环境搭建
   - [2-Gatling基础概念与核心组件.md](testing/gatling/2-Gatling基础概念与核心组件.md) - 基础概念与核心组件
@@ -285,6 +296,7 @@
   - [7-Gatling性能优化与调试.md](testing/gatling/7-Gatling性能优化与调试.md) - 性能优化与调试
   - [8-Gatling CI_CD集成与企业级应用.md](testing/gatling/8-Gatling CI_CD集成与企业级应用.md) - CI/CD集成与企业级应用
   - [Gatling学习资源汇总.md](testing/gatling/Gatling学习资源汇总.md) - 学习资源汇总
+  - [code/](testing/gatling/code/) - Gatling代码示例
 - [jmeter](testing/jmeter/) - JMeter性能测试工具
   - [README.md](testing/jmeter/README.md) - JMeter学习笔记
   - [1-JMeter简介与环境搭建.md](testing/jmeter/1-JMeter简介与环境搭建.md) - 简介与环境搭建
@@ -296,9 +308,15 @@
   - [7-JMeter最佳实践与优化.md](testing/jmeter/7-JMeter最佳实践与优化.md) - 最佳实践与优化
   - [学习资源汇总.md](testing/jmeter/学习资源汇总.md) - 学习资源汇总
   - [项目总结.md](testing/jmeter/项目总结.md) - 项目总结
+  - [code/](testing/jmeter/code/) - JMeter代码示例
 - [k6](testing/k6/) - k6性能测试工具
   - [README.md](testing/k6/README.md) - k6学习笔记
   - [SUMMARY.md](testing/k6/SUMMARY.md) - 内容总结
+  - [chapter01-introduction/](testing/k6/chapter01-introduction/) - k6简介
+  - [chapter02-getting-started/](testing/k6/chapter02-getting-started/) - 快速开始
+  - [chapter03-test-scripts/](testing/k6/chapter03-test-scripts/) - 测试脚本
+  - [chapter04-advanced-features/](testing/k6/chapter04-advanced-features/) - 高级特性
+  - [code/](testing/k6/code/) - k6代码示例
 - [playwright](testing/playwright/) - Playwright自动化测试框架
   - [1-Playwright简介与环境搭建.md](testing/playwright/1-Playwright简介与环境搭建.md) - 简介与环境搭建
   - [2-Playwright基础概念与核心组件.md](testing/playwright/2-Playwright基础概念与核心组件.md) - 基础概念与核心组件
@@ -310,6 +328,7 @@
   - [8-Playwright CI_CD集成与企业级应用.md](testing/playwright/8-Playwright CI_CD集成与企业级应用.md) - CI/CD集成与企业级应用
   - [9-Playwright学习资源汇总.md](testing/playwright/9-Playwright学习资源汇总.md) - 学习资源汇总
   - [10-Playwright扩展专题1-CodeGen.md](testing/playwright/10-Playwright扩展专题1-CodeGen.md) - 扩展专题-CodeGen
+  - [code/](testing/playwright/code/) - Playwright代码示例
 - [rest-assured](testing/rest-assured/) - REST Assured API测试框架
   - [README.md](testing/rest-assured/README.md) - REST Assured学习笔记
   - [QUICK_START.md](testing/rest-assured/QUICK_START.md) - 快速开始
@@ -321,12 +340,21 @@
   - [6-身份验证与安全测试.md](testing/rest-assured/6-身份验证与安全测试.md) - 身份验证与安全测试
   - [7-测试框架设计与组织.md](testing/rest-assured/7-测试框架设计与组织.md) - 测试框架设计与组织
   - [8-高级特性与最佳实践.md](testing/rest-assured/8-高级特性与最佳实践.md) - 高级特性与最佳实践
+  - [code/](testing/rest-assured/code/) - REST Assured代码示例
 - [selenium](testing/selenium/) - Selenium Web自动化测试
   - [README.md](testing/selenium/README.md) - Selenium学习笔记
   - [1-Selenium简介与环境搭建.md](testing/selenium/1-Selenium简介与环境搭建.md) - 简介与环境搭建
   - [2-Selenium基础概念与WebDriver%20API.md](testing/selenium/2-Selenium基础概念与WebDriver%20API.md) - 基础概念与WebDriver API
   - [3-Selenium元素定位与交互操作.md](testing/selenium/3-Selenium元素定位与交互操作.md) - 元素定位与交互操作
   - [4-Selenium高级操作与窗口管理.md](testing/selenium/4-Selenium高级操作与窗口管理.md) - 高级操作与窗口管理
+  - [5-Selenium测试框架设计.md](testing/selenium/5-Selenium测试框架设计.md) - 测试框架设计
+  - [6-Selenium高级特性与技巧.md](testing/selenium/6-Selenium高级特性与技巧.md) - 高级特性与技巧
+  - [7-Selenium并行测试与性能优化.md](testing/selenium/7-Selenium并行测试与性能优化.md) - 并行测试与性能优化
+  - [8-Selenium CI_CD集成与最佳实践.md](testing/selenium/8-Selenium CI_CD集成与最佳实践.md) - CI/CD集成与最佳实践
+  - [9-Selenium移动端自动化测试.md](testing/selenium/9-Selenium移动端自动化测试.md) - 移动端自动化测试
+  - [10-Selenium实战项目与扩展.md](testing/selenium/10-Selenium实战项目与扩展.md) - 实战项目与扩展
+  - [学习资源汇总.md](testing/selenium/学习资源汇总.md) - 学习资源汇总
+  - [项目总结.md](testing/selenium/项目总结.md) - 项目总结
   - [code/](testing/selenium/code/) - Selenium代码示例
     - [chapter1/README.md](testing/selenium/code/chapter1/README.md) - 第1章代码示例
     - [chapter2/README.md](testing/selenium/code/chapter2/README.md) - 第2章代码示例
@@ -341,6 +369,7 @@
   - [7-安全测试.md](testing/strategy/7-安全测试.md) - 安全测试
   - [8-持续集成与持续测试.md](testing/strategy/8-持续集成与持续测试.md) - 持续集成与持续测试
   - [学习资源汇总.md](testing/strategy/学习资源汇总.md) - 学习资源汇总
+  - [code/](testing/strategy/code/) - 测试策略代码示例
 - [unit-test](testing/unit-test/) - 单元测试
   - [README.md](testing/unit-test/README.md) - 单元测试学习笔记
   - [1-章节-介绍.md](testing/unit-test/1-章节-介绍.md) - 介绍
@@ -353,6 +382,7 @@
   - [8-章节-覆盖率与质量门.md](testing/unit-test/8-章节-覆盖率与质量门.md) - 覆盖率与质量门
   - [9-章节-高级主题.md](testing/unit-test/9-章节-高级主题.md) - 高级主题
   - [10-章节-CI与最佳实践.md](testing/unit-test/10-章节-CI与最佳实践.md) - CI与最佳实践
+  - [code/](testing/unit-test/code/) - 单元测试代码示例
 - [unit-test-java](testing/unit-test-java/) - Java单元测试
   - [README.md](testing/unit-test-java/README.md) - Java单元测试学习笔记
   - [1-Java单元测试简介与环境搭建.md](testing/unit-test-java/1-Java单元测试简介与环境搭建.md) - 简介与环境搭建
