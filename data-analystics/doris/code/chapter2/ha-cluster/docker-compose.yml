@@ -1,0 +1,243 @@
+version: '3.8'
+
+services:
+  # FE Follower节点1
+  fe-follower-1:
+    image: apache/doris:2.1.0-fe-x86_64
+    container_name: doris-fe-follower-1
+    hostname: fe-follower-1
+    environment:
+      - FE_SERVERS=fe1:fe-follower-1:9010,fe2:fe-follower-2:9010,fe3:fe-follower-3:9010
+      - FE_ID=1
+    volumes:
+      - ./fe-follower-1/conf:/opt/apache-doris/fe/conf
+      - ./fe-follower-1/doris-meta:/opt/apache-doris/fe/doris-meta
+      - ./fe-follower-1/log:/opt/apache-doris/fe/log
+    ports:
+      - "8030:8030"  # HTTP端口
+      - "9030:9030"  # MySQL协议端口
+      - "9010:9010"  # FE RPC端口
+    networks:
+      - doris-ha-net
+    command: >
+      bash -c "
+        if [ ! -f /opt/apache-doris/fe/doris-meta/ROLE ]; then
+          /opt/apache-doris/fe/bin/start_fe.sh --host fe-follower-1 --daemon
+        else
+          /opt/apache-doris/fe/bin/start_fe.sh --host fe-follower-1 --daemon
+        fi
+        tail -f /dev/null
+      "
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8030/api/bootstrap"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+
+  # FE Follower节点2
+  fe-follower-2:
+    image: apache/doris:2.1.0-fe-x86_64
+    container_name: doris-fe-follower-2
+    hostname: fe-follower-2
+    environment:
+      - FE_SERVERS=fe1:fe-follower-1:9010,fe2:fe-follower-2:9010,fe3:fe-follower-3:9010
+      - FE_ID=2
+    volumes:
+      - ./fe-follower-2/conf:/opt/apache-doris/fe/conf
+      - ./fe-follower-2/doris-meta:/opt/apache-doris/fe/doris-meta
+      - ./fe-follower-2/log:/opt/apache-doris/fe/log
+    ports:
+      - "8031:8030"  # HTTP端口
+      - "9031:9030"  # MySQL协议端口
+      - "9011:9010"  # FE RPC端口
+    networks:
+      - doris-ha-net
+    depends_on:
+      fe-follower-1:
+        condition: service_healthy
+    command: >
+      bash -c "
+        /opt/apache-doris/fe/bin/start_fe.sh --host fe-follower-2 --daemon
+        tail -f /dev/null
+      "
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8030/api/bootstrap"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+
+  # FE Follower节点3
+  fe-follower-3:
+    image: apache/doris:2.1.0-fe-x86_64
+    container_name: doris-fe-follower-3
+    hostname: fe-follower-3
+    environment:
+      - FE_SERVERS=fe1:fe-follower-1:9010,fe2:fe-follower-2:9010,fe3:fe-follower-3:9010
+      - FE_ID=3
+    volumes:
+      - ./fe-follower-3/conf:/opt/apache-doris/fe/conf
+      - ./fe-follower-3/doris-meta:/opt/apache-doris/fe/doris-meta
+      - ./fe-follower-3/log:/opt/apache-doris/fe/log
+    ports:
+      - "8032:8030"  # HTTP端口
+      - "9032:9030"  # MySQL协议端口
+      - "9012:9010"  # FE RPC端口
+    networks:
+      - doris-ha-net
+    depends_on:
+      fe-follower-1:
+        condition: service_healthy
+    command: >
+      bash -c "
+        /opt/apache-doris/fe/bin/start_fe.sh --host fe-follower-3 --daemon
+        tail -f /dev/null
+      "
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8030/api/bootstrap"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+
+  # BE节点1
+  be-1:
+    image: apache/doris:2.1.0-be-x86_64
+    container_name: doris-be-1
+    hostname: be-1
+    volumes:
+      - ./be-1/conf:/opt/apache-doris/be/conf
+      - ./be-1/storage:/opt/apache-doris/be/storage
+      - ./be-1/log:/opt/apache-doris/be/log
+    ports:
+      - "8040:8040"  # BE HTTP端口
+      - "9000:9000"  # BE Thrift端口
+      - "9050:9050"  # BE心跳端口
+    networks:
+      - doris-ha-net
+    depends_on:
+      fe-follower-1:
+        condition: service_healthy
+    command: >
+      bash -c "
+        /opt/apache-doris/be/bin/start_be.sh --daemon
+        tail -f /dev/null
+      "
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8040/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+
+  # BE节点2
+  be-2:
+    image: apache/doris:2.1.0-be-x86_64
+    container_name: doris-be-2
+    hostname: be-2
+    volumes:
+      - ./be-2/conf:/opt/apache-doris/be/conf
+      - ./be-2/storage:/opt/apache-doris/be/storage
+      - ./be-2/log:/opt/apache-doris/be/log
+    ports:
+      - "8041:8040"  # BE HTTP端口
+      - "9001:9000"  # BE Thrift端口
+      - "9051:9050"  # BE心跳端口
+    networks:
+      - doris-ha-net
+    depends_on:
+      fe-follower-1:
+        condition: service_healthy
+    command: >
+      bash -c "
+        /opt/apache-doris/be/bin/start_be.sh --daemon
+        tail -f /dev/null
+      "
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8040/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+
+  # BE节点3
+  be-3:
+    image: apache/doris:2.1.0-be-x86_64
+    container_name: doris-be-3
+    hostname: be-3
+    volumes:
+      - ./be-3/conf:/opt/apache-doris/be/conf
+      - ./be-3/storage:/opt/apache-doris/be/storage
+      - ./be-3/log:/opt/apache-doris/be/log
+    ports:
+      - "8042:8040"  # BE HTTP端口
+      - "9002:9000"  # BE Thrift端口
+      - "9052:9050"  # BE心跳端口
+    networks:
+      - doris-ha-net
+    depends_on:
+      fe-follower-1:
+        condition: service_healthy
+    command: >
+      bash -c "
+        /opt/apache-doris/be/bin/start_be.sh --daemon
+        tail -f /dev/null
+      "
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8040/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+
+  # 初始化脚本服务
+  init-cluster:
+    image: mysql:8.0
+    container_name: doris-init-cluster
+    networks:
+      - doris-ha-net
+    depends_on:
+      fe-follower-1:
+        condition: service_healthy
+      fe-follower-2:
+        condition: service_healthy
+      fe-follower-3:
+        condition: service_healthy
+      be-1:
+        condition: service_healthy
+      be-2:
+        condition: service_healthy
+      be-3:
+        condition: service_healthy
+    volumes:
+      - ./init-sql:/docker-entrypoint-initdb.d
+    command: >
+      bash -c "
+        echo '等待集群完全就绪...'
+        sleep 30
+        
+        echo '添加BE节点到集群...'
+        mysql -h fe-follower-1 -P 9030 -uroot -e 'ALTER SYSTEM ADD BACKEND \"be-1:9050\";'
+        mysql -h fe-follower-1 -P 9030 -uroot -e 'ALTER SYSTEM ADD BACKEND \"be-2:9050\";'
+        mysql -h fe-follower-1 -P 9030 -uroot -e 'ALTER SYSTEM ADD BACKEND \"be-3:9050\";'
+        
+        echo '执行初始化SQL...'
+        mysql -h fe-follower-1 -P 9030 -uroot < /docker-entrypoint-initdb.d/init-cluster.sql
+        
+        echo '集群初始化完成!'
+      "
+    restart: "no"
+
+networks:
+  doris-ha-net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16

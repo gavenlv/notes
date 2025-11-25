@@ -1,0 +1,90 @@
+version: '3.8'
+
+services:
+  fe:
+    image: apache/doris:2.1.0-fe-x86_64
+    container_name: doris-fe
+    hostname: fe
+    environment:
+      - FE_SERVERS=fe1:127.0.0.1:9010
+      - FE_ID=1
+    ports:
+      - "8030:8030"  # HTTP UI端口
+      - "9030:9030"  # MySQL协议端口
+      - "9010:9010"  # FE内部通信端口
+    volumes:
+      - fe_log:/opt/apache-doris/fe/log
+      - fe_meta:/opt/apache-doris/fe/doris-meta
+    networks:
+      - doris-net
+    command: /opt/apache-doris/fe/bin/start_fe.sh --daemon
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8030/api/bootstrap"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+
+  be:
+    image: apache/doris:2.1.0-be-x86_64
+    container_name: doris-be
+    hostname: be
+    environment:
+      - FE_SERVERS=fe1:127.0.0.1:9010
+      - BE_ADDR=127.0.0.1:9050
+    ports:
+      - "8040:8040"  # BE HTTP端口
+      - "9000:9000"  # BE内部通信端口
+      - "9050:9050"  # BE心跳端口
+    volumes:
+      - be_log:/opt/apache-doris/be/log
+      - be_storage:/opt/apache-doris/be/storage
+    networks:
+      - doris-net
+    depends_on:
+      fe:
+        condition: service_healthy
+    command: /opt/apache-doris/be/bin/start_be.sh --daemon
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8040/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+
+  # 初始化脚本，用于添加BE节点到集群
+  init:
+    image: mysql:8.0
+    container_name: doris-init
+    depends_on:
+      fe:
+        condition: service_healthy
+      be:
+        condition: service_healthy
+    networks:
+      - doris-net
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    command: >
+      sh -c "
+      echo 'Waiting for FE to be ready...' &&
+      until mysql -h fe -P 9030 -uroot -e 'SELECT 1'; do
+        echo 'FE not ready, sleeping...'
+        sleep 5
+      done &&
+      echo 'FE is ready, adding BE node...' &&
+      mysql -h fe -P 9030 -uroot -e 'ALTER SYSTEM ADD BACKEND \"be:9050\";' &&
+      echo 'BE node added successfully!' &&
+      echo 'Cluster status:' &&
+      mysql -h fe -P 9030 -uroot -e 'SHOW BACKENDS;'
+      "
+
+volumes:
+  fe_log:
+  fe_meta:
+  be_log:
+  be_storage:
+
+networks:
+  doris-net:
+    driver: bridge
