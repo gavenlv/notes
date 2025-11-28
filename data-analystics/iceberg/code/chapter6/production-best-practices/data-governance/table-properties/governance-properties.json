@@ -1,0 +1,65 @@
+{
+  "table_properties": {
+    "governance": {
+      "data_owner": "analytics-team",
+      "data_steward": "data-governance-team",
+      "business_owner": "marketing-department",
+      "contact_email": "data-governance@example.com",
+      "sla_tier": "tier-2",
+      "data_classification": "confidential",
+      "retention_policy": {
+        "active_data_period": "365d",
+        "archive_data_period": "1095d",
+        "deletion_policy": "permanent_deletion_after_archive_expiry"
+      }
+    },
+    "compliance": {
+      "gdpr_compliant": true,
+      "ccpa_compliant": true,
+      "hipaa_compliant": false,
+      "pii_fields": [
+        "customer_email",
+        "customer_phone",
+        "customer_address"
+      ],
+      "encryption_required": true,
+      "auditing_enabled": true
+    },
+    "lineage": {
+      "source_systems": [
+        "crm-system",
+        "erp-system",
+        "web-analytics"
+      ],
+      "downstream_consumers": [
+        "reporting-dashboard",
+        "ml-model-training",
+        "customer-analytics"
+      ],
+      "etl_pipeline": "daily-etl-pipeline-v2"
+    },
+    "quality": {
+      "quality_tier": "gold",
+      "dq_rules": {
+        "completeness": ">= 99%",
+        "accuracy": ">= 98%",
+        "consistency": ">= 99.5%",
+        "timeliness": "< 24h"
+      },
+      "automated_testing": true,
+      "manual_qa_frequency": "weekly"
+    },
+    "metadata": {
+      "description": "Customer transaction data with enriched marketing attributes",
+      "tags": [
+        "customer-data",
+        "transactions",
+        "marketing",
+        "analytics"
+      ],
+      "documentation_url": "https://internal-docs.example.com/customer-data",
+      "schema_version": "1.2.0",
+      "last_updated": "2023-12-01"
+    }
+  }
+}

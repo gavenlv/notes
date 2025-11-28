@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+<!--
+  HDFS Configuration for Iceberg Production Environment
+  =====================================================
+-->
+<configuration>
+  
+  <!-- Core HDFS Configuration -->
+  <property>
+    <name>dfs.nameservices</name>
+    <value>prod-cluster</value>
+    <description>NameService ID for the cluster</description>
+  </property>
+  
+  <property>
+    <name>dfs.ha.namenodes.prod-cluster</name>
+    <value>nn1,nn2</value>
+    <description>NameNodes for the NameService</description>
+  </property>
+  
+  <property>
+    <name>dfs.namenode.rpc-address.prod-cluster.nn1</name>
+    <value>namenode1:9000</value>
+    <description>RPC address for NameNode 1</description>
+  </property>
+  
+  <property>
+    <name>dfs.namenode.rpc-address.prod-cluster.nn2</name>
+    <value>namenode2:9000</value>
+    <description>RPC address for NameNode 2</description>
+  </property>
+  
+  <property>
+    <name>dfs.namenode.http-address.prod-cluster.nn1</name>
+    <value>namenode1:50070</value>
+    <description>HTTP address for NameNode 1</description>
+  </property>
+  
+  <property>
+    <name>dfs.namenode.http-address.prod-cluster.nn2</name>
+    <value>namenode2:50070</value>
+    <description>HTTP address for NameNode 2</description>
+  </property>
+  
+  <!-- Journal Node Configuration -->
+  <property>
+    <name>dfs.namenode.shared.edits.dir</name>
+    <value>qjournal://jn1:8485;jn2:8485;jn3:8485/prod-cluster</value>
+    <description>Journal Nodes for HA setup</description>
+  </property>
+  
+  <property>
+    <name>dfs.client.failover.proxy.provider.prod-cluster</name>
+    <value>org.apache.hadoop.hdfs.server.namenode.ha.ConfiguredFailoverProxyProvider</value>
+    <description>Failover proxy provider</description>
+  </property>
+  
+  <property>
+    <name>dfs.ha.fencing.methods</name>
+    <value>sshfence
+    shell(/bin/true)</value>
+    <description>Fencing methods for HA</description>
+  </property>
+  
+  <property>
+    <name>dfs.ha.automatic-failover.enabled</name>
+    <value>true</value>
+    <description>Enable automatic failover</description>
+  </property>
+  
+  <!-- Replication Configuration -->
+  <property>
+    <name>dfs.replication</name>
+    <value>3</value>
+    <description>Default block replication</description>
+  </property>
+  
+  <property>
+    <name>dfs.blocksize</name>
+    <value>134217728</value>
+    <description>Block size (128MB) optimized for Iceberg</description>
+  </property>
+  
+  <!-- Performance Tuning -->
+  <property>
+    <name>dfs.namenode.handler.count</name>
+    <value>100</value>
+    <description>Number of handler threads for NameNode</description>
+  </property>
+  
+  <property>
+    <name>dfs.datanode.handler.count</name>
+    <value>20</value>
+    <description>Number of handler threads for DataNode</description>
+  </property>
+  
+  <property>
+    <name>dfs.namenode.service.handler.count</name>
+    <value>20</value>
+    <description>Number of service handler threads</description>
+  </property>
+  
+  <property>
+    <name>dfs.namenode.accesstime.precision</name>
+    <value>3600000</value>
+    <description>Access time precision (1 hour) to reduce NameNode load</description>
+  </property>
+  
+  <!-- Short-Circuit Read Configuration -->
+  <property>
+    <name>dfs.client.read.shortcircuit</name>
+    <value>true</value>
+    <description>Enable short-circuit reads</description>
+  </property>
+  
+  <property>
+    <name>dfs.domain.socket.path</name>
+    <value>/var/lib/hadoop-hdfs/dn_socket</value>
+    <description>Domain socket path for short-circuit reads</description>
+  </property>
+  
+  <!-- Buffer and Cache Configuration -->
+  <property>
+    <name>dfs.client.socketcache.capacity</name>
+    <value>200</value>
+    <description>Socket cache capacity</description>
+  </property>
+  
+  <property>
+    <name>dfs.client.socketcache.expiryMsec</name>
+    <value>30000</value>
+    <description>Socket cache expiry time</description>
+  </property>
+  
+  <property>
+    <name>dfs.bytes-per-checksum</name>
+    <value>512</value>
+    <description>Bytes per checksum</description>
+  </property>
+  
+  <property>
+    <name>dfs.client.block.write.replace-datanode-on-failure.enable</name>
+    <value>true</value>
+    <description>Enable replacement of failed datanodes during write</description>
+  </property>
+  
+  <property>
+    <name>dfs.client.block.write.replace-datanode-on-failure.policy</name>
+    <value>NEVER</value>
+    <description>Policy for replacing datanodes</description>
+  </property>
+  
+  <!-- Directory and File Permissions -->
+  <property>
+    <name>dfs.namenode.name.dir</name>
+    <value>/data/hadoop/namenode</value>
+    <description>NameNode storage directories</description>
+  </property>
+  
+  <property>
+    <name>dfs.datanode.data.dir</name>
+    <value>/data1/hadoop/datanode,/data2/hadoop/datanode,/data3/hadoop/datanode</value>
+    <description>DataNode storage directories</description>
+  </property>
+  
+  <property>
+    <name>dfs.permissions.enabled</name>
+    <value>true</value>
+    <description>Enable HDFS permissions</description>
+  </property>
+  
+  <property>
+    <name>dfs.webhdfs.enabled</name>
+    <value>true</value>
+    <description>Enable WebHDFS</description>
+  </property>
+  
+  <property>
+    <name>dfs.namenode.datanode.registration.ip-hostname-check</name>
+    <value>false</value>
+    <description>Disable IP hostname check for DataNode registration</description>
+  </property>
+  
+  <!-- Journal Node Configuration -->
+  <property>
+    <name>dfs.journalnode.edits.dir</name>
+    <value>/data/hadoop/journalnode</value>
+    <description>JournalNode storage directory</description>
+  </property>
+  
+  <!-- Checkpoint Configuration -->
+  <property>
+    <name>dfs.namenode.checkpoint.period</name>
+    <value>3600</value>
+    <description>Checkpoint period in seconds</description>
+  </property>
+  
+  <property>
+    <name>dfs.namenode.checkpoint.txns</name>
+    <value>1000000</value>
+    <description>Checkpoint transaction count</description>
+  </property>
+  
+  <property>
+    <name>dfs.namenode.checkpoint.check.period</name>
+    <value>3600</value>
+    <description>Checkpoint check period</description>
+  </property>
+  
+  <!-- Balancer Configuration -->
+  <property>
+    <name>dfs.balance.bandwidthPerSec</name>
+    <value>10485760</value>
+    <description>Balancer bandwidth (10MB/s)</description>
+  </property>
+  
+  <!-- Compression Configuration -->
+  <property>
+    <name>dfs.client.use.datanode.hostname</name>
+    <value>true</value>
+    <description>Use DataNode hostname for communication</description>
+  </property>
+  
+  <property>
+    <name>dfs.encrypt.data.transfer</name>
+    <value>false</value>
+    <description>Encrypt data transfer (set to true for production security)</description>
+  </property>
+  
+  <!-- GC Configuration -->
+  <property>
+    <name>dfs.namenode.gc.warn.threshold.ms</name>
+    <value>1000</value>
+    <description>GC warning threshold</description>
+  </property>
+  
+  <!-- Safe Mode Configuration -->
+  <property>
+    <name>dfs.namenode.safemode.threshold-pct</name>
+    <value>0.999f</value>
+    <description>Safemode threshold percentage</description>
+  </property>
+  
+  <property>
+    <name>dfs.namenode.safemode.extension</name>
+    <value>30000</value>
+    <description>Safemode extension time in ms</description>
+  </property>
+  
+</configuration>

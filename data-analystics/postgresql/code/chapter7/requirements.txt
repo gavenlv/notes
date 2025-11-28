@@ -1,0 +1,21 @@
+# PostgreSQL教程第7章依赖包
+
+# PostgreSQL数据库连接
+psycopg2-binary==2.9.9
+
+# 可选：日志和调试工具
+colorama==0.4.6
+click==8.1.7
+
+# 可选：性能监控
+psutil==5.9.6
+memory-profiler==0.61.0
+
+# 可选：并发测试
+concurrent-futures==3.1.1; python_version < '3.2'
+
+# 可选：时间处理
+python-dateutil==2.8.2
+
+# 可选：JSON处理
+ujson==5.9.0

@@ -1,0 +1,13 @@
+# RabbitMQ Python客户端库
+pika>=1.3.0
+
+# 可选：用于更高级的功能
+#Kombu>=5.0.0  # 高级Python AMQP客户端
+#celery>=5.0.0  # 分布式任务队列（基于RabbitMQ）
+
+# 开发和测试工具
+pytest>=7.0.0
+pytest-asyncio>=0.21.0
+
+# 用于演示和测试
+colorama>=0.4.0  # 彩色终端输出

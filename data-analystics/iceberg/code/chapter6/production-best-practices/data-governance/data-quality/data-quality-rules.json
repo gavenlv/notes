@@ -1,0 +1,90 @@
+{
+  "data_quality_rules": {
+    "completeness": {
+      "rule_name": "completeness_check",
+      "description": "Check for null or missing values in critical columns",
+      "columns": [
+        "customer_id",
+        "transaction_amount",
+        "transaction_date"
+      ],
+      "threshold": 0.99,
+      "action": "alert"
+    },
+    "accuracy": {
+      "rule_name": "accuracy_check",
+      "description": "Validate data against business rules",
+      "rules": [
+        {
+          "column": "transaction_amount",
+          "condition": "transaction_amount > 0",
+          "threshold": 0.999,
+          "action": "reject"
+        },
+        {
+          "column": "currency_code",
+          "condition": "currency_code in ('USD', 'EUR', 'GBP', 'JPY', 'CAD')",
+          "threshold": 1.0,
+          "action": "alert"
+        }
+      ]
+    },
+    "consistency": {
+      "rule_name": "consistency_check",
+      "description": "Check for consistent data formats and values",
+      "rules": [
+        {
+          "column": "email",
+          "pattern": "^[A-Za-z0-9+_.-]+@([A-Za-z0-9.-]+\\.[A-Za-z]{2,})$",
+          "threshold": 0.99,
+          "action": "correct"
+        },
+        {
+          "column": "phone",
+          "pattern": "^\\+?[1-9]\\d{1,14}$",
+          "threshold": 0.95,
+          "action": "flag"
+        }
+      ]
+    },
+    "uniqueness": {
+      "rule_name": "uniqueness_check",
+      "description": "Ensure primary keys and unique identifiers are unique",
+      "columns": [
+        "transaction_id"
+      ],
+      "threshold": 1.0,
+      "action": "reject"
+    },
+    "timeliness": {
+      "rule_name": "timeliness_check",
+      "description": "Check data is processed within expected timeframes",
+      "rules": [
+        {
+          "column": "transaction_date",
+          "condition": "transaction_date >= date_sub(current_date, 2)",
+          "threshold": 0.99,
+          "action": "alert"
+        }
+      ]
+    },
+    "validity": {
+      "rule_name": "validity_check",
+      "description": "Validate data against reference data or domain values",
+      "rules": [
+        {
+          "column": "country_code",
+          "reference_table": "iceberg_catalog.reference_data.country_codes",
+          "threshold": 1.0,
+          "action": "reject"
+        },
+        {
+          "column": "product_category",
+          "reference_table": "iceberg_catalog.reference_data.product_categories",
+          "threshold": 0.99,
+          "action": "alert"
+        }
+      ]
+    }
+  }
+}

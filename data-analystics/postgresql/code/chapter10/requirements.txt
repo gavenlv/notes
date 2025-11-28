@@ -1,0 +1,42 @@
+# PostgreSQL第10章：备份恢复监控依赖包
+# 使用说明：pip install -r requirements.txt
+
+# 数据库连接
+psycopg2-binary==2.9.7
+
+# 数据处理
+pandas==2.0.3
+numpy==1.24.3
+
+# 可视化
+matplotlib==3.7.2
+seaborn==0.12.2
+plotly==5.15.0
+
+# 监控和日志
+psutil==5.9.5
+structlog==23.1.0
+
+# 配置管理
+pyyaml==6.0.1
+python-dotenv==1.0.0
+
+# 异步处理
+asyncio-throttle==1.0.2
+aiofiles==23.2.1
+
+# 通知
+smtplib2==0.2.0
+slack-sdk==3.21.3
+
+# 时间处理
+arrow==1.2.3
+
+# 测试
+pytest==7.4.0
+pytest-asyncio==0.21.1
+
+# 代码质量
+black==23.7.0
+flake8==6.0.0
+mypy==1.4.1

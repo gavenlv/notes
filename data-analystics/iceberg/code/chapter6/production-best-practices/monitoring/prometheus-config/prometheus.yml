@@ -1,0 +1,62 @@
+# Prometheus Configuration for Iceberg Monitoring
+# =============================================
+
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  scrape_timeout: 10s
+
+# Alert manager configuration
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+          - alertmanager:9093
+
+# Load rules once and periodically evaluate them according to the global 'evaluation_interval'.
+rule_files:
+  - "iceberg-rules.yml"
+  - "spark-rules.yml"
+  - "hdfs-rules.yml"
+
+# A scrape configuration containing exactly one endpoint to scrape:
+scrape_configs:
+  # Spark metrics
+  - job_name: 'spark'
+    static_configs:
+      - targets: ['spark-master:8080', 'spark-worker1:8081', 'spark-worker2:8081']
+    metrics_path: '/metrics/'
+    
+  # Spark applications with Prometheus sink
+  - job_name: 'spark-applications'
+    static_configs:
+      - targets: ['spark-driver:4040', 'spark-executor1:4041', 'spark-executor2:4041']
+    metrics_path: '/metrics/executors/prometheus'
+
+  # HDFS metrics
+  - job_name: 'hdfs'
+    static_configs:
+      - targets: ['namenode:50070', 'datanode1:50075', 'datanode2:50075']
+    metrics_path: '/jmx'
+
+  # Iceberg REST catalog metrics
+  - job_name: 'iceberg-catalog'
+    static_configs:
+      - targets: ['iceberg-rest-catalog:8080']
+    metrics_path: '/metrics'
+
+  # Flink metrics
+  - job_name: 'flink'
+    static_configs:
+      - targets: ['flink-jobmanager:8081', 'flink-taskmanager1:8082', 'flink-taskmanager2:8082']
+    metrics_path: '/metrics'
+
+  # Node exporter for system metrics
+  - job_name: 'node-exporter'
+    static_configs:
+      - targets: ['node-exporter1:9100', 'node-exporter2:9100', 'node-exporter3:9100']
+
+  # JVM metrics for Java applications
+  - job_name: 'jvm'
+    static_configs:
+      - targets: ['spark-driver:9090', 'iceberg-catalog:9090', 'flink-jobmanager:9090']

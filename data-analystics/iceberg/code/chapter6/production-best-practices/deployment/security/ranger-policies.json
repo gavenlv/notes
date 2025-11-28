@@ -1,0 +1,207 @@
+{
+  "policies": [
+    {
+      "name": "iceberg_table_access_policy",
+      "description": "Policy for controlling access to Iceberg tables",
+      "repositoryType": "hdfs",
+      "repositoryName": "hdfs_prod",
+      "resources": {
+        "path": {
+          "values": ["/warehouse/iceberg"],
+          "isRecursive": true,
+          "isExcludes": false
+        }
+      },
+      "policyItems": [
+        {
+          "users": ["data_analyst", "data_scientist"],
+          "groups": ["data_team"],
+          "accesses": [
+            {"type": "read", "isAllowed": true},
+            {"type": "execute", "isAllowed": true}
+          ],
+          "delegateAdmin": false
+        },
+        {
+          "users": ["data_engineer"],
+          "groups": ["data_engineering"],
+          "accesses": [
+            {"type": "read", "isAllowed": true},
+            {"type": "write", "isAllowed": true},
+            {"type": "execute", "isAllowed": true}
+          ],
+          "delegateAdmin": false
+        }
+      ],
+      "denyPolicyItems": [],
+      "allowExceptions": [],
+      "denyExceptions": [],
+      "dataMaskPolicyItems": [],
+      "rowFilterPolicyItems": [],
+      "options": {},
+      "validitySchedules": [],
+      "policyPriority": 0,
+      "isAuditEnabled": true,
+      "zoneName": "",
+      "isDenyAllElse": false
+    },
+    {
+      "name": "iceberg_metadata_access_policy",
+      "description": "Policy for controlling access to Iceberg metadata",
+      "repositoryType": "hdfs",
+      "repositoryName": "hdfs_prod",
+      "resources": {
+        "path": {
+          "values": ["/warehouse/iceberg/*/.metadata", "/warehouse/iceberg/*/*/metadata"],
+          "isRecursive": true,
+          "isExcludes": false
+        }
+      },
+      "policyItems": [
+        {
+          "users": ["data_engineer"],
+          "groups": ["data_engineering", "admins"],
+          "accesses": [
+            {"type": "read", "isAllowed": true},
+            {"type": "write", "isAllowed": true},
+            {"type": "execute", "isAllowed": true}
+          ],
+          "delegateAdmin": false
+        }
+      ],
+      "denyPolicyItems": [
+        {
+          "users": ["data_analyst", "data_scientist"],
+          "groups": ["data_team"],
+          "accesses": [
+            {"type": "write", "isAllowed": false}
+          ],
+          "delegateAdmin": false
+        }
+      ],
+      "allowExceptions": [],
+      "denyExceptions": [],
+      "dataMaskPolicyItems": [],
+      "rowFilterPolicyItems": [],
+      "options": {},
+      "validitySchedules": [],
+      "policyPriority": 0,
+      "isAuditEnabled": true,
+      "zoneName": "",
+      "isDenyAllElse": false
+    },
+    {
+      "name": "iceberg_table_row_filter_policy",
+      "description": "Row-level filtering policy for customer data",
+      "repositoryType": "hive",
+      "repositoryName": "hive_prod",
+      "resources": {
+        "database": {
+          "values": ["iceberg_db"]
+        },
+        "table": {
+          "values": ["customer_data"]
+        }
+      },
+      "policyItems": [],
+      "denyPolicyItems": [],
+      "allowExceptions": [],
+      "denyExceptions": [],
+      "dataMaskPolicyItems": [],
+      "rowFilterPolicyItems": [
+        {
+          "users": ["data_analyst"],
+          "groups": ["data_team"],
+          "rowFilterInfo": {
+            "filterExpr": "region = 'US'"
+          },
+          "accesses": [
+            {"type": "select", "isAllowed": true}
+          ]
+        }
+      ],
+      "options": {},
+      "validitySchedules": [],
+      "policyPriority": 0,
+      "isAuditEnabled": true,
+      "zoneName": "",
+      "isDenyAllElse": false
+    },
+    {
+      "name": "iceberg_column_masking_policy",
+      "description": "Column-level masking for sensitive data",
+      "repositoryType": "hive",
+      "repositoryName": "hive_prod",
+      "resources": {
+        "database": {
+          "values": ["iceberg_db"]
+        },
+        "table": {
+          "values": ["customer_data"]
+        },
+        "column": {
+          "values": ["ssn", "credit_card_number"]
+        }
+      },
+      "policyItems": [],
+      "denyPolicyItems": [],
+      "allowExceptions": [],
+      "denyExceptions": [],
+      "dataMaskPolicyItems": [
+        {
+          "users": ["data_analyst"],
+          "groups": ["data_team"],
+          "dataMaskInfo": {
+            "dataMaskType": "MASK_SHOW_LAST_4"
+          },
+          "accesses": [
+            {"type": "select", "isAllowed": true}
+          ]
+        }
+      ],
+      "rowFilterPolicyItems": [],
+      "options": {},
+      "validitySchedules": [],
+      "policyPriority": 0,
+      "isAuditEnabled": true,
+      "zoneName": "",
+      "isDenyAllElse": false
+    },
+    {
+      "name": "iceberg_admin_policy",
+      "description": "Administrative policy for Iceberg operations",
+      "repositoryType": "hive",
+      "repositoryName": "hive_prod",
+      "resources": {
+        "database": {
+          "values": ["iceberg_db"]
+        }
+      },
+      "policyItems": [
+        {
+          "users": ["data_engineer", "admin_user"],
+          "groups": ["admins"],
+          "accesses": [
+            {"type": "create", "isAllowed": true},
+            {"type": "drop", "isAllowed": true},
+            {"type": "alter", "isAllowed": true},
+            {"type": "index", "isAllowed": true},
+            {"type": "lock", "isAllowed": true}
+          ],
+          "delegateAdmin": true
+        }
+      ],
+      "denyPolicyItems": [],
+      "allowExceptions": [],
+      "denyExceptions": [],
+      "dataMaskPolicyItems": [],
+      "rowFilterPolicyItems": [],
+      "options": {},
+      "validitySchedules": [],
+      "policyPriority": 0,
+      "isAuditEnabled": true,
+      "zoneName": "",
+      "isDenyAllElse": false
+    }
+  ]
+}

@@ -1,0 +1,108 @@
+# Flink Configuration for Iceberg Production Environment
+# ======================================================
+
+# Basic Configuration
+jobmanager.rpc.address: jobmanager
+jobmanager.rpc.port: 6123
+jobmanager.memory.process.size: 4096m
+taskmanager.memory.process.size: 16384m
+taskmanager.numberOfTaskSlots: 10
+parallelism.default: 10
+
+# High Availability Configuration
+high-availability: zookeeper
+high-availability.storageDir: hdfs://namenode:9000/flink/ha/
+high-availability.zookeeper.quorum: zk1:2181,zk2:2181,zk3:2181
+high-availability.zookeeper.path.root: /flink
+high-availability.cluster-id: /iceberg-cluster
+
+# Checkpointing Configuration
+state.backend: rocksdb
+state.backend.rocksdb.localdir: /tmp/flink/rocksdb
+state.checkpoints.dir: hdfs://namenode:9000/flink/checkpoints
+state.savepoints.dir: hdfs://namenode:9000/flink/savepoints
+state.checkpoint-storage: filesystem
+state.backend.incremental: true
+
+# Checkpointing Behavior
+execution.checkpointing.interval: 60000
+execution.checkpointing.mode: EXACTLY_ONCE
+execution.checkpointing.timeout: 600000
+execution.checkpointing.min-pause: 10000
+execution.checkpointing.max-concurrent-checkpoints: 1
+execution.checkpointing.externalized-checkpoint-retention: RETAIN_ON_CANCELLATION
+
+# Restart Strategy
+restart-strategy: fixed-delay
+restart-strategy.fixed-delay.attempts: 10
+restart-strategy.fixed-delay.delay: 30000
+
+# Network Configuration
+taskmanager.network.memory.fraction: 0.1
+taskmanager.network.memory.min: 64mb
+taskmanager.network.memory.max: 1gb
+taskmanager.network.request-backoff.initial: 100
+taskmanager.network.request-backoff.max: 10000
+
+# Memory Configuration
+taskmanager.memory.framework.heap.size: 1024m
+taskmanager.memory.managed.fraction: 0.4
+taskmanager.memory.managed.consumer-weights: OPERATOR:70,MANAGED_MEMORY:30
+
+# Metrics Configuration
+metrics.reporter.prom.class: org.apache.flink.metrics.prometheus.PrometheusReporter
+metrics.reporter.prom.port: 9249
+metrics.latency.interval: 60000
+metrics.latency.granularity: operator
+
+# Web UI Configuration
+web.upload.dir: /tmp/flink-web-upload
+web.timeout: 600000
+
+# Iceberg Catalog Configuration
+table.exec.iceberg.catalog-type: hive
+table.exec.iceberg.catalog-name: iceberg_catalog
+table.exec.iceberg.catalog-table-base-path: hdfs://namenode:9000/warehouse
+table.exec.iceberg.catalog-warehouse: hdfs://namenode:9000/warehouse
+table.exec.iceberg.catalog-uri: thrift://hive-metastore:9083
+
+# Iceberg Table Configuration
+table.exec.iceberg.table.write-format: PARQUET
+table.exec.iceberg.table.write-target-file-size-bytes: 536870912
+table.exec.iceberg.table.writer-buffer-size: 134217728
+table.exec.iceberg.table.upsert-mode: true
+
+# Streaming Configuration
+pipeline.time-characteristic: EventTime
+pipeline.auto-watermark-interval: 1000
+state.backend.rocksdb.timer-service.factory: ROCKSDB
+state.backend.rocksdb.predefined-options: SPINNING_DISK_OPTIMIZED_HIGH_MEM
+
+# JVM Options
+env.java.opts.jobmanager: -XX:+UseG1GC -XX:MaxGCPauseMillis=100
+env.java.opts.taskmanager: -XX:+UseG1GC -XX:MaxGCPauseMillis=100
+
+# Classloading Configuration
+classloader.resolve-order: parent-first
+
+# History Server Configuration
+historyserver.archive.fs.dir: hdfs://namenode:9000/flink/completed-jobs/
+historyserver.web.address: 0.0.0.0
+historyserver.web.port: 8082
+historyserver.web.ssl.enabled: false
+
+# Security Configuration
+security.ssl.enabled: false
+security.integration.enabled: false
+
+# ResourceManager Configuration
+resourcemanager.taskmanager-timeout: 300000
+resourcemanager.taskmanager-registration-timeout: 300000
+
+# Blob Server Configuration
+blob.server.port: 6124
+blob.fetch.backlog: 1000
+
+# Heartbeat Configuration
+heartbeat.interval: 10000
+heartbeat.timeout: 50000

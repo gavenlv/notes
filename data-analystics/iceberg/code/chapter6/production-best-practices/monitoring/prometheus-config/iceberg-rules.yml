@@ -1,0 +1,131 @@
+# Iceberg Monitoring Rules
+# ======================
+
+groups:
+- name: iceberg.rules
+  rules:
+  # Table metadata related alerts
+  - alert: IcebergTableMetadataRefreshFailed
+    expr: increase(iceberg_table_metadata_refresh_failures_total[5m]) > 0
+    for: 1m
+    labels:
+      severity: critical
+    annotations:
+      summary: "Iceberg table metadata refresh failed"
+      description: "Failed to refresh metadata for table {{ $labels.table }} in namespace {{ $labels.namespace }}"
+
+  - alert: IcebergHighMetadataRefreshLatency
+    expr: iceberg_table_metadata_refresh_duration_seconds > 10
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "Iceberg metadata refresh latency is high"
+      description: "Metadata refresh for table {{ $labels.table }} is taking more than 10 seconds"
+
+  # Snapshot related alerts
+  - alert: IcebergSnapshotCreationFailed
+    expr: increase(iceberg_snapshot_creation_failures_total[5m]) > 0
+    for: 1m
+    labels:
+      severity: critical
+    annotations:
+      summary: "Iceberg snapshot creation failed"
+      description: "Failed to create snapshot for table {{ $labels.table }} in namespace {{ $labels.namespace }}"
+
+  - alert: IcebergStaleSnapshots
+    expr: time() - iceberg_latest_snapshot_timestamp_seconds > 3600
+    for: 10m
+    labels:
+      severity: warning
+    annotations:
+      summary: "Iceberg snapshots are stale"
+      description: "No new snapshots created for table {{ $labels.table }} in the last hour"
+
+  # File operations alerts
+  - alert: IcebergHighFileOperationLatency
+    expr: iceberg_file_operation_duration_seconds{operation=~"read|write"} > 30
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "Iceberg file operation latency is high"
+      description: "{{ $labels.operation }} operation on table {{ $labels.table }} is taking more than 30 seconds"
+
+  - alert: IcebergFileOperationFailures
+    expr: increase(iceberg_file_operation_failures_total[5m]) > 5
+    for: 1m
+    labels:
+      severity: critical
+    annotations:
+      summary: "Iceberg file operations are failing"
+      description: "Multiple file operation failures detected for table {{ $labels.table }}"
+
+  # Manifest operations alerts
+  - alert: IcebergManifestOperationFailures
+    expr: increase(iceberg_manifest_operation_failures_total[5m]) > 3
+    for: 1m
+    labels:
+      severity: critical
+    annotations:
+      summary: "Iceberg manifest operations are failing"
+      description: "Multiple manifest operation failures detected for table {{ $labels.table }}"
+
+  # Partition related alerts
+  - alert: IcebergPartitionSkew
+    expr: stddev(iceberg_partition_file_count) / avg(iceberg_partition_file_count) > 2
+    for: 10m
+    labels:
+      severity: warning
+    annotations:
+      summary: "Iceberg partition skew detected"
+      description: "Significant partition skew detected for table {{ $labels.table }}"
+
+  # Query performance alerts
+  - alert: IcebergSlowQueries
+    expr: iceberg_query_duration_seconds > 60
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "Iceberg queries are running slowly"
+      description: "Query on table {{ $labels.table }} is taking more than 60 seconds"
+
+  # Resource utilization alerts
+  - alert: IcebergHighMemoryUsage
+    expr: iceberg_memory_usage_bytes / iceberg_memory_limit_bytes > 0.9
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "Iceberg high memory usage"
+      description: "Memory usage for Iceberg operations is above 90% capacity"
+
+  - alert: IcebergHighCPUUsage
+    expr: rate(iceberg_cpu_seconds_total[5m]) > 0.8
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "Iceberg high CPU usage"
+      description: "CPU usage for Iceberg operations is consistently above 80%"
+
+  # Data quality alerts
+  - alert: IcebergDataQualityIssues
+    expr: increase(iceberg_data_quality_issues_total[10m]) > 0
+    for: 1m
+    labels:
+      severity: warning
+    annotations:
+      summary: "Iceberg data quality issues detected"
+      description: "Data quality issues detected in table {{ $labels.table }}"
+
+  # Record metrics
+  - record: iceberg_table_average_file_size_bytes
+    expr: iceberg_table_total_file_size_bytes / iceberg_table_file_count
+
+  - record: iceberg_average_query_latency_seconds
+    expr: rate(iceberg_query_duration_seconds_sum[5m]) / rate(iceberg_query_duration_seconds_count[5m])
+
+  - record: iceberg_table_growth_rate
+    expr: rate(iceberg_table_total_file_size_bytes[30m])
