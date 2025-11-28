@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>第1章 JavaScript基础概念与环境搭建 - 示例代码</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        h1, h2, h3 {
+            color: #333;
+        }
+        code {
+            background-color: #f0f0f0;
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+        }
+        pre {
+            background-color: #f0f0f0;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        input {
+            padding: 10px;
+            margin: 5px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .output {
+            background-color: #e9f7ef;
+            border-left: 5px solid #4CAF50;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 0 4px 4px 0;
+        }
+        .error {
+            background-color: #ffebee;
+            border-left: 5px solid #f44336;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 0 4px 4px 0;
+        }
+        .warning {
+            background-color: #fff8e1;
+            border-left: 5px solid #ff9800;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 0 4px 4px 0;
+        }
+        .tab {
+            overflow: hidden;
+            border: 1px solid #ccc;
+            background-color: #f1f1f1;
+        }
+        .tab button {
+            background-color: inherit;
+            float: left;
+            border: none;
+            outline: none;
+            cursor: pointer;
+            padding: 14px 16px;
+            transition: 0.3s;
+            font-size: 17px;
+        }
+        .tab button:hover {
+            background-color: #ddd;
+        }
+        .tab button.active {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .tabcontent {
+            display: none;
+            padding: 6px 12px;
+            border: 1px solid #ccc;
+            border-top: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>第1章：JavaScript基础概念与环境搭建 - 示例代码</h1>
+        <p>这个HTML文件包含了第1章中的所有示例代码。您可以直接在浏览器中打开此文件来运行示例。</p>
+    </div>
+
+    <div class="container">
+        <h2>1.4 第一个JavaScript程序</h2>
+        
+        <h3>内联JavaScript示例</h3>
+        <button onclick="showInlineMessage()">内联JavaScript消息</button>
+        
+        <h3>基本输出示例</h3>
+        <button onclick="showBasicOutputs()">显示基本输出</button>
+        
+        <div id="basic-output"></div>
+    </div>
+
+    <div class="container">
+        <h2>1.5 JavaScript代码的基本组成</h2>
+        
+        <h3>语句与表达式</h3>
+        <button onclick="demonstrateStatementsExpressions()">演示语句与表达式</button>
+        
+        <div id="statements-expressions-output"></div>
+        
+        <h3>条件语句</h3>
+        <input type="number" id="age-input" placeholder="输入你的年龄">
+        <button onclick="checkAge()">检查年龄</button>
+        
+        <div id="age-output"></div>
+        
+        <h3>循环语句</h3>
+        <button onclick="demonstrateLoops()">演示循环</button>
+        
+        <div id="loops-output"></div>
+    </div>
+
+    <div class="container">
+        <h2>1.6 调试技巧</h2>
+        
+        <h3>Console输出示例</h3>
+        <button onclick="demonstrateConsoleMethods()">演示Console方法</button>
+        <p>打开浏览器控制台查看输出结果（按F12或右键→检查→Console）</p>
+        
+        <h3>调试器示例</h3>
+        <button onclick="triggerDebugger()">触发调试器</button>
+        <p>点击按钮后，代码会在debugger语句处暂停（需要打开开发者工具）</p>
+        
+        <h3>错误处理示例</h3>
+        <button onclick="demonstrateErrorHandling()">演示错误处理</button>
+        
+        <div id="error-output"></div>
+    </div>
+
+    <div class="container">
+        <h2>1.7 开发最佳实践</h2>
+        
+        <h3>函数示例</h3>
+        <input type="number" id="quantity" placeholder="数量" value="5">
+        <input type="number" id="price" placeholder="单价" value="10">
+        <button onclick="calculatePrice()">计算价格</button>
+        
+        <div id="price-output"></div>
+        
+        <h3>对象操作示例</h3>
+        <input type="text" id="user-name" placeholder="用户名">
+        <input type="number" id="user-age" placeholder="年龄">
+        <button onclick="createUser()">创建用户</button>
+        
+        <div id="user-output"></div>
+    </div>
+
+    <!-- 引入外部JavaScript文件 -->
+    <script src="chapter1_javascript_basics.js"></script>
+    
+    <script>
+        // 内联JavaScript函数
+        function showInlineMessage() {
+            alert('这是内联JavaScript的消息！');
+        }
+        
+        function showBasicOutputs() {
+            const outputDiv = document.getElementById('basic-output');
+            
+            // 使用document.write创建内容（不推荐在实际项目中使用）
+            outputDiv.innerHTML = '';
+            
+            // 创建段落并添加到div
+            const p = document.createElement('p');
+            p.textContent = '这是由JavaScript生成的文本，时间：' + new Date().toLocaleTimeString();
+            outputDiv.appendChild(p);
+            
+            // 输出当前日期和时间
+            const timeP = document.createElement('p');
+            timeP.textContent = '当前日期：' + new Date().toLocaleDateString();
+            outputDiv.appendChild(timeP);
+            
+            // 输出浏览器信息
+            const browserP = document.createElement('p');
+            browserP.textContent = '浏览器信息：' + navigator.userAgent;
+            outputDiv.appendChild(browserP);
+        }
+        
+        function demonstrateStatementsExpressions() {
+            const outputDiv = document.getElementById('statements-expressions-output');
+            outputDiv.innerHTML = '<h4>语句与表达式示例：</h4>';
+            
+            // 表达式示例
+            let result = 10 + 5; // 表达式，结果为15
+            outputDiv.innerHTML += `<p>10 + 5 = ${result}</p>`;
+            
+            // 条件语句示例
+            let x = 10;
+            if (x > 5) {
+                outputDiv.innerHTML += `<p>x > 5 为真，x = ${x}</p>`;
+            } else {
+                outputDiv.innerHTML += `<p>x > 5 为假，x = ${x}</p>`;
+            }
+            
+            // 三元运算符（表达式）
+            let message = x > 5 ? 'x大于5' : 'x不大于5';
+            outputDiv.innerHTML += `<p>三元运算符结果：${message}</p>`;
+            
+            // 函数调用表达式
+            function greet(name) {
+                return '你好，' + name + '！';
+            }
+            
+            outputDiv.innerHTML += `<p>函数调用：${greet('JavaScript')}</p>`;
+        }
+        
+        function checkAge() {
+            const ageInput = document.getElementById('age-input');
+            const outputDiv = document.getElementById('age-output');
+            const age = parseInt(ageInput.value);
+            
+            if (isNaN(age)) {
+                outputDiv.innerHTML = '<div class="error">请输入有效的年龄！</div>';
+                return;
+            }
+            
+            let message = '';
+            if (age < 0) {
+                message = '年龄不能为负数！';
+            } else if (age < 18) {
+                message = `你是未成年人，年龄为${age}岁。`;
+            } else if (age < 60) {
+                message = `你是成年人，年龄为${age}岁。`;
+            } else {
+                message = `你是老年人，年龄为${age}岁。`;
+            }
+            
+            outputDiv.innerHTML = `<div class="output">${message}</div>`;
+        }
+        
+        function demonstrateLoops() {
+            const outputDiv = document.getElementById('loops-output');
+            outputDiv.innerHTML = '<h4>循环示例：</h4>';
+            
+            // for循环
+            outputDiv.innerHTML += '<h5>for循环：</h5>';
+            let forLoopResult = '';
+            for (let i = 1; i <= 5; i++) {
+                forLoopResult += i + ' ';
+            }
+            outputDiv.innerHTML += `<p>1到5的数字：${forLoopResult}</p>`;
+            
+            // while循环
+            outputDiv.innerHTML += '<h5>while循环：</h5>';
+            let j = 5;
+            let whileLoopResult = '';
+            while (j > 0) {
+                whileLoopResult += j + ' ';
+                j--;
+            }
+            outputDiv.innerHTML += `<p>5到1的数字：${whileLoopResult}</p>`;
+            
+            // do-while循环
+            outputDiv.innerHTML += '<h5>do-while循环：</h5>';
+            let k = 1;
+            let doWhileLoopResult = '';
+            do {
+                doWhileLoopResult += k * 2 + ' ';
+                k++;
+            } while (k <= 5);
+            outputDiv.innerHTML += `<p>1到5的两倍：${doWhileLoopResult}</p>`;
+            
+            // for-in循环（遍历对象）
+            outputDiv.innerHTML += '<h5>for-in循环（遍历对象）：</h5>';
+            const person = {
+                name: '张三',
+                age: 30,
+                city: '北京'
+            };
+            
+            let personInfo = '';
+            for (let key in person) {
+                personInfo += `${key}: ${person[key]} `;
+            }
+            outputDiv.innerHTML += `<p>对象属性：${personInfo}</p>`;
+            
+            // for-of循环（遍历数组）
+            outputDiv.innerHTML += '<h5>for-of循环（遍历数组）：</h5>';
+            const colors = ['红色', '绿色', '蓝色'];
+            let colorList = '';
+            for (let color of colors) {
+                colorList += color + ' ';
+            }
+            outputDiv.innerHTML += `<p>颜色列表：${colorList}</p>`;
+        }
+        
+        function demonstrateConsoleMethods() {
+            // 基本输出
+            console.log('这是console.log输出');
+            
+            // 不同级别的输出
+            console.info('这是信息提示');
+            console.warn('这是警告信息');
+            console.error('这是错误信息');
+            
+            // 输出变量
+            let user = {
+                name: '李四',
+                age: 25,
+                email: 'lisi@example.com'
+            };
+            console.log('用户对象:', user);
+            
+            // 表格形式输出
+            console.table(user);
+            
+            // 分组输出
+            console.group('组1');
+            console.log('组1中的信息1');
+            console.log('组1中的信息2');
+            console.groupEnd();
+            
+            // 计时
+            console.time('计算时间');
+            let sum = 0;
+            for (let i = 0; i < 1000000; i++) {
+                sum += i;
+            }
+            console.timeEnd('计算时间');
+            
+            // 断言
+            console.assert(1 === 2, '1不等于2，这会显示在控制台中');
+        }
+        
+        function triggerDebugger() {
+            let numbers = [1, 2, 3, 4, 5];
+            let sum = 0;
+            
+            // 代码执行到这里会暂停（如果开发者工具打开）
+            debugger;
+            
+            for (let i = 0; i < numbers.length; i++) {
+                sum += numbers[i];
+            }
+            
+            alert('计算结果：' + sum);
+        }
+        
+        function demonstrateErrorHandling() {
+            const outputDiv = document.getElementById('error-output');
+            outputDiv.innerHTML = '';
+            
+            // 尝试解析有效的JSON
+            try {
+                const validJSON = '{"name": "王五", "age": 30}';
+                const data = JSON.parse(validJSON);
+                outputDiv.innerHTML += `<div class="output">成功解析JSON: ${data.name}, ${data.age}岁</div>`;
+            } catch (error) {
+                outputDiv.innerHTML += `<div class="error">解析JSON时出错: ${error.message}</div>`;
+            }
+            
+            // 尝试解析无效的JSON
+            try {
+                const invalidJSON = '{"name": "赵六", "age":}';
+                const data = JSON.parse(invalidJSON);
+                outputDiv.innerHTML += `<div class="output">成功解析JSON: ${data.name}, ${data.age}岁</div>`;
+            } catch (error) {
+                outputDiv.innerHTML += `<div class="error">解析JSON时出错: ${error.message}</div>`;
+            }
+            
+            // 使用finally块
+            try {
+                outputDiv.innerHTML += '<div class="output">尝试执行操作...</div>';
+                // 模拟一个可能失败的操作
+                let success = Math.random() > 0.5;
+                if (!success) {
+                    throw new Error('随机操作失败');
+                }
+                outputDiv.innerHTML += '<div class="output">操作成功完成！</div>';
+            } catch (error) {
+                outputDiv.innerHTML += `<div class="error">操作失败: ${error.message}</div>`;
+            } finally {
+                outputDiv.innerHTML += '<div class="warning">操作结束，无论成功或失败都会执行这个块</div>';
+            }
+        }
+        
+        function calculatePrice() {
+            const quantity = parseFloat(document.getElementById('quantity').value);
+            const price = parseFloat(document.getElementById('price').value);
+            const outputDiv = document.getElementById('price-output');
+            
+            if (isNaN(quantity) || isNaN(price)) {
+                outputDiv.innerHTML = '<div class="error">请输入有效的数量和价格！</div>';
+                return;
+            }
+            
+            // 计算折扣后的总价
+            let totalPrice = 0;
+            let discountPercent = 0;
+            
+            if (quantity > 10) {
+                discountPercent = 10; // 10%折扣
+                totalPrice = quantity * price * 0.9;
+            } else {
+                totalPrice = quantity * price;
+            }
+            
+            const message = `
+                <div class="output">
+                    <p>数量: ${quantity}</p>
+                    <p>单价: ¥${price.toFixed(2)}</p>
+                    <p>折扣: ${discountPercent}%</p>
+                    <p><strong>总价: ¥${totalPrice.toFixed(2)}</strong></p>
+                </div>
+            `;
+            
+            outputDiv.innerHTML = message;
+        }
+        
+        function createUser() {
+            const name = document.getElementById('user-name').value;
+            const age = document.getElementById('user-age').value;
+            const outputDiv = document.getElementById('user-output');
+            
+            if (!name || !age) {
+                outputDiv.innerHTML = '<div class="error">请填写完整的用户信息！</div>';
+                return;
+            }
+            
+            const userAge = parseInt(age);
+            if (isNaN(userAge) || userAge <= 0) {
+                outputDiv.innerHTML = '<div class="error">请输入有效的年龄！</div>';
+                return;
+            }
+            
+            // 创建用户对象
+            const user = {
+                name: name,
+                age: userAge,
+                createdAt: new Date().toISOString(),
+                id: Math.floor(Math.random() * 10000)
+            };
+            
+            // 在控制台输出对象
+            console.log('创建的用户对象:', user);
+            console.table(user);
+            
+            // 在页面显示用户信息
+            const message = `
+                <div class="output">
+                    <h4>用户创建成功！</h4>
+                    <p>ID: ${user.id}</p>
+                    <p>姓名: ${user.name}</p>
+                    <p>年龄: ${user.age}</p>
+                    <p>创建时间: ${new Date(user.createdAt).toLocaleString()}</p>
+                </div>
+            `;
+            
+            outputDiv.innerHTML = message;
+            
+            // 清空输入框
+            document.getElementById('user-name').value = '';
+            document.getElementById('user-age').value = '';
+        }
+    </script>
+</body>
+</html>

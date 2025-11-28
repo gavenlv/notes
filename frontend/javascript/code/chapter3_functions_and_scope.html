@@ -1,0 +1,973 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>第3章 函数与作用域 - 示例代码</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        h1, h2, h3, h4 {
+            color: #333;
+        }
+        code {
+            background-color: #f0f0f0;
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+        }
+        pre {
+            background-color: #f0f0f0;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        button.secondary {
+            background-color: #2196F3;
+        }
+        button.secondary:hover {
+            background-color: #0b7dda;
+        }
+        input, select, textarea {
+            padding: 10px;
+            margin: 5px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .output {
+            background-color: #e9f7ef;
+            border-left: 5px solid #4CAF50;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 0 4px 4px 0;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+        .error {
+            background-color: #ffebee;
+            border-left: 5px solid #f44336;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 0 4px 4px 0;
+        }
+        .warning {
+            background-color: #fff8e1;
+            border-left: 5px solid #ff9800;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 0 4px 4px 0;
+        }
+        .tab {
+            overflow: hidden;
+            border: 1px solid #ccc;
+            background-color: #f1f1f1;
+        }
+        .tab button {
+            background-color: inherit;
+            float: left;
+            border: none;
+            outline: none;
+            cursor: pointer;
+            padding: 14px 16px;
+            transition: 0.3s;
+            font-size: 17px;
+        }
+        .tab button:hover {
+            background-color: #ddd;
+        }
+        .tab button.active {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .tabcontent {
+            display: none;
+            padding: 6px 12px;
+            border: 1px solid #ccc;
+            border-top: none;
+        }
+        .flex-container {
+            display: flex;
+            flex-wrap: wrap;
+        }
+        .flex-item {
+            flex: 1 0 30%;
+            margin: 5px;
+        }
+        .result-box {
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            min-height: 50px;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>第3章：函数与作用域 - 示例代码</h1>
+        <p>这个HTML文件包含了第3章中的所有示例代码。您可以直接在浏览器中打开此文件来运行示例。</p>
+        <p>请打开浏览器控制台（按F12）查看详细的输出结果。</p>
+    </div>
+
+    <div class="container">
+        <h2>3.2 函数声明方式</h2>
+        
+        <div class="tab">
+            <button class="tablinks active" onclick="openTab(event, 'FunctionDeclaration')">函数声明</button>
+            <button class="tablinks" onclick="openTab(event, 'FunctionExpression')">函数表达式</button>
+            <button class="tablinks" onclick="openTab(event, 'ArrowFunction')">箭头函数</button>
+            <button class="tablinks" onclick="openTab(event, 'IIFE')">IIFE</button>
+            <button class="tablinks" onclick="openTab(event, 'ConstructorFunction')">构造函数</button>
+        </div>
+        
+        <div id="FunctionDeclaration" class="tabcontent" style="display:block">
+            <h3>函数声明（Function Declaration）</h3>
+            <button onclick="demonstrateFunctionDeclaration()">演示函数声明</button>
+            <div id="function-declaration-output" class="result-box"></div>
+        </div>
+        
+        <div id="FunctionExpression" class="tabcontent">
+            <h3>函数表达式（Function Expression）</h3>
+            <button onclick="demonstrateFunctionExpression()">演示函数表达式</button>
+            <div id="function-expression-output" class="result-box"></div>
+        </div>
+        
+        <div id="ArrowFunction" class="tabcontent">
+            <h3>箭头函数（Arrow Function）</h3>
+            <button onclick="demonstrateArrowFunction()">演示箭头函数</button>
+            <div id="arrow-function-output" class="result-box"></div>
+        </div>
+        
+        <div id="IIFE" class="tabcontent">
+            <h3>立即执行函数表达式（IIFE）</h3>
+            <button onclick="demonstrateIIFE()">演示IIFE</button>
+            <div id="iife-output" class="result-box"></div>
+        </div>
+        
+        <div id="ConstructorFunction" class="tabcontent">
+            <h3>构造函数（Constructor Function）</h3>
+            <button onclick="demonstrateConstructorFunction()">演示构造函数</button>
+            <div id="constructor-function-output" class="result-box"></div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>3.3 函数参数</h2>
+        
+        <div class="tab">
+            <button class="tablinks active" onclick="openTab(event, 'ParametersAndArguments')">参数与实参</button>
+            <button class="tablinks" onclick="openTab(event, 'DefaultParameters')">默认参数</button>
+            <button class="tablinks" onclick="openTab(event, 'RestParameters')">剩余参数</button>
+            <button class="tablinks" onclick="openTab(event, 'ParameterDestructuring')">参数解构</button>
+        </div>
+        
+        <div id="ParametersAndArguments" class="tabcontent" style="display:block">
+            <h3>参数与实参</h3>
+            <button onclick="demonstrateParametersAndArguments()">演示参数与实参</button>
+            <div id="parameters-arguments-output" class="result-box"></div>
+        </div>
+        
+        <div id="DefaultParameters" class="tabcontent">
+            <h3>默认参数</h3>
+            <div class="flex-container">
+                <div class="flex-item">
+                    <label for="default-name">姓名:</label>
+                    <input type="text" id="default-name" value="">
+                </div>
+                <div class="flex-item">
+                    <label for="default-age">年龄:</label>
+                    <input type="number" id="default-age" value="">
+                </div>
+            </div>
+            <button onclick="demonstrateDefaultParameters()">演示默认参数</button>
+            <div id="default-parameters-output" class="result-box"></div>
+        </div>
+        
+        <div id="RestParameters" class="tabcontent">
+            <h3>剩余参数</h3>
+            <button onclick="demonstrateRestParameters()">演示剩余参数</button>
+            <div id="rest-parameters-output" class="result-box"></div>
+        </div>
+        
+        <div id="ParameterDestructuring" class="tabcontent">
+            <h3>参数解构</h3>
+            <button onclick="demonstrateParameterDestructuring()">演示参数解构</button>
+            <div id="parameter-destructuring-output" class="result-box"></div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>3.4 返回值</h2>
+        
+        <div class="tab">
+            <button class="tablinks active" onclick="openTab(event, 'ReturnStatement')">return语句</button>
+            <button class="tablinks" onclick="openTab(event, 'MultipleReturnValues')">返回多个值</button>
+            <button class="tablinks" onclick="openTab(event, 'RecursiveFunction')">递归函数</button>
+        </div>
+        
+        <div id="ReturnStatement" class="tabcontent" style="display:block">
+            <h3>return语句</h3>
+            <button onclick="demonstrateReturnStatement()">演示return语句</button>
+            <div id="return-statement-output" class="result-box"></div>
+        </div>
+        
+        <div id="MultipleReturnValues" class="tabcontent">
+            <h3>返回多个值</h3>
+            <button onclick="demonstrateMultipleReturnValues()">演示返回多个值</button>
+            <div id="multiple-return-values-output" class="result-box"></div>
+        </div>
+        
+        <div id="RecursiveFunction" class="tabcontent">
+            <h3>递归函数</h3>
+            <div class="flex-container">
+                <div class="flex-item">
+                    <label for="recursive-number">数字:</label>
+                    <input type="number" id="recursive-number" value="5">
+                </div>
+            </div>
+            <button onclick="demonstrateRecursiveFunction()">演示递归函数</button>
+            <div id="recursive-function-output" class="result-box"></div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>3.5 函数作用域</h2>
+        
+        <div class="tab">
+            <button class="tablinks active" onclick="openTab(event, 'GlobalScope')">全局作用域</button>
+            <button class="tablinks" onclick="openTab(event, 'FunctionScope')">函数作用域</button>
+            <button class="tablinks" onclick="openTab(event, 'BlockScope')">块级作用域</button>
+            <button class="tablinks" onclick="openTab(event, 'LexicalScope')">词法作用域</button>
+            <button class="tablinks" onclick="openTab(event, 'ScopeChain')">作用域链</button>
+        </div>
+        
+        <div id="GlobalScope" class="tabcontent" style="display:block">
+            <h3>全局作用域</h3>
+            <button onclick="demonstrateGlobalScope()">演示全局作用域</button>
+            <div id="global-scope-output" class="result-box"></div>
+        </div>
+        
+        <div id="FunctionScope" class="tabcontent">
+            <h3>函数作用域</h3>
+            <button onclick="demonstrateFunctionScope()">演示函数作用域</button>
+            <div id="function-scope-output" class="result-box"></div>
+        </div>
+        
+        <div id="BlockScope" class="tabcontent">
+            <h3>块级作用域</h3>
+            <button onclick="demonstrateBlockScope()">演示块级作用域</button>
+            <div id="block-scope-output" class="result-box"></div>
+        </div>
+        
+        <div id="LexicalScope" class="tabcontent">
+            <h3>词法作用域</h3>
+            <button onclick="demonstrateLexicalScope()">演示词法作用域</button>
+            <div id="lexical-scope-output" class="result-box"></div>
+        </div>
+        
+        <div id="ScopeChain" class="tabcontent">
+            <h3>作用域链</h3>
+            <button onclick="demonstrateScopeChain()">演示作用域链</button>
+            <div id="scope-chain-output" class="result-box"></div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>3.6 闭包</h2>
+        
+        <div class="tab">
+            <button class="tablinks active" onclick="openTab(event, 'ClosureBasics')">闭包基础</button>
+            <button class="tablinks" onclick="openTab(event, 'ClosureApplications')">闭包应用</button>
+            <button class="tablinks" onclick="openTab(event, 'ClosurePitfalls')">闭包注意事项</button>
+        </div>
+        
+        <div id="ClosureBasics" class="tabcontent" style="display:block">
+            <h3>闭包基础</h3>
+            <button onclick="demonstrateClosureBasics()">演示闭包基础</button>
+            <div id="closure-basics-output" class="result-box"></div>
+        </div>
+        
+        <div id="ClosureApplications" class="tabcontent">
+            <h3>闭包应用</h3>
+            <div class="tab">
+                <button class="tablinks active" onclick="openNestedTab(event, 'PrivateVariables', 'ClosureApplications')">私有变量</button>
+                <button class="tablinks" onclick="openNestedTab(event, 'FunctionFactory', 'ClosureApplications')">函数工厂</button>
+                <button class="tablinks" onclick="openNestedTab(event, 'EventHandling', 'ClosureApplications')">事件处理</button>
+                <button class="tablinks" onclick="openNestedTab(event, 'Memoization', 'ClosureApplications')">缓存和记忆化</button>
+            </div>
+            
+            <div id="PrivateVariables" class="nested-tabcontent" style="display:block">
+                <h4>私有变量</h4>
+                <div class="flex-container">
+                    <div class="flex-item">
+                        <label for="bank-initial">初始金额:</label>
+                        <input type="number" id="bank-initial" value="1000">
+                    </div>
+                    <div class="flex-item">
+                        <label for="bank-deposit">存款金额:</label>
+                        <input type="number" id="bank-deposit" value="500">
+                    </div>
+                    <div class="flex-item">
+                        <label for="bank-withdraw">取款金额:</label>
+                        <input type="number" id="bank-withdraw" value="200">
+                    </div>
+                </div>
+                <button onclick="createBankAccount()">创建银行账户</button>
+                <button onclick="depositMoney()">存款</button>
+                <button onclick="withdrawMoney()">取款</button>
+                <button onclick="checkBalance()">查询余额</button>
+                <div id="private-variables-output" class="result-box"></div>
+            </div>
+            
+            <div id="FunctionFactory" class="nested-tabcontent">
+                <h4>函数工厂</h4>
+                <div class="flex-container">
+                    <div class="flex-item">
+                        <label for="multiplier">乘数:</label>
+                        <input type="number" id="multiplier" value="3">
+                    </div>
+                </div>
+                <button onclick="createMultiplier()">创建乘法器</button>
+                <button onclick="testMultiplier()">测试乘法器</button>
+                <div id="function-factory-output" class="result-box"></div>
+            </div>
+            
+            <div id="EventHandling" class="tabcontent">
+                <h4>事件处理</h4>
+                <button onclick="createButtonCounter()">创建按钮计数器</button>
+                <div id="button-container"></div>
+                <div id="event-handling-output" class="result-box"></div>
+            </div>
+            
+            <div id="Memoization" class="nested-tabcontent">
+                <h4>缓存和记忆化</h4>
+                <div class="flex-container">
+                    <div class="flex-item">
+                        <label for="memo-number">数字:</label>
+                        <input type="number" id="memo-number" value="10">
+                    </div>
+                </div>
+                <button onclick="testMemoization()">测试记忆化</button>
+                <div id="memoization-output" class="result-box"></div>
+            </div>
+        </div>
+        
+        <div id="ClosurePitfalls" class="tabcontent">
+            <h3>闭包注意事项</h3>
+            <button onclick="demonstrateClosurePitfalls()">演示闭包注意事项</button>
+            <div id="closure-pitfalls-output" class="result-box"></div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>3.7 函数方法与属性</h2>
+        
+        <div class="tab">
+            <button class="tablinks active" onclick="openTab(event, 'FunctionProperties')">函数属性</button>
+            <button class="tablinks" onclick="openTab(event, 'CallApplyBind')">call、apply和bind</button>
+            <button class="tablinks" onclick="openTab(event, 'FunctionsAsParameters')">函数作为参数</button>
+            <button class="tablinks" onclick="openTab(event, 'FunctionsAsReturnValues')">函数作为返回值</button>
+        </div>
+        
+        <div id="FunctionProperties" class="tabcontent" style="display:block">
+            <h3>函数属性</h3>
+            <button onclick="demonstrateFunctionProperties()">演示函数属性</button>
+            <div id="function-properties-output" class="result-box"></div>
+        </div>
+        
+        <div id="CallApplyBind" class="tabcontent">
+            <h3>call、apply和bind</h3>
+            <button onclick="demonstrateCallApplyBind()">演示call、apply和bind</button>
+            <div id="call-apply-bind-output" class="result-box"></div>
+        </div>
+        
+        <div id="FunctionsAsParameters" class="tabcontent">
+            <h3>函数作为参数</h3>
+            <div class="flex-container">
+                <div class="flex-item">
+                    <label for="callback-numbers">数字列表 (逗号分隔):</label>
+                    <input type="text" id="callback-numbers" value="1,2,3,4,5">
+                </div>
+            </div>
+            <button onclick="demonstrateFunctionsAsParameters()">演示函数作为参数</button>
+            <div id="functions-as-parameters-output" class="result-box"></div>
+        </div>
+        
+        <div id="FunctionsAsReturnValues" class="tabcontent">
+            <h3>函数作为返回值</h3>
+            <button onclick="demonstrateFunctionsAsReturnValues()">演示函数作为返回值</button>
+            <div id="functions-as-return-values-output" class="result-box"></div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>3.8 函数式编程概念</h2>
+        
+        <div class="tab">
+            <button class="tablinks active" onclick="openTab(event, 'PureFunctions')">纯函数</button>
+            <button class="tablinks" onclick="openTab(event, 'HigherOrderFunctions')">高阶函数</button>
+            <button class="tablinks" onclick="openTab(event, 'FunctionComposition')">函数组合</button>
+            <button class="tablinks" onclick="openTab(event, 'Currying')">柯里化</button>
+        </div>
+        
+        <div id="PureFunctions" class="tabcontent" style="display:block">
+            <h3>纯函数</h3>
+            <button onclick="demonstratePureFunctions()">演示纯函数</button>
+            <div id="pure-functions-output" class="result-box"></div>
+        </div>
+        
+        <div id="HigherOrderFunctions" class="tabcontent">
+            <h3>高阶函数</h3>
+            <button onclick="demonstrateHigherOrderFunctions()">演示高阶函数</button>
+            <div id="higher-order-functions-output" class="result-box"></div>
+        </div>
+        
+        <div id="FunctionComposition" class="tabcontent">
+            <h3>函数组合</h3>
+            <button onclick="demonstrateFunctionComposition()">演示函数组合</button>
+            <div id="function-composition-output" class="result-box"></div>
+        </div>
+        
+        <div id="Currying" class="tabcontent">
+            <h3>柯里化</h3>
+            <button onclick="demonstrateCurrying()">演示柯里化</button>
+            <div id="currying-output" class="result-box"></div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>3.9 综合练习</h2>
+        
+        <div class="tab">
+            <button class="tablinks active" onclick="openTab(event, 'Calculator')">计算器对象</button>
+            <button class="tablinks" onclick="openTab(event, 'ArrayProcessor')">数组处理函数</button>
+            <button class="tablinks" onclick="openTab(event, 'MemoizationImplementation')">记忆化函数实现</button>
+            <button class="tablinks" onclick="openTab(event, 'ValidatorFactory')">验证器工厂</button>
+            <button class="tablinks" onclick="openTab(event, 'DebounceFunction')">防抖函数</button>
+        </div>
+        
+        <div id="Calculator" class="tabcontent" style="display:block">
+            <h3>计算器对象</h3>
+            <div class="flex-container">
+                <div class="flex-item">
+                    <label for="calc-value">初始值:</label>
+                    <input type="number" id="calc-value" value="0">
+                </div>
+                <div class="flex-item">
+                    <label for="calc-number">操作数:</label>
+                    <input type="number" id="calc-number" value="5">
+                </div>
+                <div class="flex-item">
+                    <label for="calc-op">运算符:</label>
+                    <select id="calc-op">
+                        <option value="+">加</option>
+                        <option value="-">减</option>
+                        <option value="*">乘</option>
+                        <option value="/">除</option>
+                    </select>
+                </div>
+            </div>
+            <button onclick="createCalculator()">创建计算器</button>
+            <button onclick="calcAdd()">加法</button>
+            <button onclick="calcSubtract()">减法</button>
+            <button onclick="calcMultiply()">乘法</button>
+            <button onclick="calcDivide()">除法</button>
+            <button onclick="calcGetResult()">获取结果</button>
+            <div id="calculator-output" class="result-box"></div>
+        </div>
+        
+        <div id="ArrayProcessor" class="tabcontent">
+            <h3>数组处理函数</h3>
+            <div class="flex-container">
+                <div class="flex-item">
+                    <label for="array-input">数组 (逗号分隔):</label>
+                    <input type="text" id="array-input" value="1,2,3,4,5">
+                </div>
+            </div>
+            <button onclick="processArray()">处理数组</button>
+            <div id="array-processor-output" class="result-box"></div>
+        </div>
+        
+        <div id="MemoizationImplementation" class="tabcontent">
+            <h3>记忆化函数实现</h3>
+            <div class="flex-container">
+                <div class="flex-item">
+                    <label for="fib-number">斐波那契数:</label>
+                    <input type="number" id="fib-number" value="10">
+                </div>
+            </div>
+            <button onclick="testMemoizationImplementation()">测试记忆化</button>
+            <div id="memoization-implementation-output" class="result-box"></div>
+        </div>
+        
+        <div id="ValidatorFactory" class="tabcontent">
+            <h3>验证器工厂</h3>
+            <div class="flex-container">
+                <div class="flex-item">
+                    <label for="validator-type">验证器类型:</label>
+                    <select id="validator-type">
+                        <option value="email">邮箱</option>
+                        <option value="phone">电话</option>
+                        <option value="number">数字</option>
+                        <option value="length">长度</option>
+                    </select>
+                </div>
+                <div class="flex-item">
+                    <label for="validator-value">验证值:</label>
+                    <input type="text" id="validator-value" value="test@example.com">
+                </div>
+            </div>
+            <button onclick="testValidator()">测试验证器</button>
+            <div id="validator-factory-output" class="result-box"></div>
+        </div>
+        
+        <div id="DebounceFunction" class="tabcontent">
+            <h3>防抖函数</h3>
+            <div class="flex-container">
+                <div class="flex-item">
+                    <label for="debounce-delay">延迟时间(ms):</label>
+                    <input type="number" id="debounce-delay" value="1000">
+                </div>
+            </div>
+            <button onclick="testDebounce()">测试防抖</button>
+            <button onclick="triggerDebounce()">触发防抖函数</button>
+            <div id="debounce-function-output" class="result-box"></div>
+        </div>
+    </div>
+
+    <!-- 引入外部JavaScript文件 -->
+    <script src="chapter3_functions_and_scope.js"></script>
+    
+    <script>
+        // Tab切换功能
+        function openTab(evt, tabName) {
+            const tabcontent = document.getElementsByClassName("tabcontent");
+            for (let i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].style.display = "none";
+            }
+            
+            const tablinks = document.getElementsByClassName("tablinks");
+            for (let i = 0; i < tablinks.length; i++) {
+                tablinks[i].className = tablinks[i].className.replace(" active", "");
+            }
+            
+            document.getElementById(tabName).style.display = "block";
+            evt.currentTarget.className += " active";
+        }
+        
+        // 嵌套Tab切换功能
+        function openNestedTab(evt, tabName, parentTab) {
+            // 获取父级标签页中的所有子标签内容
+            const nestedContent = document.querySelectorAll(`#${parentTab} .nested-tabcontent`);
+            for (let i = 0; i < nestedContent.length; i++) {
+                nestedContent[i].style.display = "none";
+            }
+            
+            // 获取父级标签页中的所有子标签按钮
+            const nestedTabs = document.querySelectorAll(`#${parentTab} .tablinks`);
+            for (let i = 0; i < nestedTabs.length; i++) {
+                nestedTabs[i].className = nestedTabs[i].className.replace(" active", "");
+            }
+            
+            document.getElementById(tabName).style.display = "block";
+            evt.currentTarget.className += " active";
+        }
+        
+        // 更新结果输出区域
+        function updateOutput(elementId, content) {
+            const element = document.getElementById(elementId);
+            if (element) {
+                element.textContent = content;
+            }
+        }
+        
+        // 3.2 函数声明方式
+        function demonstrateFunctionDeclaration() {
+            const result = chapter3Examples.demonstrateFunctionDeclaration();
+            updateOutput('function-declaration-output', result);
+        }
+        
+        function demonstrateFunctionExpression() {
+            const result = chapter3Examples.demonstrateFunctionExpression();
+            updateOutput('function-expression-output', result);
+        }
+        
+        function demonstrateArrowFunction() {
+            const result = chapter3Examples.demonstrateArrowFunction();
+            updateOutput('arrow-function-output', result);
+        }
+        
+        function demonstrateIIFE() {
+            const result = chapter3Examples.demonstrateIIFE();
+            updateOutput('iife-output', result);
+        }
+        
+        function demonstrateConstructorFunction() {
+            const result = chapter3Examples.demonstrateConstructorFunction();
+            updateOutput('constructor-function-output', result);
+        }
+        
+        // 3.3 函数参数
+        function demonstrateParametersAndArguments() {
+            const result = chapter3Examples.demonstrateParametersAndArguments();
+            updateOutput('parameters-arguments-output', result);
+        }
+        
+        function demonstrateDefaultParameters() {
+            const name = document.getElementById('default-name').value;
+            const age = document.getElementById('default-age').value;
+            const result = chapter3Examples.demonstrateDefaultParameters(name, age);
+            updateOutput('default-parameters-output', result);
+        }
+        
+        function demonstrateRestParameters() {
+            const result = chapter3Examples.demonstrateRestParameters();
+            updateOutput('rest-parameters-output', result);
+        }
+        
+        function demonstrateParameterDestructuring() {
+            const result = chapter3Examples.demonstrateParameterDestructuring();
+            updateOutput('parameter-destructuring-output', result);
+        }
+        
+        // 3.4 返回值
+        function demonstrateReturnStatement() {
+            const result = chapter3Examples.demonstrateReturnStatement();
+            updateOutput('return-statement-output', result);
+        }
+        
+        function demonstrateMultipleReturnValues() {
+            const result = chapter3Examples.demonstrateMultipleReturnValues();
+            updateOutput('multiple-return-values-output', result);
+        }
+        
+        function demonstrateRecursiveFunction() {
+            const number = parseInt(document.getElementById('recursive-number').value);
+            const result = chapter3Examples.demonstrateRecursiveFunction(number);
+            updateOutput('recursive-function-output', result);
+        }
+        
+        // 3.5 函数作用域
+        function demonstrateGlobalScope() {
+            const result = chapter3Examples.demonstrateGlobalScope();
+            updateOutput('global-scope-output', result);
+        }
+        
+        function demonstrateFunctionScope() {
+            const result = chapter3Examples.demonstrateFunctionScope();
+            updateOutput('function-scope-output', result);
+        }
+        
+        function demonstrateBlockScope() {
+            const result = chapter3Examples.demonstrateBlockScope();
+            updateOutput('block-scope-output', result);
+        }
+        
+        function demonstrateLexicalScope() {
+            const result = chapter3Examples.demonstrateLexicalScope();
+            updateOutput('lexical-scope-output', result);
+        }
+        
+        function demonstrateScopeChain() {
+            const result = chapter3Examples.demonstrateScopeChain();
+            updateOutput('scope-chain-output', result);
+        }
+        
+        // 3.6 闭包
+        function demonstrateClosureBasics() {
+            const result = chapter3Examples.demonstrateClosureBasics();
+            updateOutput('closure-basics-output', result);
+        }
+        
+        function demonstrateClosureApplications() {
+            const result = chapter3Examples.demonstrateClosureApplications();
+            updateOutput('closure-applications-output', result);
+        }
+        
+        function demonstrateClosurePitfalls() {
+            const result = chapter3Examples.demonstrateClosurePitfalls();
+            updateOutput('closure-pitfalls-output', result);
+        }
+        
+        // 闭包应用 - 私有变量
+        let bankAccount = null;
+        
+        function createBankAccount() {
+            const initialAmount = parseFloat(document.getElementById('bank-initial').value);
+            bankAccount = chapter3Examples.createBankAccount(initialAmount);
+            updateOutput('private-variables-output', `银行账户创建成功，初始金额: ¥${initialAmount}`);
+        }
+        
+        function depositMoney() {
+            if (!bankAccount) {
+                updateOutput('private-variables-output', '请先创建银行账户');
+                return;
+            }
+            
+            const amount = parseFloat(document.getElementById('bank-deposit').value);
+            const result = bankAccount.deposit(amount);
+            updateOutput('private-variables-output', `存款 ¥${amount} 成功，当前余额: ¥${result}`);
+        }
+        
+        function withdrawMoney() {
+            if (!bankAccount) {
+                updateOutput('private-variables-output', '请先创建银行账户');
+                return;
+            }
+            
+            const amount = parseFloat(document.getElementById('bank-withdraw').value);
+            const result = bankAccount.withdraw(amount);
+            updateOutput('private-variables-output', `取款结果: ${result}`);
+        }
+        
+        function checkBalance() {
+            if (!bankAccount) {
+                updateOutput('private-variables-output', '请先创建银行账户');
+                return;
+            }
+            
+            const balance = bankAccount.getBalance();
+            updateOutput('private-variables-output', `当前余额: ¥${balance}`);
+        }
+        
+        // 闭包应用 - 函数工厂
+        let multiplier = null;
+        
+        function createMultiplier() {
+            const factor = parseFloat(document.getElementById('multiplier').value);
+            multiplier = chapter3Examples.createMultiplier(factor);
+            updateOutput('function-factory-output', `创建了乘数因子为 ${factor} 的乘法器`);
+        }
+        
+        function testMultiplier() {
+            if (!multiplier) {
+                updateOutput('function-factory-output', '请先创建乘法器');
+                return;
+            }
+            
+            updateOutput('function-factory-output', `5 × ${document.getElementById('multiplier').value} = ${multiplier(5)}`);
+        }
+        
+        // 闭包应用 - 事件处理
+        function createButtonCounter() {
+            const container = document.getElementById('button-container');
+            container.innerHTML = '';
+            
+            const buttons = [];
+            for (let i = 0; i < 3; i++) {
+                const button = document.createElement('button');
+                button.textContent = `按钮 ${i + 1}`;
+                
+                // 使用闭包创建计数器
+                const counter = chapter3Examples.createClickCounter();
+                
+                button.addEventListener('click', function() {
+                    const count = counter();
+                    updateOutput('event-handling-output', `按钮 ${i + 1} 被点击了 ${count} 次`);
+                });
+                
+                container.appendChild(button);
+                buttons.push(button);
+            }
+            
+            updateOutput('event-handling-output', '创建了3个按钮，每个按钮都有独立的点击计数器');
+        }
+        
+        // 闭包应用 - 记忆化
+        let memoizedFibonacci = null;
+        
+        function testMemoization() {
+            const number = parseInt(document.getElementById('memo-number').value);
+            
+            if (!memoizedFibonacci) {
+                memoizedFibonacci = chapter3Examples.memoize(chapter3Examples.fibonacci);
+            }
+            
+            const result = memoizedFibonacci(number);
+            updateOutput('memoization-output', `斐波那契数列第 ${number} 项是: ${result}`);
+        }
+        
+        // 3.7 函数方法与属性
+        function demonstrateFunctionProperties() {
+            const result = chapter3Examples.demonstrateFunctionProperties();
+            updateOutput('function-properties-output', result);
+        }
+        
+        function demonstrateCallApplyBind() {
+            const result = chapter3Examples.demonstrateCallApplyBind();
+            updateOutput('call-apply-bind-output', result);
+        }
+        
+        function demonstrateFunctionsAsParameters() {
+            const numbersText = document.getElementById('callback-numbers').value;
+            const numbers = numbersText.split(',').map(n => parseInt(n.trim()));
+            const result = chapter3Examples.demonstrateFunctionsAsParameters(numbers);
+            updateOutput('functions-as-parameters-output', result);
+        }
+        
+        function demonstrateFunctionsAsReturnValues() {
+            const result = chapter3Examples.demonstrateFunctionsAsReturnValues();
+            updateOutput('functions-as-return-values-output', result);
+        }
+        
+        // 3.8 函数式编程概念
+        function demonstratePureFunctions() {
+            const result = chapter3Examples.demonstratePureFunctions();
+            updateOutput('pure-functions-output', result);
+        }
+        
+        function demonstrateHigherOrderFunctions() {
+            const result = chapter3Examples.demonstrateHigherOrderFunctions();
+            updateOutput('higher-order-functions-output', result);
+        }
+        
+        function demonstrateFunctionComposition() {
+            const result = chapter3Examples.demonstrateFunctionComposition();
+            updateOutput('function-composition-output', result);
+        }
+        
+        function demonstrateCurrying() {
+            const result = chapter3Examples.demonstrateCurrying();
+            updateOutput('currying-output', result);
+        }
+        
+        // 3.9 综合练习
+        let calculator = null;
+        
+        function createCalculator() {
+            const initialValue = parseFloat(document.getElementById('calc-value').value);
+            calculator = chapter3Exercises.createCalculator(initialValue);
+            updateOutput('calculator-output', `计算器已创建，初始值: ${initialValue}`);
+        }
+        
+        function calcAdd() {
+            if (!calculator) {
+                updateOutput('calculator-output', '请先创建计算器');
+                return;
+            }
+            
+            const number = parseFloat(document.getElementById('calc-number').value);
+            const result = calculator.add(number);
+            updateOutput('calculator-output', `加法结果: ${result}`);
+        }
+        
+        function calcSubtract() {
+            if (!calculator) {
+                updateOutput('calculator-output', '请先创建计算器');
+                return;
+            }
+            
+            const number = parseFloat(document.getElementById('calc-number').value);
+            const result = calculator.subtract(number);
+            updateOutput('calculator-output', `减法结果: ${result}`);
+        }
+        
+        function calcMultiply() {
+            if (!calculator) {
+                updateOutput('calculator-output', '请先创建计算器');
+                return;
+            }
+            
+            const number = parseFloat(document.getElementById('calc-number').value);
+            const result = calculator.multiply(number);
+            updateOutput('calculator-output', `乘法结果: ${result}`);
+        }
+        
+        function calcDivide() {
+            if (!calculator) {
+                updateOutput('calculator-output', '请先创建计算器');
+                return;
+            }
+            
+            const number = parseFloat(document.getElementById('calc-number').value);
+            const result = calculator.divide(number);
+            updateOutput('calculator-output', `除法结果: ${result}`);
+        }
+        
+        function calcGetResult() {
+            if (!calculator) {
+                updateOutput('calculator-output', '请先创建计算器');
+                return;
+            }
+            
+            const result = calculator.getResult();
+            updateOutput('calculator-output', `当前结果: ${result}`);
+        }
+        
+        function processArray() {
+            const arrayText = document.getElementById('array-input').value;
+            const array = arrayText.split(',').map(n => parseInt(n.trim()));
+            const result = chapter3Exercises.processArray(array);
+            updateOutput('array-processor-output', result);
+        }
+        
+        function testMemoizationImplementation() {
+            const number = parseInt(document.getElementById('fib-number').value);
+            const result = chapter3Exercises.testMemoization(number);
+            updateOutput('memoization-implementation-output', result);
+        }
+        
+        function testValidator() {
+            const type = document.getElementById('validator-type').value;
+            const value = document.getElementById('validator-value').value;
+            const result = chapter3Exercises.testValidator(type, value);
+            updateOutput('validator-factory-output', result);
+        }
+        
+        let debouncedFunction = null;
+        let debounceCount = 0;
+        
+        function testDebounce() {
+            const delay = parseInt(document.getElementById('debounce-delay').value);
+            debouncedFunction = chapter3Exercises.debounce(() => {
+                debounceCount++;
+                updateOutput('debounce-function-output', `防抖函数已执行 ${debounceCount} 次`);
+            }, delay);
+            
+            updateOutput('debounce-function-output', `防抖函数已创建，延迟 ${delay}ms`);
+        }
+        
+        function triggerDebounce() {
+            if (!debouncedFunction) {
+                updateOutput('debounce-function-output', '请先创建防抖函数');
+                return;
+            }
+            
+            debouncedFunction();
+            updateOutput('debounce-function-output', '触发了防抖函数，等待执行...');
+        }
+    </script>
+</body>
+</html>

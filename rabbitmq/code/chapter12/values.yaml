@@ -1,0 +1,445 @@
+# Default values for rabbitmq-cluster
+# This is a YAML-formatted file.
+
+# 全局配置
+global:
+  imageRegistry: ""
+  imagePullSecrets: []
+  storageClass: ""
+
+# 镜像配置
+image:
+  registry: docker.io
+  repository: rabbitmq
+  tag: "3.10-management-alpine"
+  pullPolicy: IfNotPresent
+
+# 集群配置
+cluster:
+  enabled: true
+  replicaCount: 3
+  name: rabbitmq-cluster
+  namespace: default
+  
+  # 集群节点配置
+  node:
+    # Erlang cookie用于集群节点间通信
+    erlangCookie: "CLUSTER_SENDFAMIQ_SECRET_COOKIE_VALUE"
+    
+    # 节点名称格式
+    naming: "rabbitmq-{i}"
+    
+    # 节点间通信端口
+    clusteringPort: 25672
+
+# 服务配置
+service:
+  # 消息队列端口
+  amqp:
+    type: ClusterIP
+    port: 5672
+    targetPort: 5672
+    
+  # 管理界面端口
+  management:
+    type: ClusterIP
+    port: 15672
+    targetPort: 15672
+    
+  # 集群通信端口
+  clustering:
+    type: ClusterIP
+    port: 25672
+    targetPort: 25672
+    
+  # 负载均衡器配置（可选）
+  loadBalancer:
+    enabled: false
+    annotations: {}
+    ports:
+      amqp: 5672
+      management: 15672
+
+# 持久化存储配置
+persistence:
+  enabled: true
+  storageClass: "rabbitmq-storage"
+  accessModes:
+    - ReadWriteOnce
+  size: 20Gi
+  
+  # PV回收策略
+  reclaimPolicy: Retain
+  
+  # Volume Mode
+  volumeMode: Filesystem
+  
+  # 存储路径
+  mountPath: /var/lib/rabbitmq
+
+# 资源限制和请求
+resources:
+  # Pod资源限制
+  limits:
+    cpu: 1000m
+    memory: 2Gi
+  # Pod资源请求
+  requests:
+    cpu: 500m
+    memory: 1Gi
+
+# 健康检查配置
+healthChecks:
+  # 就绪探针
+  readinessProbe:
+    enabled: true
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 6
+    command:
+      - rabbitmq-diagnostics
+      - check_port_connectivity
+      - -t
+      - "rabbitmq-cluster-0.rabbitmq-cluster-headless.default.svc.cluster.local:5672"
+  
+  # 存活探针
+  livenessProbe:
+    enabled: true
+    initialDelaySeconds: 60
+    periodSeconds: 30
+    timeoutSeconds: 5
+    failureThreshold: 3
+    command:
+      - rabbitmq-diagnostics
+      - ping
+
+# 高级配置
+advanced:
+  # 内存使用配置
+  memory:
+    # 内存使用阈值（相对值）
+    scaleFactor: 1.20
+    # 磁盘可用空间限制
+    diskFreeLimit:
+      absolute: 6GB
+      relative: 0.5
+    
+  # 网络配置
+  network:
+    # 最大连接数
+    maxConnections: 1000
+    # 连接池配置
+    connectionBackoff: true
+    
+  # 队列配置
+  queues:
+    # 默认队列持久化
+    durable: true
+    # 默认自动删除
+    autoDelete: false
+    # 默认排他性
+    exclusive: false
+    
+  # 消息处理配置
+  message:
+    # 最大消息大小
+    maxSize: 134217728  # 128MB
+    # 消息TTL
+    timeToLive: 86400000  # 24小时
+    # 队列长度限制
+    maxLength: 10000
+
+# 安全配置
+security:
+  # 用户凭据
+  credentials:
+    username: admin
+    password: admin123
+    
+  # SSL/TLS配置
+  ssl:
+    enabled: false
+    # certSecret: rabbitmq-tls
+    # keySecret: rabbitmq-tls-key
+    # cacertsSecret: rabbitmq-ca
+    
+  # 访问控制
+  access:
+    # 允许guest用户从任何地方登录
+    allowGuestUser: false
+    
+  # 网络策略
+  networkPolicy:
+    enabled: false
+    ingressRules: []
+    egressRules: []
+
+# 网络策略详细配置
+networkPolicy:
+  enabled: true
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: default
+        - podSelector:
+            matchLabels:
+              app: web
+              tier: frontend
+      ports:
+        - protocol: TCP
+          port: 5672
+        - protocol: TCP
+          port: 15672
+  egress:
+    - {}  # 允许所有出站流量
+
+# 配置管理
+config:
+  # RabbitMQ配置文件
+  rabbitmq:
+    # 服务器配置
+    server:
+      # 默认用户配置
+      defaultUser: admin
+      defaultPass: admin123
+      defaultPermissions:
+        configure: ".*"
+        read: ".*"
+        write: ".*"
+        
+      # 监听配置
+      listeners:
+        tcp: 5672
+        ssl: 5671
+        
+      # 集群配置
+      clustering:
+        enabled: true
+        discovery: classic_config
+        
+      # 监控配置
+      monitoring:
+        prometheus:
+          enabled: false
+          port: 15692
+        stats:
+          enabled: true
+  
+  # 环境变量
+  env:
+    - name: RABBITMQ_DEFAULT_USER
+      value: admin
+    - name: RABBITMQ_DEFAULT_PASS
+      value: admin123
+    - name: RABBITMQ_ERLANG_COOKIE
+      value: "CLUSTER_SENDFAMIQ_SECRET_COOKIE_VALUE"
+    - name: RABBITMQ_USE_LONGNAME
+      value: "true"
+    - name: RABBITMQ_NODENAME
+      value: "rabbitmq@$(MY_POD_NAME).$(SERVICE_NAME).$(NAMESPACE).svc.cluster.local"
+
+# 插件配置
+plugins:
+  enabled:
+    - rabbitmq_management
+    - rabbitmq_monitoring
+    - rabbitmq_peer_discovery_k8s
+    - rabbitmq_consistent_hash_exchange
+    - rabbitmq_delayed_message_exchange
+    - rabbitmq_federation
+    - rabbitmq_federation_management
+    - rabbitmq_shovel
+    - rabbitmq_shovel_management
+    - rabbitmq_tracing
+    - rabbitmq_event_exchange
+  
+  # 插件配置文件
+  configMap: |
+    [rabbitmq_management,rabbitmq_monitoring].
+    [rabbitmq_peer_discovery_k8s].
+    [rabbitmq_consistent_hash_exchange].
+    [rabbitmq_delayed_message_exchange].
+    [rabbitmq_federation,rabbitmq_federation_management].
+    [rabbitmq_shovel,rabbitmq_shovel_management].
+    [rabbitmq_tracing].
+    [rabbitmq_event_exchange].
+
+# ServiceMonitor配置（用于Prometheus监控）
+serviceMonitor:
+  enabled: true
+  interval: 30s
+  path: /metrics
+  port: metrics
+  scheme: http
+  tlsConfig: {}
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "15692"
+    prometheus.io/path: "/metrics"
+
+# PodDisruptionBudget配置
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 2
+  # maxUnavailable: 1
+
+# 水平自动扩缩容配置
+hpa:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: 80
+  
+  # 扩缩容行为
+  behavior:
+    scaleUp:
+      stabilizationWindowSeconds: 300
+      policies:
+      - type: Percent
+        value: 100
+        periodSeconds: 15
+    scaleDown:
+      stabilizationWindowSeconds: 300
+      policies:
+      - type: Percent
+        value: 50
+        periodSeconds: 60
+
+# Ingress配置
+ingress:
+  enabled: true
+  className: nginx
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    kubernetes.io/tls-acme: "true"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    
+  hosts:
+    - host: rabbitmq.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+  
+  tls:
+    - secretName: rabbitmq-tls
+      hosts:
+        - rabbitmq.example.com
+
+# 备份配置
+backup:
+  enabled: true
+  schedule: "0 2 * * *"  # 每天2点备份
+  retention: 30  # 保留30天
+  
+  # 备份存储
+  storage:
+    type: s3
+    bucket: rabbitmq-backups
+    region: us-west-2
+    
+  # Velero配置
+  velero:
+    enabled: false
+    schedule: "daily-backup"
+
+# 监控配置
+monitoring:
+  # Grafana仪表板
+  grafana:
+    enabled: true
+    dashboards:
+      - name: "RabbitMQ"
+        dashboard: |
+          {
+            "dashboard": {
+              "title": "RabbitMQ Overview",
+              "panels": [
+                {
+                  "title": "Queue Length",
+                  "type": "graph",
+                  "targets": [
+                    {
+                      "expr": "rabbitmq_queue_messages",
+                      "refId": "A"
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+  
+  # 告警规则
+  alerts:
+    enabled: true
+    rules:
+      - alert: RabbitMQDown
+        expr: up{job="rabbitmq"} == 0
+        for: 0m
+        labels:
+          severity: critical
+        annotations:
+          summary: RabbitMQ instance down
+          
+      - alert: RabbitMQHighQueueLength
+        expr: rabbitmq_queue_messages > 10000
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: High queue length
+
+# 性能优化配置
+performance:
+  # 批处理配置
+  batching:
+    enabled: true
+    batchSize: 1000
+    batchTimeout: 100ms
+    
+  # 内存优化
+  memory:
+    # 内存阈值
+    watermark: 0.7
+    # 垃圾回收配置
+    gc: aggressive
+    
+  # I/O优化
+  io:
+    # I/O批处理
+    batchSize: 32
+    # 线程池配置
+    threadPool:
+      size: 16
+
+# 调试配置
+debug:
+  enabled: false
+  level: info
+  
+  # 日志配置
+  logging:
+    level: info
+    format: json
+    
+  # 性能分析
+  profiling:
+    enabled: false
+    port: 15693
+
+# 测试配置
+testing:
+  # 集成测试
+  integration:
+    enabled: false
+    image: "rabbitmq-integration-test"
+    
+  # 性能测试
+  performance:
+    enabled: false
+    duration: 5m
+    messageSize: 1KB
+    concurrentProducers: 10
+    concurrentConsumers: 10

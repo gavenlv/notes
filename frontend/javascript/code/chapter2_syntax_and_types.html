@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>第2章 JavaScript语法与数据类型 - 示例代码</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        h1, h2, h3, h4 {
+            color: #333;
+        }
+        code {
+            background-color: #f0f0f0;
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+        }
+        pre {
+            background-color: #f0f0f0;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        button.secondary {
+            background-color: #2196F3;
+        }
+        button.secondary:hover {
+            background-color: #0b7dda;
+        }
+        input, select, textarea {
+            padding: 10px;
+            margin: 5px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .output {
+            background-color: #e9f7ef;
+            border-left: 5px solid #4CAF50;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 0 4px 4px 0;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+        .error {
+            background-color: #ffebee;
+            border-left: 5px solid #f44336;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 0 4px 4px 0;
+        }
+        .warning {
+            background-color: #fff8e1;
+            border-left: 5px solid #ff9800;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 0 4px 4px 0;
+        }
+        .tab {
+            overflow: hidden;
+            border: 1px solid #ccc;
+            background-color: #f1f1f1;
+        }
+        .tab button {
+            background-color: inherit;
+            float: left;
+            border: none;
+            outline: none;
+            cursor: pointer;
+            padding: 14px 16px;
+            transition: 0.3s;
+            font-size: 17px;
+        }
+        .tab button:hover {
+            background-color: #ddd;
+        }
+        .tab button.active {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .tabcontent {
+            display: none;
+            padding: 6px 12px;
+            border: 1px solid #ccc;
+            border-top: none;
+        }
+        .flex-container {
+            display: flex;
+            flex-wrap: wrap;
+        }
+        .flex-item {
+            flex: 1 0 30%;
+            margin: 5px;
+        }
+        .result-box {
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            min-height: 50px;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>第2章：JavaScript语法与数据类型 - 示例代码</h1>
+        <p>这个HTML文件包含了第2章中的所有示例代码。您可以直接在浏览器中打开此文件来运行示例。</p>
+        <p>请打开浏览器控制台（按F12）查看详细的输出结果。</p>
+    </div>
+
+    <div class="container">
+        <h2>2.1 JavaScript基础语法</h2>
+        
+        <div class="tab">
+            <button class="tablinks active" onclick="openTab(event, 'StatementsExpressions')">语句与表达式</button>
+            <button class="tablinks" onclick="openTab(event, 'Identifiers')">标识符命名</button>
+        </div>
+        
+        <div id="StatementsExpressions" class="tabcontent" style="display:block">
+            <h3>语句与表达式示例</h3>
+            <button onclick="demonstrateStatementsExpressions()">演示语句与表达式</button>
+            <div id="statements-output" class="result-box"></div>
+        </div>
+        
+        <div id="Identifiers" class="tabcontent">
+            <h3>标识符命名示例</h3>
+            <button onclick="demonstrateIdentifiers()">演示标识符命名</button>
+            <div id="identifiers-output" class="result-box"></div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>2.2 变量声明</h2>
+        
+        <div class="tab">
+            <button class="tablinks active" onclick="openTab(event, 'VarDeclaration')">var声明</button>
+            <button class="tablinks" onclick="openTab(event, 'LetDeclaration')">let声明</button>
+            <button class="tablinks" onclick="openTab(event, 'ConstDeclaration')">const声明</button>
+            <button class="tablinks" onclick="openTab(event, 'VariableComparison')">变量对比</button>
+        </div>
+        
+        <div id="VarDeclaration" class="tabcontent" style="display:block">
+            <h3>var声明示例</h3>
+            <button onclick="demonstrateVarDeclaration()">演示var声明</button>
+            <div id="var-output" class="result-box"></div>
+        </div>
+        
+        <div id="LetDeclaration" class="tabcontent">
+            <h3>let声明示例</h3>
+            <button onclick="demonstrateLetDeclaration()">演示let声明</button>
+            <div id="let-output" class="result-box"></div>
+        </div>
+        
+        <div id="ConstDeclaration" class="tabcontent">
+            <h3>const声明示例</h3>
+            <button onclick="demonstrateConstDeclaration()">演示const声明</button>
+            <div id="const-output" class="result-box"></div>
+        </div>
+        
+        <div id="VariableComparison" class="tabcontent">
+            <h3>变量声明对比</h3>
+            <button onclick="compareVariableDeclarations()">对比变量声明</button>
+            <div id="comparison-output" class="result-box"></div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>2.3 JavaScript数据类型</h2>
+        
+        <div class="tab">
+            <button class="tablinks active" onclick="openTab(event, 'BasicTypes')">基本数据类型</button>
+            <button class="tablinks" onclick="openTab(event, 'ComplexTypes')">复杂数据类型</button>
+            <button class="tablinks" onclick="openTab(event, 'TypeChecking')">类型检查</button>
+        </div>
+        
+        <div id="BasicTypes" class="tabcontent" style="display:block">
+            <h3>基本数据类型示例</h3>
+            <button onclick="demonstrateBasicTypes()">演示基本数据类型</button>
+            <div id="basic-types-output" class="result-box"></div>
+        </div>
+        
+        <div id="ComplexTypes" class="tabcontent">
+            <h3>复杂数据类型示例</h3>
+            <button onclick="demonstrateComplexTypes()">演示复杂数据类型</button>
+            <div id="complex-types-output" class="result-box"></div>
+        </div>
+        
+        <div id="TypeChecking" class="tabcontent">
+            <h3>类型检查示例</h3>
+            <button onclick="demonstrateTypeChecking()">演示类型检查</button>
+            <div id="type-checking-output" class="result-box"></div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>2.4 类型转换</h2>
+        
+        <div class="tab">
+            <button class="tablinks active" onclick="openTab(event, 'ImplicitConversion')">隐式类型转换</button>
+            <button class="tablinks" onclick="openTab(event, 'ExplicitConversion')">显式类型转换</button>
+        </div>
+        
+        <div id="ImplicitConversion" class="tabcontent" style="display:block">
+            <h3>隐式类型转换示例</h3>
+            <button onclick="demonstrateImplicitConversion()">演示隐式类型转换</button>
+            <div id="implicit-conversion-output" class="result-box"></div>
+        </div>
+        
+        <div id="ExplicitConversion" class="tabcontent">
+            <h3>显式类型转换示例</h3>
+            <button onclick="demonstrateExplicitConversion()">演示显式类型转换</button>
+            <div id="explicit-conversion-output" class="result-box"></div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>2.5 运算符</h2>
+        
+        <div class="tab">
+            <button class="tablinks active" onclick="openTab(event, 'ArithmeticOperators')">算术运算符</button>
+            <button class="tablinks" onclick="openTab(event, 'ComparisonOperators')">比较运算符</button>
+            <button class="tablinks" onclick="openTab(event, 'LogicalOperators')">逻辑运算符</button>
+            <button class="tablinks" onclick="openTab(event, 'BitwiseOperators')">位运算符</button>
+            <button class="tablinks" onclick="openTab(event, 'TernaryOperator')">三元运算符</button>
+        </div>
+        
+        <div id="ArithmeticOperators" class="tabcontent" style="display:block">
+            <h3>算术运算符示例</h3>
+            <div class="flex-container">
+                <div class="flex-item">
+                    <label for="arith-num1">数字1:</label>
+                    <input type="number" id="arith-num1" value="10">
+                </div>
+                <div class="flex-item">
+                    <label for="arith-num2">数字2:</label>
+                    <input type="number" id="arith-num2" value="3">
+                </div>
+            </div>
+            <button onclick="demonstrateArithmeticOperators()">演示算术运算符</button>
+            <div id="arithmetic-operators-output" class="result-box"></div>
+        </div>
+        
+        <div id="ComparisonOperators" class="tabcontent">
+            <h3>比较运算符示例</h3>
+            <div class="flex-container">
+                <div class="flex-item">
+                    <label for="comp-value1">值1:</label>
+                    <input type="text" id="comp-value1" value="5">
+                </div>
+                <div class="flex-item">
+                    <label for="comp-value2">值2:</label>
+                    <input type="text" id="comp-value2" value="5">
+                </div>
+            </div>
+            <button onclick="demonstrateComparisonOperators()">演示比较运算符</button>
+            <div id="comparison-operators-output" class="result-box"></div>
+        </div>
+        
+        <div id="LogicalOperators" class="tabcontent">
+            <h3>逻辑运算符示例</h3>
+            <div class="flex-container">
+                <div class="flex-item">
+                    <label for="log-value1">值1:</label>
+                    <select id="log-value1">
+                        <option value="true">true</option>
+                        <option value="false">false</option>
+                        <option value="0">0</option>
+                        <option value="1">1</option>
+                        <option value="''">空字符串</option>
+                        <option value="'hello'">"hello"</option>
+                    </select>
+                </div>
+                <div class="flex-item">
+                    <label for="log-value2">值2:</label>
+                    <select id="log-value2">
+                        <option value="true">true</option>
+                        <option value="false">false</option>
+                        <option value="0">0</option>
+                        <option value="1">1</option>
+                        <option value="''">空字符串</option>
+                        <option value="'hello'">"hello"</option>
+                    </select>
+                </div>
+            </div>
+            <button onclick="demonstrateLogicalOperators()">演示逻辑运算符</button>
+            <div id="logical-operators-output" class="result-box"></div>
+        </div>
+        
+        <div id="BitwiseOperators" class="tabcontent">
+            <h3>位运算符示例</h3>
+            <div class="flex-container">
+                <div class="flex-item">
+                    <label for="bit-num1">数字1:</label>
+                    <input type="number" id="bit-num1" value="5">
+                </div>
+                <div class="flex-item">
+                    <label for="bit-num2">数字2:</label>
+                    <input type="number" id="bit-num2" value="3">
+                </div>
+            </div>
+            <button onclick="demonstrateBitwiseOperators()">演示位运算符</button>
+            <div id="bitwise-operators-output" class="result-box"></div>
+        </div>
+        
+        <div id="TernaryOperator" class="tabcontent">
+            <h3>三元运算符示例</h3>
+            <div class="flex-container">
+                <div class="flex-item">
+                    <label for="cond-value">条件值:</label>
+                    <input type="number" id="cond-value" value="18">
+                </div>
+                <div class="flex-item">
+                    <label for="cond-type">条件类型:</label>
+                    <select id="cond-type">
+                        <option value="age">年龄判断</option>
+                        <option value="score">成绩判断</option>
+                    </select>
+                </div>
+            </div>
+            <button onclick="demonstrateTernaryOperator()">演示三元运算符</button>
+            <div id="ternary-operator-output" class="result-box"></div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>2.6 条件语句</h2>
+        
+        <div class="tab">
+            <button class="tablinks active" onclick="openTab(event, 'IfStatement')">if语句</button>
+            <button class="tablinks" onclick="openTab(event, 'SwitchStatement')">switch语句</button>
+        </div>
+        
+        <div id="IfStatement" class="tabcontent" style="display:block">
+            <h3>if语句示例</h3>
+            <div class="flex-container">
+                <div class="flex-item">
+                    <label for="if-score">成绩:</label>
+                    <input type="number" id="if-score" value="85" min="0" max="100">
+                </div>
+                <div class="flex-item">
+                    <label for="if-age">年龄:</label>
+                    <input type="number" id="if-age" value="20">
+                </div>
+            </div>
+            <button onclick="demonstrateIfStatement()">演示if语句</button>
+            <div id="if-statement-output" class="result-box"></div>
+        </div>
+        
+        <div id="SwitchStatement" class="tabcontent">
+            <h3>switch语句示例</h3>
+            <div class="flex-container">
+                <div class="flex-item">
+                    <label for="switch-day">星期几(0-6):</label>
+                    <input type="number" id="switch-day" value="3" min="0" max="6">
+                </div>
+                <div class="flex-item">
+                    <label for="switch-grade">成绩等级(A-F):</label>
+                    <select id="switch-grade">
+                        <option value="A">A</option>
+                        <option value="B">B</option>
+                        <option value="C">C</option>
+                        <option value="D">D</option>
+                        <option value="F">F</option>
+                    </select>
+                </div>
+            </div>
+            <button onclick="demonstrateSwitchStatement()">演示switch语句</button>
+            <div id="switch-statement-output" class="result-box"></div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>2.7 循环语句</h2>
+        
+        <div class="tab">
+            <button class="tablinks active" onclick="openTab(event, 'ForLoop')">for循环</button>
+            <button class="tablinks" onclick="openTab(event, 'WhileLoop')">while循环</button>
+            <button class="tablinks" onclick="openTab(event, 'DoWhileLoop')">do-while循环</button>
+            <button class="tablinks" onclick="openTab(event, 'ForInOfLoop')">for-in和for-of循环</button>
+            <button class="tablinks" onclick="openTab(event, 'BreakContinue')">break和continue</button>
+        </div>
+        
+        <div id="ForLoop" class="tabcontent" style="display:block">
+            <h3>for循环示例</h3>
+            <div class="flex-container">
+                <div class="flex-item">
+                    <label for="for-start">起始值:</label>
+                    <input type="number" id="for-start" value="1">
+                </div>
+                <div class="flex-item">
+                    <label for="for-end">结束值:</label>
+                    <input type="number" id="for-end" value="10">
+                </div>
+                <div class="flex-item">
+                    <label for="for-step">步长:</label>
+                    <input type="number" id="for-step" value="1">
+                </div>
+            </div>
+            <button onclick="demonstrateForLoop()">演示for循环</button>
+            <div id="for-loop-output" class="result-box"></div>
+        </div>
+        
+        <div id="WhileLoop" class="tabcontent">
+            <h3>while循环示例</h3>
+            <div class="flex-container">
+                <div class="flex-item">
+                    <label for="while-number">数字:</label>
+                    <input type="number" id="while-number" value="5">
+                </div>
+            </div>
+            <button onclick="demonstrateWhileLoop()">演示while循环</button>
+            <div id="while-loop-output" class="result-box"></div>
+        </div>
+        
+        <div id="DoWhileLoop" class="tabcontent">
+            <h3>do-while循环示例</h3>
+            <div class="flex-container">
+                <div class="flex-item">
+                    <label for="dowhile-number">数字:</label>
+                    <input type="number" id="dowhile-number" value="0">
+                </div>
+            </div>
+            <button onclick="demonstrateDoWhileLoop()">演示do-while循环</button>
+            <div id="dowhile-loop-output" class="result-box"></div>
+        </div>
+        
+        <div id="ForInOfLoop" class="tabcontent">
+            <h3>for-in和for-of循环示例</h3>
+            <button onclick="demonstrateForInOfLoop()">演示for-in和for-of循环</button>
+            <div id="forinof-loop-output" class="result-box"></div>
+        </div>
+        
+        <div id="BreakContinue" class="tabcontent">
+            <h3>break和continue示例</h3>
+            <div class="flex-container">
+                <div class="flex-item">
+                    <label for="breakcontinue-limit">循环限制:</label>
+                    <input type="number" id="breakcontinue-limit" value="10">
+                </div>
+            </div>
+            <button onclick="demonstrateBreakContinue()">演示break和continue</button>
+            <div id="breakcontinue-output" class="result-box"></div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>2.8 异常处理</h2>
+        
+        <div class="tab">
+            <button class="tablinks active" onclick="openTab(event, 'TryCatch')">try-catch语句</button>
+            <button class="tablinks" onclick="openTab(event, 'ThrowStatement')">throw语句</button>
+        </div>
+        
+        <div id="TryCatch" class="tabcontent" style="display:block">
+            <h3>try-catch语句示例</h3>
+            <button onclick="demonstrateTryCatch()">演示try-catch</button>
+            <div id="trycatch-output" class="result-box"></div>
+        </div>
+        
+        <div id="ThrowStatement" class="tabcontent">
+            <h3>throw语句示例</h3>
+            <div class="flex-container">
+                <div class="flex-item">
+                    <label for="throw-age">年龄:</label>
+                    <input type="number" id="throw-age" value="25">
+                </div>
+            </div>
+            <button onclick="demonstrateThrowStatement()">演示throw语句</button>
+            <div id="throw-output" class="result-box"></div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>2.9 综合练习</h2>
+        
+        <div class="tab">
+            <button class="tablinks active" onclick="openTab(event, 'Calculator')">计算器</button>
+            <button class="tablinks" onclick="openTab(event, 'LeapYear')">闰年判断</button>
+            <button class="tablinks" onclick="openTab(event, 'CharacterCount')">字符统计</button>
+        </div>
+        
+        <div id="Calculator" class="tabcontent" style="display:block">
+            <h3>简单计算器</h3>
+            <div class="flex-container">
+                <div class="flex-item">
+                    <label for="calc-num1">数字1:</label>
+                    <input type="number" id="calc-num1" value="10">
+                </div>
+                <div class="flex-item">
+                    <label for="calc-op">运算符:</label>
+                    <select id="calc-op">
+                        <option value="+">+</option>
+                        <option value="-">-</option>
+                        <option value="*">×</option>
+                        <option value="/">÷</option>
+                        <option value="%">%</option>
+                    </select>
+                </div>
+                <div class="flex-item">
+                    <label for="calc-num2">数字2:</label>
+                    <input type="number" id="calc-num2" value="5">
+                </div>
+            </div>
+            <button onclick="calculate()">计算</button>
+            <div id="calc-output" class="result-box"></div>
+        </div>
+        
+        <div id="LeapYear" class="tabcontent">
+            <h3>闰年判断</h3>
+            <div class="flex-container">
+                <div class="flex-item">
+                    <label for="leap-year">年份:</label>
+                    <input type="number" id="leap-year" value="2024" min="0">
+                </div>
+            </div>
+            <button onclick="checkLeapYear()">判断闰年</button>
+            <div id="leap-output" class="result-box"></div>
+        </div>
+        
+        <div id="CharacterCount" class="tabcontent">
+            <h3>字符统计</h3>
+            <div class="flex-container">
+                <div class="flex-item">
+                    <label for="char-string">字符串:</label>
+                    <input type="text" id="char-string" value="hello world" style="width: 100%;">
+                </div>
+            </div>
+            <button onclick="countCharacters()">统计字符</button>
+            <div id="char-output" class="result-box"></div>
+        </div>
+    </div>
+
+    <!-- 引入外部JavaScript文件 -->
+    <script src="chapter2_syntax_and_types.js"></script>
+    
+    <script>
+        // Tab切换功能
+        function openTab(evt, tabName) {
+            const tabcontent = document.getElementsByClassName("tabcontent");
+            for (let i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].style.display = "none";
+            }
+            
+            const tablinks = document.getElementsByClassName("tablinks");
+            for (let i = 0; i < tablinks.length; i++) {
+                tablinks[i].className = tablinks[i].className.replace(" active", "");
+            }
+            
+            document.getElementById(tabName).style.display = "block";
+            evt.currentTarget.className += " active";
+        }
+        
+        // 更新结果输出区域
+        function updateOutput(elementId, content) {
+            const element = document.getElementById(elementId);
+            if (element) {
+                element.textContent = content;
+            }
+        }
+        
+        // 演示语句与表达式
+        function demonstrateStatementsExpressions() {
+            const result = chapter2Examples.demonstrateStatementsExpressions();
+            updateOutput('statements-output', result);
+        }
+        
+        // 演示标识符命名
+        function demonstrateIdentifiers() {
+            const result = chapter2Examples.demonstrateIdentifiers();
+            updateOutput('identifiers-output', result);
+        }
+        
+        // 演示var声明
+        function demonstrateVarDeclaration() {
+            const result = chapter2Examples.demonstrateVarDeclaration();
+            updateOutput('var-output', result);
+        }
+        
+        // 演示let声明
+        function demonstrateLetDeclaration() {
+            const result = chapter2Examples.demonstrateLetDeclaration();
+            updateOutput('let-output', result);
+        }
+        
+        // 演示const声明
+        function demonstrateConstDeclaration() {
+            const result = chapter2Examples.demonstrateConstDeclaration();
+            updateOutput('const-output', result);
+        }
+        
+        // 对比变量声明
+        function compareVariableDeclarations() {
+            const result = chapter2Examples.compareVariableDeclarations();
+            updateOutput('comparison-output', result);
+        }
+        
+        // 演示基本数据类型
+        function demonstrateBasicTypes() {
+            const result = chapter2Examples.demonstrateBasicTypes();
+            updateOutput('basic-types-output', result);
+        }
+        
+        // 演示复杂数据类型
+        function demonstrateComplexTypes() {
+            const result = chapter2Examples.demonstrateComplexTypes();
+            updateOutput('complex-types-output', result);
+        }
+        
+        // 演示类型检查
+        function demonstrateTypeChecking() {
+            const result = chapter2Examples.demonstrateTypeChecking();
+            updateOutput('type-checking-output', result);
+        }
+        
+        // 演示隐式类型转换
+        function demonstrateImplicitConversion() {
+            const result = chapter2Examples.demonstrateImplicitConversion();
+            updateOutput('implicit-conversion-output', result);
+        }
+        
+        // 演示显式类型转换
+        function demonstrateExplicitConversion() {
+            const result = chapter2Examples.demonstrateExplicitConversion();
+            updateOutput('explicit-conversion-output', result);
+        }
+        
+        // 演示算术运算符
+        function demonstrateArithmeticOperators() {
+            const num1 = parseFloat(document.getElementById('arith-num1').value);
+            const num2 = parseFloat(document.getElementById('arith-num2').value);
+            const result = chapter2Examples.demonstrateArithmeticOperators(num1, num2);
+            updateOutput('arithmetic-operators-output', result);
+        }
+        
+        // 演示比较运算符
+        function demonstrateComparisonOperators() {
+            const value1 = document.getElementById('comp-value1').value;
+            const value2 = document.getElementById('comp-value2').value;
+            const result = chapter2Examples.demonstrateComparisonOperators(value1, value2);
+            updateOutput('comparison-operators-output', result);
+        }
+        
+        // 演示逻辑运算符
+        function demonstrateLogicalOperators() {
+            const value1 = document.getElementById('log-value1').value;
+            const value2 = document.getElementById('log-value2').value;
+            const result = chapter2Examples.demonstrateLogicalOperators(value1, value2);
+            updateOutput('logical-operators-output', result);
+        }
+        
+        // 演示位运算符
+        function demonstrateBitwiseOperators() {
+            const num1 = parseInt(document.getElementById('bit-num1').value);
+            const num2 = parseInt(document.getElementById('bit-num2').value);
+            const result = chapter2Examples.demonstrateBitwiseOperators(num1, num2);
+            updateOutput('bitwise-operators-output', result);
+        }
+        
+        // 演示三元运算符
+        function demonstrateTernaryOperator() {
+            const value = document.getElementById('cond-value').value;
+            const type = document.getElementById('cond-type').value;
+            const result = chapter2Examples.demonstrateTernaryOperator(value, type);
+            updateOutput('ternary-operator-output', result);
+        }
+        
+        // 演示if语句
+        function demonstrateIfStatement() {
+            const score = parseInt(document.getElementById('if-score').value);
+            const age = parseInt(document.getElementById('if-age').value);
+            const result = chapter2Examples.demonstrateIfStatement(score, age);
+            updateOutput('if-statement-output', result);
+        }
+        
+        // 演示switch语句
+        function demonstrateSwitchStatement() {
+            const day = parseInt(document.getElementById('switch-day').value);
+            const grade = document.getElementById('switch-grade').value;
+            const result = chapter2Examples.demonstrateSwitchStatement(day, grade);
+            updateOutput('switch-statement-output', result);
+        }
+        
+        // 演示for循环
+        function demonstrateForLoop() {
+            const start = parseInt(document.getElementById('for-start').value);
+            const end = parseInt(document.getElementById('for-end').value);
+            const step = parseInt(document.getElementById('for-step').value);
+            const result = chapter2Examples.demonstrateForLoop(start, end, step);
+            updateOutput('for-loop-output', result);
+        }
+        
+        // 演示while循环
+        function demonstrateWhileLoop() {
+            const number = parseInt(document.getElementById('while-number').value);
+            const result = chapter2Examples.demonstrateWhileLoop(number);
+            updateOutput('while-loop-output', result);
+        }
+        
+        // 演示do-while循环
+        function demonstrateDoWhileLoop() {
+            const number = parseInt(document.getElementById('dowhile-number').value);
+            const result = chapter2Examples.demonstrateDoWhileLoop(number);
+            updateOutput('dowhile-loop-output', result);
+        }
+        
+        // 演示for-in和for-of循环
+        function demonstrateForInOfLoop() {
+            const result = chapter2Examples.demonstrateForInOfLoop();
+            updateOutput('forinof-loop-output', result);
+        }
+        
+        // 演示break和continue
+        function demonstrateBreakContinue() {
+            const limit = parseInt(document.getElementById('breakcontinue-limit').value);
+            const result = chapter2Examples.demonstrateBreakContinue(limit);
+            updateOutput('breakcontinue-output', result);
+        }
+        
+        // 演示try-catch
+        function demonstrateTryCatch() {
+            const result = chapter2Examples.demonstrateTryCatch();
+            updateOutput('trycatch-output', result);
+        }
+        
+        // 演示throw语句
+        function demonstrateThrowStatement() {
+            const age = parseInt(document.getElementById('throw-age').value);
+            const result = chapter2Examples.demonstrateThrowStatement(age);
+            updateOutput('throw-output', result);
+        }
+        
+        // 计算器功能
+        function calculate() {
+            const num1 = parseFloat(document.getElementById('calc-num1').value);
+            const num2 = parseFloat(document.getElementById('calc-num2').value);
+            const op = document.getElementById('calc-op').value;
+            const result = chapter2Exercises.calculate(num1, num2, op);
+            updateOutput('calc-output', result);
+        }
+        
+        // 闰年判断
+        function checkLeapYear() {
+            const year = parseInt(document.getElementById('leap-year').value);
+            const result = chapter2Exercises.checkLeapYear(year);
+            updateOutput('leap-output', result);
+        }
+        
+        // 字符统计
+        function countCharacters() {
+            const str = document.getElementById('char-string').value;
+            const result = chapter2Exercises.countCharacters(str);
+            updateOutput('char-output', result);
+        }
+    </script>
+</body>
+</html>

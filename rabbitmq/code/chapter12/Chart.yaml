@@ -1,0 +1,29 @@
+# RabbitMQ集群Helm Chart
+# 用于在Kubernetes环境中快速部署RabbitMQ集群
+
+apiVersion: v2
+name: rabbitmq-cluster
+description: RabbitMQ集群云原生部署Chart
+type: application
+version: 1.0.0
+appVersion: "3.10"
+home: https://www.rabbitmq.com
+sources:
+  - https://github.com/rabbitmq/rabbitmq-server
+maintainers:
+  - name: DevOps Team
+    email: devops@example.com
+
+keywords:
+  - rabbitmq
+  - message-queue
+  - cluster
+  - kubernetes
+  - cloud-native
+
+dependencies:
+  - name: common
+    version: 1.x.x
+    repository: https://charts.bitnami.com/bitnami
+    tags:
+      - bitnami-common
