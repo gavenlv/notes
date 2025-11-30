@@ -1,0 +1,1022 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>第5章：DOM操作与事件处理 - 实战示例</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f7fa;
+        }
+        h1, h2, h3 {
+            color: #2c3e50;
+        }
+        .container {
+            background-color: white;
+            border-radius: 8px;
+            padding: 25px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .section {
+            margin-bottom: 30px;
+            padding: 15px;
+            border-left: 4px solid #3498db;
+            background-color: #f8f9fa;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 14px;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        .result {
+            background-color: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 10px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .input-field {
+            width: 100%;
+            padding: 8px;
+            margin: 5px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 15px;
+        }
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border: 1px solid transparent;
+            border-bottom: none;
+            border-radius: 5px 5px 0 0;
+            margin-right: 5px;
+            background-color: #f1f1f1;
+        }
+        .tab.active {
+            background-color: white;
+            border-color: #ddd;
+            border-bottom: 1px solid white;
+            margin-bottom: -1px;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* 演示特定样式 */
+        #elementDemo {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin: 10px 0;
+            background-color: #f9f9f9;
+        }
+        .highlight {
+            background-color: yellow;
+        }
+        .box {
+            width: 100px;
+            height: 100px;
+            margin: 10px;
+            display: inline-block;
+            background-color: #3498db;
+            color: white;
+            text-align: center;
+            line-height: 100px;
+            cursor: pointer;
+        }
+        .draggable {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            background-color: #e74c3c;
+            color: white;
+            text-align: center;
+            line-height: 100px;
+            cursor: move;
+            z-index: 1000;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .error {
+            color: #e74c3c;
+            font-size: 12px;
+            margin-top: 5px;
+            display: none;
+        }
+        .invalid {
+            border-color: #e74c3c;
+        }
+        .tab-btn {
+            background-color: #f8f9fa;
+            border: 1px solid #ddd;
+            padding: 8px 15px;
+            cursor: pointer;
+            margin-right: 5px;
+        }
+        .tab-btn.active {
+            background-color: #3498db;
+            color: white;
+        }
+        .tab-content-panel {
+            border: 1px solid #ddd;
+            padding: 20px;
+            display: none;
+        }
+        .tab-content-panel.active {
+            display: block;
+        }
+        .item {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        .loader {
+            text-align: center;
+            padding: 20px;
+            display: none;
+        }
+        .event-log {
+            background-color: #f8f9fa;
+            border: 1px solid #ddd;
+            padding: 10px;
+            height: 200px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 12px;
+            margin-top: 10px;
+        }
+        .focused {
+            outline: 2px solid #3498db;
+            outline-offset: 2px;
+        }
+    </style>
+</head>
+<body>
+    <h1>第5章：DOM操作与事件处理 - 实战示例</h1>
+    
+    <div class="container">
+        <div class="tabs">
+            <div class="tab active" onclick="showTab('dom-selection')">DOM选择</div>
+            <div class="tab" onclick="showTab('dom-manipulation')">DOM操作</div>
+            <div class="tab" onclick="showTab('dom-style')">属性与样式</div>
+            <div class="tab" onclick="showTab('form-handling')">表单处理</div>
+            <div class="tab" onclick="showTab('event-basics')">事件基础</div>
+            <div class="tab" onclick="showTab('event-advanced')">事件高级</div>
+            <div class="tab" onclick="showTab('interactive-demo')">交互演示</div>
+        </div>
+
+        <!-- DOM选择标签页 -->
+        <div id="dom-selection" class="tab-content active">
+            <div class="section">
+                <h2>DOM元素选择</h2>
+                <div id="elementDemo">
+                    <h3>演示区域</h3>
+                    <p>这是一个段落，class为"content"</p>
+                    <div class="box">Box 1</div>
+                    <div class="box special">Box 2</div>
+                    <ul>
+                        <li>列表项1</li>
+                        <li>列表项2</li>
+                        <li>列表项3</li>
+                    </ul>
+                </div>
+                <button onclick="selectById()">通过ID选择</button>
+                <button onclick="selectByClass()">通过类名选择</button>
+                <button onclick="selectByTag()">通过标签名选择</button>
+                <button onclick="selectByQuery()">使用querySelector</button>
+                <button onclick="selectAllByQuery()">使用querySelectorAll</button>
+                <div id="selectionResult" class="result"></div>
+            </div>
+        </div>
+
+        <!-- DOM操作标签页 -->
+        <div id="dom-manipulation" class="tab-content">
+            <div class="section">
+                <h2>DOM元素操作</h2>
+                <div id="manipulationDemo">
+                    <h3>原始内容</h3>
+                    <p>这是第一个段落</p>
+                </div>
+                <button onclick="createElement()">创建元素</button>
+                <button onclick="addElement()">添加元素</button>
+                <button onclick="removeElement()">删除元素</button>
+                <button onclick="replaceElement()">替换元素</button>
+                <button onclick="cloneElement()">克隆元素</button>
+                <button onclick="resetManipulationDemo()">重置演示</button>
+                <div id="manipulationResult" class="result"></div>
+            </div>
+        </div>
+
+        <!-- 属性与样式标签页 -->
+        <div id="dom-style" class="tab-content">
+            <div class="section">
+                <h2>属性与样式操作</h2>
+                <div id="styleDemo" class="box">样式演示</div>
+                <button onclick="changeStyle()">改变样式</button>
+                <button onclick="addClass()">添加类</button>
+                <button onclick="removeClass()">移除类</button>
+                <button onclick="toggleClass()">切换类</button>
+                <button onclick="changeAttribute()">改变属性</button>
+                <button onclick="changeDataAttribute()">改变数据属性</button>
+                <div id="styleResult" class="result"></div>
+            </div>
+        </div>
+
+        <!-- 表单处理标签页 -->
+        <div id="form-handling" class="tab-content">
+            <div class="section">
+                <h2>表单处理与验证</h2>
+                <form id="demoForm">
+                    <div class="form-group">
+                        <label for="username">用户名:</label>
+                        <input type="text" id="username" name="username" class="input-field">
+                        <div id="usernameError" class="error">用户名不能为空</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="email">电子邮件:</label>
+                        <input type="email" id="email" name="email" class="input-field">
+                        <div id="emailError" class="error">请输入有效的电子邮件地址</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="password">密码:</label>
+                        <input type="password" id="password" name="password" class="input-field">
+                        <div id="passwordError" class="error">密码必须至少8位，包含大写字母和数字</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>性别:</label>
+                        <input type="radio" name="gender" value="male" checked> 男
+                        <input type="radio" name="gender" value="female"> 女
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>兴趣:</label>
+                        <input type="checkbox" name="interests" value="reading"> 阅读
+                        <input type="checkbox" name="interests" value="sports"> 运动
+                        <input type="checkbox" name="interests" value="music"> 音乐
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="country">国家:</label>
+                        <select id="country" name="country" class="input-field">
+                            <option value="">请选择</option>
+                            <option value="cn">中国</option>
+                            <option value="us">美国</option>
+                            <option value="jp">日本</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="message">留言:</label>
+                        <textarea id="message" name="message" rows="4" class="input-field"></textarea>
+                    </div>
+                    
+                    <button type="submit">提交表单</button>
+                    <button type="button" onclick="getFormData()">获取表单数据</button>
+                    <button type="button" onclick="resetForm()">重置表单</button>
+                </form>
+                <div id="formResult" class="result"></div>
+            </div>
+        </div>
+
+        <!-- 事件基础标签页 -->
+        <div id="event-basics" class="tab-content">
+            <div class="section">
+                <h2>事件基础</h2>
+                <button id="basicBtn1" class="custom-button">基础点击</button>
+                <button id="basicBtn2" class="custom-button">多次监听</button>
+                <button id="basicBtn3" class="custom-button">一次性事件</button>
+                <button id="basicBtn4" class="custom-button">事件对象</button>
+                <div id="mouseArea" style="width: 300px; height: 200px; border: 1px solid #ddd; margin: 10px 0; padding: 10px;">
+                    鼠标事件测试区域
+                </div>
+                <input type="text" id="keyboardInput" class="input-field" placeholder="键盘事件测试">
+                <div id="eventBasicsResult" class="result"></div>
+            </div>
+        </div>
+
+        <!-- 事件高级标签页 -->
+        <div id="event-advanced" class="tab-content">
+            <div class="section">
+                <h2>事件冒泡与捕获</h2>
+                <div id="outer" style="width: 300px; height: 200px; background-color: #3498db; padding: 20px; position: relative;">
+                    外层元素
+                    <div id="middle" style="width: 200px; height: 120px; background-color: #2ecc71; padding: 20px; position: absolute; top: 20px; left: 20px;">
+                        中层元素
+                        <div id="inner" style="width: 100px; height: 60px; background-color: #e74c3c; padding: 10px; position: absolute; top: 20px; left: 20px;">
+                            内层元素
+                        </div>
+                    </div>
+                </div>
+                <button onclick="clearEventLog()">清除事件日志</button>
+                <button onclick="toggleEventBubbling()">切换事件冒泡</button>
+                <div id="eventLog" class="event-log"></div>
+                <div class="section">
+                    <h2>事件委托</h2>
+                    <ul id="delegationList" style="border: 1px solid #ddd; padding: 10px;">
+                        <li data-id="1">列表项 1</li>
+                        <li data-id="2">列表项 2</li>
+                        <li data-id="3">列表项 3</li>
+                    </ul>
+                    <button onclick="addListItem()">添加列表项</button>
+                    <div id="delegationResult" class="result"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 交互演示标签页 -->
+        <div id="interactive-demo" class="tab-content">
+            <div class="section">
+                <h2>选项卡切换</h2>
+                <div class="tab-headers">
+                    <button class="tab-btn active" data-tab="demo-tab1">选项卡1</button>
+                    <button class="tab-btn" data-tab="demo-tab2">选项卡2</button>
+                    <button class="tab-btn" data-tab="demo-tab3">选项卡3</button>
+                </div>
+                <div class="tab-content-panel active" id="demo-tab1">
+                    <h3>选项卡1内容</h3>
+                    <p>这是第一个选项卡的内容。选项卡是常见的UI组件，用于在同一区域内切换不同的内容。</p>
+                </div>
+                <div class="tab-content-panel" id="demo-tab2">
+                    <h3>选项卡2内容</h3>
+                    <p>这是第二个选项卡的内容。通过JavaScript可以轻松实现选项卡的切换功能。</p>
+                </div>
+                <div class="tab-content-panel" id="demo-tab3">
+                    <h3>选项卡3内容</h3>
+                    <p>这是第三个选项卡的内容。可以使用事件委托来优化选项卡的性能。</p>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h2>拖拽功能</h2>
+                <div id="draggable" class="draggable">拖拽我</div>
+                <p style="margin-top: 120px;">提示：点击并拖动红色方块</p>
+            </div>
+            
+            <div class="section">
+                <h2>无限滚动加载</h2>
+                <div id="content-container" style="height: 300px; overflow-y: auto; border: 1px solid #ddd; padding: 10px;">
+                    <!-- 内容将通过JavaScript动态添加 -->
+                </div>
+                <div id="loader" class="loader">加载中...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 显示指定的标签页
+        function showTab(tabId) {
+            // 隐藏所有标签内容
+            const tabContents = document.querySelectorAll('.tab-content');
+            tabContents.forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // 移除所有标签的活动状态
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // 显示指定的标签内容和激活对应的标签
+            document.getElementById(tabId).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // DOM选择功能
+        function selectById() {
+            const element = document.getElementById('elementDemo');
+            const result = document.getElementById('selectionResult');
+            result.textContent = `通过ID选择的结果:\n元素: ${element.tagName}\n内容: ${element.textContent.substring(0, 50)}...`;
+        }
+
+        function selectByClass() {
+            const elements = document.getElementsByClassName('box');
+            const result = document.getElementById('selectionResult');
+            let text = `通过类名选择的结果:\n找到 ${elements.length} 个元素:\n`;
+            for (let i = 0; i < elements.length; i++) {
+                text += `${i+1}. ${elements[i].tagName} - "${elements[i].textContent}"\n`;
+            }
+            result.textContent = text;
+        }
+
+        function selectByTag() {
+            const elements = document.getElementsByTagName('li');
+            const result = document.getElementById('selectionResult');
+            let text = `通过标签名选择的结果:\n找到 ${elements.length} 个元素:\n`;
+            for (let i = 0; i < elements.length; i++) {
+                text += `${i+1}. ${elements[i].textContent}\n`;
+            }
+            result.textContent = text;
+        }
+
+        function selectByQuery() {
+            const element = document.querySelector('.box.special');
+            const result = document.getElementById('selectionResult');
+            if (element) {
+                result.textContent = `使用querySelector选择的结果:\n元素: ${element.tagName}\n类名: ${element.className}\n内容: "${element.textContent}"`;
+            } else {
+                result.textContent = '未找到匹配的元素';
+            }
+        }
+
+        function selectAllByQuery() {
+            const elements = document.querySelectorAll('#elementDemo div, #elementDemo p');
+            const result = document.getElementById('selectionResult');
+            let text = `使用querySelectorAll选择的结果:\n找到 ${elements.length} 个元素:\n`;
+            elements.forEach((element, index) => {
+                text += `${index+1}. ${element.tagName} - "${element.textContent.substring(0, 20)}..."\n`;
+            });
+            result.textContent = text;
+        }
+
+        // DOM操作功能
+        let manipulationOriginalContent;
+        
+        function createElement() {
+            const newDiv = document.createElement('div');
+            newDiv.className = 'box';
+            newDiv.textContent = '新创建的元素';
+            
+            const result = document.getElementById('manipulationResult');
+            result.textContent = `创建了新元素:\n${newDiv.outerHTML}`;
+        }
+
+        function addElement() {
+            const demo = document.getElementById('manipulationDemo');
+            const newPara = document.createElement('p');
+            newPara.textContent = `新添加的段落 - ${new Date().toLocaleTimeString()}`;
+            
+            demo.appendChild(newPara);
+            
+            const result = document.getElementById('manipulationResult');
+            result.textContent = `已添加新段落: "${newPara.textContent}"`;
+        }
+
+        function removeElement() {
+            const demo = document.getElementById('manipulationDemo');
+            const paras = demo.getElementsByTagName('p');
+            
+            if (paras.length > 0) {
+                const lastPara = paras[paras.length - 1];
+                const removedText = lastPara.textContent;
+                lastPara.parentNode.removeChild(lastPara);
+                
+                const result = document.getElementById('manipulationResult');
+                result.textContent = `已删除段落: "${removedText}"`;
+            } else {
+                const result = document.getElementById('manipulationResult');
+                result.textContent = '没有可删除的段落';
+            }
+        }
+
+        function replaceElement() {
+            const demo = document.getElementById('manipulationDemo');
+            const paras = demo.getElementsByTagName('p');
+            
+            if (paras.length > 0) {
+                const firstPara = paras[0];
+                const oldText = firstPara.textContent;
+                
+                const newPara = document.createElement('p');
+                newPara.innerHTML = `<strong>已替换的内容</strong> - ${new Date().toLocaleTimeString()}`;
+                
+                firstPara.parentNode.replaceChild(newPara, firstPara);
+                
+                const result = document.getElementById('manipulationResult');
+                result.textContent = `已替换段落:\n旧内容: "${oldText}"\n新内容: "${newPara.textContent}"`;
+            } else {
+                const result = document.getElementById('manipulationResult');
+                result.textContent = '没有可替换的段落';
+            }
+        }
+
+        function cloneElement() {
+            const demo = document.getElementById('manipulationDemo');
+            const paras = demo.getElementsByTagName('p');
+            
+            if (paras.length > 0) {
+                const firstPara = paras[0];
+                const clonedPara = firstPara.cloneNode(true);
+                clonedPara.textContent = clonedPara.textContent + ' (克隆)';
+                
+                demo.appendChild(clonedPara);
+                
+                const result = document.getElementById('manipulationResult');
+                result.textContent = `已克隆并添加段落:\n"${clonedPara.textContent}"`;
+            } else {
+                const result = document.getElementById('manipulationResult');
+                result.textContent = '没有可克隆的段落';
+            }
+        }
+
+        function resetManipulationDemo() {
+            if (!manipulationOriginalContent) {
+                manipulationOriginalContent = document.getElementById('manipulationDemo').innerHTML;
+            }
+            
+            document.getElementById('manipulationDemo').innerHTML = manipulationOriginalContent;
+            document.getElementById('manipulationResult').textContent = '演示区域已重置';
+        }
+
+        // 属性与样式操作
+        function changeStyle() {
+            const demo = document.getElementById('styleDemo');
+            demo.style.backgroundColor = '#' + Math.floor(Math.random()*16777215).toString(16);
+            demo.style.color = 'white';
+            demo.style.fontSize = Math.floor(Math.random() * 20 + 14) + 'px';
+            demo.style.borderRadius = Math.floor(Math.random() * 20) + 'px';
+            
+            const result = document.getElementById('styleResult');
+            result.textContent = `已更改样式:\n背景色: ${demo.style.backgroundColor}\n颜色: ${demo.style.color}\n字体大小: ${demo.style.fontSize}\n圆角: ${demo.style.borderRadius}`;
+        }
+
+        function addClass() {
+            const demo = document.getElementById('styleDemo');
+            demo.classList.add('highlight');
+            
+            const result = document.getElementById('styleResult');
+            result.textContent = `已添加类: "highlight"\n当前类: "${demo.className}"`;
+        }
+
+        function removeClass() {
+            const demo = document.getElementById('styleDemo');
+            demo.classList.remove('highlight');
+            
+            const result = document.getElementById('styleResult');
+            result.textContent = `已移除类: "highlight"\n当前类: "${demo.className}"`;
+        }
+
+        function toggleClass() {
+            const demo = document.getElementById('styleDemo');
+            demo.classList.toggle('highlight');
+            
+            const result = document.getElementById('styleResult');
+            result.textContent = `切换了类: "highlight"\n当前类: "${demo.className}"`;
+        }
+
+        function changeAttribute() {
+            const demo = document.getElementById('styleDemo');
+            demo.setAttribute('title', '这是一个提示');
+            demo.setAttribute('tabindex', '0');
+            
+            const result = document.getElementById('styleResult');
+            result.textContent = `已设置属性:\ntitle: "${demo.getAttribute('title')}"\ntabindex: "${demo.getAttribute('tabindex')}"`;
+        }
+
+        function changeDataAttribute() {
+            const demo = document.getElementById('styleDemo');
+            demo.dataset.userId = '12345';
+            demo.dataset.info = '一些示例信息';
+            
+            const result = document.getElementById('styleResult');
+            result.textContent = `已设置数据属性:\ndata-user-id: "${demo.dataset.userId}"\ndata-info: "${demo.dataset.info}"`;
+        }
+
+        // 表单处理
+        document.getElementById('demoForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            
+            const formData = new FormData(this);
+            const data = {};
+            
+            for (let [key, value] of formData.entries()) {
+                data[key] = value;
+            }
+            
+            // 处理复选框
+            const interests = document.querySelectorAll('input[name="interests"]:checked');
+            data.interests = Array.from(interests).map(cb => cb.value);
+            
+            const result = document.getElementById('formResult');
+            result.textContent = `表单提交成功！\n\n表单数据:\n${JSON.stringify(data, null, 2)}`;
+        });
+
+        function getFormData() {
+            const form = document.getElementById('demoForm');
+            const formData = new FormData(form);
+            const data = {};
+            
+            for (let [key, value] of formData.entries()) {
+                data[key] = value;
+            }
+            
+            // 处理复选框
+            const interests = document.querySelectorAll('input[name="interests"]:checked');
+            data.interests = Array.from(interests).map(cb => cb.value);
+            
+            const result = document.getElementById('formResult');
+            result.textContent = `表单数据:\n${JSON.stringify(data, null, 2)}`;
+        }
+
+        function resetForm() {
+            document.getElementById('demoForm').reset();
+            
+            // 清除错误信息
+            document.querySelectorAll('.error').forEach(error => {
+                error.style.display = 'none';
+            });
+            
+            document.querySelectorAll('.invalid').forEach(field => {
+                field.classList.remove('invalid');
+            });
+            
+            const result = document.getElementById('formResult');
+            result.textContent = '表单已重置';
+        }
+
+        // 表单验证
+        document.getElementById('username').addEventListener('input', function() {
+            const error = document.getElementById('usernameError');
+            if (!this.value.trim()) {
+                error.style.display = 'block';
+                this.classList.add('invalid');
+            } else {
+                error.style.display = 'none';
+                this.classList.remove('invalid');
+            }
+        });
+
+        document.getElementById('email').addEventListener('input', function() {
+            const error = document.getElementById('emailError');
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            
+            if (!this.value.trim()) {
+                error.textContent = '电子邮件不能为空';
+                error.style.display = 'block';
+                this.classList.add('invalid');
+            } else if (!emailRegex.test(this.value)) {
+                error.textContent = '请输入有效的电子邮件地址';
+                error.style.display = 'block';
+                this.classList.add('invalid');
+            } else {
+                error.style.display = 'none';
+                this.classList.remove('invalid');
+            }
+        });
+
+        document.getElementById('password').addEventListener('input', function() {
+            const error = document.getElementById('passwordError');
+            
+            if (!this.value) {
+                error.textContent = '密码不能为空';
+                error.style.display = 'block';
+                this.classList.add('invalid');
+            } else if (this.value.length < 8) {
+                error.textContent = '密码必须至少8位';
+                error.style.display = 'block';
+                this.classList.add('invalid');
+            } else if (!/[A-Z]/.test(this.value) || !/[0-9]/.test(this.value)) {
+                error.textContent = '密码必须包含大写字母和数字';
+                error.style.display = 'block';
+                this.classList.add('invalid');
+            } else {
+                error.style.display = 'none';
+                this.classList.remove('invalid');
+            }
+        });
+
+        // 事件基础
+        document.getElementById('basicBtn1').addEventListener('click', function() {
+            const result = document.getElementById('eventBasicsResult');
+            const time = new Date().toLocaleTimeString();
+            result.textContent = `基础点击事件触发于: ${time}`;
+        });
+
+        document.getElementById('basicBtn2').addEventListener('click', function() {
+            const result = document.getElementById('eventBasicsResult');
+            const time = new Date().toLocaleTimeString();
+            result.textContent = `多次监听器1触发于: ${time}`;
+        });
+
+        document.getElementById('basicBtn2').addEventListener('click', function() {
+            const result = document.getElementById('eventBasicsResult');
+            const time = new Date().toLocaleTimeString();
+            result.textContent += `\n多次监听器2触发于: ${time}`;
+        });
+
+        document.getElementById('basicBtn3').addEventListener('click', function() {
+            const result = document.getElementById('eventBasicsResult');
+            const time = new Date().toLocaleTimeString();
+            result.textContent = `一次性事件触发于: ${time}\n下次点击不会触发`;
+        }, { once: true });
+
+        document.getElementById('basicBtn4').addEventListener('click', function(event) {
+            const result = document.getElementById('eventBasicsResult');
+            result.textContent = `事件对象信息:\n类型: ${event.type}\n目标: ${event.target.tagName}\n当前元素: ${event.currentTarget.tagName}\n时间戳: ${event.timeStamp}\n客户端坐标: (${event.clientX}, ${event.clientY})`;
+        });
+
+        // 鼠标事件
+        const mouseArea = document.getElementById('mouseArea');
+        mouseArea.addEventListener('mouseover', function(event) {
+            const result = document.getElementById('eventBasicsResult');
+            result.textContent = `鼠标进入事件\n坐标: (${event.clientX}, ${event.clientY})`;
+        });
+
+        mouseArea.addEventListener('mousemove', function(event) {
+            const result = document.getElementById('eventBasicsResult');
+            result.textContent = `鼠标移动事件\n坐标: (${event.clientX}, ${event.clientY})`;
+        });
+
+        mouseArea.addEventListener('mouseout', function(event) {
+            const result = document.getElementById('eventBasicsResult');
+            result.textContent = `鼠标离开事件\n坐标: (${event.clientX}, ${event.clientY})`;
+        });
+
+        // 键盘事件
+        const keyboardInput = document.getElementById('keyboardInput');
+        keyboardInput.addEventListener('keydown', function(event) {
+            const result = document.getElementById('eventBasicsResult');
+            result.textContent = `键盘按下事件\n键: ${event.key}\n代码: ${event.code}\n是否重复: ${event.repeat}`;
+        });
+
+        keyboardInput.addEventListener('keyup', function(event) {
+            const result = document.getElementById('eventBasicsResult');
+            result.textContent = `键盘释放事件\n键: ${event.key}\n代码: ${event.code}\n输入值: ${this.value}`;
+        });
+
+        // 事件冒泡与捕获
+        let eventBubblingEnabled = true;
+
+        const outer = document.getElementById('outer');
+        const middle = document.getElementById('middle');
+        const inner = document.getElementById('inner');
+
+        // 捕获阶段
+        outer.addEventListener('click', function(event) {
+            logEvent('外层 - 捕获阶段');
+        }, true);
+
+        middle.addEventListener('click', function(event) {
+            logEvent('中层 - 捕获阶段');
+        }, true);
+
+        inner.addEventListener('click', function(event) {
+            logEvent('内层 - 捕获阶段');
+        }, true);
+
+        // 冒泡阶段
+        inner.addEventListener('click', function(event) {
+            logEvent('内层 - 冒泡阶段');
+        });
+
+        middle.addEventListener('click', function(event) {
+            logEvent('中层 - 冒泡阶段');
+        });
+
+        outer.addEventListener('click', function(event) {
+            logEvent('外层 - 冒泡阶段');
+        });
+
+        function logEvent(message) {
+            const log = document.getElementById('eventLog');
+            const time = new Date().toLocaleTimeString();
+            log.textContent += `[${time}] ${message}\n`;
+            log.scrollTop = log.scrollHeight;
+        }
+
+        function clearEventLog() {
+            document.getElementById('eventLog').textContent = '';
+        }
+
+        function toggleEventBubbling() {
+            eventBubblingEnabled = !eventBubblingEnabled;
+            
+            if (eventBubblingEnabled) {
+                inner.addEventListener('click', function(event) {
+                    event.stopPropagation();
+                    logEvent('内层 - 冒泡阶段（已阻止冒泡）');
+                });
+            } else {
+                // 移除阻止冒泡的监听器（需要引用到相同的函数）
+                alert('事件冒泡已启用。请刷新页面重置。');
+            }
+        }
+
+        // 事件委托
+        const delegationList = document.getElementById('delegationList');
+        
+        delegationList.addEventListener('click', function(event) {
+            if (event.target.tagName === 'LI') {
+                const itemId = event.target.getAttribute('data-id');
+                const itemText = event.target.textContent;
+                
+                const result = document.getElementById('delegationResult');
+                result.textContent = `点击了列表项:\nID: ${itemId}\n内容: ${itemText}`;
+                
+                // 高亮点击的项目
+                document.querySelectorAll('#delegationList li').forEach(li => {
+                    li.style.backgroundColor = '';
+                });
+                event.target.style.backgroundColor = '#f0f0f0';
+            }
+        });
+
+        function addListItem() {
+            const list = document.getElementById('delegationList');
+            const newItemCount = list.children.length + 1;
+            const newItem = document.createElement('li');
+            newItem.setAttribute('data-id', newItemCount);
+            newItem.textContent = `列表项 ${newItemCount}`;
+            list.appendChild(newItem);
+            
+            const result = document.getElementById('delegationResult');
+            result.textContent = `添加了新列表项: "${newItem.textContent}"`;
+        }
+
+        // 选项卡功能
+        function initTabs() {
+            const tabButtons = document.querySelectorAll('.tab-btn');
+            const tabContents = document.querySelectorAll('.tab-content-panel');
+            
+            // 使用事件委托
+            document.querySelector('.tab-headers').addEventListener('click', function(event) {
+                if (event.target.classList.contains('tab-btn')) {
+                    // 获取要显示的选项卡ID
+                    const tabId = event.target.getAttribute('data-tab');
+                    
+                    // 移除所有按钮和内容的active类
+                    tabButtons.forEach(btn => btn.classList.remove('active'));
+                    tabContents.forEach(content => content.classList.remove('active'));
+                    
+                    // 为当前按钮和对应内容添加active类
+                    event.target.classList.add('active');
+                    document.getElementById(tabId).classList.add('active');
+                }
+            });
+        }
+
+        // 拖拽功能
+        function makeDraggable(element) {
+            let isDragging = false;
+            let currentX;
+            let currentY;
+            let initialX;
+            let initialY;
+            let xOffset = 0;
+            let yOffset = 0;
+            
+            // 鼠标按下
+            element.addEventListener('mousedown', dragStart);
+            
+            // 鼠标移动
+            document.addEventListener('mousemove', drag);
+            
+            // 鼠标释放
+            document.addEventListener('mouseup', dragEnd);
+            
+            function dragStart(e) {
+                initialX = e.clientX - xOffset;
+                initialY = e.clientY - yOffset;
+                
+                if (e.target === element) {
+                    isDragging = true;
+                    element.style.cursor = 'grabbing';
+                }
+            }
+            
+            function drag(e) {
+                if (isDragging) {
+                    e.preventDefault();
+                    currentX = e.clientX - initialX;
+                    currentY = e.clientY - initialY;
+                    
+                    xOffset = currentX;
+                    yOffset = currentY;
+                    
+                    setTranslate(currentX, currentY, element);
+                }
+            }
+            
+            function dragEnd(e) {
+                initialX = currentX;
+                initialY = currentY;
+                isDragging = false;
+                element.style.cursor = 'move';
+            }
+            
+            function setTranslate(xPos, yPos, el) {
+                el.style.transform = `translate3d(${xPos}px, ${yPos}px, 0)`;
+            }
+        }
+
+        // 无限滚动
+        function initInfiniteScroll() {
+            const container = document.getElementById('content-container');
+            const loader = document.getElementById('loader');
+            let page = 1;
+            let isLoading = false;
+            
+            // 模拟数据加载函数
+            function loadData(page) {
+                return new Promise((resolve) => {
+                    setTimeout(() => {
+                        const items = [];
+                        for (let i = 1; i <= 5; i++) {
+                            const itemNum = (page - 1) * 5 + i;
+                            items.push(`<div class="item">项目 ${itemNum} - 加载时间: ${new Date().toLocaleTimeString()}</div>`);
+                        }
+                        resolve(items);
+                    }, 500);  // 模拟网络延迟
+                });
+            }
+            
+            // 渲染数据
+            async function renderData(items) {
+                const fragment = document.createDocumentFragment();
+                items.forEach(itemHtml => {
+                    const div = document.createElement('div');
+                    div.innerHTML = itemHtml;
+                    fragment.appendChild(div.firstElementChild);
+                });
+                container.appendChild(fragment);
+            }
+            
+            // 加载更多数据
+            async function loadMore() {
+                if (isLoading) return;
+                
+                isLoading = true;
+                loader.style.display = 'block';
+                
+                try {
+                    const items = await loadData(page);
+                    await renderData(items);
+                    page++;
+                } catch (error) {
+                    console.error('加载数据失败:', error);
+                } finally {
+                    isLoading = false;
+                    loader.style.display = 'none';
+                }
+            }
+            
+            // 检查是否需要加载更多
+            function checkScroll() {
+                if (container.scrollTop + container.clientHeight >= container.scrollHeight - 50) {
+                    loadMore();
+                }
+            }
+            
+            // 监听滚动事件（使用节流优化性能）
+            let throttleTimer;
+            function throttleCheckScroll() {
+                if (throttleTimer) return;
+                
+                throttleTimer = setTimeout(() => {
+                    checkScroll();
+                    throttleTimer = null;
+                }, 200);  // 200ms节流
+            }
+            
+            container.addEventListener('scroll', throttleCheckScroll);
+            
+            // 初始加载
+            loadMore();
+        }
+
+        // 初始化所有功能
+        document.addEventListener('DOMContentLoaded', function() {
+            initTabs();
+            makeDraggable(document.getElementById('draggable'));
+            initInfiniteScroll();
+            
+            // 保存DOM操作演示的原始内容
+            manipulationOriginalContent = document.getElementById('manipulationDemo').innerHTML;
+        });
+    </script>
+</body>
+</html>

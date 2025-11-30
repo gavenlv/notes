@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>第4章：对象与数组 - 实战示例</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f7fa;
+        }
+        h1, h2, h3 {
+            color: #2c3e50;
+        }
+        .container {
+            background-color: white;
+            border-radius: 8px;
+            padding: 25px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .section {
+            margin-bottom: 30px;
+            padding: 15px;
+            border-left: 4px solid #3498db;
+            background-color: #f8f9fa;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 14px;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        .result {
+            background-color: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 10px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .input-field {
+            width: 100%;
+            padding: 8px;
+            margin: 5px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #3498db;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 15px;
+        }
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border: 1px solid transparent;
+            border-bottom: none;
+            border-radius: 5px 5px 0 0;
+            margin-right: 5px;
+            background-color: #f1f1f1;
+        }
+        .tab.active {
+            background-color: white;
+            border-color: #ddd;
+            border-bottom: 1px solid white;
+            margin-bottom: -1px;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <h1>第4章：对象与数组 - 实战示例</h1>
+    
+    <div class="container">
+        <div class="tabs">
+            <div class="tab active" onclick="showTab('objects')">对象操作</div>
+            <div class="tab" onclick="showTab('arrays')">数组操作</div>
+            <div class="tab" onclick="showTab('data-structure')">复杂数据结构</div>
+            <div class="tab" onclick="showTab('practical-apps')">实际应用</div>
+        </div>
+
+        <!-- 对象操作标签页 -->
+        <div id="objects" class="tab-content active">
+            <div class="section">
+                <h2>对象创建与操作</h2>
+                <button onclick="createObject()">创建对象</button>
+                <button onclick="accessProperties()">访问属性</button>
+                <button onclick="modifyProperties()">修改属性</button>
+                <button onclick="deleteProperty()">删除属性</button>
+                <button onclick="enumerateProperties()">枚举属性</button>
+                <div id="objectResult" class="result"></div>
+            </div>
+
+            <div class="section">
+                <h2>对象方法</h2>
+                <button onclick="demonstrateObjectMethods()">演示对象方法</button>
+                <div id="objectMethodsResult" class="result"></div>
+            </div>
+        </div>
+
+        <!-- 数组操作标签页 -->
+        <div id="arrays" class="tab-content">
+            <div class="section">
+                <h2>数组创建与操作</h2>
+                <button onclick="createArrays()">创建数组</button>
+                <button onclick="modifyArray()">修改数组</button>
+                <div id="arrayResult" class="result"></div>
+            </div>
+
+            <div class="section">
+                <h2>数组方法演示</h2>
+                <button onclick="demonstrateArrayMethods()">演示数组方法</button>
+                <div id="arrayMethodsResult" class="result"></div>
+            </div>
+        </div>
+
+        <!-- 复杂数据结构标签页 -->
+        <div id="data-structure" class="tab-content">
+            <div class="section">
+                <h2>公司数据结构示例</h2>
+                <button onclick="createCompanyStructure()">创建公司结构</button>
+                <button onclick="queryDepartment()">查询部门信息</button>
+                <button onclick="analyzeSkills()">分析员工技能</button>
+                <div id="dataStructureResult" class="result"></div>
+            </div>
+        </div>
+
+        <!-- 实际应用标签页 -->
+        <div id="practical-apps" class="tab-content">
+            <div class="section">
+                <h2>购物车应用</h2>
+                <table>
+                    <tr>
+                        <th>商品名称</th>
+                        <th>价格</th>
+                        <th>数量</th>
+                        <th>小计</th>
+                        <th>操作</th>
+                    </tr>
+                    <tbody id="cartTableBody">
+                    </tbody>
+                </table>
+                <div>
+                    <input type="text" id="productName" class="input-field" placeholder="商品名称">
+                    <input type="number" id="productPrice" class="input-field" placeholder="价格" style="width: 100px;">
+                    <input type="number" id="productQuantity" class="input-field" placeholder="数量" style="width: 100px;">
+                    <button onclick="addToCart()">添加到购物车</button>
+                </div>
+                <div style="margin-top: 15px;">
+                    <strong>总计: ¥<span id="cartTotal">0.00</span></strong>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 显示指定的标签页
+        function showTab(tabId) {
+            // 隐藏所有标签内容
+            const tabContents = document.querySelectorAll('.tab-content');
+            tabContents.forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // 移除所有标签的活动状态
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // 显示指定的标签内容和激活对应的标签
+            document.getElementById(tabId).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // 对象相关函数
+        function createObject() {
+            const person = {
+                name: "张三",
+                age: 30,
+                job: "前端开发",
+                hobbies: ["编程", "阅读", "旅行"],
+                address: {
+                    city: "北京",
+                    district: "朝阳区"
+                },
+                greet: function() {
+                    return `你好，我是${this.name}，今年${this.age}岁，职业是${this.job}`;
+                }
+            };
+            
+            const resultDiv = document.getElementById('objectResult');
+            resultDiv.textContent = `创建的对象：\n${JSON.stringify(person, null, 2)}\n\n调用greet方法：\n${person.greet()}`;
+        }
+
+        function accessProperties() {
+            const car = {
+                brand: "特斯拉",
+                model: "Model 3",
+                year: 2022,
+                color: "红色",
+                price: 250000,
+                features: ["自动驾驶", "触摸屏", "无钥匙进入"]
+            };
+            
+            let result = "使用不同的方式访问对象属性：\n\n";
+            
+            // 点表示法
+            result += `点表示法访问: car.brand = ${car.brand}\n`;
+            
+            // 方括号表示法
+            const propName = "model";
+            result += `方括号表示法访问: car['${propName}'] = ${car[propName]}\n`;
+            
+            // 访问嵌套属性
+            result += `访问特性: car.features[0] = ${car.features[0]}\n`;
+            
+            // 计算属性访问
+            const featuresCount = car.features.length;
+            result += `特性数量: car.features.length = ${featuresCount}\n`;
+            
+            document.getElementById('objectResult').textContent = result;
+        }
+
+        function modifyProperties() {
+            const laptop = {
+                brand: "联想",
+                model: "ThinkPad",
+                ram: "8GB",
+                storage: "256GB SSD"
+            };
+            
+            let result = `原始对象：\n${JSON.stringify(laptop, null, 2)}\n\n`;
+            
+            // 修改现有属性
+            laptop.ram = "16GB";
+            result += `修改内存后：\n${JSON.stringify(laptop, null, 2)}\n\n`;
+            
+            // 添加新属性
+            laptop.price = 5999;
+            laptop.color = "黑色";
+            result += `添加新属性后：\n${JSON.stringify(laptop, null, 2)}\n\n`;
+            
+            // 添加方法
+            laptop.getSpecs = function() {
+                return `${this.brand} ${this.model}, ${this.ram}, ${this.storage}, 价格: ¥${this.price}`;
+            };
+            
+            result += `添加方法后调用：\n${laptop.getSpecs()}`;
+            
+            document.getElementById('objectResult').textContent = result;
+        }
+
+        function deleteProperty() {
+            const smartphone = {
+                brand: "华为",
+                model: "P50",
+                os: "HarmonyOS",
+                year: 2021,
+                price: 4299,
+                color: "黑色",
+                storage: "128GB",
+                isAvailable: true,
+                discount: null
+            };
+            
+            let result = `原始对象：\n${JSON.stringify(smartphone, null, 2)}\n\n`;
+            
+            // 删除属性
+            delete smartphone.year;
+            result += `删除year属性后：\n${JSON.stringify(smartphone, null, 2)}\n\n`;
+            
+            // 删除多个属性
+            delete smartphone.color;
+            delete smartphone.storage;
+            result += `删除多个属性后：\n${JSON.stringify(smartphone, null, 2)}\n\n`;
+            
+            // 尝试删除不存在的属性
+            delete screenSize;  // 不会报错
+            result += `尝试删除不存在的属性不会报错\n\n`;
+            
+            // 尝试删除继承的属性
+            result += `删除toString属性前：\n`;
+            result += `smartphone.toString === Object.prototype.toString: ${smartphone.toString === Object.prototype.toString}\n`;
+            
+            delete smartphone.toString;  // 不会成功删除继承的属性
+            result += `删除toString属性后：\n`;
+            result += `smartphone.toString === Object.prototype.toString: ${smartphone.toString === Object.prototype.toString}`;
+            
+            document.getElementById('objectResult').textContent = result;
+        }
+
+        function enumerateProperties() {
+            const book = {
+                title: "JavaScript高级程序设计",
+                author: "尼古拉斯·泽卡斯",
+                publisher: "人民邮电出版社",
+                year: 2019,
+                isbn: "978-7-115-51766-1",
+                pages: 748,
+                language: "中文",
+                price: 129.00,
+                rating: 4.8
+            };
+            
+            let result = "对象：\n";
+            result += `${JSON.stringify(book, null, 2)}\n\n`;
+            
+            // 使用for...in循环
+            result += "使用for...in循环遍历属性：\n";
+            for (const prop in book) {
+                result += `${prop}: ${book[prop]}\n`;
+            }
+            
+            result += "\n使用Object.keys()获取所有属性名：\n";
+            const keys = Object.keys(book);
+            result += keys.join(", ");
+            
+            result += "\n\n使用Object.values()获取所有属性值：\n";
+            const values = Object.values(book);
+            result += values.join(", ");
+            
+            result += "\n\n使用Object.entries()获取键值对数组：\n";
+            const entries = Object.entries(book);
+            entries.forEach(([key, value]) => {
+                result += `${key}: ${value}\n`;
+            });
+            
+            document.getElementById('objectResult').textContent = result;
+        }
+
+        function demonstrateObjectMethods() {
+            let result = "Object静态方法演示：\n\n";
+            
+            // Object.assign()
+            const target = { a: 1, b: 2 };
+            const source = { b: 3, c: 4 };
+            const assigned = Object.assign(target, source);
+            result += `Object.assign(target, source):\n`;
+            result += `target: ${JSON.stringify(target)}\n`;
+            result += `assigned: ${JSON.stringify(assigned)}\n`;
+            result += `target === assigned: ${target === assigned}\n\n`;
+            
+            // Object.is()
+            result += "Object.is()比较：\n";
+            result += `Object.is(100, 100): ${Object.is(100, 100)}\n`;
+            result += `Object.is('foo', 'foo'): ${Object.is('foo', 'foo')}\n`;
+            result += `Object.is({}, {}): ${Object.is({}, {})}\n`;
+            result += `Object.is(+0, -0): ${Object.is(+0, -0)} (与===不同)\n`;
+            result += `Object.is(NaN, NaN): ${Object.is(NaN, NaN)} (与===不同)\n\n`;
+            
+            // Object.freeze()
+            const frozen = { prop: "不可修改" };
+            Object.freeze(frozen);
+            frozen.prop = "尝试修改";
+            frozen.newProp = "新属性";
+            delete frozen.prop;
+            result += `Object.freeze()演示:\n`;
+            result += `尝试修改冻结对象后: ${JSON.stringify(frozen)}\n\n`;
+            
+            // Object.seal()
+            const sealed = { prop: "可以修改" };
+            Object.seal(sealed);
+            sealed.prop = "已修改";
+            sealed.newProp = "新属性";
+            delete sealed.prop;
+            result += `Object.seal()演示:\n`;
+            result += `修改密封对象后: ${JSON.stringify(sealed)}\n\n`;
+            
+            // Object.create()
+            const personProto = {
+                greet: function() {
+                    return `你好，我是${this.name}`;
+                }
+            };
+            
+            const person = Object.create(personProto);
+            person.name = "张三";
+            result += `Object.create()演示:\n`;
+            result += `创建的对象: ${JSON.stringify(person)}\n`;
+            result += `调用原型方法: ${person.greet()}`;
+            
+            document.getElementById('objectMethodsResult').textContent = result;
+        }
+
+        // 数组相关函数
+        function createArrays() {
+            let result = "数组的创建方式：\n\n";
+            
+            // 数组字面量
+            const numbers = [1, 2, 3, 4, 5];
+            const mixed = [1, "字符串", true, null, undefined, {a: 1}, [1, 2, 3]];
+            result += "数组字面量创建：\n";
+            result += `numbers: ${JSON.stringify(numbers)}\n`;
+            result += `mixed: ${JSON.stringify(mixed)}\n\n`;
+            
+            // Array构造函数
+            const arr1 = new Array();  // 空数组
+            const arr2 = new Array(3);  // 长度为3的空数组
+            const arr3 = new Array(1, 2, 3);  // [1, 2, 3]
+            result += "Array构造函数创建：\n";
+            result += `arr1 (new Array()): ${JSON.stringify(arr1)}, length: ${arr1.length}\n`;
+            result += `arr2 (new Array(3)): ${JSON.stringify(arr2)}, length: ${arr2.length}\n`;
+            result += `arr3 (new Array(1, 2, 3)): ${JSON.stringify(arr3)}, length: ${arr3.length}\n\n`;
+            
+            // Array.of()
+            const arr4 = Array.of(5);  // [5]
+            const arr5 = Array.of(1, 2, 3);  // [1, 2, 3]
+            result += "Array.of()创建：\n";
+            result += `arr4 (Array.of(5)): ${JSON.stringify(arr4)}\n`;
+            result += `arr5 (Array.of(1, 2, 3)): ${JSON.stringify(arr5)}\n\n`;
+            
+            // Array.from()
+            const str = "hello";
+            const chars = Array.from(str);
+            result += "Array.from()创建：\n";
+            result += `从字符串"${str}"创建数组: ${JSON.stringify(chars)}\n`;
+            
+            const arrayLike = {0: "a", 1: "b", 2: "c", length: 3};
+            const arr6 = Array.from(arrayLike);
+            result += `从类数组对象创建数组: ${JSON.stringify(arr6)}\n`;
+            
+            const numbers2 = [1, 2, 3, 4];
+            const doubled = Array.from(numbers2, x => x * 2);
+            result += `使用映射函数: ${JSON.stringify(doubled)}`;
+            
+            document.getElementById('arrayResult').textContent = result;
+        }
+
+        function modifyArray() {
+            let result = "数组操作演示：\n\n";
+            const fruits = ["苹果", "香蕉", "橙子"];
+            result += `原始数组: ${JSON.stringify(fruits)}\n\n`;
+            
+            // 添加元素
+            const fruitsCopy1 = [...fruits];
+            fruitsCopy1.push("葡萄");
+            result += `使用push()添加元素: ${JSON.stringify(fruitsCopy1)}\n`;
+            
+            const fruitsCopy2 = [...fruits];
+            fruitsCopy2.unshift("草莓");
+            result += `使用unshift()添加元素: ${JSON.stringify(fruitsCopy2)}\n`;
+            
+            // 删除元素
+            const fruitsCopy3 = [...fruits];
+            const last = fruitsCopy3.pop();
+            result += `使用pop()删除元素，返回值: "${last}"，数组变为: ${JSON.stringify(fruitsCopy3)}\n`;
+            
+            const fruitsCopy4 = [...fruits];
+            const first = fruitsCopy4.shift();
+            result += `使用shift()删除元素，返回值: "${first}"，数组变为: ${JSON.stringify(fruitsCopy4)}\n`;
+            
+            // splice操作
+            const fruitsCopy5 = [...fruits];
+            fruitsCopy5.splice(1, 0, "芒果", "桃子");
+            result += `使用splice(1, 0, "芒果", "桃子")插入元素: ${JSON.stringify(fruitsCopy5)}\n`;
+            
+            const fruitsCopy6 = [...fruits];
+            fruitsCopy6.splice(1, 1, "菠萝");
+            result += `使用splice(1, 1, "菠萝")替换元素: ${JSON.stringify(fruitsCopy6)}`;
+            
+            document.getElementById('arrayResult').textContent = result;
+        }
+
+        function demonstrateArrayMethods() {
+            const numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+            let result = `原始数组: ${JSON.stringify(numbers)}\n\n`;
+            
+            // 查找方法
+            const evenNumber = numbers.find(num => num % 2 === 0);
+            const evenIndex = numbers.findIndex(num => num % 2 === 0);
+            result += `查找方法演示:\n`;
+            result += `find()找到第一个偶数: ${evenNumber}\n`;
+            result += `findIndex()找到第一个偶数的索引: ${evenIndex}\n`;
+            result += `indexOf(5): ${numbers.indexOf(5)}\n`;
+            result += `includes(11): ${numbers.includes(11)}\n\n`;
+            
+            // 过滤和转换
+            const evenNumbers = numbers.filter(num => num % 2 === 0);
+            const squared = numbers.map(num => num * num);
+            const sum = numbers.reduce((acc, num) => acc + num, 0);
+            result += `过滤和转换方法演示:\n`;
+            result += `filter()过滤偶数: ${JSON.stringify(evenNumbers)}\n`;
+            result += `map()平方数组: ${JSON.stringify(squared)}\n`;
+            result += `reduce()求和: ${sum}\n\n`;
+            
+            // 其他有用方法
+            const isAllPositive = numbers.every(num => num > 0);
+            const hasEven = numbers.some(num => num % 2 === 0);
+            result += `判断方法演示:\n`;
+            result += `every()判断是否所有数字都大于0: ${isAllPositive}\n`;
+            result += `some()判断是否有偶数: ${hasEven}\n\n`;
+            
+            // 连接和切片
+            const arr1 = [1, 2, 3];
+            const arr2 = [4, 5, 6];
+            const combined = arr1.concat(arr2);
+            const sliced = numbers.slice(2, 7);
+            result += `连接和切片方法演示:\n`;
+            result += `concat()连接数组: ${JSON.stringify(combined)}\n`;
+            result += `slice(2, 7)切片数组: ${JSON.stringify(sliced)}\n\n`;
+            
+            // 排序和反转
+            const unsorted = [3, 1, 4, 1, 5, 9, 2, 6, 5];
+            const sorted = [...unsorted].sort((a, b) => a - b);
+            const reversed = [...unsorted].reverse();
+            result += `排序和反转方法演示:\n`;
+            result += `未排序数组: ${JSON.stringify(unsorted)}\n`;
+            result += `sort()排序后: ${JSON.stringify(sorted)}\n`;
+            result += `reverse()反转后: ${JSON.stringify(reversed)}`;
+            
+            document.getElementById('arrayMethodsResult').textContent = result;
+        }
+
+        // 复杂数据结构
+        function createCompanyStructure() {
+            const company = {
+                name: "科技创新公司",
+                founded: 2010,
+                employees: [
+                    {
+                        id: 1,
+                        name: "张三",
+                        position: "前端开发",
+                        department: "技术部",
+                        skills: ["HTML", "CSS", "JavaScript", "React"],
+                        contact: {
+                            email: "zhangsan@example.com",
+                            phone: "138-0000-0001"
+                        }
+                    },
+                    {
+                        id: 2,
+                        name: "李四",
+                        position: "后端开发",
+                        department: "技术部",
+                        skills: ["Node.js", "Python", "数据库"],
+                        contact: {
+                            email: "lisi@example.com",
+                            phone: "138-0000-0002"
+                        }
+                    },
+                    {
+                        id: 3,
+                        name: "王五",
+                        position: "产品经理",
+                        department: "产品部",
+                        skills: ["产品设计", "需求分析", "项目管理"],
+                        contact: {
+                            email: "wangwu@example.com",
+                            phone: "138-0000-0003"
+                        }
+                    }
+                ],
+                departments: [
+                    {
+                        name: "技术部",
+                        manager: "赵经理",
+                        budget: 500000
+                    },
+                    {
+                        name: "产品部",
+                        manager: "钱经理",
+                        budget: 300000
+                    }
+                ]
+            };
+            
+            // 存储到全局变量，供其他函数使用
+            window.currentCompany = company;
+            
+            let result = "创建的公司数据结构：\n\n";
+            result += `公司名称: ${company.name}\n`;
+            result += `成立年份: ${company.founded}\n`;
+            result += `员工数量: ${company.employees.length}\n`;
+            result += `部门数量: ${company.departments.length}\n\n`;
+            
+            result += "员工列表:\n";
+            company.employees.forEach(emp => {
+                result += `- ${emp.name} (${emp.position}, ${emp.department})\n`;
+            });
+            
+            result += "\n部门列表:\n";
+            company.departments.forEach(dept => {
+                result += `- ${dept.name} (经理: ${dept.manager}, 预算: ¥${dept.budget.toLocaleString()})\n`;
+            });
+            
+            document.getElementById('dataStructureResult').textContent = result;
+        }
+
+        function queryDepartment() {
+            if (!window.currentCompany) {
+                createCompanyStructure();
+            }
+            
+            const company = window.currentCompany;
+            
+            // 获取所有技术部员工
+            const techEmployees = company.employees.filter(
+                employee => employee.department === "技术部"
+            );
+            
+            // 计算每个部门的员工数量
+            const departmentCounts = company.employees.reduce((result, employee) => {
+                result[employee.department] = (result[employee.department] || 0) + 1;
+                return result;
+            }, {});
+            
+            // 获取所有职位
+            const positions = [...new Set(company.employees.map(emp => emp.position))];
+            
+            let result = "部门信息查询结果：\n\n";
+            
+            result += "技术部员工:\n";
+            techEmployees.forEach(emp => {
+                result += `- ${emp.name}: ${emp.position}\n`;
+            });
+            
+            result += "\n各部门员工数量:\n";
+            Object.entries(departmentCounts).forEach(([dept, count]) => {
+                result += `- ${dept}: ${count}人\n`;
+            });
+            
+            result += "\n所有职位:\n";
+            positions.forEach(pos => {
+                result += `- ${pos}\n`;
+            });
+            
+            document.getElementById('dataStructureResult').textContent = result;
+        }
+
+        function analyzeSkills() {
+            if (!window.currentCompany) {
+                createCompanyStructure();
+            }
+            
+            const company = window.currentCompany;
+            
+            // 获取所有技能并去重
+            const allSkills = company.employees
+                .flatMap(employee => employee.skills)
+                .filter((skill, index, self) => self.indexOf(skill) === index);
+            
+            // 统计每个技能的掌握人数
+            const skillCounts = allSkills.reduce((result, skill) => {
+                result[skill] = company.employees.filter(emp => 
+                    emp.skills.includes(skill)
+                ).length;
+                return result;
+            }, {});
+            
+            // 找出最流行的技能
+            const mostPopularSkills = Object.entries(skillCounts)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 3);
+            
+            // 按技能分组员工
+            const skillsToEmployees = allSkills.reduce((result, skill) => {
+                result[skill] = company.employees
+                    .filter(emp => emp.skills.includes(skill))
+                    .map(emp => emp.name);
+                return result;
+            }, {});
+            
+            let result = "员工技能分析：\n\n";
+            
+            result += `所有技能 (${allSkills.length}个):\n`;
+            allSkills.forEach(skill => {
+                result += `- ${skill}\n`;
+            });
+            
+            result += "\n各技能掌握人数:\n";
+            Object.entries(skillCounts).forEach(([skill, count]) => {
+                result += `- ${skill}: ${count}人\n`;
+            });
+            
+            result += "\n最流行的技能 (前3):\n";
+            mostPopularSkills.forEach(([skill, count], index) => {
+                result += `${index + 1}. ${skill}: ${count}人\n`;
+            });
+            
+            result += "\n技能分组员工:\n";
+            Object.entries(skillsToEmployees).forEach(([skill, employees]) => {
+                result += `${skill}: ${employees.join(", ")}\n`;
+            });
+            
+            document.getElementById('dataStructureResult').textContent = result;
+        }
+
+        // 购物车应用
+        let shoppingCart = [];
+
+        function renderCart() {
+            const tbody = document.getElementById('cartTableBody');
+            const totalElement = document.getElementById('cartTotal');
+            
+            // 清空表格
+            tbody.innerHTML = '';
+            
+            let total = 0;
+            
+            // 渲染购物车中的商品
+            shoppingCart.forEach((item, index) => {
+                const row = tbody.insertRow();
+                const subtotal = item.price * item.quantity;
+                total += subtotal;
+                
+                row.innerHTML = `
+                    <td>${item.name}</td>
+                    <td>¥${item.price.toFixed(2)}</td>
+                    <td>
+                        <button onclick="updateQuantity(${index}, -1)">-</button>
+                        <span style="margin: 0 10px;">${item.quantity}</span>
+                        <button onclick="updateQuantity(${index}, 1)">+</button>
+                    </td>
+                    <td>¥${subtotal.toFixed(2)}</td>
+                    <td><button onclick="removeFromCart(${index})">删除</button></td>
+                `;
+            });
+            
+            // 更新总价
+            totalElement.textContent = total.toFixed(2);
+        }
+
+        function addToCart() {
+            const nameInput = document.getElementById('productName');
+            const priceInput = document.getElementById('productPrice');
+            const quantityInput = document.getElementById('productQuantity');
+            
+            const name = nameInput.value.trim();
+            const price = parseFloat(priceInput.value);
+            const quantity = parseInt(quantityInput.value);
+            
+            if (!name || isNaN(price) || isNaN(quantity) || price <= 0 || quantity <= 0) {
+                alert('请输入有效的商品信息');
+                return;
+            }
+            
+            // 检查购物车中是否已有该商品
+            const existingItemIndex = shoppingCart.findIndex(item => item.name === name);
+            
+            if (existingItemIndex !== -1) {
+                // 如果已有该商品，增加数量
+                shoppingCart[existingItemIndex].quantity += quantity;
+            } else {
+                // 如果没有，添加新商品
+                shoppingCart.push({
+                    name,
+                    price,
+                    quantity
+                });
+            }
+            
+            // 清空输入框
+            nameInput.value = '';
+            priceInput.value = '';
+            quantityInput.value = '';
+            
+            // 重新渲染购物车
+            renderCart();
+        }
+
+        function updateQuantity(index, change) {
+            shoppingCart[index].quantity += change;
+            
+            // 如果数量小于等于0，从购物车中移除
+            if (shoppingCart[index].quantity <= 0) {
+                removeFromCart(index);
+            } else {
+                renderCart();
+            }
+        }
+
+        function removeFromCart(index) {
+            shoppingCart.splice(index, 1);
+            renderCart();
+        }
+    </script>
+</body>
+</html>

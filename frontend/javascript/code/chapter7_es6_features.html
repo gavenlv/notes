@@ -1,0 +1,2173 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>第7章：ES6+新特性 - 实战示例</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f7fa;
+        }
+        h1, h2, h3 {
+            color: #2c3e50;
+        }
+        .container {
+            background-color: white;
+            border-radius: 8px;
+            padding: 25px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .section {
+            margin-bottom: 30px;
+            padding: 15px;
+            border-left: 4px solid #3498db;
+            background-color: #f8f9fa;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 14px;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        .result {
+            background-color: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 10px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .input-field {
+            width: 100%;
+            padding: 8px;
+            margin: 5px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 15px;
+        }
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border: 1px solid transparent;
+            border-bottom: none;
+            border-radius: 5px 5px 0 0;
+            margin-right: 5px;
+            background-color: #f1f1f1;
+        }
+        .tab.active {
+            background-color: white;
+            border-color: #ddd;
+            border-bottom: 1px solid white;
+            margin-bottom: -1px;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* 演示特定样式 */
+        .code-block {
+            background-color: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 10px 0;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+        .highlight {
+            background-color: yellow;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #3498db;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        .user-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+            display: inline-block;
+            width: 200px;
+            vertical-align: top;
+        }
+        .user-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: #3498db;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 10px;
+        }
+        .product {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+            max-width: 300px;
+        }
+        .product-title {
+            font-weight: bold;
+            font-size: 18px;
+        }
+        .product-price {
+            color: #e74c3c;
+            font-size: 16px;
+            margin: 5px 0;
+        }
+        .product-discount {
+            background-color: #f39c12;
+            color: white;
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-size: 12px;
+        }
+        .product-stock {
+            margin-top: 10px;
+        }
+        .status-ok {
+            color: #27ae60;
+        }
+        .status-error {
+            color: #e74c3c;
+        }
+        .message-box {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 10px;
+            margin: 5px 0;
+            max-width: 300px;
+        }
+        .message-box .highlight {
+            font-weight: bold;
+            color: #e74c3c;
+        }
+        .canvas-container {
+            margin: 20px 0;
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: center;
+        }
+        .calculator {
+            background-color: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            max-width: 300px;
+            margin: 0 auto;
+        }
+        .calc-display {
+            background-color: #2c3e50;
+            color: white;
+            text-align: right;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            font-size: 18px;
+        }
+        .calc-buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 5px;
+        }
+        .calc-button {
+            padding: 10px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .calc-button:hover {
+            background-color: #2980b9;
+        }
+    </style>
+</head>
+<body>
+    <h1>第7章：ES6+新特性 - 实战示例</h1>
+    
+    <div class="container">
+        <div class="tabs">
+            <div class="tab active" onclick="showTab('let-const')">let/const</div>
+            <div class="tab" onclick="showTab('arrow-functions')">箭头函数</div>
+            <div class="tab" onclick="showTab('template-strings')">模板字符串</div>
+            <div class="tab" onclick="showTab('destructuring')">解构赋值</div>
+            <div class="tab" onclick="showTab('spread-rest')">扩展与剩余</div>
+            <div class="tab" onclick="showTab('object-literals')">对象字面量</div>
+            <div class="tab" onclick="showTab('data-structures')">新数据结构</div>
+            <div class="tab" onclick="showTab('iterators-generators')">迭代器与生成器</div>
+            <div class="tab" onclick="showTab('classes')">类与继承</div>
+            <div class="tab" onclick="showTab('examples')">实际示例</div>
+        </div>
+
+        <!-- let/const标签页 -->
+        <div id="let-const" class="tab-content active">
+            <div class="section">
+                <h2>let与const比较</h2>
+                <button onclick="compareVarLetConst()">比较var/let/const</button>
+                <button onclick="blockScopeDemo()">块级作用域演示</button>
+                <button onclick="loopScopeDemo()">循环作用域演示</button>
+                <div id="letConstResult" class="result"></div>
+            </div>
+        </div>
+
+        <!-- 箭头函数标签页 -->
+        <div id="arrow-functions" class="tab-content">
+            <div class="section">
+                <h2>箭头函数基础</h2>
+                <button onclick="arrowFunctionBasics()">箭头函数基础语法</button>
+                <button onclick="arrowFunctionThis()">this绑定问题</button>
+                <button onclick="arrowFunctionArrayMethods()">数组方法中的应用</button>
+                <div id="arrowFunctionResult" class="result"></div>
+            </div>
+        </div>
+
+        <!-- 模板字符串标签页 -->
+        <div id="template-strings" class="tab-content">
+            <div class="section">
+                <h2>模板字符串基础</h2>
+                <button onclick="templateStringBasics()">基本模板字符串</button>
+                <button onclick="multilineStrings()">多行字符串</button>
+                <button onclick="templateStringAdvanced()">高级用法</button>
+                <button onclick="taggedTemplates()">标签模板字符串</button>
+                <div id="templateStringResult" class="result"></div>
+            </div>
+        </div>
+
+        <!-- 解构赋值标签页 -->
+        <div id="destructuring" class="tab-content">
+            <div class="section">
+                <h2>数组解构</h2>
+                <button onclick="arrayDestructuring()">基本数组解构</button>
+                <button onclick="arrayDestructuringAdvanced()">高级数组解构</button>
+                <div id="arrayDestructuringResult" class="result"></div>
+            </div>
+            
+            <div class="section">
+                <h2>对象解构</h2>
+                <button onclick="objectDestructuring()">基本对象解构</button>
+                <button onclick="objectDestructuringAdvanced()">高级对象解构</button>
+                <button onclick="functionParameterDestructuring()">函数参数解构</button>
+                <div id="objectDestructuringResult" class="result"></div>
+            </div>
+        </div>
+
+        <!-- 扩展与剩余标签页 -->
+        <div id="spread-rest" class="tab-content">
+            <div class="section">
+                <h2>扩展运算符</h2>
+                <button onclick="spreadArray()">数组扩展</button>
+                <button onclick="spreadObject()">对象扩展</button>
+                <button onclick="spreadFunctionArgs()">函数参数扩展</button>
+                <div id="spreadResult" class="result"></div>
+            </div>
+            
+            <div class="section">
+                <h2>剩余参数</h2>
+                <button onclick="restParameters()">剩余参数基础</button>
+                <button onclick="restVsArguments()">rest参数vs arguments</button>
+                <div id="restResult" class="result"></div>
+            </div>
+        </div>
+
+        <!-- 对象字面量标签页 -->
+        <div id="object-literals" class="tab-content">
+            <div class="section">
+                <h2>对象字面量增强</h2>
+                <button onclick="objectShorthand()">属性简写</button>
+                <button onclick="methodShorthand()">方法简写</button>
+                <button onclick="computedPropertyNames()">计算属性名</button>
+                <div id="objectLiteralResult" class="result"></div>
+            </div>
+        </div>
+
+        <!-- 新数据结构标签页 -->
+        <div id="data-structures" class="tab-content">
+            <div class="section">
+                <h2>Symbol</h2>
+                <button onclick="symbolBasics()">Symbol基础</button>
+                <button onclick="symbolAdvanced()">Symbol高级用法</button>
+                <div id="symbolResult" class="result"></div>
+            </div>
+            
+            <div class="section">
+                <h2>Set</h2>
+                <button onclick="setBasics()">Set基础操作</button>
+                <button onclick="setAdvanced()">Set高级应用</button>
+                <div id="setResult" class="result"></div>
+            </div>
+            
+            <div class="section">
+                <h2>Map</h2>
+                <button onclick="mapBasics()">Map基础操作</button>
+                <button onclick="mapAdvanced()">Map高级应用</button>
+                <div id="mapResult" class="result"></div>
+            </div>
+        </div>
+
+        <!-- 迭代器与生成器标签页 -->
+        <div id="iterators-generators" class="tab-content">
+            <div class="section">
+                <h2>迭代器</h2>
+                <button onclick="iteratorBasics()">迭代器基础</button>
+                <button onclick="customIterator()">自定义迭代器</button>
+                <div id="iteratorResult" class="result"></div>
+            </div>
+            
+            <div class="section">
+                <h2>生成器</h2>
+                <button onclick="generatorBasics()">生成器基础</button>
+                <button onclick="generatorAdvanced()">生成器高级应用</button>
+                <div id="generatorResult" class="result"></div>
+            </div>
+        </div>
+
+        <!-- 类与继承标签页 -->
+        <div id="classes" class="tab-content">
+            <div class="section">
+                <h2>类的基础</h2>
+                <button onclick="classBasics()">类的基本定义</button>
+                <button onclick="classInheritance()">类继承</button>
+                <button onclick="classAdvanced()">类的高级特性</button>
+                <div id="classResult" class="result"></div>
+            </div>
+        </div>
+
+        <!-- 实际示例标签页 -->
+        <div id="examples" class="tab-content">
+            <div class="section">
+                <h2>实际应用示例</h2>
+                <button onclick="userCardsExample()">用户卡片生成</button>
+                <button onclick="productDisplayExample()">商品展示</button>
+                <button onclick="messageFormatExample()">消息格式化</button>
+                <button onclick="calculatorExample()">计算器实现</button>
+                <div id="examplesResult" class="result"></div>
+                
+                <div id="userCardsContainer"></div>
+                <div id="productContainer"></div>
+                <div id="messageContainer"></div>
+                <div id="calculatorContainer"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 显示指定的标签页
+        function showTab(tabId) {
+            // 隐藏所有标签内容
+            const tabContents = document.querySelectorAll('.tab-content');
+            tabContents.forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // 移除所有标签的活动状态
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // 显示指定的标签内容和激活对应的标签
+            document.getElementById(tabId).classList.add('active');
+            event.target.classList.add('active');
+        }
+        
+        // 辅助函数：显示结果
+        function showResult(elementId, message) {
+            const result = document.getElementById(elementId);
+            result.textContent += message + '\n';
+            result.scrollTop = result.scrollHeight;
+        }
+        
+        // 辅助函数：清除结果
+        function clearResult(elementId) {
+            document.getElementById(elementId).textContent = '';
+        }
+        
+        // ====================== let/const ======================
+        
+        // 比较var/let/const
+        function compareVarLetConst() {
+            clearResult('letConstResult');
+            showResult('letConstResult', '=== var/let/const 比较 ===');
+            
+            showResult('letConstResult', '使用var:');
+            for (var i = 0; i < 3; i++) {
+                // setTimeout中的i是同一个变量
+                setTimeout(() => {
+                    showResult('letConstResult', `var - 循环后i的值: ${i}`);
+                }, 100);
+            }
+            
+            showResult('letConstResult', '使用let:');
+            for (let j = 0; j < 3; j++) {
+                // 每次循环j都是新的变量
+                setTimeout(() => {
+                    showResult('letConstResult', `let - 循环内j的值: ${j}`);
+                }, 200);
+            }
+            
+            // const的不可变性
+            showResult('letConstResult', 'const的特性:');
+            const arr = [1, 2, 3];
+            showResult('letConstResult', `原始数组: [${arr}]`);
+            arr.push(4); // 可以修改数组内容
+            showResult('letConstResult', `修改后数组: [${arr}]`);
+            // arr = [5, 6]; // TypeError: 不能重新赋值
+            showResult('letConstResult', 'const对象/数组可以修改内容，但不能重新赋值');
+        }
+        
+        // 块级作用域演示
+        function blockScopeDemo() {
+            clearResult('letConstResult');
+            showResult('letConstResult', '=== 块级作用域演示 ===');
+            
+            function testScope() {
+                var varVar = "var变量";
+                let letVar = "let变量";
+                const constVar = "const变量";
+                
+                if (true) {
+                    var innerVarVar = "内部var变量";
+                    let innerLetVar = "内部let变量";
+                    const innerConstVar = "内部const变量";
+                    
+                    showResult('letConstResult', `块内可以访问: ${innerVarVar}, ${innerLetVar}, ${innerConstVar}`);
+                }
+                
+                showResult('letConstResult', `块外可以访问: ${varVar}, ${innerVarVar}`);
+                showResult('letConstResult', `块外不能访问内部let和const变量`);
+                
+                try {
+                    showResult('letConstResult', `尝试访问: ${innerLetVar}`);
+                } catch (e) {
+                    showResult('letConstResult', `错误: ${e.message}`);
+                }
+            }
+            
+            testScope();
+        }
+        
+        // 循环作用域演示
+        function loopScopeDemo() {
+            clearResult('letConstResult');
+            showResult('letConstResult', '=== 循环作用域演示 ===');
+            
+            // 模拟按钮点击事件
+            const buttons = [];
+            for (let i = 0; i < 3; i++) {
+                buttons.push({
+                    index: i,
+                    click: () => showResult('letConstResult', `按钮 ${i+1} 被点击`)
+                });
+            }
+            
+            // 模拟点击
+            buttons.forEach(btn => btn.click());
+        }
+        
+        // ====================== 箭头函数 ======================
+        
+        // 箭头函数基础语法
+        function arrowFunctionBasics() {
+            clearResult('arrowFunctionResult');
+            showResult('arrowFunctionResult', '=== 箭头函数基础语法 ===');
+            
+            // 传统函数
+            const traditionalAdd = function(a, b) {
+                return a + b;
+            };
+            
+            // 箭头函数不同形式
+            const arrow1 = (a, b) => {
+                return a + b;
+            };
+            
+            const arrow2 = (a, b) => a + b; // 单表达式
+            
+            const double = x => x * 2; // 单参数
+            
+            const getRandom = () => Math.random(); // 无参数
+            
+            showResult('arrowFunctionResult', `传统函数 5+3 = ${traditionalAdd(5, 3)}`);
+            showResult('arrowFunctionResult', `箭头函数(完整) 5+3 = ${arrow1(5, 3)}`);
+            showResult('arrowFunctionResult', `箭头函数(简化) 5+3 = ${arrow2(5, 3)}`);
+            showResult('arrowFunctionResult', `箭头函数(单参数) double(5) = ${double(5)}`);
+            showResult('arrowFunctionResult', `箭头函数(无参数) 随机数 = ${getRandom().toFixed(4)}`);
+        }
+        
+        // this绑定问题
+        function arrowFunctionThis() {
+            clearResult('arrowFunctionResult');
+            showResult('arrowFunctionResult', '=== 箭头函数的this绑定 ===');
+            
+            const obj = {
+                name: "对象",
+                
+                // 传统函数中的this
+                traditionalMethod: function() {
+                    showResult('arrowFunctionResult', `传统方法中的this.name: ${this.name}`);
+                    
+                    setTimeout(function() {
+                        showResult('arrowFunctionResult', `setTimeout内的this.name: ${this.name || 'undefined/window'}`);
+                    }, 100);
+                    
+                    setTimeout(() => {
+                        showResult('arrowFunctionResult', `setTimeout箭头函数内的this.name: ${this.name}`);
+                    }, 200);
+                },
+                
+                // 箭头函数作为方法（不推荐）
+                arrowMethod: () => {
+                    showResult('arrowFunctionResult', `箭头方法内的this.name: ${this.name || 'undefined/window'}`);
+                },
+                
+                // 推荐的简写方法
+                recommendedMethod() {
+                    showResult('arrowFunctionResult', `推荐方法内的this.name: ${this.name}`);
+                }
+            };
+            
+            obj.traditionalMethod();
+            obj.arrowMethod();
+            obj.recommendedMethod();
+        }
+        
+        // 数组方法中的应用
+        function arrowFunctionArrayMethods() {
+            clearResult('arrowFunctionResult');
+            showResult('arrowFunctionResult', '=== 数组方法中的箭头函数 ===');
+            
+            const numbers = [1, 2, 3, 4, 5];
+            
+            // 使用传统函数
+            const doubled1 = numbers.map(function(x) {
+                return x * 2;
+            });
+            
+            // 使用箭头函数
+            const doubled2 = numbers.map(x => x * 2);
+            
+            const evens = numbers.filter(x => x % 2 === 0);
+            const sum = numbers.reduce((acc, x) => acc + x, 0);
+            
+            showResult('arrowFunctionResult', `原始数组: [${numbers}]`);
+            showResult('arrowFunctionResult', `翻倍结果(传统): [${doubled1}]`);
+            showResult('arrowFunctionResult', `翻倍结果(箭头): [${doubled2}]`);
+            showResult('arrowFunctionResult', `偶数: [${evens}]`);
+            showResult('arrowFunctionResult', `总和: ${sum}`);
+        }
+        
+        // ====================== 模板字符串 ======================
+        
+        // 基本模板字符串
+        function templateStringBasics() {
+            clearResult('templateStringResult');
+            showResult('templateStringResult', '=== 基本模板字符串 ===');
+            
+            const name = "Alice";
+            const age = 30;
+            const greeting = `Hello, ${name}!`;
+            const info = `${name} is ${age} years old`;
+            
+            // 表达式
+            const a = 10;
+            const b = 20;
+            const calculation = `${a} + ${b} = ${a + b}`;
+            
+            // 函数调用
+            const upper = str => str.toUpperCase();
+            const message = `${upper("hello")} world!`;
+            
+            // 三元表达式
+            const userAge = 18;
+            const status = `${userAge >= 18 ? "成年" : "未成年"}`;
+            
+            showResult('templateStringResult', greeting);
+            showResult('templateStringResult', info);
+            showResult('templateStringResult', calculation);
+            showResult('templateStringResult', message);
+            showResult('templateStringResult', status);
+        }
+        
+        // 多行字符串
+        function multilineStrings() {
+            clearResult('templateStringResult');
+            showResult('templateStringResult', '=== 多行字符串 ===');
+            
+            const html = `
+                <div class="container">
+                    <h1>标题</h1>
+                    <p>这是一个段落</p>
+                    <ul>
+                        <li>项目1</li>
+                        <li>项目2</li>
+                    </ul>
+                </div>
+            `;
+            
+            const sql = `
+                SELECT id, name, email
+                FROM users
+                WHERE age > 18
+                ORDER BY name DESC
+                LIMIT 10
+            `;
+            
+            showResult('templateStringResult', 'HTML模板:');
+            showResult('templateStringResult', html);
+            
+            showResult('templateStringResult', 'SQL查询:');
+            showResult('templateStringResult', sql);
+        }
+        
+        // 高级用法
+        function templateStringAdvanced() {
+            clearResult('templateStringResult');
+            showResult('templateStringResult', '=== 模板字符串高级用法 ===');
+            
+            // 嵌套模板字符串
+            const user = {
+                name: "Bob",
+                age: 30,
+                address: {
+                    city: "北京",
+                    country: "中国"
+                }
+            };
+            
+            const userInfo = `
+                用户信息:
+                姓名: ${user.name}
+                年龄: ${user.age}
+                地址: ${user.address.city}, ${user.address.country}
+            `;
+            
+            showResult('templateStringResult', userInfo);
+            
+            // 条件渲染
+            function formatProduct(product) {
+                return `
+                    <div class="product">
+                        <h3>${product.name}</h3>
+                        <p>价格: ¥${product.price}</p>
+                        ${product.discount ? 
+                            `<p class="discount">折扣: ${product.discount}%</p>` : 
+                            ''}
+                        ${product.inStock ? 
+                            '<button class="buy">购买</button>' : 
+                            '<button disabled>缺货</button>'}
+                    </div>
+                `;
+            }
+            
+            const product1 = { name: "手机", price: 2999, discount: 10, inStock: true };
+            const product2 = { name: "耳机", price: 299, inStock: false };
+            
+            showResult('templateStringResult', '商品1 HTML:');
+            showResult('templateStringResult', formatProduct(product1));
+            
+            showResult('templateStringResult', '商品2 HTML:');
+            showResult('templateStringResult', formatProduct(product2));
+        }
+        
+        // 标签模板字符串
+        function taggedTemplates() {
+            clearResult('templateStringResult');
+            showResult('templateStringResult', '=== 标签模板字符串 ===');
+            
+            function highlight(strings, ...values) {
+                return strings.reduce((result, str, i) => {
+                    const value = i < values.length ? 
+                        `<span class="highlight">${values[i]}</span>` : 
+                        '';
+                    return `${result}${str}${value}`;
+                }, '');
+            }
+            
+            function escape(strings, ...values) {
+                return strings.reduce((result, str, i) => {
+                    const value = i < values.length ? 
+                        String(values[i]).replace(/[&<>"']/g, 
+                            char => ({
+                                '&': '&amp;',
+                                '<': '&lt;',
+                                '>': '&gt;',
+                                '"': '&quot;',
+                                "'": '&#039;'
+                            })[char]) : 
+                        '';
+                    return `${result}${str}${value}`;
+                }, '');
+            }
+            
+            const name = "<script>alert('XSS')</script>";
+            const highlighted = highlight`用户: ${name}, 年龄: ${30}`;
+            const escaped = escape`用户: ${name}, 年龄: ${30}`;
+            
+            showResult('templateStringResult', '高亮模板字符串:');
+            showResult('templateStringResult', highlighted);
+            
+            showResult('templateStringResult', '转义模板字符串:');
+            showResult('templateStringResult', escaped);
+        }
+        
+        // ====================== 解构赋值 ======================
+        
+        // 基本数组解构
+        function arrayDestructuring() {
+            clearResult('arrayDestructuringResult');
+            showResult('arrayDestructuringResult', '=== 基本数组解构 ===');
+            
+            const colors = ["red", "green", "blue", "yellow"];
+            
+            // 基本解构
+            const [first, second, third] = colors;
+            showResult('arrayDestructuringResult', `基本解构: ${first}, ${second}, ${third}`);
+            
+            // 忽略某些元素
+            const [, , thirdColor] = colors;
+            showResult('arrayDestructuringResult', `忽略前两个: ${thirdColor}`);
+            
+            // 默认值
+            const [a, b, c, d = "purple"] = colors;
+            showResult('arrayDestructuringResult', `使用默认值: ${d}`);
+            
+            // 剩余元素
+            const [primary, ...rest] = colors;
+            showResult('arrayDestructuringResult', `第一个: ${primary}, 剩余: [${rest}]`);
+            
+            // 变量交换
+            let x = 10, y = 20;
+            [x, y] = [y, x];
+            showResult('arrayDestructuringResult', `交换变量: x=${x}, y=${y}`);
+        }
+        
+        // 高级数组解构
+        function arrayDestructuringAdvanced() {
+            clearResult('arrayDestructuringResult');
+            showResult('arrayDestructuringResult', '=== 高级数组解构 ===');
+            
+            // 函数返回值解构
+            function getCoordinates() {
+                return [10, 20, 30];
+            }
+            
+            const [x, y, z] = getCoordinates();
+            showResult('arrayDestructuringResult', `函数返回值解构: x=${x}, y=${y}, z=${z}`);
+            
+            // 嵌套数组解构
+            const matrix = [[1, 2], [3, 4], [5, 6]];
+            const [[a1, b1], [a2, b2]] = matrix;
+            showResult('arrayDestructuringResult', `嵌套数组解构: [${a1}, ${b1}], [${a2}, ${b2}]`);
+            
+            // 解构函数参数
+            const sum = ([a, b, c]) => a + b + c;
+            showResult('arrayDestructuringResult', `解构函数参数: sum([1,2,3]) = ${sum([1, 2, 3])}`);
+        }
+        
+        // 基本对象解构
+        function objectDestructuring() {
+            clearResult('objectDestructuringResult');
+            showResult('objectDestructuringResult', '=== 基本对象解构 ===');
+            
+            const person = {
+                name: "Alice",
+                age: 30,
+                job: "developer",
+                email: "alice@example.com"
+            };
+            
+            // 基本解构
+            const { name, age } = person;
+            showResult('objectDestructuringResult', `基本解构: ${name}, ${age}`);
+            
+            // 重命名变量
+            const { name: fullName, age: years } = person;
+            showResult('objectDestructuringResult', `重命名: ${fullName}, ${years}`);
+            
+            // 默认值
+            const { name: personName, salary = 50000 } = person;
+            showResult('objectDestructuringResult', `默认值: ${personName}, 薪资: ${salary}`);
+            
+            // 剩余属性
+            const { job, email, ...otherProps } = person;
+            showResult('objectDestructuringResult', `提取属性: ${job}, ${email}`);
+            showResult('objectDestructuringResult', `剩余属性: ${JSON.stringify(otherProps)}`);
+        }
+        
+        // 高级对象解构
+        function objectDestructuringAdvanced() {
+            clearResult('objectDestructuringResult');
+            showResult('objectDestructuringResult', '=== 高级对象解构 ===');
+            
+            // 嵌套对象解构
+            const employee = {
+                id: 123,
+                personal: {
+                    name: "Bob",
+                    address: {
+                        city: "北京",
+                        street: "中关村"
+                    }
+                },
+                work: {
+                    position: "前端开发",
+                    company: {
+                        name: "科技公司",
+                        location: "上海"
+                    }
+                }
+            };
+            
+            const { 
+                personal: { 
+                    name: empName, 
+                    address: { 
+                        city, 
+                        street 
+                    } 
+                },
+                work: {
+                    position,
+                    company: {
+                        name: companyName
+                    }
+                }
+            } = employee;
+            
+            showResult('objectDestructuringResult', `嵌套解构: ${empName}, ${city}, ${street}`);
+            showResult('objectDestructuringResult', `工作信息: ${position} at ${companyName}`);
+            
+            // 函数参数解构
+            function displayUser({ name, age, location = "未知" }) {
+                return `${name}, ${age}岁, 来自${location}`;
+            }
+            
+            const user = { name: "Carol", age: 25, location: "上海" };
+            showResult('objectDestructuringResult', `函数参数解构: ${displayUser(user)}`);
+        }
+        
+        // 函数参数解构
+        function functionParameterDestructuring() {
+            clearResult('objectDestructuringResult');
+            showResult('objectDestructuringResult', '=== 函数参数解构 ===');
+            
+            // 对象参数解构
+            function createUser({ name, age, email, role = "user" }) {
+                return {
+                    id: Date.now(),
+                    name,
+                    age,
+                    email,
+                    role,
+                    createdAt: new Date().toISOString()
+                };
+            }
+            
+            const newUser = createUser({
+                name: "Dave",
+                age: 28,
+                email: "dave@example.com"
+            });
+            
+            showResult('objectDestructuringResult', '创建用户:');
+            showResult('objectDestructuringResult', JSON.stringify(newUser, null, 2));
+            
+            // 数组参数解构
+            function getFirstAndLast([first, , last]) {
+                return { first, last };
+            }
+            
+            const colors = ["red", "green", "blue", "yellow"];
+            const { first, last } = getFirstAndLast(colors);
+            
+            showResult('objectDestructuringResult', `获取首尾颜色: ${first}, ${last}`);
+            
+            // 嵌套参数解构
+            function processConfig({
+                database: {
+                    host = "localhost",
+                    port = 5432
+                } = {},
+                server: {
+                    port: serverPort = 3000
+                } = {},
+                timeout = 5000
+            } = {}) {
+                return {
+                    dbHost: host,
+                    dbPort: port,
+                    serverPort,
+                    timeout
+                };
+            }
+            
+            const config = {
+                database: {
+                    host: "db.example.com"
+                },
+                server: {
+                    port: 8080
+                }
+            };
+            
+            const processedConfig = processConfig(config);
+            showResult('objectDestructuringResult', '处理配置:');
+            showResult('objectDestructuringResult', JSON.stringify(processedConfig, null, 2));
+        }
+        
+        // ====================== 扩展与剩余 ======================
+        
+        // 数组扩展
+        function spreadArray() {
+            clearResult('spreadResult');
+            showResult('spreadResult', '=== 数组扩展运算符 ===');
+            
+            // 数组合并
+            const arr1 = [1, 2, 3];
+            const arr2 = [4, 5, 6];
+            const combined = [...arr1, ...arr2];
+            showResult('spreadResult', `数组合并: [${combined}]`);
+            
+            // 数组复制
+            const original = [1, 2, 3];
+            const copy = [...original];
+            showResult('spreadResult', `数组复制: [${copy}]`);
+            
+            // 在数组中间插入元素
+            const numbers = [1, 4, 5];
+            const withInserted = [1, 2, 3, ...numbers.slice(1)];
+            showResult('spreadResult', `插入元素: [${withInserted}]`);
+            
+            // 字符串转数组
+            const str = "hello";
+            const chars = [...str];
+            showResult('spreadResult', `字符串转数组: [${chars}]`);
+            
+            // 集合转数组
+            const mySet = new Set([1, 2, 3]);
+            const setArray = [...mySet];
+            showResult('spreadResult', `Set转数组: [${setArray}]`);
+        }
+        
+        // 对象扩展
+        function spreadObject() {
+            clearResult('spreadResult');
+            showResult('spreadResult', '=== 对象扩展运算符 ===');
+            
+            const user = {
+                name: "Alice",
+                age: 30
+            };
+            
+            // 对象合并
+            const updatedUser = {
+                ...user,
+                email: "alice@example.com"
+            };
+            showResult('spreadResult', '对象合并:');
+            showResult('spreadResult', JSON.stringify(updatedUser, null, 2));
+            
+            // 对象覆盖
+            const overridden = {
+                ...user,
+                age: 31  // 覆盖原来的age
+            };
+            showResult('spreadResult', '属性覆盖:');
+            showResult('spreadResult', JSON.stringify(overridden, null, 2));
+            
+            // 多对象合并
+            const baseConfig = {
+                api: "https://api.example.com",
+                timeout: 5000
+            };
+            
+            const devConfig = {
+                api: "http://localhost:3000",
+                debug: true
+            };
+            
+            const prodConfig = {
+                timeout: 10000,
+                cache: true
+            };
+            
+            const devMerged = { ...baseConfig, ...devConfig };
+            const prodMerged = { ...baseConfig, ...prodConfig };
+            
+            showResult('spreadResult', '开发环境配置:');
+            showResult('spreadResult', JSON.stringify(devMerged, null, 2));
+            
+            showResult('spreadResult', '生产环境配置:');
+            showResult('spreadResult', JSON.stringify(prodMerged, null, 2));
+        }
+        
+        // 函数参数扩展
+        function spreadFunctionArgs() {
+            clearResult('spreadResult');
+            showResult('spreadResult', '=== 函数参数扩展 ===');
+            
+            // 使用扩展运算符传递参数
+            function add(a, b, c) {
+                return a + b + c;
+            }
+            
+            const numbers = [1, 2, 3];
+            const sum = add(...numbers);
+            showResult('spreadResult', `扩展参数求和: ${sum}`);
+            
+            // 结合传统参数和扩展参数
+            function greet(greeting, ...names) {
+                return `${greeting}, ${names.join(', ')}!`;
+            }
+            
+            const greeting = greet('Hello', 'Alice', 'Bob', 'Charlie');
+            showResult('spreadResult', `动态问候: ${greeting}`);
+        }
+        
+        // 剩余参数基础
+        function restParameters() {
+            clearResult('restResult');
+            showResult('restResult', '=== 剩余参数基础 ===');
+            
+            function sum(first, second, ...rest) {
+                showResult('restResult', `第一个参数: ${first}`);
+                showResult('restResult', `第二个参数: ${second}`);
+                showResult('restResult', `剩余参数: [${rest}]`);
+                return first + second + rest.reduce((acc, val) => acc + val, 0);
+            }
+            
+            const result = sum(1, 2, 3, 4, 5);
+            showResult('restResult', `总和: ${result}`);
+        }
+        
+        // rest参数vs arguments
+        function restVsArguments() {
+            clearResult('restResult');
+            showResult('restResult', '=== rest参数 vs arguments ===');
+            
+            function funcWithRest(...args) {
+                showResult('restResult', 'rest参数是一个真正的数组:');
+                showResult('restResult', `类型: ${Array.isArray(args)}`);
+                showResult('restResult', `可以使用数组方法: ${args.join(', ')}`);
+                showResult('restResult', `有数组方法: ${typeof args.map}`);
+                
+                showResult('restResult', 'arguments是类数组对象:');
+                showResult('restResult', `类型: ${Array.isArray(arguments)}`);
+                showResult('restResult', `需要转换: ${Array.from(arguments).join(', ')}`);
+                showResult('restResult', `没有数组方法: ${typeof arguments.map}`);
+            }
+            
+            funcWithRest(1, 2, 3);
+        }
+        
+        // ====================== 对象字面量 ======================
+        
+        // 属性简写
+        function objectShorthand() {
+            clearResult('objectLiteralResult');
+            showResult('objectLiteralResult', '=== 对象属性简写 ===');
+            
+            const name = "Alice";
+            const age = 30;
+            const email = "alice@example.com";
+            
+            // ES5写法
+            const personES5 = {
+                name: name,
+                age: age,
+                email: email
+            };
+            
+            // ES6简写
+            const personES6 = {
+                name,
+                age,
+                email
+            };
+            
+            showResult('objectLiteralResult', 'ES5写法:');
+            showResult('objectLiteralResult', JSON.stringify(personES5, null, 2));
+            
+            showResult('objectLiteralResult', 'ES6简写:');
+            showResult('objectLiteralResult', JSON.stringify(personES6, null, 2));
+        }
+        
+        // 方法简写
+        function methodShorthand() {
+            clearResult('objectLiteralResult');
+            showResult('objectLiteralResult', '=== 对象方法简写 ===');
+            
+            // ES5写法
+            const calculatorES5 = {
+                value: 0,
+                add: function(x) {
+                    this.value += x;
+                    return this;
+                },
+                subtract: function(x) {
+                    this.value -= x;
+                    return this;
+                },
+                getResult: function() {
+                    return this.value;
+                }
+            };
+            
+            // ES6简写
+            const calculatorES6 = {
+                value: 0,
+                add(x) {
+                    this.value += x;
+                    return this;
+                },
+                subtract(x) {
+                    this.value -= x;
+                    return this;
+                },
+                getResult() {
+                    return this.value;
+                }
+            };
+            
+            const result = calculatorES6.add(10).subtract(3).getResult();
+            showResult('objectLiteralResult', `计算结果: ${result}`);
+            
+            showResult('objectLiteralResult', 'ES6简写方法:');
+            showResult('objectLiteralResult', JSON.stringify(calculatorES6, null, 2));
+        }
+        
+        // 计算属性名
+        function computedPropertyNames() {
+            clearResult('objectLiteralResult');
+            showResult('objectLiteralResult', '=== 计算属性名 ===');
+            
+            const propName = "dynamicProp";
+            const value = "dynamic value";
+            
+            // 动态属性名
+            const obj = {
+                [propName]: value,
+                ["computed" + "Prop"]: "computed value"
+            };
+            
+            showResult('objectLiteralResult', '动态属性名对象:');
+            showResult('objectLiteralResult', JSON.stringify(obj, null, 2));
+            
+            // 实际应用：基于条件创建属性
+            function createObject(includeExtra) {
+                const base = {
+                    id: 1,
+                    name: "基础对象"
+                };
+                
+                return {
+                    ...base,
+                    ...(includeExtra ? { extra: "额外属性" } : {})
+                };
+            }
+            
+            const obj1 = createObject(true);
+            const obj2 = createObject(false);
+            
+            showResult('objectLiteralResult', '包含额外属性:');
+            showResult('objectLiteralResult', JSON.stringify(obj1, null, 2));
+            
+            showResult('objectLiteralResult', '不包含额外属性:');
+            showResult('objectLiteralResult', JSON.stringify(obj2, null, 2));
+        }
+        
+        // ====================== 新数据结构 ======================
+        
+        // Symbol基础
+        function symbolBasics() {
+            clearResult('symbolResult');
+            showResult('symbolResult', '=== Symbol基础 ===');
+            
+            // 创建Symbol
+            const sym1 = Symbol();
+            const sym2 = Symbol("description");
+            const sym3 = Symbol("description"); // 即使描述相同，也是不同的Symbol
+            
+            showResult('symbolResult', `sym1 === sym2: ${sym1 === sym2}`);
+            showResult('symbolResult', `sym2 === sym3: ${sym2 === sym3}`);
+            showResult('symbolResult', `sym2描述: ${sym2.description}`);
+            showResult('symbolResult', `sym3描述: ${sym3.description}`);
+            
+            // Symbol作为对象属性
+            const idSymbol = Symbol("id");
+            const user = {
+                name: "Alice",
+                [idSymbol]: 12345
+            };
+            
+            showResult('symbolResult', `Symbol属性值: ${user[idSymbol]}`);
+            
+            // Symbol属性不会出现在for...in循环中
+            showResult('symbolResult', 'for...in循环结果:');
+            for (const prop in user) {
+                showResult('symbolResult', `  ${prop}`);
+            }
+            
+            // Object.keys()也不会返回Symbol属性
+            showResult('symbolResult', `Object.keys()结果: [${Object.keys(user)}]`);
+            
+            // 需要使用Object.getOwnPropertySymbols()获取Symbol属性
+            const symbolProps = Object.getOwnPropertySymbols(user);
+            showResult('symbolResult', `Symbol属性: ${symbolProps.map(s => s.description)}`);
+        }
+        
+        // Symbol高级用法
+        function symbolAdvanced() {
+            clearResult('symbolResult');
+            showResult('symbolResult', '=== Symbol高级用法 ===');
+            
+            // Symbol.for()和Symbol.keyFor()
+            const globalSym1 = Symbol.for("global");
+            const globalSym2 = Symbol.for("global");
+            
+            showResult('symbolResult', `全局Symbol相等: ${globalSym1 === globalSym2}`);
+            showResult('symbolResult', `Symbol.keyFor结果: ${Symbol.keyFor(globalSym1)}`);
+            
+            // 内置Symbol - 实现迭代器
+            class MyCollection {
+                constructor() {
+                    this.items = [];
+                }
+                
+                add(item) {
+                    this.items.push(item);
+                }
+                
+                // 使用内置Symbol实现迭代
+                [Symbol.iterator]() {
+                    let index = 0;
+                    return {
+                        next: () => {
+                            if (index < this.items.length) {
+                                return { value: this.items[index++], done: false };
+                            } else {
+                                return { done: true };
+                            }
+                        }
+                    };
+                }
+            }
+            
+            const collection = new MyCollection();
+            collection.add("A");
+            collection.add("B");
+            collection.add("C");
+            
+            showResult('symbolResult', '使用Symbol迭代器遍历:');
+            for (const item of collection) {
+                showResult('symbolResult', `  ${item}`);
+            }
+            
+            // 使用扩展运算符
+            const arrayFromCollection = [...collection];
+            showResult('symbolResult', `从集合创建数组: [${arrayFromCollection}]`);
+        }
+        
+        // Set基础操作
+        function setBasics() {
+            clearResult('setResult');
+            showResult('setResult', '=== Set基础操作 ===');
+            
+            // 创建Set
+            const set1 = new Set();
+            const set2 = new Set([1, 2, 3, 3, 4]); // 自动去重
+            
+            showResult('setResult', `创建Set: ${JSON.stringify([...set2])}`);
+            
+            // 添加元素
+            set1.add("a");
+            set1.add("b");
+            set1.add("a"); // 重复添加不会生效
+            
+            showResult('setResult', `添加元素后: ${JSON.stringify([...set1])}`);
+            
+            // 删除元素
+            set1.delete("a");
+            showResult('setResult', `删除元素后: ${JSON.stringify([...set1])}`);
+            
+            // 检查元素是否存在
+            showResult('setResult', `包含"b": ${set1.has("b")}`);
+            showResult('setResult', `包含"a": ${set1.has("a")}`);
+            
+            // 获取大小
+            showResult('setResult', `Set大小: ${set1.size}`);
+            
+            // Set的遍历
+            const colors = new Set(["red", "green", "blue"]);
+            
+            showResult('setResult', '使用forEach遍历:');
+            colors.forEach((value, valueAgain, set) => {
+                showResult('setResult', `  ${value}`);
+            });
+            
+            showResult('setResult', '使用for...of遍历:');
+            for (const color of colors) {
+                showResult('setResult', `  ${color}`);
+            }
+        }
+        
+        // Set高级应用
+        function setAdvanced() {
+            clearResult('setResult');
+            showResult('setResult', '=== Set高级应用 ===');
+            
+            // 1. 数组去重
+            const arrayWithDuplicates = [1, 2, 2, 3, 4, 4, 5];
+            const uniqueArray = [...new Set(arrayWithDuplicates)];
+            
+            showResult('setResult', `原数组: [${arrayWithDuplicates}]`);
+            showResult('setResult', `去重后: [${uniqueArray}]`);
+            
+            // 2. 检查元素是否唯一
+            function hasDuplicates(arr) {
+                return arr.length !== new Set(arr).size;
+            }
+            
+            showResult('setResult', `数组[1,2,3]有重复: ${hasDuplicates([1, 2, 3])}`);
+            showResult('setResult', `数组[1,2,2]有重复: ${hasDuplicates([1, 2, 2])}`);
+            
+            // 3. 集合操作
+            const setA = new Set([1, 2, 3]);
+            const setB = new Set([3, 4, 5]);
+            
+            // 并集
+            const union = new Set([...setA, ...setB]);
+            showResult('setResult', `并集: [${[...union]}]`);
+            
+            // 交集
+            const intersection = new Set([...setA].filter(x => setB.has(x)));
+            showResult('setResult', `交集: [${[...intersection]}]`);
+            
+            // 差集 (A - B)
+            const difference = new Set([...setA].filter(x => !setB.has(x)));
+            showResult('setResult', `差集(A-B): [${[...difference]}]`);
+        }
+        
+        // Map基础操作
+        function mapBasics() {
+            clearResult('mapResult');
+            showResult('mapResult', '=== Map基础操作 ===');
+            
+            // 创建Map
+            const map1 = new Map();
+            const map2 = new Map([
+                ["key1", "value1"],
+                ["key2", "value2"]
+            ]);
+            
+            // 设置值
+            map1.set("name", "Alice");
+            map1.set("age", 30);
+            map1.set("objectKey", { id: 1 });
+            
+            // Map可以使用任何类型作为键
+            const key1 = {};
+            const key2 = function() {};
+            map1.set(key1, "object as key");
+            map1.set(key2, "function as key");
+            
+            // 获取值
+            showResult('mapResult', `name: ${map1.get("name")}`);
+            showResult('mapResult', `objectKey: ${JSON.stringify(map1.get("objectKey"))}`);
+            showResult('mapResult', `key1: ${map1.get(key1)}`);
+            
+            // 检查键是否存在
+            showResult('mapResult', `有name键: ${map1.has("name")}`);
+            showResult('mapResult', `有不存在的键: ${map1.has("nonexistent")}`);
+            
+            // 获取大小
+            showResult('mapResult', `Map大小: ${map1.size}`);
+            
+            // Map的遍历
+            const userMap = new Map([
+                ["name", "Bob"],
+                ["age", 25],
+                ["email", "bob@example.com"]
+            ]);
+            
+            showResult('mapResult', '使用forEach遍历:');
+            userMap.forEach((value, key) => {
+                showResult('mapResult', `  ${key}: ${value}`);
+            });
+            
+            showResult('mapResult', '使用for...of遍历键值对:');
+            for (const [key, value] of userMap) {
+                showResult('mapResult', `  ${key}: ${value}`);
+            }
+            
+            showResult('mapResult', '只遍历键:');
+            for (const key of userMap.keys()) {
+                showResult('mapResult', `  ${key}`);
+            }
+            
+            showResult('mapResult', '只遍历值:');
+            for (const value of userMap.values()) {
+                showResult('mapResult', `  ${value}`);
+            }
+        }
+        
+        // Map高级应用
+        function mapAdvanced() {
+            clearResult('mapResult');
+            showResult('mapResult', '=== Map高级应用 ===');
+            
+            // Map与对象的转换
+            const mapToObject = (map) => {
+                const obj = {};
+                for (const [key, value] of map) {
+                    obj[key] = value;
+                }
+                return obj;
+            };
+            
+            const objectToMap = (obj) => {
+                return new Map(Object.entries(obj));
+            };
+            
+            const obj = { a: 1, b: 2 };
+            const map = objectToMap(obj);
+            const backToObj = mapToObject(map);
+            
+            showResult('mapResult', 'Map与对象转换:');
+            showResult('mapResult', `原始对象: ${JSON.stringify(obj)}`);
+            showResult('mapResult', `转换的Map: [${[...map]}]`);
+            showResult('mapResult', `转回的对象: ${JSON.stringify(backToObj)}`);
+            
+            // 实际应用：缓存
+            const cache = new Map();
+            
+            function expensiveOperation(input) {
+                // 检查缓存
+                if (cache.has(input)) {
+                    showResult('mapResult', `从缓存获取结果: ${input}`);
+                    return cache.get(input);
+                }
+                
+                showResult('mapResult', `执行耗时操作: ${input}`);
+                // 模拟耗时操作
+                const result = input * input;
+                
+                // 存入缓存
+                cache.set(input, result);
+                return result;
+            }
+            
+            showResult('mapResult', `结果: ${expensiveOperation(5)}`);
+            showResult('mapResult', `结果: ${expensiveOperation(5)}`); // 从缓存
+            showResult('mapResult', `结果: ${expensiveOperation(10)}`);
+            showResult('mapResult', `结果: ${expensiveOperation(10)}`); // 从缓存
+            showResult('mapResult', `缓存大小: ${cache.size}`);
+        }
+        
+        // ====================== 迭代器与生成器 ======================
+        
+        // 迭代器基础
+        function iteratorBasics() {
+            clearResult('iteratorResult');
+            showResult('iteratorResult', '=== 迭代器基础 ===');
+            
+            // 获取数组的迭代器
+            const myArray = ["a", "b", "c"];
+            const iterator = myArray[Symbol.iterator]();
+            
+            showResult('iteratorResult', '手动迭代数组:');
+            let result = iterator.next();
+            while (!result.done) {
+                showResult('iteratorResult', `  ${result.value}`);
+                result = iterator.next();
+            }
+            
+            // 内置可迭代对象
+            const iterableTypes = [
+                { name: "字符串", value: "hello", isIterable: true },
+                { name: "数组", value: [1, 2, 3], isIterable: true },
+                { name: "Map", value: new Map([['a', 1]]), isIterable: true },
+                { name: "Set", value: new Set([1, 2, 3]), isIterable: true },
+                { name: "普通对象", value: { a: 1 }, isIterable: false }
+            ];
+            
+            iterableTypes.forEach(item => {
+                const isIterable = typeof item.value[Symbol.iterator] === 'function';
+                showResult('iteratorResult', `${item.name} 是否可迭代: ${isIterable}`);
+                
+                if (isIterable) {
+                    showResult('iteratorResult', `  可遍历值: ${[...item.value]}`);
+                }
+            });
+        }
+        
+        // 自定义迭代器
+        function customIterator() {
+            clearResult('iteratorResult');
+            showResult('iteratorResult', '=== 自定义迭代器 ===');
+            
+            // 实现一个范围对象
+            const range = {
+                start: 1,
+                end: 5,
+                
+                [Symbol.iterator]() {
+                    let current = this.start;
+                    const end = this.end;
+                    
+                    return {
+                        next() {
+                            if (current <= end) {
+                                return { value: current++, done: false };
+                            } else {
+                                return { done: true };
+                            }
+                        }
+                    };
+                }
+            };
+            
+            showResult('iteratorResult', '使用for...of遍历自定义迭代器:');
+            for (const num of range) {
+                showResult('iteratorResult', `  ${num}`);
+            }
+            
+            showResult('iteratorResult', '使用扩展运算符:');
+            const arrayFromRange = [...range];
+            showResult('iteratorResult', `  [${arrayFromRange}]`);
+            
+            // 实现一个有限斐波那契数列迭代器
+            const fibonacci = {
+                [Symbol.iterator]() {
+                    let [prev, curr] = [0, 1];
+                    let count = 0;
+                    const maxCount = 10;
+                    
+                    return {
+                        next() {
+                            if (count++ < maxCount) {
+                                [prev, curr] = [curr, prev + curr];
+                                return { value: prev, done: false };
+                            } else {
+                                return { done: true };
+                            }
+                        }
+                    };
+                }
+            };
+            
+            showResult('iteratorResult', '斐波那契数列:');
+            const fibArray = [...fibonacci];
+            showResult('iteratorResult', `  [${fibArray}]`);
+        }
+        
+        // 生成器基础
+        function generatorBasics() {
+            clearResult('generatorResult');
+            showResult('generatorResult', '=== 生成器基础 ===');
+            
+            // 基本生成器
+            function* simpleGenerator() {
+                showResult('generatorResult', '生成器开始执行');
+                yield 1;
+                showResult('generatorResult', '第一个yield后');
+                yield 2;
+                showResult('generatorResult', '第二个yield后');
+                yield 3;
+                showResult('generatorResult', '生成器结束');
+            }
+            
+            const gen = simpleGenerator();
+            
+            showResult('generatorResult', '手动迭代生成器:');
+            let result = gen.next();
+            while (!result.done) {
+                showResult('generatorResult', `  值: ${result.value}, 完成: ${result.done}`);
+                result = gen.next();
+            }
+            
+            // 使用for...of
+            showResult('generatorResult', '使用for...of遍历:');
+            for (const value of simpleGenerator()) {
+                showResult('generatorResult', `  ${value}`);
+            }
+            
+            // 使用扩展运算符
+            showResult('generatorResult', '使用扩展运算符:');
+            const arrayFromGen = [...simpleGenerator()];
+            showResult('generatorResult', `  [${arrayFromGen}]`);
+        }
+        
+        // 生成器高级应用
+        function generatorAdvanced() {
+            clearResult('generatorResult');
+            showResult('generatorResult', '=== 生成器高级应用 ===');
+            
+            // 1. 无限序列
+            function* infiniteSequence() {
+                let i = 0;
+                while (true) {
+                    yield i++;
+                }
+            }
+            
+            showResult('generatorResult', '取无限序列的前10个值:');
+            const infiniteGen = infiniteSequence();
+            for (let i = 0; i < 10; i++) {
+                showResult('generatorResult', `  ${infiniteGen.next().value}`);
+            }
+            
+            // 2. 生成器实现状态机
+            function* trafficLight() {
+                const states = ["red", "yellow", "green"];
+                let currentStateIndex = 0;
+                
+                while (true) {
+                    yield states[currentStateIndex];
+                    currentStateIndex = (currentStateIndex + 1) % states.length;
+                }
+            }
+            
+            showResult('generatorResult', '交通灯状态机:');
+            const light = trafficLight();
+            for (let i = 0; i < 8; i++) {
+                showResult('generatorResult', `  ${light.next().value}`);
+            }
+            
+            // 3. 生成器处理嵌套结构
+            class TreeNode {
+                constructor(value, children = []) {
+                    this.value = value;
+                    this.children = children;
+                }
+                
+                // 使用生成器实现深度优先遍历
+                *[Symbol.iterator]() {
+                    yield this.value;
+                    
+                    for (const child of this.children) {
+                        yield* child;
+                    }
+                }
+            }
+            
+            // 构建树
+            const tree = new TreeNode(1, [
+                new TreeNode(2, [
+                    new TreeNode(4),
+                    new TreeNode(5)
+                ]),
+                new TreeNode(3, [
+                    new TreeNode(6),
+                    new TreeNode(7)
+                ])
+            ]);
+            
+            showResult('generatorResult', '深度优先遍历树:');
+            for (const value of tree) {
+                showResult('generatorResult', `  ${value}`);
+            }
+        }
+        
+        // ====================== 类与继承 ======================
+        
+        // 类的基本定义
+        function classBasics() {
+            clearResult('classResult');
+            showResult('classResult', '=== 类的基本定义 ===');
+            
+            class Person {
+                // 构造函数
+                constructor(name, age) {
+                    this.name = name;
+                    this.age = age;
+                }
+                
+                // 实例方法
+                greet() {
+                    return `Hello, I'm ${this.name}`;
+                }
+                
+                // 获取器
+                get info() {
+                    return `${this.name} is ${this.age} years old`;
+                }
+                
+                // 设置器
+                set age(value) {
+                    if (value < 0) {
+                        throw new Error("年龄不能为负数");
+                    }
+                    this._age = value;
+                }
+                
+                get age() {
+                    return this._age;
+                }
+                
+                // 静态方法
+                static createAdult(name) {
+                    return new Person(name, 18);
+                }
+            }
+            
+            // 使用类
+            const alice = new Person("Alice", 30);
+            showResult('classResult', alice.greet());
+            showResult('classResult', alice.info);
+            
+            const bob = Person.createAdult("Bob");
+            showResult('classResult', `静态方法创建的Bob年龄: ${bob.age}`);
+            
+            // 类表达式
+            const MyClass = class MyInnerClass {
+                constructor(value) {
+                    this.value = value;
+                }
+                
+                getValue() {
+                    return this.value;
+                }
+            };
+            
+            const instance = new MyClass("类表达式");
+            showResult('classResult', `类表达式实例: ${instance.getValue()}`);
+        }
+        
+        // 类继承
+        function classInheritance() {
+            clearResult('classResult');
+            showResult('classResult', '=== 类继承 ===');
+            
+            // 基类
+            class Animal {
+                constructor(name) {
+                    this.name = name;
+                }
+                
+                speak() {
+                    return `${this.name} makes a sound`;
+                }
+            }
+            
+            // 子类
+            class Dog extends Animal {
+                constructor(name, breed) {
+                    // 调用父类构造函数
+                    super(name);
+                    this.breed = breed;
+                }
+                
+                // 重写父类方法
+                speak() {
+                    return `${this.name} barks`;
+                }
+                
+                // 新增方法
+                fetch() {
+                    return `${this.name} is fetching`;
+                }
+            }
+            
+            const myDog = new Dog("Rex", "Golden Retriever");
+            showResult('classResult', myDog.speak());
+            showResult('classResult', myDog.fetch());
+            
+            // 调用父类方法
+            class Cat extends Animal {
+                speak() {
+                    // 使用super调用父类方法
+                    return super.speak() + " and purrs";
+                }
+            }
+            
+            const myCat = new Cat("Whiskers");
+            showResult('classResult', myCat.speak());
+            
+            // 继承中的属性访问
+            class Vehicle {
+                constructor(brand) {
+                    this.brand = brand;
+                }
+                
+                start() {
+                    return `${this.brand} vehicle starts`;
+                }
+            }
+            
+            class Car extends Vehicle {
+                constructor(brand, model) {
+                    super(brand);
+                    this.model = model;
+                }
+                
+                start() {
+                    // 调用父类方法并添加子类特有内容
+                    return `${super.start()}, specifically a ${this.model}`;
+                }
+            }
+            
+            const myCar = new Car("Toyota", "Camry");
+            showResult('classResult', myCar.start());
+        }
+        
+        // 类的高级特性
+        function classAdvanced() {
+            clearResult('classResult');
+            showResult('classResult', '=== 类的高级特性 ===');
+            
+            // 私有字段（ES2022）
+            class BankAccount {
+                // 私有字段以#开头
+                #balance = 0;
+                #owner;
+                
+                constructor(owner, initialBalance = 0) {
+                    this.#owner = owner;
+                    this.#balance = initialBalance;
+                }
+                
+                // 公共方法可以访问私有字段
+                deposit(amount) {
+                    if (amount <= 0) {
+                        throw new Error("存款金额必须大于0");
+                    }
+                    this.#balance += amount;
+                    return this.#balance;
+                }
+                
+                withdraw(amount) {
+                    if (amount <= 0) {
+                        throw new Error("取款金额必须大于0");
+                    }
+                    if (amount > this.#balance) {
+                        throw new Error("余额不足");
+                    }
+                    this.#balance -= amount;
+                    return this.#balance;
+                }
+                
+                get balance() {
+                    return this.#balance;
+                }
+                
+                get owner() {
+                    return this.#owner;
+                }
+            }
+            
+            const account = new BankAccount("Alice", 1000);
+            showResult('classResult', `初始余额: ${account.deposit(500)}`);
+            showResult('classResult', `取款后余额: ${account.withdraw(200)}`);
+            showResult('classResult', `账户所有者: ${account.owner}`);
+            
+            // 静态字段和方法
+            class MathUtils {
+                // 静态字段（ES2022）
+                static PI = 3.14159;
+                
+                static circleArea(radius) {
+                    return (MathUtils.PI * radius * radius).toFixed(2);
+                }
+                
+                static triangleArea(base, height) {
+                    return (0.5 * base * height).toFixed(2);
+                }
+            }
+            
+            showResult('classResult', `圆面积: ${MathUtils.circleArea(5)}`);
+            showResult('classResult', `三角形面积: ${MathUtils.triangleArea(10, 5)}`);
+        }
+        
+        // ====================== 实际示例 ======================
+        
+        // 用户卡片生成
+        function userCardsExample() {
+            clearResult('examplesResult');
+            showResult('examplesResult', '=== 用户卡片生成 ===');
+            
+            const users = [
+                { id: 1, name: "张三", email: "zhangsan@example.com", avatar: "Z" },
+                { id: 2, name: "李四", email: "lisi@example.com", avatar: "L" },
+                { id: 3, name: "王五", email: "wangwu@example.com", avatar: "W" }
+            ];
+            
+            const container = document.getElementById('userCardsContainer');
+            container.innerHTML = '';
+            
+            // 使用ES6+特性生成用户卡片
+            const userCardsHTML = users.map(({ id, name, email, avatar }) => `
+                <div class="user-card">
+                    <div class="user-avatar">${avatar}</div>
+                    <div>
+                        <h3>${name}</h3>
+                        <p>${email}</p>
+                    </div>
+                </div>
+            `).join('');
+            
+            container.innerHTML = userCardsHTML;
+            
+            showResult('examplesResult', `已生成 ${users.length} 个用户卡片`);
+        }
+        
+        // 商品展示
+        function productDisplayExample() {
+            clearResult('examplesResult');
+            showResult('examplesResult', '=== 商品展示 ===');
+            
+            const products = [
+                { 
+                    id: 1, 
+                    name: "智能手机", 
+                    price: 2999, 
+                    discount: 10, 
+                    inStock: true,
+                    description: "最新款智能手机，高性能处理器"
+                },
+                { 
+                    id: 2, 
+                    name: "无线耳机", 
+                    price: 299, 
+                    discount: null, 
+                    inStock: true,
+                    description: "高音质无线蓝牙耳机"
+                },
+                { 
+                    id: 3, 
+                    name: "智能手表", 
+                    price: 1299, 
+                    discount: 15, 
+                    inStock: false,
+                    description: "多功能智能手表，支持健康监测"
+                }
+            ];
+            
+            const container = document.getElementById('productContainer');
+            container.innerHTML = '';
+            
+            // 使用ES6+特性生成商品展示
+            const productsHTML = products.map(product => {
+                const { id, name, price, discount, inStock, description } = product;
+                const finalPrice = discount ? price * (1 - discount / 100) : price;
+                
+                return `
+                    <div class="product">
+                        <h3 class="product-title">${name}</h3>
+                        <p>${description}</p>
+                        <p class="product-price">
+                            ¥${finalPrice.toFixed(2)}
+                            ${discount ? `<span class="product-discount">省${(price - finalPrice).toFixed(2)}</span>` : ''}
+                        </p>
+                        <div class="product-stock ${inStock ? 'status-ok' : 'status-error'}">
+                            ${inStock ? '✓ 有货' : '✗ 缺货'}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            container.innerHTML = productsHTML;
+            
+            showResult('examplesResult', `已展示 ${products.length} 个商品`);
+        }
+        
+        // 消息格式化
+        function messageFormatExample() {
+            clearResult('examplesResult');
+            showResult('examplesResult', '=== 消息格式化 ===');
+            
+            // 使用高亮标签模板
+            function highlight(strings, ...values) {
+                return strings.reduce((result, str, i) => {
+                    const value = i < values.length ? 
+                        `<span class="highlight">${values[i]}</span>` : 
+                        '';
+                    return `${result}${str}${value}`;
+                }, '');
+            }
+            
+            const messages = [
+                { user: "张三", content: "Hello, world!", timestamp: Date.now() },
+                { user: "李四", content: "How are you today?", timestamp: Date.now() + 1000 },
+                { user: "王五", content: "I'm doing great, thanks!", timestamp: Date.now() + 2000 }
+            ];
+            
+            const container = document.getElementById('messageContainer');
+            container.innerHTML = '';
+            
+            // 生成消息HTML
+            const messagesHTML = messages.map(message => {
+                const { user, content, timestamp } = message;
+                const time = new Date(timestamp).toLocaleTimeString();
+                
+                return `
+                    <div class="message-box">
+                        <strong>${user}:</strong> ${highlight`${content}`} (${time})
+                    </div>
+                `;
+            }).join('');
+            
+            container.innerHTML = messagesHTML;
+            
+            showResult('examplesResult', `已显示 ${messages.length} 条消息`);
+        }
+        
+        // 计算器实现
+        function calculatorExample() {
+            clearResult('examplesResult');
+            showResult('examplesResult', '=== 计算器实现 ===');
+            
+            class Calculator {
+                constructor() {
+                    this.value = 0;
+                    this.previousValue = null;
+                    this.operation = null;
+                    this.waitingForNewValue = false;
+                }
+                
+                inputDigit(digit) {
+                    if (this.waitingForNewValue) {
+                        this.value = 0;
+                        this.waitingForNewValue = false;
+                    }
+                    
+                    this.value = this.value * 10 + digit;
+                    return this.updateDisplay();
+                }
+                
+                inputOperation(op) {
+                    const inputValue = this.value;
+                    
+                    if (this.previousValue === null) {
+                        this.previousValue = inputValue;
+                    } else if (this.operation) {
+                        const currentValue = this.previousValue || 0;
+                        const newValue = this.calculate(currentValue, inputValue, this.operation);
+                        
+                        this.value = newValue;
+                        this.previousValue = newValue;
+                    }
+                    
+                    this.waitingForNewValue = true;
+                    this.operation = op;
+                    return this.updateDisplay();
+                }
+                
+                calculate(firstValue, secondValue, operation) {
+                    switch (operation) {
+                        case '+': return firstValue + secondValue;
+                        case '-': return firstValue - secondValue;
+                        case '×': return firstValue * secondValue;
+                        case '÷': return secondValue !== 0 ? firstValue / secondValue : 0;
+                        default: return secondValue;
+                    }
+                }
+                
+                clear() {
+                    this.value = 0;
+                    this.previousValue = null;
+                    this.operation = null;
+                    this.waitingForNewValue = false;
+                    return this.updateDisplay();
+                }
+                
+                updateDisplay() {
+                    return this.value;
+                }
+            }
+            
+            // 创建计算器UI
+            const calculator = new Calculator();
+            const container = document.getElementById('calculatorContainer');
+            
+            const calcHTML = `
+                <div class="calculator">
+                    <div class="calc-display" id="calc-display">0</div>
+                    <div class="calc-buttons">
+                        <button class="calc-button" onclick="calc.clear()">C</button>
+                        <button class="calc-button" onclick="calc.inputOperation('÷')">÷</button>
+                        <button class="calc-button" onclick="calc.inputOperation('×')">×</button>
+                        <button class="calc-button" onclick="calc.inputOperation('-')">-</button>
+                        
+                        <button class="calc-button" onclick="calc.inputDigit(7)">7</button>
+                        <button class="calc-button" onclick="calc.inputDigit(8)">8</button>
+                        <button class="calc-button" onclick="calc.inputDigit(9)">9</button>
+                        <button class="calc-button" onclick="calc.inputOperation('+')">+</button>
+                        
+                        <button class="calc-button" onclick="calc.inputDigit(4)">4</button>
+                        <button class="calc-button" onclick="calc.inputDigit(5)">5</button>
+                        <button class="calc-button" onclick="calc.inputDigit(6)">6</button>
+                        <button class="calc-button" onclick="calc.inputOperation('=')">=</button>
+                        
+                        <button class="calc-button" onclick="calc.inputDigit(1)">1</button>
+                        <button class="calc-button" onclick="calc.inputDigit(2)">2</button>
+                        <button class="calc-button" onclick="calc.inputDigit(3)">3</button>
+                        <button class="calc-button" onclick="calc.inputOperation('=')">=</button>
+                        
+                        <button class="calc-button" onclick="calc.inputDigit(0)">0</button>
+                        <button class="calc-button" onclick="calc.inputDigit('.')">.</button>
+                        <button class="calc-button" onclick="calc.inputOperation('=')">=</button>
+                        <button class="calc-button" onclick="calc.inputOperation('=')">=</button>
+                    </div>
+                </div>
+            `;
+            
+            container.innerHTML = calcHTML;
+            
+            // 覆盖原始方法以更新显示
+            const originalUpdateDisplay = calculator.updateDisplay.bind(calculator);
+            calculator.updateDisplay = function() {
+                const value = originalUpdateDisplay();
+                document.getElementById('calc-display').textContent = value;
+                return value;
+            };
+            
+            // 将计算器实例暴露到全局，供按钮调用
+            window.calc = calculator;
+            
+            showResult('examplesResult', '计算器已初始化，可以使用按钮进行计算');
+        }
+    </script>
+</body>
+</html>

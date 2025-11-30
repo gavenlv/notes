@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>第10章：模块化与构建工具 - 实战示例</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f7fa;
+        }
+        
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        h2 {
+            color: #3498db;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+            margin-top: 40px;
+        }
+        
+        h3 {
+            color: #2980b9;
+            margin-top: 30px;
+        }
+        
+        .demo-section {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+            margin-bottom: 10px;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: #2980b9;
+        }
+        
+        .result-box {
+            background-color: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 15px;
+            margin-top: 15px;
+            min-height: 50px;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+        
+        input, select, textarea {
+            padding: 8px;
+            margin-right: 10px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+        
+        .code-highlight {
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            font-family: monospace;
+            font-size: 14px;
+            overflow-x: auto;
+        }
+        
+        .module-diagram {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .module-box {
+            background-color: #e8f4f8;
+            border: 1px solid #bee5eb;
+            border-radius: 5px;
+            padding: 10px;
+            min-width: 120px;
+            text-align: center;
+        }
+        
+        .module-box.main {
+            background-color: #f8e8e8;
+            border-color: #e5bee5;
+        }
+        
+        .module-box.shared {
+            background-color: #e8f8e8;
+            border-color: #bee5be;
+        }
+        
+        .performance-chart {
+            height: 200px;
+            margin-top: 15px;
+            position: relative;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        
+        .loading-spinner {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .tab-container {
+            margin-top: 15px;
+        }
+        
+        .tab-buttons {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .tab-button {
+            padding: 10px 15px;
+            background-color: #f1f1f1;
+            border: 1px solid #ddd;
+            border-bottom: none;
+            cursor: pointer;
+            margin-right: 5px;
+            border-radius: 5px 5px 0 0;
+        }
+        
+        .tab-button.active {
+            background-color: white;
+            border-bottom: 1px solid white;
+            margin-bottom: -1px;
+        }
+        
+        .tab-content {
+            display: none;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-top: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <h1>第10章：模块化与构建工具 - 实战示例</h1>
+    
+    <div id="moduleSystemDemo" class="demo-section">
+        <h2>模块系统对比</h2>
+        <h3>CommonJS vs ES Modules</h3>
+        <div class="tab-container">
+            <div class="tab-buttons">
+                <button class="tab-button active" onclick="switchTab('commonjs')">CommonJS</button>
+                <button class="tab-button" onclick="switchTab('esmodules')">ES Modules</button>
+                <button class="tab-button" onclick="switchTab('comparison')">对比</button>
+            </div>
+            
+            <div id="commonjs-tab" class="tab-content active">
+                <div class="code-highlight">
+// commonjs/math.js<br>
+const PI = 3.14159;<br>
+<br>
+function add(a, b) {<br>
+&nbsp;&nbsp;return a + b;<br>
+}<br>
+<br>
+module.exports = {<br>
+&nbsp;&nbsp;PI,<br>
+&nbsp;&nbsp;add<br>
+};
+
+// commonjs/main.js<br>
+const { PI, add } = require('./math.js');<br>
+console.log(add(5, 3)); // 8
+                </div>
+                <button onclick="simulateCommonJS()">模拟CommonJS加载</button>
+            </div>
+            
+            <div id="esmodules-tab" class="tab-content">
+                <div class="code-highlight">
+// esmodules/math.js<br>
+export const PI = 3.14159;<br>
+<br>
+export function add(a, b) {<br>
+&nbsp;&nbsp;return a + b;<br>
+}<br>
+
+// esmodules/main.js<br>
+import { PI, add } from './math.js';<br>
+console.log(add(5, 3)); // 8
+                </div>
+                <button onclick="simulateESModules()">模拟ES Module加载</button>
+            </div>
+            
+            <div id="comparison-tab" class="tab-content">
+                <div class="code-highlight">
+主要区别:<br><br>
+1. 加载方式:<br>
+- CommonJS: 同步加载，适用于服务器<br>
+- ES Modules: 异步加载，适用于浏览器<br><br>
+2. 导出语法:<br>
+- CommonJS: module.exports / exports<br>
+- ES Modules: export / export default<br><br>
+3. 导入语法:<br>
+- CommonJS: require()<br>
+- ES Modules: import<br><br>
+4. 值的引用:<br>
+- CommonJS: 导出的是值的拷贝<br>
+- ES Modules: 导出的是值的引用
+                </div>
+            </div>
+        </div>
+        <div id="moduleResult" class="result-box"></div>
+    </div>
+    
+    <div id="codeSplittingDemo" class="demo-section">
+        <h2>代码分割与懒加载</h2>
+        <h3>动态导入示例</h3>
+        <div>
+            <button onclick="loadModule('dashboard')">
+                <span class="loading-spinner" id="spinner-dashboard"></span>
+                加载仪表板模块
+            </button>
+            <button onclick="loadModule('profile')">
+                <span class="loading-spinner" id="spinner-profile"></span>
+                加载个人资料模块
+            </button>
+            <button onclick="loadModule('analytics')">
+                <span class="loading-spinner" id="spinner-analytics"></span>
+                加载分析模块
+            </button>
+            <button onclick="showLoadedModules()">显示已加载模块</button>
+        </div>
+        
+        <div class="module-diagram">
+            <div class="module-box main">主应用</div>
+            <div id="moduleContainer"></div>
+        </div>
+        
+        <div class="performance-chart" id="bundleChart"></div>
+        
+        <div id="codeSplittingResult" class="result-box"></div>
+    </div>
+    
+    <div id="moduleFederationDemo" class="demo-section">
+        <h2>模块联邦示例</h2>
+        <h3>微前端架构</h3>
+        <div>
+            <button onclick="loadRemoteComponent('header', 'Header组件')">
+                加载Header组件
+            </button>
+            <button onclick="loadRemoteComponent('sidebar', '侧边栏组件')">
+                加载侧边栏组件
+            </button>
+            <button onclick="loadRemoteComponent('footer', 'Footer组件')>
+                加载Footer组件
+            </button>
+            <button onclick="showAppArchitecture()">显示应用架构</button>
+        </div>
+        
+        <div id="federationContainer" class="module-diagram" style="margin-top: 15px;">
+            <div class="module-box main">宿主应用</div>
+        </div>
+        
+        <div id="moduleFederationResult" class="result-box"></div>
+    </div>
+    
+    <div id="performanceDemo" class="demo-section">
+        <h2>性能优化示例</h2>
+        <h3>打包优化与代码分析</h3>
+        <div>
+            <button onclick="analyzeBundle()">分析打包结果</button>
+            <button onclick="simulateOptimization()">模拟优化策略</button>
+            <button onclick="showPerformanceMetrics()">显示性能指标</button>
+        </div>
+        
+        <div id="performanceResult" class="result-box"></div>
+    </div>
+    
+    <div id="buildToolsDemo" class="demo-section">
+        <h2>构建工具对比</h2>
+        <h3>Webpack vs Vite vs Rollup</h3>
+        <div>
+            <button onclick="compareBuildTools()">构建工具对比</button>
+            <button onclick="simulateWebpack()">模拟Webpack打包</button>
+            <button onclick="simulateVite()">模拟Vite构建</button>
+        </div>
+        
+        <div id="buildToolsResult" class="result-box"></div>
+    </div>
+    
+    <script type="module" src="chapter10_modularity.js"></script>
+</body>
+</html>

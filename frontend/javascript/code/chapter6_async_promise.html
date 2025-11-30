@@ -1,0 +1,1782 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>第6章：异步编程与Promise - 实战示例</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f7fa;
+        }
+        h1, h2, h3 {
+            color: #2c3e50;
+        }
+        .container {
+            background-color: white;
+            border-radius: 8px;
+            padding: 25px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .section {
+            margin-bottom: 30px;
+            padding: 15px;
+            border-left: 4px solid #3498db;
+            background-color: #f8f9fa;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 14px;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        .result {
+            background-color: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 10px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .input-field {
+            width: 100%;
+            padding: 8px;
+            margin: 5px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 15px;
+        }
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border: 1px solid transparent;
+            border-bottom: none;
+            border-radius: 5px 5px 0 0;
+            margin-right: 5px;
+            background-color: #f1f1f1;
+        }
+        .tab.active {
+            background-color: white;
+            border-color: #ddd;
+            border-bottom: 1px solid white;
+            margin-bottom: -1px;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* 演示特定样式 */
+        .user-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+            display: flex;
+            align-items: center;
+        }
+        .user-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: #3498db;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            float: left;
+            margin-right: 15px;
+        }
+        .user-info {
+            flex-grow: 1;
+        }
+        .post-item {
+            border: 1px solid #eee;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #3498db;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #3498db;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 10px;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .progress-container {
+            width: 100%;
+            height: 30px;
+            background-color: #f1f1f1;
+            border-radius: 5px;
+            margin: 10px 0;
+            overflow: hidden;
+        }
+        .progress-bar {
+            height: 100%;
+            background-color: #3498db;
+            width: 0;
+            transition: width 0.3s ease;
+        }
+        .file-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        .file-icon {
+            margin-right: 10px;
+            font-size: 20px;
+        }
+        .file-info {
+            flex-grow: 1;
+        }
+        .file-status {
+            margin-left: 10px;
+            font-style: italic;
+        }
+        .animated-box {
+            width: 100px;
+            height: 100px;
+            background-color: #e74c3c;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: absolute;
+            top: 20px;
+            left: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>第6章：异步编程与Promise - 实战示例</h1>
+    
+    <div class="container">
+        <div class="tabs">
+            <div class="tab active" onclick="showTab('async-basics')">异步基础</div>
+            <div class="tab" onclick="showTab('callback')">回调函数</div>
+            <div class="tab" onclick="showTab('promise-basics')">Promise基础</div>
+            <div class="tab" onclick="showTab('async-await')">async/await</div>
+            <div class="tab" onclick="showTab('promise-methods')">Promise方法</div>
+            <div class="tab" onclick="showTab('network-requests')">网络请求</div>
+            <div class="tab" onclick="showTab('advanced-techniques')">高级技巧</div>
+            <div class="tab" onclick="showTab('animation')">动画序列</div>
+        </div>
+
+        <!-- 异步基础标签页 -->
+        <div id="async-basics" class="tab-content active">
+            <div class="section">
+                <h2>同步与异步执行</h2>
+                <button onclick="demonstrateSync()">演示同步执行</button>
+                <button onclick="demonstrateAsync()">演示异步执行</button>
+                <button onclick="clearResult('basicsResult')">清除结果</button>
+                <div id="basicsResult" class="result"></div>
+            </div>
+            
+            <div class="section">
+                <h2>常见的异步操作</h2>
+                <button onclick="setTimeoutExample()">setTimeout示例</button>
+                <button onclick="setIntervalExample()">setInterval示例</button>
+                <button onclick="clearIntervalExample()">清除setInterval</button>
+                <div id="timerResult" class="result"></div>
+            </div>
+        </div>
+
+        <!-- 回调函数标签页 -->
+        <div id="callback" class="tab-content">
+            <div class="section">
+                <h2>基本回调函数</h2>
+                <button onclick="basicCallbackExample()">基本回调</button>
+                <button onclick="asyncCallbackExample()">异步回调</button>
+                <div id="callbackBasicResult" class="result"></div>
+            </div>
+            
+            <div class="section">
+                <h2>回调地狱</h2>
+                <button onclick="callbackHellExample()">回调地狱示例</button>
+                <div id="callbackHellResult" class="result"></div>
+            </div>
+            
+            <div class="section">
+                <h2>回调函数的错误处理</h2>
+                <button onclick="callbackErrorHandling()">错误处理示例</button>
+                <div id="callbackErrorResult" class="result"></div>
+            </div>
+        </div>
+
+        <!-- Promise基础标签页 -->
+        <div id="promise-basics" class="tab-content">
+            <div class="section">
+                <h2>创建和使用Promise</h2>
+                <button onclick="createPromise()">创建Promise</button>
+                <button onclick="consumePromise()">使用Promise</button>
+                <button onclick="promiseChaining()">Promise链式调用</button>
+                <div id="promiseBasicsResult" class="result"></div>
+            </div>
+            
+            <div class="section">
+                <h2>Promise错误处理</h2>
+                <button onclick="promiseErrorHandling()">Promise错误处理</button>
+                <button onclick="promiseErrorPropagation()">错误传播</button>
+                <div id="promiseErrorResult" class="result"></div>
+            </div>
+        </div>
+
+        <!-- async/await标签页 -->
+        <div id="async-await" class="tab-content">
+            <div class="section">
+                <h2>async函数基础</h2>
+                <button onclick="asyncFunctionExample()">async函数示例</button>
+                <button onclick="awaitExample()">await示例</button>
+                <div id="asyncBasicsResult" class="result"></div>
+            </div>
+            
+            <div class="section">
+                <h2>async/await错误处理</h2>
+                <button onclick="asyncErrorHandling()">async错误处理</button>
+                <div id="asyncErrorResult" class="result"></div>
+            </div>
+            
+            <div class="section">
+                <h2>并行与顺序执行</h2>
+                <button onclick="parallelExecution()">并行执行</button>
+                <button onclick="sequentialExecution()">顺序执行</button>
+                <div id="executionResult" class="result"></div>
+            </div>
+        </div>
+
+        <!-- Promise方法标签页 -->
+        <div id="promise-methods" class="tab-content">
+            <div class="section">
+                <h2>Promise.resolve和Promise.reject</h2>
+                <button onclick="promiseResolve()">Promise.resolve示例</button>
+                <button onclick="promiseReject()">Promise.reject示例</button>
+                <div id="promiseResolveResult" class="result"></div>
+            </div>
+            
+            <div class="section">
+                <h2>Promise组合方法</h2>
+                <button onclick="promiseAll()">Promise.all示例</button>
+                <button onclick="promiseRace()">Promise.race示例</button>
+                <button onclick="promiseAllSettled()">Promise.allSettled示例</button>
+                <div id="promiseCombinationResult" class="result"></div>
+            </div>
+        </div>
+
+        <!-- 网络请求标签页 -->
+        <div id="network-requests" class="tab-content">
+            <div class="section">
+                <h2>使用fetch API</h2>
+                <button onclick="basicFetch()">基本fetch请求</button>
+                <button onclick="fetchWithPromiseChain()">Promise链式请求</button>
+                <button onclick="fetchWithAsyncAwait()">async/await请求</button>
+                <button onclick="fetchWithErrorHandling()">带错误处理的请求</button>
+                <div id="fetchResult" class="result"></div>
+                <div id="userCards" style="margin-top: 20px;"></div>
+            </div>
+            
+            <div class="section">
+                <h2>文件操作模拟</h2>
+                <button onclick="readFileExample()">读取文件示例</button>
+                <button onclick="readMultipleFilesSequential()">顺序读取多个文件</button>
+                <button onclick="readMultipleFilesParallel()">并行读取多个文件</button>
+                <div id="fileResult" class="result"></div>
+                <div id="fileList" style="margin-top: 20px;"></div>
+            </div>
+        </div>
+
+        <!-- 高级技巧标签页 -->
+        <div id="advanced-techniques" class="tab-content">
+            <div class="section">
+                <h2>超时处理</h2>
+                <button onclick="timeoutExample()">超时处理示例</button>
+                <div id="timeoutResult" class="result"></div>
+            </div>
+            
+            <div class="section">
+                <h2>重试机制</h2>
+                <button onclick="retryExample()">重试机制示例</button>
+                <div id="retryResult" class="result"></div>
+            </div>
+            
+            <div class="section">
+                <h2>缓存Promise结果</h2>
+                <button onclick="memoizationExample()">Promise缓存示例</button>
+                <div id="memoizationResult" class="result"></div>
+            </div>
+            
+            <div class="section">
+                <h2>并发限制</h2>
+                <button onclick="concurrentLimitExample()">并发限制示例</button>
+                <div id="concurrentLimitResult" class="result"></div>
+            </div>
+        </div>
+
+        <!-- 动画序列标签页 -->
+        <div id="animation" class="tab-content">
+            <div class="section">
+                <h2>动画序列</h2>
+                <div style="position: relative; height: 250px; border: 1px solid #ddd; margin-bottom: 20px;">
+                    <div id="animatedBox" class="animated-box">动画方块</div>
+                </div>
+                <button onclick="runSequentialAnimation()">顺序动画</button>
+                <button onclick="runParallelAnimation()">并行动画</button>
+                <button onclick="resetAnimation()">重置动画</button>
+                <div id="animationResult" class="result"></div>
+            </div>
+            
+            <div class="section">
+                <h2>进度指示器</h2>
+                <div class="progress-container">
+                    <div id="progressBar" class="progress-bar"></div>
+                </div>
+                <button onclick="startProgressDemo()">启动进度演示</button>
+                <div id="progressResult" class="result"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 显示指定的标签页
+        function showTab(tabId) {
+            // 隐藏所有标签内容
+            const tabContents = document.querySelectorAll('.tab-content');
+            tabContents.forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // 移除所有标签的活动状态
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // 显示指定的标签内容和激活对应的标签
+            document.getElementById(tabId).classList.add('active');
+            event.target.classList.add('active');
+        }
+        
+        // 辅助函数：显示结果
+        function showResult(elementId, message) {
+            const result = document.getElementById(elementId);
+            result.textContent += message + '\n';
+            result.scrollTop = result.scrollHeight;
+        }
+        
+        // 辅助函数：清除结果
+        function clearResult(elementId) {
+            document.getElementById(elementId).textContent = '';
+        }
+        
+        // ====================== 异步基础 ======================
+        
+        // 演示同步执行
+        function demonstrateSync() {
+            clearResult('basicsResult');
+            showResult('basicsResult', '=== 同步执行示例 ===');
+            showResult('basicsResult', '开始');
+            
+            // 模拟耗时操作（同步）
+            const start = new Date().getTime();
+            while (new Date().getTime() - start < 1000) {
+                // 空循环，模拟耗时操作
+            }
+            
+            showResult('basicsResult', '耗时操作完成');
+            showResult('basicsResult', '结束');
+        }
+        
+        // 演示异步执行
+        function demonstrateAsync() {
+            clearResult('basicsResult');
+            showResult('basicsResult', '=== 异步执行示例 ===');
+            showResult('basicsResult', '开始');
+            
+            // 异步操作
+            setTimeout(function() {
+                showResult('basicsResult', '异步操作完成');
+            }, 1000);
+            
+            showResult('basicsResult', '结束');
+        }
+        
+        // setTimeout示例
+        function setTimeoutExample() {
+            clearResult('timerResult');
+            showResult('timerResult', '=== setTimeout示例 ===');
+            
+            showResult('timerResult', '设置定时器，2秒后执行');
+            setTimeout(function() {
+                showResult('timerResult', '定时器执行了！');
+            }, 2000);
+        }
+        
+        // setInterval示例
+        let intervalId;
+        function setIntervalExample() {
+            clearResult('timerResult');
+            showResult('timerResult', '=== setInterval示例 ===');
+            
+            let counter = 0;
+            showResult('timerResult', '设置重复定时器，每秒执行一次');
+            
+            intervalId = setInterval(function() {
+                counter++;
+                showResult('timerResult', `定时器执行次数: ${counter}`);
+                
+                if (counter >= 5) {
+                    clearInterval(intervalId);
+                    showResult('timerResult', '定时器已停止');
+                }
+            }, 1000);
+        }
+        
+        // 清除setInterval
+        function clearIntervalExample() {
+            if (intervalId) {
+                clearInterval(intervalId);
+                showResult('timerResult', '手动清除定时器');
+            }
+        }
+        
+        // ====================== 回调函数 ======================
+        
+        // 基本回调示例
+        function basicCallbackExample() {
+            clearResult('callbackBasicResult');
+            showResult('callbackBasicResult', '=== 基本回调示例 ===');
+            
+            function process(value, callback) {
+                const result = `处理后的值: ${value}`;
+                callback(result);
+            }
+            
+            process('原始数据', function(result) {
+                showResult('callbackBasicResult', `回调函数接收到: ${result}`);
+            });
+        }
+        
+        // 异步回调示例
+        function asyncCallbackExample() {
+            clearResult('callbackBasicResult');
+            showResult('callbackBasicResult', '=== 异步回调示例 ===');
+            
+            function asyncProcess(value, callback) {
+                showResult('callbackBasicResult', '开始异步处理...');
+                
+                setTimeout(function() {
+                    const result = `异步处理 ${value}`;
+                    callback(result);
+                }, 1000);
+            }
+            
+            asyncProcess('数据', function(result) {
+                showResult('callbackBasicResult', `异步回调接收到: ${result}`);
+            });
+        }
+        
+        // 回调地狱示例
+        function callbackHellExample() {
+            clearResult('callbackHellResult');
+            showResult('callbackHellResult', '=== 回调地狱示例 ===');
+            
+            function step1(callback) {
+                setTimeout(function() {
+                    showResult('callbackHellResult', '步骤1完成');
+                    callback('结果1');
+                }, 500);
+            }
+            
+            function step2(data, callback) {
+                setTimeout(function() {
+                    showResult('callbackHellResult', `步骤2完成，输入: ${data}`);
+                    callback('结果2');
+                }, 500);
+            }
+            
+            function step3(data, callback) {
+                setTimeout(function() {
+                    showResult('callbackHellResult', `步骤3完成，输入: ${data}`);
+                    callback('最终结果');
+                }, 500);
+            }
+            
+            step1(function(result1) {
+                step2(result1, function(result2) {
+                    step3(result2, function(finalResult) {
+                        showResult('callbackHellResult', `完成: ${finalResult}`);
+                    });
+                });
+            });
+        }
+        
+        // 回调函数的错误处理
+        function callbackErrorHandling() {
+            clearResult('callbackErrorResult');
+            showResult('callbackErrorResult', '=== 回调错误处理示例 ===');
+            
+            function fetchData(success, callback) {
+                setTimeout(function() {
+                    if (success) {
+                        callback(null, { id: 1, name: '数据' });
+                    } else {
+                        callback(new Error('获取数据失败'));
+                    }
+                }, 1000);
+            }
+            
+            fetchData(true, function(error, data) {
+                if (error) {
+                    showResult('callbackErrorResult', `错误: ${error.message}`);
+                    return;
+                }
+                showResult('callbackErrorResult', `成功: ${JSON.stringify(data)}`);
+            });
+            
+            fetchData(false, function(error, data) {
+                if (error) {
+                    showResult('callbackErrorResult', `错误: ${error.message}`);
+                    return;
+                }
+                showResult('callbackErrorResult', `成功: ${JSON.stringify(data)}`);
+            });
+        }
+        
+        // ====================== Promise基础 ======================
+        
+        // 创建Promise
+        function createPromise() {
+            clearResult('promiseBasicsResult');
+            showResult('promiseBasicsResult', '=== 创建Promise示例 ===');
+            
+            const promise = new Promise(function(resolve, reject) {
+                const success = Math.random() > 0.5;
+                
+                setTimeout(function() {
+                    if (success) {
+                        resolve('操作成功');
+                    } else {
+                        reject(new Error('操作失败'));
+                    }
+                }, 1000);
+            });
+            
+            showResult('promiseBasicsResult', 'Promise已创建，1秒后完成...');
+            return promise;
+        }
+        
+        // 使用Promise
+        function consumePromise() {
+            clearResult('promiseBasicsResult');
+            showResult('promiseBasicsResult', '=== 使用Promise示例 ===');
+            
+            const promise = createPromise();
+            
+            promise
+                .then(function(result) {
+                    showResult('promiseBasicsResult', `Promise状态: fulfilled，结果: ${result}`);
+                })
+                .catch(function(error) {
+                    showResult('promiseBasicsResult', `Promise状态: rejected，错误: ${error.message}`);
+                });
+        }
+        
+        // Promise链式调用
+        function promiseChaining() {
+            clearResult('promiseBasicsResult');
+            showResult('promiseBasicsResult', '=== Promise链式调用示例 ===');
+            
+            function step1(data) {
+                return new Promise(function(resolve) {
+                    setTimeout(function() {
+                        const result = `${data} -> 步骤1处理`;
+                        showResult('promiseBasicsResult', `步骤1完成: ${result}`);
+                        resolve(result);
+                    }, 500);
+                });
+            }
+            
+            function step2(data) {
+                return new Promise(function(resolve) {
+                    setTimeout(function() {
+                        const result = `${data} -> 步骤2处理`;
+                        showResult('promiseBasicsResult', `步骤2完成: ${result}`);
+                        resolve(result);
+                    }, 500);
+                });
+            }
+            
+            function step3(data) {
+                return new Promise(function(resolve) {
+                    setTimeout(function() {
+                        const result = `${data} -> 步骤3处理`;
+                        showResult('promiseBasicsResult', `步骤3完成: ${result}`);
+                        resolve(result);
+                    }, 500);
+                });
+            }
+            
+            step1('初始数据')
+                .then(step2)
+                .then(step3)
+                .then(function(finalResult) {
+                    showResult('promiseBasicsResult', `最终结果: ${finalResult}`);
+                })
+                .catch(function(error) {
+                    showResult('promiseBasicsResult', `错误: ${error.message}`);
+                });
+        }
+        
+        // Promise错误处理
+        function promiseErrorHandling() {
+            clearResult('promiseErrorResult');
+            showResult('promiseErrorResult', '=== Promise错误处理示例 ===');
+            
+            const successPromise = new Promise(function(resolve) {
+                setTimeout(function() {
+                    resolve('成功数据');
+                }, 500);
+            });
+            
+            const failurePromise = new Promise(function(resolve, reject) {
+                setTimeout(function() {
+                    reject(new Error('失败原因'));
+                }, 500);
+            });
+            
+            successPromise
+                .then(function(result) {
+                    showResult('promiseErrorResult', `成功Promise结果: ${result}`);
+                })
+                .catch(function(error) {
+                    showResult('promiseErrorResult', `成功Promise错误: ${error.message}`);
+                });
+            
+            failurePromise
+                .then(function(result) {
+                    showResult('promiseErrorResult', `失败Promise结果: ${result}`);
+                })
+                .catch(function(error) {
+                    showResult('promiseErrorResult', `失败Promise错误: ${error.message}`);
+                });
+        }
+        
+        // Promise错误传播
+        function promiseErrorPropagation() {
+            clearResult('promiseErrorResult');
+            showResult('promiseErrorResult', '=== Promise错误传播示例 ===');
+            
+            function step1() {
+                return new Promise(function(resolve, reject) {
+                    setTimeout(function() {
+                        reject(new Error('步骤1失败'));
+                    }, 500);
+                });
+            }
+            
+            function step2(data) {
+                return new Promise(function(resolve) {
+                    setTimeout(function() {
+                        const result = `${data} -> 步骤2处理`;
+                        resolve(result);
+                    }, 500);
+                });
+            }
+            
+            step1()
+                .then(function(data) {
+                    // 这部分不会执行
+                    return step2(data);
+                })
+                .then(function(data) {
+                    // 这部分也不会执行
+                    showResult('promiseErrorResult', `最终结果: ${data}`);
+                })
+                .catch(function(error) {
+                    // 错误会传播到这里
+                    showResult('promiseErrorResult', `捕获到错误: ${error.message}`);
+                });
+        }
+        
+        // ====================== async/await ======================
+        
+        // async函数示例
+        function asyncFunctionExample() {
+            clearResult('asyncBasicsResult');
+            showResult('asyncBasicsResult', '=== async函数示例 ===');
+            
+            async function fetchData() {
+                return '从async函数返回的数据';
+            }
+            
+            fetchData().then(function(data) {
+                showResult('asyncBasicsResult', `async函数返回: ${data}`);
+            });
+            
+            // 直接返回Promise
+            async function fetchWithPromise() {
+                return new Promise(function(resolve) {
+                    setTimeout(function() {
+                        resolve('Promise解析的数据');
+                    }, 1000);
+                });
+            }
+            
+            fetchWithPromise().then(function(data) {
+                showResult('asyncBasicsResult', `async函数中的Promise: ${data}`);
+            });
+        }
+        
+        // await示例
+        function awaitExample() {
+            clearResult('asyncBasicsResult');
+            showResult('asyncBasicsResult', '=== await示例 ===');
+            
+            function getData() {
+                return new Promise(function(resolve) {
+                    setTimeout(function() {
+                        resolve('异步获取的数据');
+                    }, 1000);
+                });
+            }
+            
+            async function processData() {
+                showResult('asyncBasicsResult', '开始处理...');
+                const data = await getData();
+                showResult('asyncBasicsResult', `获取到数据: ${data}`);
+                return `处理后的${data}`;
+            }
+            
+            processData().then(function(result) {
+                showResult('asyncBasicsResult', `最终结果: ${result}`);
+            });
+        }
+        
+        // async错误处理
+        function asyncErrorHandling() {
+            clearResult('asyncErrorResult');
+            showResult('asyncErrorResult', '=== async错误处理示例 ===');
+            
+            async function fetchData(success) {
+                return new Promise(function(resolve, reject) {
+                    setTimeout(function() {
+                        if (success) {
+                            resolve('成功数据');
+                        } else {
+                            reject(new Error('获取数据失败'));
+                        }
+                    }, 1000);
+                });
+            }
+            
+            async function processSuccess() {
+                try {
+                    const data = await fetchData(true);
+                    showResult('asyncErrorResult', `成功处理: ${data}`);
+                } catch (error) {
+                    showResult('asyncErrorResult', `捕获错误: ${error.message}`);
+                }
+            }
+            
+            async function processFailure() {
+                try {
+                    const data = await fetchData(false);
+                    showResult('asyncErrorResult', `成功处理: ${data}`);
+                } catch (error) {
+                    showResult('asyncErrorResult', `捕获错误: ${error.message}`);
+                }
+            }
+            
+            processSuccess();
+            processFailure();
+        }
+        
+        // 并行执行
+        function parallelExecution() {
+            clearResult('executionResult');
+            showResult('executionResult', '=== 并行执行示例 ===');
+            
+            async function fetchUser() {
+                return new Promise(function(resolve) {
+                    setTimeout(function() {
+                        showResult('executionResult', '获取用户完成');
+                        resolve({ id: 1, name: '张三' });
+                    }, 1000);
+                });
+            }
+            
+            async function fetchPosts() {
+                return new Promise(function(resolve) {
+                    setTimeout(function() {
+                        showResult('executionResult', '获取文章完成');
+                        resolve([{ id: 1, title: '文章1' }, { id: 2, title: '文章2' }]);
+                    }, 800);
+                });
+            }
+            
+            async function fetchComments() {
+                return new Promise(function(resolve) {
+                    setTimeout(function() {
+                        showResult('executionResult', '获取评论完成');
+                        resolve([{ id: 1, content: '评论1' }, { id: 2, content: '评论2' }]);
+                    }, 1200);
+                });
+            }
+            
+            async function fetchAllDataParallel() {
+                showResult('executionResult', '开始并行获取所有数据...');
+                const startTime = Date.now();
+                
+                const [user, posts, comments] = await Promise.all([
+                    fetchUser(),
+                    fetchPosts(),
+                    fetchComments()
+                ]);
+                
+                const endTime = Date.now();
+                showResult('executionResult', `所有数据获取完成，耗时: ${endTime - startTime}ms`);
+                
+                return { user, posts, comments };
+            }
+            
+            fetchAllDataParallel().then(function(result) {
+                showResult('executionResult', `最终结果: ${JSON.stringify(result)}`);
+            });
+        }
+        
+        // 顺序执行
+        function sequentialExecution() {
+            clearResult('executionResult');
+            showResult('executionResult', '=== 顺序执行示例 ===');
+            
+            async function step1() {
+                return new Promise(function(resolve) {
+                    setTimeout(function() {
+                        showResult('executionResult', '步骤1完成');
+                        resolve('步骤1的结果');
+                    }, 800);
+                });
+            }
+            
+            async function step2(data) {
+                return new Promise(function(resolve) {
+                    setTimeout(function() {
+                        showResult('executionResult', `步骤2完成，输入: ${data}`);
+                        resolve(`处理${data}后的结果`);
+                    }, 600);
+                });
+            }
+            
+            async function step3(data) {
+                return new Promise(function(resolve) {
+                    setTimeout(function() {
+                        showResult('executionResult', `步骤3完成，输入: ${data}`);
+                        resolve(`最终处理${data}后的结果`);
+                    }, 1000);
+                });
+            }
+            
+            async function processSequentially() {
+                showResult('executionResult', '开始顺序处理...');
+                const startTime = Date.now();
+                
+                const result1 = await step1();
+                const result2 = await step2(result1);
+                const result3 = await step3(result2);
+                
+                const endTime = Date.now();
+                showResult('executionResult', `所有步骤完成，耗时: ${endTime - startTime}ms`);
+                
+                return result3;
+            }
+            
+            processSequentially().then(function(result) {
+                showResult('executionResult', `最终结果: ${result}`);
+            });
+        }
+        
+        // ====================== Promise方法 ======================
+        
+        // Promise.resolve示例
+        function promiseResolve() {
+            clearResult('promiseResolveResult');
+            showResult('promiseResolveResult', '=== Promise.resolve示例 ===');
+            
+            // 解析普通值
+            const valuePromise = Promise.resolve('普通值');
+            valuePromise.then(value => showResult('promiseResolveResult', `解析普通值: ${value}`));
+            
+            // 解析Promise
+            const originalPromise = new Promise(resolve => 
+                setTimeout(() => resolve('原始Promise的值'), 1000)
+            );
+            const wrappedPromise = Promise.resolve(originalPromise);
+            wrappedPromise.then(value => showResult('promiseResolveResult', `解析Promise: ${value}`));
+            
+            // 解析thenable对象
+            const thenable = {
+                then: function(resolve) {
+                    setTimeout(() => resolve('thenable对象的值'), 500);
+                }
+            };
+            Promise.resolve(thenable)
+                .then(value => showResult('promiseResolveResult', `解析thenable: ${value}`));
+        }
+        
+        // Promise.reject示例
+        function promiseReject() {
+            clearResult('promiseResolveResult');
+            showResult('promiseResolveResult', '=== Promise.reject示例 ===');
+            
+            Promise.reject(new Error('拒绝的原因'))
+                .catch(error => showResult('promiseResolveResult', `捕获错误: ${error.message}`));
+        }
+        
+        // Promise.all示例
+        function promiseAll() {
+            clearResult('promiseCombinationResult');
+            showResult('promiseCombinationResult', '=== Promise.all示例 ===');
+            
+            const promise1 = Promise.resolve(3);
+            const promise2 = new Promise(resolve => setTimeout(() => resolve(5), 1000));
+            const promise3 = Promise.resolve(10);
+            
+            Promise.all([promise1, promise2, promise3])
+                .then(values => {
+                    showResult('promiseCombinationResult', `Promise.all结果: [${values.join(', ')}]`);
+                })
+                .catch(error => {
+                    showResult('promiseCombinationResult', `Promise.all错误: ${error.message}`);
+                });
+        }
+        
+        // Promise.race示例
+        function promiseRace() {
+            clearResult('promiseCombinationResult');
+            showResult('promiseCombinationResult', '=== Promise.race示例 ===');
+            
+            const promise1 = new Promise(resolve => setTimeout(() => resolve('第一个完成'), 500));
+            const promise2 = new Promise(resolve => setTimeout(() => resolve('第二个完成'), 1000));
+            
+            Promise.race([promise1, promise2])
+                .then(value => {
+                    showResult('promiseCombinationResult', `Promise.race结果: ${value}`);
+                });
+        }
+        
+        // Promise.allSettled示例
+        function promiseAllSettled() {
+            clearResult('promiseCombinationResult');
+            showResult('promiseCombinationResult', '=== Promise.allSettled示例 ===');
+            
+            const promise1 = Promise.resolve(3);
+            const promise2 = new Promise((resolve, reject) => setTimeout(() => reject('失败'), 1000));
+            const promise3 = Promise.resolve(10);
+            
+            Promise.allSettled([promise1, promise2, promise3])
+                .then(results => {
+                    results.forEach((result, index) => {
+                        if (result.status === 'fulfilled') {
+                            showResult('promiseCombinationResult', `Promise ${index + 1} 成功: ${result.value}`);
+                        } else {
+                            showResult('promiseCombinationResult', `Promise ${index + 1} 失败: ${result.reason}`);
+                        }
+                    });
+                });
+        }
+        
+        // ====================== 网络请求 ======================
+        
+        // 基本fetch请求
+        function basicFetch() {
+            clearResult('fetchResult');
+            showResult('fetchResult', '=== 基本fetch请求示例 ===');
+            
+            // 模拟网络请求（因为无法访问真实API）
+            function mockFetch(url) {
+                return new Promise((resolve, reject) => {
+                    setTimeout(() => {
+                        if (url.includes('users')) {
+                            resolve({
+                                ok: true,
+                                json: () => Promise.resolve([
+                                    { id: 1, name: '张三', email: 'zhangsan@example.com' },
+                                    { id: 2, name: '李四', email: 'lisi@example.com' },
+                                    { id: 3, name: '王五', email: 'wangwu@example.com' }
+                                ])
+                            });
+                        } else {
+                            reject(new Error('不支持的URL'));
+                        }
+                    }, 1000);
+                });
+            }
+            
+            mockFetch('https://api.example.com/users')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP错误: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    showResult('fetchResult', `获取到数据: ${JSON.stringify(data)}`);
+                    displayUsers(data);
+                })
+                .catch(error => {
+                    showResult('fetchResult', `请求失败: ${error.message}`);
+                });
+        }
+        
+        // 显示用户卡片
+        function displayUsers(users) {
+            const container = document.getElementById('userCards');
+            container.innerHTML = '';
+            
+            users.forEach(user => {
+                const card = document.createElement('div');
+                card.className = 'user-card';
+                card.innerHTML = `
+                    <div class="user-avatar">${user.name.charAt(0)}</div>
+                    <div class="user-info">
+                        <h3>${user.name}</h3>
+                        <p>${user.email}</p>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+        
+        // Promise链式请求
+        function fetchWithPromiseChain() {
+            clearResult('fetchResult');
+            showResult('fetchResult', '=== Promise链式请求示例 ===');
+            
+            function mockFetch(url) {
+                return new Promise((resolve, reject) => {
+                    setTimeout(() => {
+                        if (url.includes('users/1')) {
+                            resolve({
+                                ok: true,
+                                json: () => Promise.resolve({ id: 1, name: '张三', email: 'zhangsan@example.com' })
+                            });
+                        } else if (url.includes('posts')) {
+                            resolve({
+                                ok: true,
+                                json: () => Promise.resolve([
+                                    { id: 1, title: '张三的文章1', userId: 1 },
+                                    { id: 2, title: '张三的文章2', userId: 1 }
+                                ])
+                            });
+                        } else if (url.includes('comments')) {
+                            resolve({
+                                ok: true,
+                                json: () => Promise.resolve([
+                                    { id: 1, content: '评论1', postId: 1 },
+                                    { id: 2, content: '评论2', postId: 2 }
+                                ])
+                            });
+                        } else {
+                            reject(new Error('不支持的URL'));
+                        }
+                    }, 800);
+                });
+            }
+            
+            mockFetch('https://api.example.com/users/1')
+                .then(response => {
+                    if (!response.ok) throw new Error(`HTTP错误: ${response.status}`);
+                    return response.json();
+                })
+                .then(user => {
+                    showResult('fetchResult', `获取用户: ${JSON.stringify(user)}`);
+                    return mockFetch(`https://api.example.com/posts?userId=${user.id}`);
+                })
+                .then(response => {
+                    if (!response.ok) throw new Error(`HTTP错误: ${response.status}`);
+                    return response.json();
+                })
+                .then(posts => {
+                    showResult('fetchResult', `获取文章: ${JSON.stringify(posts)}`);
+                    const postIds = posts.map(post => post.id).join(',');
+                    return mockFetch(`https://api.example.com/comments?postId=${postIds}`);
+                })
+                .then(response => {
+                    if (!response.ok) throw new Error(`HTTP错误: ${response.status}`);
+                    return response.json();
+                })
+                .then(comments => {
+                    showResult('fetchResult', `获取评论: ${JSON.stringify(comments)}`);
+                })
+                .catch(error => {
+                    showResult('fetchResult', `请求失败: ${error.message}`);
+                });
+        }
+        
+        // async/await请求
+        function fetchWithAsyncAwait() {
+            clearResult('fetchResult');
+            showResult('fetchResult', '=== async/await请求示例 ===');
+            
+            function mockFetch(url) {
+                return new Promise((resolve, reject) => {
+                    setTimeout(() => {
+                        if (url.includes('users/1')) {
+                            resolve({
+                                ok: true,
+                                json: () => Promise.resolve({ id: 1, name: '张三', email: 'zhangsan@example.com' })
+                            });
+                        } else if (url.includes('posts')) {
+                            resolve({
+                                ok: true,
+                                json: () => Promise.resolve([
+                                    { id: 1, title: '张三的文章1', userId: 1 },
+                                    { id: 2, title: '张三的文章2', userId: 1 }
+                                ])
+                            });
+                        } else if (url.includes('comments')) {
+                            resolve({
+                                ok: true,
+                                json: () => Promise.resolve([
+                                    { id: 1, content: '评论1', postId: 1 },
+                                    { id: 2, content: '评论2', postId: 2 }
+                                ])
+                            });
+                        } else {
+                            reject(new Error('不支持的URL'));
+                        }
+                    }, 800);
+                });
+            }
+            
+            async function fetchAllData() {
+                try {
+                    const userResponse = await mockFetch('https://api.example.com/users/1');
+                    if (!userResponse.ok) throw new Error(`HTTP错误: ${userResponse.status}`);
+                    const user = await userResponse.json();
+                    showResult('fetchResult', `获取用户: ${JSON.stringify(user)}`);
+                    
+                    const postsResponse = await mockFetch(`https://api.example.com/posts?userId=${user.id}`);
+                    if (!postsResponse.ok) throw new Error(`HTTP错误: ${postsResponse.status}`);
+                    const posts = await postsResponse.json();
+                    showResult('fetchResult', `获取文章: ${JSON.stringify(posts)}`);
+                    
+                    const postIds = posts.map(post => post.id).join(',');
+                    const commentsResponse = await mockFetch(`https://api.example.com/comments?postId=${postIds}`);
+                    if (!commentsResponse.ok) throw new Error(`HTTP错误: ${commentsResponse.status}`);
+                    const comments = await commentsResponse.json();
+                    showResult('fetchResult', `获取评论: ${JSON.stringify(comments)}`);
+                    
+                    return { user, posts, comments };
+                } catch (error) {
+                    showResult('fetchResult', `请求失败: ${error.message}`);
+                    throw error;
+                }
+            }
+            
+            fetchAllData();
+        }
+        
+        // 带错误处理的请求
+        function fetchWithErrorHandling() {
+            clearResult('fetchResult');
+            showResult('fetchResult', '=== 带错误处理的请求示例 ===');
+            
+            function mockFetch(url, shouldFail = false) {
+                return new Promise((resolve, reject) => {
+                    setTimeout(() => {
+                        if (shouldFail) {
+                            reject(new Error('网络连接失败'));
+                        } else if (url.includes('users/1')) {
+                            resolve({
+                                ok: true,
+                                json: () => Promise.resolve({ id: 1, name: '张三', email: 'zhangsan@example.com' })
+                            });
+                        } else {
+                            resolve({
+                                ok: false,
+                                status: 404,
+                                json: () => Promise.resolve({ error: 'Not found' })
+                            });
+                        }
+                    }, 800);
+                });
+            }
+            
+            // 处理网络错误
+            mockFetch('https://api.example.com/users/1', true)
+                .then(response => response.json())
+                .then(data => {
+                    showResult('fetchResult', `成功: ${JSON.stringify(data)}`);
+                })
+                .catch(error => {
+                    showResult('fetchResult', `网络错误: ${error.message}`);
+                });
+            
+            // 处理HTTP错误
+            mockFetch('https://api.example.com/notfound')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP错误: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    showResult('fetchResult', `成功: ${JSON.stringify(data)}`);
+                })
+                .catch(error => {
+                    showResult('fetchResult', `HTTP错误: ${error.message}`);
+                });
+        }
+        
+        // 读取文件示例
+        function readFileExample() {
+            clearResult('fileResult');
+            showResult('fileResult', '=== 读取文件示例 ===');
+            
+            function readFile(filename) {
+                return new Promise((resolve, reject) => {
+                    setTimeout(() => {
+                        if (filename.endsWith('.txt')) {
+                            resolve(`文件内容: ${filename}`);
+                        } else {
+                            reject(new Error('不支持的文件类型'));
+                        }
+                    }, 500);
+                });
+            }
+            
+            const file1 = 'document.txt';
+            const file2 = 'image.jpg';
+            
+            readFile(file1)
+                .then(content => {
+                    showResult('fileResult', `${file1}: ${content}`);
+                })
+                .catch(error => {
+                    showResult('fileResult', `${file1}: ${error.message}`);
+                });
+            
+            readFile(file2)
+                .then(content => {
+                    showResult('fileResult', `${file2}: ${content}`);
+                })
+                .catch(error => {
+                    showResult('fileResult', `${file2}: ${error.message}`);
+                });
+            
+            // 显示文件列表
+            const fileList = document.getElementById('fileList');
+            fileList.innerHTML = '';
+            
+            const files = [
+                { name: file1, icon: '📄', status: '读取中...' },
+                { name: file2, icon: '🖼️', status: '读取中...' }
+            ];
+            
+            files.forEach(file => {
+                const item = document.createElement('div');
+                item.className = 'file-item';
+                item.id = `file-${file.name.replace('.', '-')}`;
+                item.innerHTML = `
+                    <div class="file-icon">${file.icon}</div>
+                    <div class="file-info">${file.name}</div>
+                    <div class="file-status">${file.status}</div>
+                `;
+                fileList.appendChild(item);
+            });
+            
+            // 更新状态
+            setTimeout(() => {
+                document.querySelector('#file-document-txt .file-status').textContent = '成功';
+                document.querySelector('#file-image-jpg .file-status').textContent = '错误';
+            }, 600);
+        }
+        
+        // 顺序读取多个文件
+        function readMultipleFilesSequential() {
+            clearResult('fileResult');
+            showResult('fileResult', '=== 顺序读取多个文件 ===');
+            
+            function readFile(filename) {
+                return new Promise((resolve, reject) => {
+                    setTimeout(() => {
+                        if (filename.endsWith('.txt')) {
+                            resolve(`文件内容: ${filename}`);
+                        } else {
+                            reject(new Error('不支持的文件类型'));
+                        }
+                    }, 500);
+                });
+            }
+            
+            async function readFilesInOrder(filenames) {
+                const results = [];
+                
+                for (const filename of filenames) {
+                    try {
+                        const content = await readFile(filename);
+                        results.push({ filename, content });
+                        showResult('fileResult', `成功读取: ${filename}`);
+                    } catch (error) {
+                        results.push({ filename, error: error.message });
+                        showResult('fileResult', `读取失败: ${filename} - ${error.message}`);
+                    }
+                }
+                
+                return results;
+            }
+            
+            const files = ['file1.txt', 'file2.txt', 'document.txt', 'image.jpg'];
+            readFilesInOrder(files).then(results => {
+                showResult('fileResult', `所有文件读取完成: ${JSON.stringify(results)}`);
+            });
+        }
+        
+        // 并行读取多个文件
+        function readMultipleFilesParallel() {
+            clearResult('fileResult');
+            showResult('fileResult', '=== 并行读取多个文件 ===');
+            
+            function readFile(filename) {
+                return new Promise((resolve, reject) => {
+                    setTimeout(() => {
+                        if (filename.endsWith('.txt')) {
+                            resolve(`文件内容: ${filename}`);
+                        } else {
+                            reject(new Error('不支持的文件类型'));
+                        }
+                    }, Math.random() * 1000 + 500); // 随机延迟
+                });
+            }
+            
+            async function readFilesInParallel(filenames) {
+                const promises = filenames.map(filename => 
+                    readFile(filename)
+                        .then(content => ({ filename, content }))
+                        .catch(error => ({ filename, error: error.message }))
+                );
+                
+                const results = await Promise.all(promises);
+                return results;
+            }
+            
+            const files = ['file1.txt', 'file2.txt', 'document.txt', 'image.jpg'];
+            readFilesInParallel(files).then(results => {
+                results.forEach(result => {
+                    if (result.content) {
+                        showResult('fileResult', `成功读取: ${result.filename} - ${result.content}`);
+                    } else {
+                        showResult('fileResult', `读取失败: ${result.filename} - ${result.error}`);
+                    }
+                });
+            });
+        }
+        
+        // ====================== 高级技巧 ======================
+        
+        // 超时处理
+        function timeoutExample() {
+            clearResult('timeoutResult');
+            showResult('timeoutResult', '=== 超时处理示例 ===');
+            
+            function withTimeout(promise, timeout) {
+                return Promise.race([
+                    promise,
+                    new Promise((_, reject) => 
+                        setTimeout(() => reject(new Error('操作超时')), timeout)
+                    )
+                ]);
+            }
+            
+            // 快速操作
+            const fastOperation = new Promise(resolve => 
+                setTimeout(() => resolve('快速操作完成'), 800)
+            );
+            
+            // 慢速操作
+            const slowOperation = new Promise(resolve => 
+                setTimeout(() => resolve('慢速操作完成'), 2000)
+            );
+            
+            // 测试快速操作（1秒超时）
+            withTimeout(fastOperation, 1000)
+                .then(result => {
+                    showResult('timeoutResult', `快速操作结果: ${result}`);
+                })
+                .catch(error => {
+                    showResult('timeoutResult', `快速操作错误: ${error.message}`);
+                });
+            
+            // 测试慢速操作（1秒超时）
+            withTimeout(slowOperation, 1000)
+                .then(result => {
+                    showResult('timeoutResult', `慢速操作结果: ${result}`);
+                })
+                .catch(error => {
+                    showResult('timeoutResult', `慢速操作错误: ${error.message}`);
+                });
+        }
+        
+        // 重试机制
+        function retryExample() {
+            clearResult('retryResult');
+            showResult('retryResult', '=== 重试机制示例 ===');
+            
+            function retry(promiseGenerator, maxAttempts = 3, delay = 500) {
+                return new Promise((resolve, reject) => {
+                    let attempt = 0;
+                    
+                    function tryAgain() {
+                        attempt++;
+                        
+                        promiseGenerator()
+                            .then(resolve)
+                            .catch(error => {
+                                if (attempt >= maxAttempts) {
+                                    reject(error);
+                                } else {
+                                    showResult('retryResult', `尝试 ${attempt} 失败，${delay}ms后重试...`);
+                                    setTimeout(tryAgain, delay);
+                                }
+                            });
+                    }
+                    
+                    tryAgain();
+                });
+            }
+            
+            function unreliableOperation() {
+                return new Promise((resolve, reject) => {
+                    const success = Math.random() > 0.7; // 30%成功率
+                    
+                    if (success) {
+                        resolve('操作成功');
+                    } else {
+                        reject(new Error('操作失败'));
+                    }
+                });
+            }
+            
+            retry(() => unreliableOperation(), 5, 800)
+                .then(result => {
+                    showResult('retryResult', `最终结果: ${result}`);
+                })
+                .catch(error => {
+                    showResult('retryResult', `所有尝试均失败: ${error.message}`);
+                });
+        }
+        
+        // Promise缓存
+        function memoizationExample() {
+            clearResult('memoizationResult');
+            showResult('memoizationResult', '=== Promise缓存示例 ===');
+            
+            function memoize(promiseGenerator) {
+                let cachedPromise = null;
+                
+                return function(...args) {
+                    if (cachedPromise) {
+                        showResult('memoizationResult', '使用缓存结果');
+                        return cachedPromise;
+                    }
+                    
+                    showResult('memoizationResult', '发起新请求');
+                    cachedPromise = promiseGenerator(...args)
+                        .finally(() => {
+                            // 5秒后清除缓存
+                            setTimeout(() => {
+                                cachedPromise = null;
+                                showResult('memoizationResult', '缓存已清除');
+                            }, 5000);
+                        });
+                    
+                    return cachedPromise;
+                };
+            }
+            
+            const fetchUserMemoized = memoize(userId => 
+                new Promise(resolve => 
+                    setTimeout(() => resolve({ id: userId, name: `用户${userId}` }), 1000)
+                )
+            );
+            
+            // 第一次调用
+            fetchUserMemoized(123).then(user => {
+                showResult('memoizationResult', `第一次调用结果: ${JSON.stringify(user)}`);
+            });
+            
+            // 第二次调用（使用缓存）
+            setTimeout(() => {
+                fetchUserMemoized(123).then(user => {
+                    showResult('memoizationResult', `第二次调用结果: ${JSON.stringify(user)}`);
+                });
+            }, 1500);
+            
+            // 不同用户（新请求）
+            setTimeout(() => {
+                fetchUserMemoized(456).then(user => {
+                    showResult('memoizationResult', `不同用户结果: ${JSON.stringify(user)}`);
+                });
+            }, 2000);
+        }
+        
+        // 并发限制
+        function concurrentLimitExample() {
+            clearResult('concurrentLimitResult');
+            showResult('concurrentLimitResult', '=== 并发限制示例 ===');
+            
+            class PromisePool {
+                constructor(maxConcurrent = 3) {
+                    this.maxConcurrent = maxConcurrent;
+                    this.running = 0;
+                    this.queue = [];
+                }
+                
+                add(promiseGenerator) {
+                    return new Promise((resolve, reject) => {
+                        this.queue.push({
+                            promiseGenerator,
+                            resolve,
+                            reject
+                        });
+                        
+                        this.process();
+                    });
+                }
+                
+                process() {
+                    if (this.running >= this.maxConcurrent || this.queue.length === 0) {
+                        return;
+                    }
+                    
+                    this.running++;
+                    const { promiseGenerator, resolve, reject } = this.queue.shift();
+                    
+                    showResult('concurrentLimitResult', `开始执行，当前并发数: ${this.running}`);
+                    
+                    promiseGenerator()
+                        .then(result => {
+                            showResult('concurrentLimitResult', `执行成功，结果: ${result}`);
+                            resolve(result);
+                        })
+                        .catch(error => {
+                            showResult('concurrentLimitResult', `执行失败，错误: ${error.message}`);
+                            reject(error);
+                        })
+                        .finally(() => {
+                            this.running--;
+                            showResult('concurrentLimitResult', `执行完成，当前并发数: ${this.running}`);
+                            this.process();
+                        });
+                }
+            }
+            
+            const pool = new PromisePool(2); // 最多同时执行2个请求
+            
+            const urls = [
+                'https://api.example.com/data1',
+                'https://api.example.com/data2',
+                'https://api.example.com/data3',
+                'https://api.example.com/data4',
+                'https://api.example.com/data5'
+            ];
+            
+            const promises = urls.map((url, index) => 
+                pool.add(() => 
+                    new Promise(resolve => 
+                        setTimeout(() => resolve(`数据${index + 1}`), Math.random() * 2000 + 500)
+                    )
+                )
+            );
+            
+            Promise.all(promises)
+                .then(results => {
+                    showResult('concurrentLimitResult', `所有请求完成: [${results.join(', ')}]`);
+                })
+                .catch(error => {
+                    showResult('concurrentLimitResult', `请求失败: ${error.message}`);
+                });
+        }
+        
+        // ====================== 动画序列 ======================
+        
+        // 创建Promise封装的动画函数
+        function animate(element, duration, properties) {
+            return new Promise(resolve => {
+                const startTime = Date.now();
+                const startValues = {};
+                
+                // 保存初始值
+                for (const prop in properties) {
+                    startValues[prop] = parseFloat(element.style[prop]) || 0;
+                }
+                
+                function update() {
+                    const elapsed = Date.now() - startTime;
+                    const progress = Math.min(elapsed / duration, 1);
+                    
+                    // 更新样式
+                    for (const prop in properties) {
+                        const start = startValues[prop];
+                        const end = properties[prop];
+                        element.style[prop] = start + (end - start) * progress + 'px';
+                    }
+                    
+                    if (progress < 1) {
+                        requestAnimationFrame(update);
+                    } else {
+                        resolve();
+                    }
+                }
+                
+                update();
+            });
+        }
+        
+        // 顺序动画
+        function runSequentialAnimation() {
+            clearResult('animationResult');
+            showResult('animationResult', '=== 顺序动画示例 ===');
+            
+            const box = document.getElementById('animatedBox');
+            box.style.left = '20px';
+            box.style.top = '20px';
+            
+            async function sequentialAnimation() {
+                showResult('animationResult', '开始顺序动画...');
+                
+                await animate(box, 1000, { left: 200 });
+                showResult('animationResult', '右移动画完成');
+                
+                await animate(box, 1000, { top: 150 });
+                showResult('animationResult', '下移动画完成');
+                
+                await animate(box, 1000, { left: 20 });
+                showResult('animationResult', '左移动画完成');
+                
+                await animate(box, 1000, { top: 20 });
+                showResult('animationResult', '上移动画完成');
+                
+                showResult('animationResult', '顺序动画完成！');
+            }
+            
+            sequentialAnimation();
+        }
+        
+        // 并行动画
+        function runParallelAnimation() {
+            clearResult('animationResult');
+            showResult('animationResult', '=== 并行动画示例 ===');
+            
+            const box = document.getElementById('animatedBox');
+            box.style.left = '20px';
+            box.style.top = '20px';
+            
+            async function parallelAnimation() {
+                showResult('animationResult', '开始并行动画...');
+                
+                await Promise.all([
+                    animate(box, 2000, { left: 200 }),
+                    animate(box, 2000, { top: 150 })
+                ]);
+                
+                showResult('animationResult', '并行动画完成！');
+            }
+            
+            parallelAnimation();
+        }
+        
+        // 重置动画
+        function resetAnimation() {
+            const box = document.getElementById('animatedBox');
+            box.style.left = '20px';
+            box.style.top = '20px';
+            
+            clearResult('animationResult');
+            showResult('animationResult', '动画位置已重置');
+        }
+        
+        // 进度演示
+        function startProgressDemo() {
+            clearResult('progressResult');
+            showResult('progressResult', '=== 进度演示示例 ===');
+            
+            const progressBar = document.getElementById('progressBar');
+            progressBar.style.width = '0%';
+            
+            let progress = 0;
+            
+            function updateProgress() {
+                return new Promise(resolve => {
+                    setTimeout(() => {
+                        progress += Math.random() * 15;
+                        if (progress > 100) progress = 100;
+                        
+                        progressBar.style.width = `${progress}%`;
+                        showResult('progressResult', `进度: ${progress.toFixed(1)}%`);
+                        
+                        resolve(progress);
+                    }, 300);
+                });
+            }
+            
+            async function progressDemo() {
+                while (progress < 100) {
+                    await updateProgress();
+                }
+                
+                showResult('progressResult', '进度演示完成！');
+            }
+            
+            progressDemo();
+        }
+    </script>
+</body>
+</html>
