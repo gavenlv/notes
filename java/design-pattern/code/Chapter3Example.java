@@ -3,20 +3,36 @@
  */
 
 // 抽象产品：图形接口
-interface Shape {
+interface GraphicShape {
     void draw();
 }
 
 // 具体产品：圆形
-class Circle implements Shape {
+class Circle implements GraphicShape {
+    private int x, y, radius;
+    
+    public Circle() {
+        // 默认构造函数
+    }
+    
+    public Circle(int x, int y, int radius) {
+        this.x = x;
+        this.y = y;
+        this.radius = radius;
+    }
+    
     @Override
     public void draw() {
-        System.out.println("绘制圆形");
+        if (x != 0 || y != 0 || radius != 0) {
+            System.out.println("绘制圆形，坐标: (" + x + ", " + y + ")，半径: " + radius);
+        } else {
+            System.out.println("绘制圆形");
+        }
     }
 }
 
 // 具体产品：矩形
-class Rectangle implements Shape {
+class Rectangle implements GraphicShape {
     @Override
     public void draw() {
         System.out.println("绘制矩形");
@@ -24,7 +40,7 @@ class Rectangle implements Shape {
 }
 
 // 具体产品：正方形
-class Square implements Shape {
+class Square implements GraphicShape {
     @Override
     public void draw() {
         System.out.println("绘制正方形");
@@ -34,11 +50,11 @@ class Square implements Shape {
 // 抽象工厂
 abstract class ShapeFactory {
     // 工厂方法
-    public abstract Shape createShape();
+    public abstract GraphicShape createShape();
     
     // 通用方法
     public void displayShapeInfo() {
-        Shape shape = createShape();
+        GraphicShape shape = createShape();
         shape.draw();
     }
 }
@@ -46,7 +62,7 @@ abstract class ShapeFactory {
 // 具体工厂：圆形工厂
 class CircleFactory extends ShapeFactory {
     @Override
-    public Shape createShape() {
+    public GraphicShape createShape() {
         return new Circle();
     }
 }
@@ -54,7 +70,7 @@ class CircleFactory extends ShapeFactory {
 // 具体工厂：矩形工厂
 class RectangleFactory extends ShapeFactory {
     @Override
-    public Shape createShape() {
+    public GraphicShape createShape() {
         return new Rectangle();
     }
 }
@@ -62,7 +78,7 @@ class RectangleFactory extends ShapeFactory {
 // 具体工厂：正方形工厂
 class SquareFactory extends ShapeFactory {
     @Override
-    public Shape createShape() {
+    public GraphicShape createShape() {
         return new Square();
     }
 }
@@ -75,6 +91,22 @@ abstract class Animal {
 
 // 具体产品：狗
 class Dog extends Animal {
+    private String name;
+    private int age;
+    private String breed;
+    
+    public Dog() {
+        // 默认构造函数
+        super(); // 调用父类的无参构造函数
+    }
+    
+    public Dog(String name, int age, String breed) {
+        super(); // 调用父类的无参构造函数
+        this.name = name;
+        this.age = age;
+        this.breed = breed;
+    }
+    
     @Override
     public void makeSound() {
         System.out.println("汪汪叫");
@@ -83,6 +115,22 @@ class Dog extends Animal {
 
 // 具体产品：猫
 class Cat extends Animal {
+    private String name;
+    private int age;
+    private boolean isIndoor;
+    
+    public Cat() {
+        // 默认构造函数
+        super(); // 调用父类的无参构造函数
+    }
+    
+    public Cat(String name, int age, boolean isIndoor) {
+        super(); // 调用父类的无参构造函数
+        this.name = name;
+        this.age = age;
+        this.isIndoor = isIndoor;
+    }
+    
     @Override
     public void makeSound() {
         System.out.println("喵喵叫");
@@ -110,25 +158,25 @@ class SimpleAnimalFactory extends AnimalFactory {
 }
 
 // 静态工厂方法示例
-interface Logger {
+interface AppLogger {
     void log(String message);
 }
 
-class ConsoleLogger implements Logger {
+class ConsoleAppLogger implements AppLogger {
     @Override
     public void log(String message) {
         System.out.println("控制台日志: " + message);
     }
 }
 
-class FileLogger implements Logger {
+class FileAppLogger implements AppLogger {
     @Override
     public void log(String message) {
         System.out.println("文件日志: " + message);
     }
 }
 
-class DatabaseLogger implements Logger {
+class DatabaseAppLogger implements AppLogger {
     @Override
     public void log(String message) {
         System.out.println("数据库日志: " + message);
@@ -136,14 +184,14 @@ class DatabaseLogger implements Logger {
 }
 
 class LoggerFactory {
-    public static Logger getLogger(String type) {
+    public static AppLogger getLogger(String type) {
         switch (type.toLowerCase()) {
             case "console":
-                return new ConsoleLogger();
+                return new ConsoleAppLogger();
             case "file":
-                return new FileLogger();
+                return new FileAppLogger();
             case "database":
-                return new DatabaseLogger();
+                return new DatabaseAppLogger();
             default:
                 throw new IllegalArgumentException("未知的日志类型: " + type);
         }
@@ -167,7 +215,7 @@ class SingletonShapeFactory {
         return instance;
     }
     
-    public Shape createShape(String type) {
+    public GraphicShape createShape(String type) {
         switch (type.toLowerCase()) {
             case "circle":
                 return new Circle();
@@ -207,9 +255,9 @@ public class Chapter3Example {
         
         // 3. 静态工厂方法演示
         System.out.println("\n3. 静态工厂方法演示：");
-        Logger consoleLogger = LoggerFactory.getLogger("console");
-        Logger fileLogger = LoggerFactory.getLogger("file");
-        Logger databaseLogger = LoggerFactory.getLogger("database");
+        AppLogger consoleLogger = LoggerFactory.getLogger("console");
+        AppLogger fileLogger = LoggerFactory.getLogger("file");
+        AppLogger databaseLogger = LoggerFactory.getLogger("database");
         
         consoleLogger.log("这是一条控制台日志");
         fileLogger.log("这是一条文件日志");
@@ -218,9 +266,9 @@ public class Chapter3Example {
         // 4. 单例工厂演示
         System.out.println("\n4. 单例工厂演示：");
         SingletonShapeFactory singletonFactory = SingletonShapeFactory.getInstance();
-        Shape circle = singletonFactory.createShape("circle");
-        Shape rectangle = singletonFactory.createShape("rectangle");
-        Shape square = singletonFactory.createShape("square");
+        GraphicShape circle = singletonFactory.createShape("circle");
+        GraphicShape rectangle = singletonFactory.createShape("rectangle");
+        GraphicShape square = singletonFactory.createShape("square");
         
         circle.draw();
         rectangle.draw();

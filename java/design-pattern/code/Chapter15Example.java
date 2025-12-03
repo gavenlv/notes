@@ -329,9 +329,9 @@ class AttributeEqualsRule implements RuleExpression {
 // 属性值大于规则（终结符）
 class AttributeGreaterThanRule implements RuleExpression {
     private String attributeName;
-    private Comparable expectedValue;
+    private Comparable<?> expectedValue;
     
-    public AttributeGreaterThanRule(String attributeName, Comparable expectedValue) {
+    public AttributeGreaterThanRule(String attributeName, Comparable<?> expectedValue) {
         this.attributeName = attributeName;
         this.expectedValue = expectedValue;
     }
@@ -342,10 +342,18 @@ class AttributeGreaterThanRule implements RuleExpression {
             return false;
         }
         Object actualValue = context.getAttribute(attributeName);
-        if (!(actualValue instanceof Comparable)) {
+        if (!(actualValue instanceof Comparable) || !(expectedValue instanceof Comparable)) {
             return false;
         }
-        return ((Comparable) actualValue).compareTo(expectedValue) > 0;
+        try {
+            @SuppressWarnings("unchecked")
+            Comparable<Object> comparableActual = (Comparable<Object>) actualValue;
+            @SuppressWarnings("unchecked")
+            Comparable<Object> comparableExpected = (Comparable<Object>) expectedValue;
+            return comparableActual.compareTo(comparableExpected) > 0;
+        } catch (ClassCastException e) {
+            return false;
+        }
     }
 }
 
@@ -354,7 +362,7 @@ class AndRule implements RuleExpression {
     private List<RuleExpression> rules;
     
     public AndRule() {
-        this.rules = new ArrayList<>();
+        this.rules = new ArrayList<RuleExpression>();
     }
     
     public AndRule addRule(RuleExpression rule) {
@@ -378,7 +386,7 @@ class OrRule implements RuleExpression {
     private List<RuleExpression> rules;
     
     public OrRule() {
-        this.rules = new ArrayList<>();
+        this.rules = new ArrayList<RuleExpression>();
     }
     
     public OrRule addRule(RuleExpression rule) {

@@ -41,7 +41,24 @@ python/design-pattern/
     ├── chapter4_builder_pattern.py        # 第4章示例代码
     ├── chapter5_prototype_pattern.py      # 第5章示例代码
     ├── chapter6_adapter_pattern.py        # 第6章示例代码
-    └── ...                                 # 其他章节的示例代码
+    ├── chapter7_bridge_pattern.py         # 第7章示例代码
+    ├── chapter8_composite_pattern.py      # 第8章示例代码
+    ├── chapter9_decorator_pattern.py      # 第9章示例代码
+    ├── chapter10_facade_pattern.py        # 第10章示例代码
+    ├── chapter11_flyweight_pattern.py     # 第11章示例代码
+    ├── chapter12_proxy_pattern.py         # 第12章示例代码
+    ├── chapter13_chain_of_responsibility_pattern.py  # 第13章示例代码
+    ├── chapter14_command_pattern.py       # 第14章示例代码
+    ├── chapter15_interpreter_pattern.py   # 第15章示例代码
+    ├── chapter16_iterator_pattern.py      # 第16章示例代码
+    ├── chapter17_mediator_pattern.py      # 第17章示例代码
+    ├── chapter18_memento_pattern.py       # 第18章示例代码
+    ├── chapter19_observer_pattern.py      # 第19章示例代码
+    ├── chapter20_state_pattern.py         # 第20章示例代码
+    ├── chapter21_strategy_pattern.py      # 第21章示例代码
+    ├── chapter22_template_method_pattern.py  # 第22章示例代码
+    ├── chapter23_visitor_pattern.py       # 第23章示例代码
+    └── chapter24_practical_project.py     # 第24章实战项目代码
 ```
 
 ## 设计模式分类

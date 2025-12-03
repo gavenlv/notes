@@ -55,9 +55,10 @@
 - [Chapter17Example.java](code/Chapter17Example.java) - 中介者模式示例
 - [Chapter18Example.java](code/Chapter18Example.java) - 备忘录模式示例
 - [Chapter19Example.java](code/Chapter19Example.java) - 观察者模式示例
-- [Chapter20Example.java](Chapter20Example.java) - 状态模式示例
-- [Chapter21Example.java](Chapter21Example.java) - 策略模式示例
-- [Chapter22Example.java](Chapter22Example.java) - 模板方法模式示例
+- [Chapter20Example.java](code/Chapter20Example.java) - 状态模式示例
+- [Chapter21Example.java](code/Chapter21Example.java) - 策略模式示例
+- [Chapter22Example.java](code/Chapter22Example.java) - 模板方法模式示例
+- [Chapter23Example.java](code/Chapter23Example.java) - 访问者模式示例
 
 ## 使用说明
 

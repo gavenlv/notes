@@ -91,7 +91,7 @@ abstract class BeverageMaker {
 }
 
 // 具体类 - 制作咖啡
-class Coffee extends BeverageMaker {
+class CoffeeMaker extends BeverageMaker {
     @Override
     void brew() {
         System.out.println("Dripping Coffee through filter");
@@ -222,7 +222,7 @@ public class Chapter22Example {
         // 2. 制作饮料示例
         System.out.println("\n2. 制作饮料示例:");
         System.out.println("制作咖啡:");
-        BeverageMaker coffee = new Coffee();
+        BeverageMaker coffee = new CoffeeMaker();
         coffee.prepareRecipe();
         
         System.out.println("\n制作茶:");

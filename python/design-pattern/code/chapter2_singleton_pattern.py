@@ -237,7 +237,7 @@ config2 = ConfigManager()
 
 print(f"config1和config2是同一个实例: {id(config1) == id(config2)}")  # 输出: True
 print(f"数据库主机: {config1.get('database')['host']}")
-config2.set('database', 'host', '192.168.1.100')
+config2.set('database', {'host': '192.168.1.100', 'port': 5432})
 print(f"更新后的数据库主机: {config1.get('database')['host']}")
 
 # 清理配置文件
