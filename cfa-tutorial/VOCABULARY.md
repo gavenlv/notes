@@ -1,0 +1,237 @@
+# 双语词汇表 | Bilingual Vocabulary
+
+## A
+
+**Alpha (阿尔法)**
+- **中文**：投资组合相对于基准的超额收益
+- **English**: Excess return of a portfolio relative to its benchmark
+
+**Arbitrage (套利)**
+- **中文**：利用市场价格差异获利
+- **English**: Profiting from price discrepancies in different markets
+
+**Asset Allocation (资产配置)**
+- **中文**：将投资分配到不同资产类别
+- **English**: Distribution of investments across asset classes
+
+## B
+
+**Beta (贝塔)**
+- **中文**：资产相对于市场的系统性风险
+- **English**: Systematic risk of an asset relative to the market
+
+**Black-Scholes Model (布莱克-斯科尔斯模型)**
+- **中文**：期权定价的数学模型
+- **English**: Mathematical model for option pricing
+
+**Bond (债券)**
+- **中文**：发行人向持有人借款的债务工具
+- **English**: Debt instrument where issuer borrows from holder
+
+## C
+
+**Capital Asset Pricing Model (资本资产定价模型)**
+- **中文**：计算资产预期收益的模型
+- **English**: Model for calculating expected return on an asset
+
+**Cash Flow (现金流)**
+- **中文**：企业现金的流入和流出
+- **English**: Inflows and outflows of cash in a business
+
+**Compound Interest (复利)**
+- **中文**：利息计算在本金和之前利息上
+- **English**: Interest calculated on principal and accumulated interest
+
+## D
+
+**Derivative (衍生品)**
+- **中文**：价值依赖于基础资产的金融工具
+- **English**: Financial instrument whose value depends on underlying asset
+
+**Discount Rate (贴现率)**
+- **中文**：将未来现金流折算为现值的利率
+- **English**: Interest rate used to discount future cash flows to present value
+
+**Diversification (分散化)**
+- **中文**：投资多种资产以降低风险
+- **English**: Investing in various assets to reduce risk
+
+## E
+
+**Efficient Market Hypothesis (有效市场假说)**
+- **中文**：市场价格反映所有可用信息
+- **English**: Market prices reflect all available information
+
+**Equity (权益)**
+- **中文**：公司的所有权份额
+- **English**: Ownership interest in a company
+
+**Ethical Standards (职业道德标准)**
+- **中文**：金融专业人士应遵守的行为准则
+- **English**: Code of conduct for financial professionals
+
+## F
+
+**Financial Statement (财务报表)**
+- **中文**：反映企业财务状况的报告
+- **English**: Reports showing company's financial position
+
+**Fixed Income (固定收益)**
+- **中文**：提供固定收益的证券
+- **English**: Securities providing fixed income payments
+
+**Future Value (终值)**
+- **中文**：当前投资在未来某一时间的价值
+- **English**: Value of current investment at future date
+
+## G
+
+**GDP (国内生产总值)**
+- **中文**：一个国家在一定时期内生产的所有最终产品和服务的市场价值
+- **English**: Market value of all final goods and services produced in a country
+
+**Gross Margin (毛利率)**
+- **中文**：销售收入减去销售成本后的利润比率
+- **English**: Profit ratio after subtracting cost of goods sold from revenue
+
+## H
+
+**Hedge Fund (对冲基金)**
+- **中文**：采用多种投资策略的私募投资基金
+- **English**: Private investment fund using various strategies
+
+**Hedging (对冲)**
+- **中文**：使用衍生品降低投资风险
+- **English**: Using derivatives to reduce investment risk
+
+## I
+
+**Inflation (通货膨胀)**
+- **中文**：物价水平持续上涨的现象
+- **English**: Sustained increase in price levels
+
+**Interest Rate (利率)**
+- **中文**：借款成本或存款收益的比率
+- **English**: Cost of borrowing or return on deposits
+
+**Internal Rate of Return (内部收益率)**
+- **中文**：使投资净现值为零的贴现率
+- **English**: Discount rate that makes NPV of investment zero
+
+## L
+
+**Leverage (杠杆)**
+- **中文**：使用借入资金增加投资规模
+- **English**: Using borrowed funds to increase investment size
+
+**Liquidity (流动性)**
+- **中文**：资产快速变现的能力
+- **English**: Ability to quickly convert assets to cash
+
+## M
+
+**Market Capitalization (市值)**
+- **中文**：公司股票总市场价值
+- **English**: Total market value of company's shares
+
+**Monetary Policy (货币政策)**
+- **中文**：中央银行控制货币供应和利率的政策
+- **English**: Central bank policies controlling money supply and interest rates
+
+## N
+
+**Net Present Value (净现值)**
+- **中文**：投资未来现金流的现值减去初始投资
+- **English**: Present value of future cash flows minus initial investment
+
+## O
+
+**Option (期权)**
+- **中文**：在未来特定时间以特定价格买卖资产的权利
+- **English**: Right to buy/sell asset at specific price on future date
+
+## P
+
+**Portfolio (投资组合)**
+- **中文**：投资者持有的多种资产集合
+- **English**: Collection of various assets held by investor
+
+**Present Value (现值)**
+- **中文**：未来现金流在当前的价值
+- **English**: Current value of future cash flows
+
+**Price-Earnings Ratio (市盈率)**
+- **中文**：股价与每股收益的比率
+- **English**: Ratio of stock price to earnings per share
+
+## R
+
+**Return on Equity (股本回报率)**
+- **中文**：净利润与股东权益的比率
+- **English**: Ratio of net income to shareholders' equity
+
+**Risk Management (风险管理)**
+- **中文**：识别、评估和控制风险的过程
+- **English**: Process of identifying, assessing, and controlling risks
+
+## S
+
+**Sharpe Ratio (夏普比率)**
+- **中文**：风险调整后的投资绩效指标
+- **English**: Risk-adjusted measure of investment performance
+
+**Standard Deviation (标准差)**
+- **中文**：衡量数据离散程度的统计指标
+- **English**: Statistical measure of data dispersion
+
+## T
+
+**Time Value of Money (货币时间价值)**
+- **中文**：货币在不同时间点的价值不同
+- **English**: Money has different values at different times
+
+## V
+
+**Valuation (估值)**
+- **中文**：确定资产或公司价值的过程
+- **English**: Process of determining value of asset or company
+
+**Volatility (波动率)**
+- **中文**：资产价格变动的程度
+- **English**: Degree of variation in asset prices
+
+## W
+
+**Weighted Average Cost of Capital (加权平均资本成本)**
+- **中文**：公司各种融资来源的平均成本
+- **English**: Average cost of company's various financing sources
+
+## Y
+
+**Yield (收益率)**
+- **中文**：投资产生的收益比率
+- **English**: Rate of return generated by an investment
+
+## 常用缩写 | Common Abbreviations
+
+**中文** | **English** | **全称** | **Full Name**
+--- | --- | --- | ---
+CFA | CFA | 特许金融分析师 | Chartered Financial Analyst
+IFRS | IFRS | 国际财务报告准则 | International Financial Reporting Standards
+GAAP | GAAP | 公认会计原则 | Generally Accepted Accounting Principles
+NPV | NPV | 净现值 | Net Present Value
+IRR | IRR | 内部收益率 | Internal Rate of Return
+ROE | ROE | 股本回报率 | Return on Equity
+ROA | ROA | 资产回报率 | Return on Assets
+EPS | EPS | 每股收益 | Earnings Per Share
+P/E | P/E | 市盈率 | Price-Earnings Ratio
+P/B | P/B | 市净率 | Price-Book Ratio
+CAPM | CAPM | 资本资产定价模型 | Capital Asset Pricing Model
+VaR | VaR | 在险价值 | Value at Risk
+MBS | MBS | 抵押贷款支持证券 | Mortgage-Backed Securities
+ABS | ABS | 资产支持证券 | Asset-Backed Securities
+CDO | CDO | 债务抵押债券 | Collateralized Debt Obligation
+
+---
+
+**持续学习和积累专业词汇是CFA成功的重要基础！** | **Continuous learning and vocabulary accumulation are essential foundations for CFA success!**
