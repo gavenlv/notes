@@ -14,6 +14,34 @@
 - **Standards of Professional Conduct**: Specific behavioral requirements
 - **Global Investment Performance Standards**: Standardized performance reporting
 
+### 详细解析与考试重点 | Detailed Analysis & Exam Focus
+
+**中文详细解析**：
+- **专业性**：必须保持专业知识和技能，避免不当行为
+  - 考试重点：识别违反专业性的行为，如泄露机密信息
+  - 案例分析：某分析师在社交媒体发布未公开投资建议的违规性
+  
+- **诚信正直**：不得从事任何欺诈行为，必须完全披露
+  - 考试重点：利益冲突的识别和披露
+  - 实际案例：同时管理对冲基金和共同基金的潜在冲突
+  
+- **客户责任**：客户利益优先，合理谨慎，适当性要求
+  - 考试重点：判断投资建议是否符合客户需求
+  - 计算题：评估投资组合的适当性
+
+**English Detailed Analysis**:
+- **Professionalism**: Must maintain professional knowledge, avoid misconduct
+  - Exam focus: Identify violations like disclosing confidential information
+  - Case study: Analyst posting investment recommendations on social media
+  
+- **Integrity**: No fraud, full disclosure required
+  - Exam focus: Identify and disclose conflicts of interest
+  - Real case: Managing both hedge fund and mutual fund conflicts
+  
+- **Duties to Clients**: Client interests first, reasonable care, suitability
+  - Exam focus: Assess if recommendations meet client needs
+  - Calculation: Evaluate portfolio suitability
+
 ### 重要概念 | Key Concepts
 
 **中文重点**：
@@ -32,41 +60,85 @@
 
 ### 时间价值 | Time Value of Money
 
-**中文计算公式**：
+**中文计算公式与考试技巧**：
 - **现值公式**：PV = FV / (1 + r)^n
+  - 考试重点：计算不同贴现率下的现值
+  - 实际应用：债券定价、项目评估
+  - 常见陷阱：忽略现金流的时间点
+  
 - **终值公式**：FV = PV × (1 + r)^n
+  - 考试重点：复利计算、有效年利率转换
+  - 计算技巧：使用金融计算器TVM功能
+  - 实战案例：投资10000元，年收益8%，5年后价值
+  
 - **年金现值**：PVA = PMT × [(1 - (1 + r)^-n) / r]
-- **年金终值**：FVA = PMT × [((1 + r)^n - 1) / r]
+  - 考试重点：期初年金与期末年金的区别
+  - 应用场景：退休规划、贷款计算
+  - 复杂题型：增长率年金、递延年金
 
-**English Formulas**:
+**English Formulas & Exam Techniques**:
 - **Present Value**: PV = FV / (1 + r)^n
+  - Exam focus: Calculate PV under different discount rates
+  - Application: Bond pricing, project evaluation
+  - Common pitfalls: Ignoring timing of cash flows
+  
 - **Future Value**: FV = PV × (1 + r)^n
+  - Exam focus: Compound interest, EAR conversion
+  - Technique: Use financial calculator TVM functions
+  - Example: Investment of 10000 at 8% for 5 years
+  
 - **Annuity Present Value**: PVA = PMT × [(1 - (1 + r)^-n) / r]
-- **Annuity Future Value**: FVA = PMT × [((1 + r)^n - 1) / r]
+  - Exam focus: Difference between annuity due and ordinary annuity
+  - Application: Retirement planning, loan calculations
+  - Advanced: Growing annuity, deferred annuity
 
 ### 概率与统计 | Probability and Statistics
 
-**中文概念**：
-- **概率分布**：正态分布、二项分布、泊松分布
-- **描述统计**：均值、中位数、众数、方差、标准差
-- **推断统计**：假设检验、置信区间、回归分析
+**中文详细解析**：
+- **正态分布**：均值、标准差、z值计算
+  - 考试重点：计算概率、置信区间
+  - 实际应用：投资回报率分布分析
+  - 复杂题型：两个正态分布变量的组合
+  
+- **假设检验**：零假设、备择假设、显著性水平
+  - 考试重点：t检验、p值解释
+  - 应用场景：检验投资策略的有效性
+  - 常见错误：混淆I型和II型错误
 
-**English Concepts**:
-- **Probability Distributions**: Normal, Binomial, Poisson distributions
-- **Descriptive Statistics**: Mean, Median, Mode, Variance, Standard Deviation
-- **Inferential Statistics**: Hypothesis testing, Confidence intervals, Regression analysis
+**English Detailed Analysis**:
+- **Normal Distribution**: Mean, standard deviation, z-score calculation
+  - Exam focus: Probability calculation, confidence intervals
+  - Application: Investment return distribution analysis
+  - Advanced: Combining two normal distributions
+  
+- **Hypothesis Testing**: Null hypothesis, alternative hypothesis, significance level
+  - Exam focus: t-test, p-value interpretation
+  - Application: Testing investment strategy effectiveness
+  - Common errors: Confusing Type I and Type II errors
 
 ### 金融计算器使用 | Financial Calculator Usage
 
 **中文操作指南**：
 - **TI BA II Plus**：时间价值计算、现金流计算、统计计算
+  - 考试重点：NPV、IRR计算，债券收益率
+  - 操作步骤：设置P/Y、C/Y，正确输入现金流
+  - 常见错误：忘记清除计算器内存
+  
 - **HP 12C**：RPN计算方式、时间价值功能
-- **常见功能**：NPV、IRR、债券计算、折旧计算
+  - 考试技巧：掌握RPN输入方法
+  - 实际应用：复杂现金流分析
+  - 时间限制：考试中快速计算的技巧
 
 **English Guide**:
 - **TI BA II Plus**: Time value, Cash flow, Statistical calculations
+  - Exam focus: NPV, IRR calculation, bond yields
+  - Steps: Set P/Y, C/Y, input cash flows correctly
+  - Common errors: Forgetting to clear memory
+  
 - **HP 12C**: RPN method, Time value functions
-- **Common Functions**: NPV, IRR, Bond calculations, Depreciation
+  - Exam technique: Master RPN input method
+  - Application: Complex cash flow analysis
+  - Time management: Quick calculation techniques
 
 ## 2.3 经济学 | Economics (8-12%)
 
@@ -102,41 +174,85 @@
 
 ### 三张主要报表 | Three Main Statements
 
-**中文分析重点**：
+**中文详细解析与考试重点**：
 - **利润表**：收入确认、费用匹配、盈利能力分析
+  - 考试重点：收入确认原则、费用分类、利润质量分析
+  - 实际应用：识别盈余管理、分析盈利趋势
+  - 复杂题型：多期比较、行业对比分析
+  
 - **资产负债表**：资产质量、负债结构、权益分析
+  - 考试重点：资产减值、负债分类、权益变动
+  - 应用场景：偿债能力评估、资本结构分析
+  - 常见陷阱：忽略表外负债、无形资产估值
+  
 - **现金流量表**：经营、投资、融资活动现金流
+  - 考试重点：间接法编制、现金流质量分析
+  - 实际意义：评估企业生存能力、投资价值
+  - 复杂分析：自由现金流计算、现金流预测
 
-**English Analysis Focus**:
+**English Detailed Analysis & Exam Focus**:
 - **Income Statement**: Revenue recognition, Expense matching, Profitability analysis
+  - Exam focus: Revenue recognition principles, expense classification, earnings quality
+  - Application: Identify earnings management, analyze profit trends
+  - Advanced: Multi-period comparison, industry analysis
+  
 - **Balance Sheet**: Asset quality, Liability structure, Equity analysis
+  - Exam focus: Asset impairment, liability classification, equity changes
+  - Application: Solvency assessment, capital structure analysis
+  - Pitfalls: Off-balance sheet liabilities, intangible asset valuation
+  
 - **Cash Flow Statement**: Operating, Investing, Financing cash flows
+  - Exam focus: Indirect method preparation, cash flow quality
+  - Significance: Assess viability, investment value
+  - Advanced: Free cash flow calculation, cash flow forecasting
 
 ### 财务比率分析 | Financial Ratio Analysis
 
-**中文比率类型**：
+**中文详细分析**：
 - **盈利能力比率**：毛利率、净利率、ROA、ROE
+  - 考试重点：杜邦分析、ROE分解
+  - 实际应用：评估管理层绩效、投资回报
+  - 行业对比：不同行业的合理比率范围
+  
 - **偿债能力比率**：流动比率、速动比率、负债比率
-- **运营效率比率**：存货周转率、应收账款周转率
-- **市场价值比率**：市盈率、市净率、股息收益率
+  - 考试重点：短期偿债能力、长期偿债能力
+  - 应用场景：信用风险评估、贷款审批
+  - 预警信号：比率异常变化的分析
 
-**English Ratio Types**:
+**English Detailed Analysis**:
 - **Profitability Ratios**: Gross margin, Net margin, ROA, ROE
+  - Exam focus: DuPont analysis, ROE decomposition
+  - Application: Management performance evaluation, investment return
+  - Industry comparison: Reasonable ratio ranges by industry
+  
 - **Liquidity Ratios**: Current ratio, Quick ratio, Debt ratio
-- **Efficiency Ratios**: Inventory turnover, Receivables turnover
-- **Market Value Ratios**: P/E ratio, P/B ratio, Dividend yield
+  - Exam focus: Short-term liquidity, long-term solvency
+  - Application: Credit risk assessment, loan approval
+  - Warning signs: Analysis of abnormal ratio changes
 
 ### 国际财务报告准则 | IFRS vs US GAAP
 
-**中文差异**：
+**中文详细差异分析**：
 - **存货计价**：IFRS禁止LIFO，US GAAP允许
+  - 考试重点：LIFO与FIFO对财务报表的影响
+  - 实际影响：存货价值、成本计算、税务影响
+  - 转换分析：从LIFO到FIFO的调整
+  
 - **研发费用**：IFRS部分资本化，US GAAP全部费用化
-- **资产重估**：IFRS允许重估增值，US GAAP不允许
+  - 考试重点：资本化条件、摊销方法
+  - 财务影响：资产价值、利润水平、现金流
+  - 案例分析：高科技企业的研发会计处理
 
-**English Differences**:
+**English Detailed Differences**:
 - **Inventory Valuation**: IFRS prohibits LIFO, US GAAP allows
+  - Exam focus: LIFO vs FIFO impact on financial statements
+  - Impact: Inventory value, cost calculation, tax effects
+  - Conversion: Adjustments from LIFO to FIFO
+  
 - **R&D Expenses**: IFRS partial capitalization, US GAAP full expensing
-- **Asset Revaluation**: IFRS allows upward revaluation, US GAAP prohibits
+  - Exam focus: Capitalization criteria, amortization methods
+  - Financial impact: Asset value, profit level, cash flow
+  - Case study: R&D accounting in high-tech companies
 
 ## 2.5 公司金融 | Corporate Finance (8-12%)
 

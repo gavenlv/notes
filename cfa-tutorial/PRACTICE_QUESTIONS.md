@@ -20,6 +20,16 @@ D) 8.50%
 **解析**：有效年利率 = (1 + 0.08/4)^4 - 1 = (1.02)^4 - 1 = 1.0824 - 1 = 0.0824 = 8.24%
 **Explanation**: EAR = (1 + 0.08/4)^4 - 1 = (1.02)^4 - 1 = 1.0824 - 1 = 0.0824 = 8.24%
 
+**考试技巧**：
+- **计算器操作**：TI BA II Plus: 8 ÷ 4 = 2, 1 + 2% = 1.02, y^x 4 = 1.0824, -1 = 0.0824
+- **公式记忆**：EAR = (1 + r/n)^n - 1，其中r为名义年利率，n为复利次数
+- **常见错误**：忘记减1，直接使用(1 + r/n)^n作为结果
+
+**Exam Techniques**:
+- **Calculator**: TI BA II Plus: 8 ÷ 4 = 2, 1 + 2% = 1.02, y^x 4 = 1.0824, -1 = 0.0824
+- **Formula**: EAR = (1 + r/n)^n - 1, where r is nominal rate, n is compounding frequency
+- **Common errors**: Forgetting to subtract 1, using (1 + r/n)^n as result
+
 ---
 
 **题目2**：一个投资组合的预期收益为12%，标准差为20%，无风险利率为4%。该组合的夏普比率是多少？
