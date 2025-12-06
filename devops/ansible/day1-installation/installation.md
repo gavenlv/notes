@@ -36,6 +36,16 @@ python3 -m pip install ansible
 ansible --version
 ```
 
+#### 语法解析
+- **`python3 -m pip install --upgrade pip`**: 使用 Python 模块方式运行 pip 工具，`-m` 参数表示运行模块，`--upgrade` 确保 pip 是最新版本
+- **`python3 -m pip install ansible`**: 安装 Ansible 核心包，包含所有基础模块和工具
+- **`ansible --version`**: 验证安装成功，显示 Ansible 版本、Python 版本和可执行文件路径
+
+#### 安装说明
+- **pip 安装优势**: 可以安装最新版本，支持虚拟环境隔离
+- **Python 版本要求**: Ansible 需要 Python 3.6 或更高版本
+- **依赖管理**: pip 会自动处理 Ansible 的依赖关系
+
 ### 方法 2: 使用系统包管理器
 
 #### Ubuntu/Debian
@@ -46,6 +56,11 @@ sudo add-apt-repository --yes --update ppa:ansible/ansible
 sudo apt install ansible
 ```
 
+#### 语法解析
+- **`software-properties-common`**: 提供 `add-apt-repository` 命令，用于管理软件仓库
+- **`ppa:ansible/ansible`**: Ansible 官方 PPA (Personal Package Archive) 仓库
+- **`--yes --update`**: 自动确认并更新软件包列表
+
 #### CentOS/RHEL/Rocky Linux
 ```bash
 # 安装 EPEL 仓库
@@ -53,16 +68,28 @@ sudo dnf install epel-release
 sudo dnf install ansible
 ```
 
+#### 语法解析
+- **`epel-release`**: Extra Packages for Enterprise Linux 仓库，提供额外的软件包
+- **`dnf`**: Dandified YUM，新一代的包管理器，替代 yum
+
 #### macOS
 ```bash
 # 使用 Homebrew
 brew install ansible
 ```
 
+#### 语法解析
+- **Homebrew**: macOS 的包管理器，自动处理依赖和路径配置
+
 ### 方法 3: 使用 Conda
 ```bash
 conda install -c conda-forge ansible
 ```
+
+#### 语法解析
+- **`conda`**: Python 包和环境管理器，支持虚拟环境隔离
+- **`-c conda-forge`**: 指定使用 conda-forge 社区仓库
+- **优势**: 环境隔离，避免系统 Python 冲突
 
 ## ⚙️ 基础配置
 
@@ -87,6 +114,17 @@ ssh-copy-id user@target_host
 ssh user@target_host
 ```
 
+#### 语法解析
+- **`ssh-keygen -t rsa -b 4096`**: 生成 RSA 类型、4096 位长度的密钥对，`-t` 指定密钥类型，`-b` 指定密钥长度
+- **`-C "your_email@example.com"`**: 添加注释信息，通常使用邮箱作为标识
+- **`ssh-copy-id`**: 自动将公钥复制到目标主机的 `~/.ssh/authorized_keys` 文件
+- **SSH 密钥认证优势**: 比密码认证更安全，支持自动化操作
+
+#### 安全最佳实践
+- 使用强密码保护私钥（可选）
+- 定期轮换密钥对
+- 限制公钥的使用范围
+
 ### 3. 配置文件示例
 
 详细配置见：[configs/ansible.cfg](./configs/ansible.cfg)
@@ -100,6 +138,12 @@ ansible-playbook --version
 ansible-galaxy --version
 ```
 
+#### 语法解析
+- **`ansible --version`**: 显示 Ansible 核心版本、Python 版本和配置路径
+- **`ansible-playbook --version`**: 验证 playbook 执行器可用性
+- **`ansible-galaxy --version`**: 检查角色管理工具状态
+- **输出信息**: 包含版本号、Python 路径、模块搜索路径等关键信息
+
 ### 2. 连接测试
 ```bash
 # 测试本地连接
@@ -108,6 +152,12 @@ ansible localhost -m ping
 # 测试远程主机连接
 ansible all -m ping -i inventory.ini
 ```
+
+#### 语法解析
+- **`ansible localhost -m ping`**: 测试本地连接，`-m ping` 使用 ping 模块
+- **`ansible all -m ping -i inventory.ini`**: 测试所有主机连接，`-i` 指定 inventory 文件
+- **ping 模块**: 返回 `pong` 表示连接成功，是最基础的连接测试
+- **localhost**: 特殊主机名，指向当前控制节点
 
 ### 3. 运行测试脚本
 
@@ -118,6 +168,11 @@ ansible all -m ping -i inventory.ini
 # Linux/macOS
 ./scripts/test-installation.sh
 ```
+
+#### 语法解析
+- **PowerShell 脚本**: 适用于 Windows 环境，包含完整的安装验证流程
+- **Shell 脚本**: 适用于 Linux/macOS，包含依赖检查和连接测试
+- **脚本功能**: 自动化验证安装完整性，减少手动检查步骤
 
 ## 🐳 Docker 环境 (可选)
 
