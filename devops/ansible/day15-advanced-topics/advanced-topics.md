@@ -646,6 +646,154 @@ control_path = %(directory)s/%%h-%%r
       no_log: true
 ```
 
+### 5.3 Ansible Vault 高级应用
+
+#### 5.3.1 多环境 Vault 管理
+
+```yaml
+# inventory/group_vars/all/vault.yml
+---
+# 开发环境变量
+dev_secrets: !vault |
+  $ANSIBLE_VAULT;1.1;AES256
+  # 开发环境加密内容
+  
+# 生产环境变量
+prod_secrets: !vault |
+  $ANSIBLE_VAULT;1.1;AES256
+  # 生产环境加密内容
+
+# 根据环境动态选择变量
+secrets: "{{ dev_secrets if env == 'development' else prod_secrets }}"
+
+# Playbook 中使用
+- name: Deploy with environment-specific secrets
+  hosts: all
+  vars_files:
+    - group_vars/all/vault.yml
+  tasks:
+    - name: Configure application
+      template:
+        src: config.j2
+        dest: /etc/app/config.yaml
+        mode: '0600'
+      vars:
+        db_password: "{{ secrets.database_password }}"
+        api_key: "{{ secrets.api_key }}"
+```
+
+#### 5.3.2 Vault ID 和分层加密
+
+```bash
+# 使用不同的 Vault ID 管理不同级别的机密
+ansible-vault encrypt --vault-id dev@prompt dev_secrets.yml
+ansible-vault encrypt --vault-id prod@prompt prod_secrets.yml
+ansible-vault encrypt --vault-id infra@prompt infrastructure_secrets.yml
+
+# 运行 Playbook 时指定多个 Vault ID
+ansible-playbook deploy.yml --vault-id dev@prompt --vault-id prod@prompt --vault-id infra@prompt
+
+# 使用密码文件
+ansible-playbook deploy.yml --vault-id dev@.vault_pass_dev --vault-id prod@.vault_pass_prod
+```
+
+#### 5.3.3 Vault 与 CI/CD 集成
+
+```yaml
+# .gitlab-ci.yml
+stages:
+  - deploy
+
+deploy_production:
+  stage: deploy
+  script:
+    - echo "$PROD_VAULT_PASSWORD" > .vault_pass_prod
+    - chmod 600 .vault_pass_prod
+    - ansible-playbook -i production deploy.yml --vault-id prod@.vault_pass_prod
+    - rm -f .vault_pass_prod
+  only:
+    - main
+  variables:
+    PROD_VAULT_PASSWORD: $PROD_VAULT_PASSWORD
+
+deploy_staging:
+  stage: deploy
+  script:
+    - echo "$STAGING_VAULT_PASSWORD" > .vault_pass_staging
+    - chmod 600 .vault_pass_staging
+    - ansible-playbook -i staging deploy.yml --vault-id staging@.vault_pass_staging
+    - rm -f .vault_pass_staging
+  only:
+    - develop
+  variables:
+    STAGING_VAULT_PASSWORD: $STAGING_VAULT_PASSWORD
+```
+
+#### 5.3.4 企业级 Vault 策略
+
+```yaml
+# ansible.cfg
+[defaults]
+vault_password_file = .vault_pass
+vault_identity_list = dev@.vault_pass_dev,prod@.vault_pass_prod,infra@.vault_pass_infra
+
+# 启用 Vault 缓存以提高性能
+vault_caching_enabled = True
+vault_caching_ttl = 3600
+
+# 安全配置
+vault_password_prompt = True
+vault_ask_vault_pass = False
+```
+
+### 5.4 零信任安全架构
+
+```yaml
+---
+- name: Zero Trust Security Implementation
+  hosts: all
+  vars:
+    # 从零信任平台获取临时令牌
+    zero_trust_token: "{{ lookup('url', 'https://zero-trust-platform/api/token', username=api_user, password=api_password) }}"
+    
+  tasks:
+    - name: Get dynamic secrets from zero trust platform
+      uri:
+        url: "https://secrets-manager/api/secrets"
+        method: GET
+        headers:
+          Authorization: "Bearer {{ zero_trust_token }}"
+        return_content: yes
+      register: secrets_response
+      
+    - name: Create temporary encrypted configuration
+      template:
+        src: zero_trust_config.j2
+        dest: /tmp/zero_trust_config.yml
+        mode: '0600'
+      vars:
+        dynamic_secrets: "{{ secrets_response.json }}"
+      
+    - name: Apply zero trust configuration
+      include_vars:
+        file: /tmp/zero_trust_config.yml
+      
+    - name: Cleanup temporary files
+      file:
+        path: /tmp/zero_trust_config.yml
+        state: absent
+      
+    - name: Configure application with zero trust principles
+      template:
+        src: app_config.j2
+        dest: /etc/app/config.yaml
+        mode: '0600'
+      vars:
+        # 使用动态获取的凭据
+        db_credentials: "{{ dynamic_secrets.database }}"
+        api_credentials: "{{ dynamic_secrets.api }}"
+```
+
 ### 5.2 最小权限原则
 
 实施最小权限原则以增强安全性。
