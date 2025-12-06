@@ -736,6 +736,352 @@ test_data_export()
 generate_sample_config()
 ```
 
+## 实验6：语法解析深度示例
+
+### 6.1 配置语法错误示例
+
+```yaml
+# syntax-error-config.yml
+# 缩进不一致的配置
+app:
+  name: "MyApp"
+   version: "1.0.0"  # 错误的缩进
+  description: "A sample app"
+
+# 使用制表符代替空格
+server:
+	port: 8080  # 制表符缩进
+	host: "localhost"
+
+# 缺少冒号
+database
+  type: "postgresql"
+  host: "localhost"
+
+# 重复键
+logging:
+  level: "info"
+  level: "debug"  # 重复键
+```
+
+### 6.2 特殊字符处理示例
+
+```yaml
+# special-chars-config.yml
+# 包含特殊字符的配置
+app:
+  name: "My:App"  # 包含冒号
+  description: "App with # special chars"  # 包含哈希符号
+  url: "https://example.com/path?query=value&param=test"
+
+# 引号使用示例
+strings:
+  single_quoted: 'This is a "quoted" string'
+  double_quoted: "This is a 'quoted' string"
+  literal: |
+    This is a literal string
+    with multiple lines
+    and special chars: : # { }
+  folded: >
+    This is a folded string
+    with multiple lines that
+    will be joined
+
+# 包含特殊字符的键
+"special:key": "value with : colon"
+"key with spaces": "value"
+"key.with.dots": "value"
+```
+
+### 6.3 多行字符串块示例
+
+```yaml
+# multiline-config.yml
+# 字面量块标量
+sql_query: |
+  SELECT 
+    users.id,
+    users.name,
+    COUNT(orders.id) as order_count
+  FROM users
+  LEFT JOIN orders ON users.id = orders.user_id
+  WHERE users.created_at > '2020-01-01'
+  GROUP BY users.id, users.name
+  ORDER BY order_count DESC
+
+# 折叠块标量
+error_message: >
+  This is a long error message that spans
+  multiple lines but will be joined into
+  a single line when parsed.
+
+# 保持块标量
+config_file: |-
+  server {
+    listen 80;
+    server_name example.com;
+    
+    location / {
+      proxy_pass http://backend;
+    }
+  }
+
+# 多行数组项
+commands:
+  - |
+    docker build -t myapp:latest .
+    docker push myapp:latest
+  - |
+    kubectl apply -f deployment.yaml
+    kubectl rollout status deployment/myapp
+```
+
+## 实验7：语法解析验证代码
+
+```python
+# syntax_validation.py
+import yaml
+import re
+from pathlib import Path
+
+class YAMLSyntaxParser:
+    """YAML语法解析器"""
+    
+    def __init__(self):
+        self.errors = []
+        self.warnings = []
+        
+    def validate_indentation(self, content):
+        """验证缩进"""
+        lines = content.split('\n')
+        
+        for i, line in enumerate(lines, 1):
+            if line.strip() and not line.startswith('#'):
+                # 检查制表符
+                if '\t' in line:
+                    self.errors.append(f"第{i}行: 检测到制表符，请使用空格缩进")
+                
+                # 检查缩进一致性
+                if line.startswith(' '):
+                    spaces = len(line) - len(line.lstrip())
+                    if spaces % 2 != 0:
+                        self.warnings.append(f"第{i}行: 缩进空格数应为偶数，当前为{spaces}")
+    
+    def validate_special_chars(self, content):
+        """验证特殊字符"""
+        lines = content.split('\n')
+        
+        for i, line in enumerate(lines, 1):
+            if line.strip() and not line.startswith('#'):
+                # 检查未转义的特殊字符
+                if re.search(r'(?<!\\):', line) and ':' in line:
+                    parts = line.split(':', 1)
+                    if len(parts) > 1 and not parts[0].strip().endswith('"'):
+                        # 检查键中是否包含冒号但未加引号
+                        if ':' in parts[0] and not (parts[0].startswith('"') and parts[0].endswith('"')):
+                            self.warnings.append(f"第{i}行: 键中包含冒号，建议使用引号包裹")
+    
+    def validate_multiline_strings(self, content):
+        """验证多行字符串"""
+        lines = content.split('\n')
+        in_multiline = False
+        multiline_type = None
+        
+        for i, line in enumerate(lines, 1):
+            # 检测多行字符串开始
+            if not in_multiline and ('|' in line or '>' in line):
+                in_multiline = True
+                if '|' in line:
+                    multiline_type = 'literal'
+                else:
+                    multiline_type = 'folded'
+                continue
+            
+            # 在多行字符串中
+            if in_multiline:
+                # 检查缩进
+                if line.strip() and not line.startswith(' '):
+                    in_multiline = False
+                    multiline_type = None
+    
+    def validate_yaml_structure(self, content):
+        """验证YAML结构"""
+        try:
+            data = yaml.safe_load(content)
+            
+            # 检查重复键
+            def check_duplicate_keys(data, path=""):
+                if isinstance(data, dict):
+                    keys = set()
+                    for key, value in data.items():
+                        if key in keys:
+                            self.errors.append(f"重复键: {path}.{key}")
+                        keys.add(key)
+                        check_duplicate_keys(value, f"{path}.{key}" if path else key)
+                elif isinstance(data, list):
+                    for item in data:
+                        check_duplicate_keys(item, path)
+            
+            check_duplicate_keys(data)
+            
+        except yaml.YAMLError as e:
+            self.errors.append(f"YAML解析错误: {e}")
+    
+    def analyze_config_complexity(self, content):
+        """分析配置复杂度"""
+        try:
+            data = yaml.safe_load(content)
+            
+            def count_nodes(obj):
+                if isinstance(obj, dict):
+                    return 1 + sum(count_nodes(v) for v in obj.values())
+                elif isinstance(obj, list):
+                    return 1 + sum(count_nodes(item) for item in obj)
+                else:
+                    return 1
+            
+            node_count = count_nodes(data) if data else 0
+            
+            if node_count > 100:
+                self.warnings.append(f"配置复杂度较高，包含{node_count}个节点")
+            
+            return node_count
+            
+        except yaml.YAMLError:
+            return 0
+    
+    def validate_file(self, file_path):
+        """验证文件"""
+        self.errors.clear()
+        self.warnings.clear()
+        
+        try:
+            with open(file_path, 'r', encoding='utf-8') as file:
+                content = file.read()
+            
+            print(f"\n=== 验证文件: {file_path} ===")
+            
+            # 执行各种验证
+            self.validate_indentation(content)
+            self.validate_special_chars(content)
+            self.validate_multiline_strings(content)
+            self.validate_yaml_structure(content)
+            complexity = self.analyze_config_complexity(content)
+            
+            # 输出结果
+            if self.errors:
+                print("❌ 错误:")
+                for error in self.errors:
+                    print(f"  - {error}")
+            else:
+                print("✅ 无语法错误")
+            
+            if self.warnings:
+                print("⚠️  警告:")
+                for warning in self.warnings:
+                    print(f"  - {warning}")
+            else:
+                print("✅ 无警告")
+            
+            print(f"📊 配置复杂度: {complexity} 个节点")
+            
+            return len(self.errors) == 0
+            
+        except Exception as e:
+            print(f"❌ 文件读取错误: {e}")
+            return False
+
+def test_syntax_validation():
+    """测试语法验证"""
+    parser = YAMLSyntaxParser()
+    
+    # 测试语法错误配置
+    print("=== 语法错误配置测试 ===")
+    syntax_error_config = """
+app:
+  name: "MyApp"
+   version: "1.0.0"  # 错误的缩进
+  description: "A sample app"
+
+server:
+	port: 8080  # 制表符缩进
+	host: "localhost"
+"""
+    
+    with open('syntax-error-test.yml', 'w', encoding='utf-8') as file:
+        file.write(syntax_error_config)
+    
+    parser.validate_file('syntax-error-test.yml')
+    
+    # 测试特殊字符配置
+    print("\n=== 特殊字符配置测试 ===")
+    special_chars_config = """
+app:
+  name: "My:App"
+  description: "App with # special chars"
+  url: "https://example.com/path?query=value&param=test"
+
+"special:key": "value with : colon"
+"key with spaces": "value"
+"""
+    
+    with open('special-chars-test.yml', 'w', encoding='utf-8') as file:
+        file.write(special_chars_config)
+    
+    parser.validate_file('special-chars-test.yml')
+    
+    # 测试多行字符串配置
+    print("\n=== 多行字符串配置测试 ===")
+    multiline_config = """
+sql_query: |
+  SELECT 
+    users.id,
+    users.name,
+    COUNT(orders.id) as order_count
+  FROM users
+  LEFT JOIN orders ON users.id = orders.user_id
+
+error_message: >
+  This is a long error message that spans
+  multiple lines but will be joined into
+  a single line when parsed.
+"""
+    
+    with open('multiline-test.yml', 'w', encoding='utf-8') as file:
+        file.write(multiline_config)
+    
+    parser.validate_file('multiline-test.yml')
+
+def generate_syntax_guide():
+    """生成语法指南"""
+    guide = {
+        '缩进规则': {
+            'description': '使用空格缩进，推荐使用2或4个空格',
+            'correct': 'key:\n  subkey: value',
+            'incorrect': 'key:\n\tsubkey: value  # 使用制表符'
+        },
+        '特殊字符': {
+            'description': '包含特殊字符的键需要使用引号包裹',
+            'correct': '"key:with:colons": value',
+            'incorrect': 'key:with:colons: value'
+        },
+        '多行字符串': {
+            'description': '使用|保留换行，>折叠换行',
+            'correct': 'text: |\n  line1\n  line2',
+            'incorrect': 'text: line1\\nline2'
+        }
+    }
+    
+    with open('syntax-guide.yml', 'w', encoding='utf-8') as file:
+        yaml.dump(guide, file, default_flow_style=False, allow_unicode=True)
+    
+    print("✅ 已生成语法指南: syntax-guide.yml")
+
+# 运行测试
+test_syntax_validation()
+generate_syntax_guide()
+```
+
 ## 实验说明
 
 1. **application.yml, application-dev.yml, application-prod.yml**: 应用配置管理示例，展示基础配置和环境特定配置
@@ -743,11 +1089,17 @@ generate_sample_config()
 3. **deployment.yml**: Kubernetes部署示例，包含Deployment、Service、ConfigMap和Secret
 4. **.github/workflows/ci-cd.yml**: CI/CD流水线示例，展示代码检查、测试、构建和部署流程
 5. **data-export.yml**: 数据导出示例，包含表结构和示例数据
-6. **practical_applications.py**: Python验证代码，用于测试所有实战应用场景
+6. **syntax-error-config.yml, special-chars-config.yml, multiline-config.yml**: 语法解析深度示例，展示常见语法错误和特殊字符处理
+7. **syntax_validation.py**: 语法解析验证代码，实现缩进验证、特殊字符验证、多行字符串验证和综合语法验证
+8. **practical_applications.py**: Python验证代码，用于测试所有实战应用场景
 
 运行验证代码：
 ```bash
+# 运行实战应用测试
 python practical_applications.py
+
+# 运行语法解析测试
+python syntax_validation.py
 ```
 
-这将验证所有YAML文件的实战应用场景，并展示它们的用法和效果。此外，代码还会生成一个示例配置文件，展示如何程序化地创建YAML配置。
+这将验证所有YAML文件的实战应用场景和语法正确性，并展示它们的用法和效果。语法解析代码会检测常见的语法错误并提供修复建议。

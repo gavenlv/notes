@@ -554,6 +554,658 @@ test_schema_validation()
 test_security()
 ```
 
+## 实验8：语法解析与锚点机制深度分析
+
+```yaml
+# syntax_analysis.yml
+# 语法解析与锚点机制深度分析示例
+---
+# 锚点引用解析
+base_configuration: &base
+  timeout: 30
+  retries: 3
+  log_level: info
+
+# 复杂锚点引用
+server_template: &server
+  cpu: 2
+  memory: 4GB
+  os: ubuntu
+  services:
+    - nginx
+    - docker
+
+# 多级锚点引用
+network_config: &network
+  subnet: 192.168.1.0/24
+  gateway: 192.168.1.1
+  dns: [8.8.8.8, 8.8.4.4]
+
+# 锚点引用组合
+production_servers:
+  web_server:
+    <<: *server
+    <<: *network
+    name: web-prod-01
+    ip: 192.168.1.10
+  db_server:
+    <<: *server
+    <<: *network
+    name: db-prod-01
+    ip: 192.168.1.20
+    cpu: 8
+    memory: 16GB
+    services:
+      - postgresql
+      - redis
+
+# 锚点循环引用检测（应避免）
+# 注意：以下示例展示应避免的循环引用
+circular_reference_a: &circular_a
+  name: "Reference A"
+  reference: *circular_b
+
+circular_reference_b: &circular_b
+  name: "Reference B"
+  reference: *circular_a
+```
+
+## 实验9：语法解析与多文档流处理
+
+```yaml
+# document_parsing.yml
+# 语法解析与多文档流处理示例
+---
+# 文档1：系统配置
+system:
+  name: production-system
+  version: 1.0.0
+  environment: production
+...
+---
+# 文档2：应用配置
+application:
+  name: web-app
+  port: 8080
+  database:
+    host: localhost
+    port: 5432
+    name: app_db
+...
+---
+# 文档3：安全配置
+security:
+  ssl:
+    enabled: true
+    certificate: /etc/ssl/cert.pem
+    key: /etc/ssl/key.pem
+  firewall:
+    enabled: true
+    rules:
+      - action: allow
+        port: 80
+      - action: allow
+        port: 443
+      - action: deny
+        port: 22
+...
+---
+# 文档4：监控配置
+monitoring:
+  metrics:
+    enabled: true
+    interval: 30s
+  logging:
+    level: info
+    format: json
+    output: /var/log/app.log
+...
+```
+
+## 实验10：语法解析与自定义类型系统
+
+```yaml
+# type_system_parsing.yml
+# 语法解析与自定义类型系统示例
+---
+# 自定义类型定义
+custom_types:
+  person_type: !person
+    schema: &person_schema
+      name: string
+      age: integer
+      email: string
+      address: map
+  
+  address_type: !address
+    schema: &address_schema
+      street: string
+      city: string
+      zip: string
+      country: string
+
+# 类型验证实例
+valid_person: !person
+  name: "Alice Johnson"
+  age: 28
+  email: "alice@example.com"
+  address: !address
+    street: "789 Oak Street"
+    city: "Springfield"
+    zip: "12345"
+    country: "USA"
+
+# 类型错误实例（应被验证器捕获）
+invalid_person: !person
+  name: "Bob Smith"
+  age: "thirty"  # 错误：应为整数
+  email: "not-an-email"  # 错误：无效邮箱格式
+  address: !address
+    street: 123  # 错误：应为字符串
+    city: "New York"
+    zip: "10001"
+    country: "USA"
+
+# 复杂类型嵌套
+company: !company
+  name: "Tech Solutions Inc."
+  founded: 2015
+  employees: 250
+  headquarters: !address
+    street: "456 Tech Park"
+    city: "San Francisco"
+    zip: "94105"
+    country: "USA"
+  departments:
+    - !department
+      name: "Engineering"
+      manager: !person
+        name: "Carol Davis"
+        age: 35
+        email: "carol@techsolutions.com"
+      employees: 120
+    - !department
+      name: "Sales"
+      manager: !person
+        name: "David Wilson"
+        age: 42
+        email: "david@techsolutions.com"
+      employees: 80
+```
+
+## 实验11：语法解析深度验证代码
+
+```python
+# syntax_parser.py
+import yaml
+import re
+from typing import Dict, List, Any, Set, Tuple
+from collections import deque
+
+class YAMLSyntaxParser:
+    """YAML语法解析器"""
+    
+    def __init__(self):
+        self.anchors = {}
+        self.aliases = {}
+        self.circular_references = []
+        self.syntax_errors = []
+        self.warnings = []
+    
+    def parse_anchors_and_aliases(self, file_path: str) -> Dict[str, Any]:
+        """解析锚点和别名"""
+        try:
+            with open(file_path, 'r', encoding='utf-8') as file:
+                content = file.read()
+            
+            # 解析锚点
+            anchor_pattern = r'&([a-zA-Z_][a-zA-Z0-9_]*)'
+            anchors = re.findall(anchor_pattern, content)
+            
+            # 解析别名
+            alias_pattern = r'\*([a-zA-Z_][a-zA-Z0-9_]*)'
+            aliases = re.findall(alias_pattern, content)
+            
+            # 检查未定义的别名
+            undefined_aliases = set(aliases) - set(anchors)
+            
+            # 检查未使用的锚点
+            unused_anchors = set(anchors) - set(aliases)
+            
+            return {
+                'anchors': anchors,
+                'aliases': aliases,
+                'undefined_aliases': list(undefined_aliases),
+                'unused_anchors': list(unused_anchors)
+            }
+            
+        except Exception as e:
+            return {'error': str(e)}
+    
+    def detect_circular_references(self, file_path: str) -> List[List[str]]:
+        """检测循环引用"""
+        try:
+            with open(file_path, 'r', encoding='utf-8') as file:
+                content = file.read()
+            
+            # 构建引用图
+            graph = {}
+            
+            # 解析锚点和别名对
+            lines = content.split('\n')
+            current_anchor = None
+            
+            for i, line in enumerate(lines, 1):
+                # 查找锚点定义
+                anchor_match = re.search(r'^\s*([a-zA-Z_][a-zA-Z0-9_]*):\s*&([a-zA-Z_][a-zA-Z0-9_]*)', line)
+                if anchor_match:
+                    current_anchor = anchor_match.group(2)
+                    graph[current_anchor] = set()
+                
+                # 查找别名引用
+                alias_match = re.search(r'\*([a-zA-Z_][a-zA-Z0-9_]*)', line)
+                if alias_match and current_anchor:
+                    referenced_anchor = alias_match.group(1)
+                    graph[current_anchor].add(referenced_anchor)
+            
+            # 检测循环引用
+            def find_cycles():
+                visited = set()
+                recursion_stack = set()
+                cycles = []
+                
+                def dfs(node, path):
+                    if node in recursion_stack:
+                        cycle_start = path.index(node)
+                        cycles.append(path[cycle_start:] + [node])
+                        return
+                    
+                    if node in visited:
+                        return
+                    
+                    visited.add(node)
+                    recursion_stack.add(node)
+                    
+                    for neighbor in graph.get(node, set()):
+                        dfs(neighbor, path + [node])
+                    
+                    recursion_stack.remove(node)
+                
+                for node in graph:
+                    if node not in visited:
+                        dfs(node, [])
+                
+                return cycles
+            
+            return find_cycles()
+            
+        except Exception as e:
+            return [['error', str(e)]]
+    
+    def analyze_document_structure(self, file_path: str) -> Dict[str, Any]:
+        """分析文档结构"""
+        try:
+            with open(file_path, 'r', encoding='utf-8') as file:
+                documents = list(yaml.safe_load_all(file))
+            
+            analysis = {
+                'document_count': len(documents),
+                'documents': [],
+                'structure_analysis': {}
+            }
+            
+            for i, doc in enumerate(documents, 1):
+                doc_analysis = {
+                    'document_number': i,
+                    'type': type(doc).__name__,
+                    'size': len(str(doc)),
+                    'keys': list(doc.keys()) if isinstance(doc, dict) else [],
+                    'nested_depth': self._calculate_nested_depth(doc)
+                }
+                analysis['documents'].append(doc_analysis)
+            
+            # 结构分析
+            if documents:
+                analysis['structure_analysis'] = {
+                    'average_depth': sum(d['nested_depth'] for d in analysis['documents']) / len(documents),
+                    'max_depth': max(d['nested_depth'] for d in analysis['documents']),
+                    'total_keys': sum(len(d['keys']) for d in analysis['documents']),
+                    'unique_keys': len(set(key for d in analysis['documents'] for key in d['keys']))
+                }
+            
+            return analysis
+            
+        except Exception as e:
+            return {'error': str(e)}
+    
+    def _calculate_nested_depth(self, obj: Any, current_depth: int = 0) -> int:
+        """计算嵌套深度"""
+        if isinstance(obj, dict):
+            if not obj:
+                return current_depth + 1
+            return max(self._calculate_nested_depth(v, current_depth + 1) for v in obj.values())
+        elif isinstance(obj, list):
+            if not obj:
+                return current_depth + 1
+            return max(self._calculate_nested_depth(item, current_depth + 1) for item in obj)
+        else:
+            return current_depth
+    
+    def validate_yaml_syntax(self, file_path: str) -> Dict[str, Any]:
+        """验证YAML语法"""
+        try:
+            with open(file_path, 'r', encoding='utf-8') as file:
+                content = file.read()
+            
+            # 基本语法检查
+            syntax_checks = {
+                'indentation_errors': self._check_indentation(content),
+                'duplicate_keys': self._check_duplicate_keys(content),
+                'invalid_characters': self._check_invalid_characters(content),
+                'unclosed_quotes': self._check_unclosed_quotes(content),
+                'invalid_anchors': self._check_invalid_anchors(content)
+            }
+            
+            # 尝试解析YAML
+            try:
+                yaml.safe_load(content)
+                syntax_checks['parsable'] = True
+            except yaml.YAMLError as e:
+                syntax_checks['parsable'] = False
+                syntax_checks['parse_error'] = str(e)
+            
+            return syntax_checks
+            
+        except Exception as e:
+            return {'error': str(e)}
+    
+    def _check_indentation(self, content: str) -> List[Tuple[int, str]]:
+        """检查缩进错误"""
+        errors = []
+        lines = content.split('\n')
+        
+        for i, line in enumerate(lines, 1):
+            if line.strip() and not line.startswith(' '):
+                # 检查是否有混合制表符和空格
+                if '\t' in line:
+                    errors.append((i, "混合使用制表符和空格"))
+                
+                # 检查缩进级别
+                if i > 1 and lines[i-2].strip() and not lines[i-2].startswith(' '):
+                    # 前一行有内容但未缩进，当前行也不应缩进
+                    if line.startswith(' '):
+                        errors.append((i, "意外的缩进"))
+        
+        return errors
+    
+    def _check_duplicate_keys(self, content: str) -> List[Tuple[int, str]]:
+        """检查重复键"""
+        errors = []
+        lines = content.split('\n')
+        key_pattern = r'^\s*([a-zA-Z_][a-zA-Z0-9_]*):'
+        
+        current_keys = set()
+        current_indent = 0
+        
+        for i, line in enumerate(lines, 1):
+            match = re.match(key_pattern, line)
+            if match:
+                key = match.group(1)
+                indent = len(line) - len(line.lstrip())
+                
+                if indent == current_indent and key in current_keys:
+                    errors.append((i, f"重复键: {key}"))
+                elif indent < current_indent:
+                    # 缩进减少，重置当前键集合
+                    current_keys = set()
+                    current_indent = indent
+                
+                current_keys.add(key)
+        
+        return errors
+    
+    def _check_invalid_characters(self, content: str) -> List[Tuple[int, str]]:
+        """检查无效字符"""
+        errors = []
+        lines = content.split('\n')
+        
+        for i, line in enumerate(lines, 1):
+            # 检查控制字符（除了制表符和换行符）
+            for j, char in enumerate(line):
+                if ord(char) < 32 and char not in ('\t', '\n', '\r'):
+                    errors.append((i, f"位置 {j+1}: 无效控制字符"))
+        
+        return errors
+    
+    def _check_unclosed_quotes(self, content: str) -> List[Tuple[int, str]]:
+        """检查未闭合的引号"""
+        errors = []
+        lines = content.split('\n')
+        
+        in_quotes = False
+        quote_char = None
+        
+        for i, line in enumerate(lines, 1):
+            j = 0
+            while j < len(line):
+                char = line[j]
+                
+                if not in_quotes and char in ('"', "'"):
+                    in_quotes = True
+                    quote_char = char
+                elif in_quotes and char == quote_char:
+                    # 检查转义
+                    if j > 0 and line[j-1] == '\\':
+                        j += 1
+                        continue
+                    in_quotes = False
+                    quote_char = None
+                
+                j += 1
+        
+        if in_quotes:
+            errors.append((len(lines), f"未闭合的{quote_char}引号"))
+        
+        return errors
+    
+    def _check_invalid_anchors(self, content: str) -> List[Tuple[int, str]]:
+        """检查无效锚点"""
+        errors = []
+        lines = content.split('\n')
+        
+        anchor_pattern = r'&([a-zA-Z_][a-zA-Z0-9_]*)'
+        
+        for i, line in enumerate(lines, 1):
+            matches = re.findall(anchor_pattern, line)
+            for anchor in matches:
+                if not anchor.replace('_', '').isalnum():
+                    errors.append((i, f"无效锚点名称: {anchor}"))
+        
+        return errors
+    
+    def comprehensive_syntax_analysis(self, file_path: str) -> Dict[str, Any]:
+        """综合语法分析"""
+        analysis = {
+            'file': file_path,
+            'anchor_analysis': self.parse_anchors_and_aliases(file_path),
+            'circular_references': self.detect_circular_references(file_path),
+            'document_structure': self.analyze_document_structure(file_path),
+            'syntax_validation': self.validate_yaml_syntax(file_path)
+        }
+        
+        return analysis
+    
+    def print_syntax_analysis(self, file_path: str):
+        """打印语法分析结果"""
+        print(f"\n语法分析: {file_path}")
+        print("=" * 60)
+        
+        analysis = self.comprehensive_syntax_analysis(file_path)
+        
+        if 'error' in analysis:
+            print(f"分析失败: {analysis['error']}")
+            return
+        
+        # 打印锚点分析
+        anchor_analysis = analysis['anchor_analysis']
+        print("\n锚点与别名分析:")
+        print(f"  锚点数量: {len(anchor_analysis.get('anchors', []))}")
+        print(f"  别名数量: {len(anchor_analysis.get('aliases', []))}")
+        
+        if anchor_analysis.get('undefined_aliases'):
+            print(f"  未定义别名: {anchor_analysis['undefined_aliases']}")
+        else:
+            print("  未定义别名: ✓ 无")
+        
+        if anchor_analysis.get('unused_anchors'):
+            print(f"  未使用锚点: {anchor_analysis['unused_anchors']}")
+        else:
+            print("  未使用锚点: ✓ 无")
+        
+        # 打印循环引用检测
+        circular_refs = analysis['circular_references']
+        if circular_refs and not (len(circular_refs) == 1 and circular_refs[0][0] == 'error'):
+            print("\n循环引用检测:")
+            for cycle in circular_refs:
+                print(f"  ⚠ 循环引用: {' -> '.join(cycle)}")
+        else:
+            print("\n循环引用检测: ✓ 无循环引用")
+        
+        # 打印文档结构分析
+        doc_structure = analysis['document_structure']
+        if 'document_count' in doc_structure:
+            print(f"\n文档结构分析:")
+            print(f"  文档数量: {doc_structure['document_count']}")
+            print(f"  平均嵌套深度: {doc_structure['structure_analysis'].get('average_depth', 0):.2f}")
+            print(f"  最大嵌套深度: {doc_structure['structure_analysis'].get('max_depth', 0)}")
+            print(f"  总键数量: {doc_structure['structure_analysis'].get('total_keys', 0)}")
+            print(f"  唯一键数量: {doc_structure['structure_analysis'].get('unique_keys', 0)}")
+        
+        # 打印语法验证
+        syntax_validation = analysis['syntax_validation']
+        print(f"\n语法验证:")
+        print(f"  可解析: {'✓' if syntax_validation.get('parsable') else '✗'}")
+        
+        if not syntax_validation.get('parsable'):
+            print(f"  解析错误: {syntax_validation.get('parse_error')}")
+        
+        # 检查各种语法错误
+        error_types = ['indentation_errors', 'duplicate_keys', 'invalid_characters', 'unclosed_quotes', 'invalid_anchors']
+        
+        for error_type in error_types:
+            errors = syntax_validation.get(error_type, [])
+            if errors:
+                print(f"  {error_type.replace('_', ' ').title()}:")
+                for line_num, message in errors[:3]:  # 只显示前3个错误
+                    print(f"    第{line_num}行: {message}")
+                if len(errors) > 3:
+                    print(f"    ... 还有 {len(errors) - 3} 个错误")
+            else:
+                print(f"  {error_type.replace('_', ' ').title()}: ✓ 无错误")
+
+# 使用示例
+if __name__ == "__main__":
+    parser = YAMLSyntaxParser()
+    
+    # 分析所有YAML文件
+    test_files = [
+        'anchors_and_aliases.yml',
+        'multi_document.yml',
+        'advanced_strings.yml',
+        'custom_types.yml',
+        'merge_keys.yml',
+        'conditional_and_loop.yml',
+        'schema_example.yml',
+        'syntax_analysis.yml',
+        'document_parsing.yml',
+        'type_system_parsing.yml'
+    ]
+    
+    for test_file in test_files:
+        parser.print_syntax_analysis(test_file)
+        print("-" * 60)
+
+# 高级语法分析工具
+def analyze_yaml_complexity(file_path: str) -> Dict[str, Any]:
+    """分析YAML文件复杂度"""
+    try:
+        with open(file_path, 'r', encoding='utf-8') as file:
+            content = file.read()
+            data = yaml.safe_load(content)
+        
+        def calculate_complexity(obj: Any, depth: int = 0) -> Dict[str, int]:
+            """计算复杂度指标"""
+            if isinstance(obj, dict):
+                complexity = {
+                    'nodes': 1,
+                    'leaves': 0,
+                    'max_depth': depth,
+                    'total_depth': depth
+                }
+                
+                for value in obj.values():
+                    child_complexity = calculate_complexity(value, depth + 1)
+                    complexity['nodes'] += child_complexity['nodes']
+                    complexity['leaves'] += child_complexity['leaves']
+                    complexity['max_depth'] = max(complexity['max_depth'], child_complexity['max_depth'])
+                    complexity['total_depth'] += child_complexity['total_depth']
+                
+                return complexity
+            
+            elif isinstance(obj, list):
+                complexity = {
+                    'nodes': 1,
+                    'leaves': 0,
+                    'max_depth': depth,
+                    'total_depth': depth
+                }
+                
+                for item in obj:
+                    child_complexity = calculate_complexity(item, depth + 1)
+                    complexity['nodes'] += child_complexity['nodes']
+                    complexity['leaves'] += child_complexity['leaves']
+                    complexity['max_depth'] = max(complexity['max_depth'], child_complexity['max_depth'])
+                    complexity['total_depth'] += child_complexity['total_depth']
+                
+                return complexity
+            
+            else:
+                return {
+                    'nodes': 1,
+                    'leaves': 1,
+                    'max_depth': depth,
+                    'total_depth': depth
+                }
+        
+        complexity = calculate_complexity(data)
+        
+        return {
+            'file': file_path,
+            'complexity': complexity,
+            'average_depth': complexity['total_depth'] / complexity['nodes'] if complexity['nodes'] > 0 else 0,
+            'leaf_ratio': complexity['leaves'] / complexity['nodes'] if complexity['nodes'] > 0 else 0
+        }
+        
+    except Exception as e:
+        return {'error': str(e)}
+
+# 运行复杂度分析
+print("\nYAML文件复杂度分析:")
+print("=" * 60)
+
+for test_file in test_files:
+    result = analyze_yaml_complexity(test_file)
+    if 'error' not in result:
+        print(f"\n{test_file}:")
+        print(f"  节点总数: {result['complexity']['nodes']}")
+        print(f"  叶子节点: {result['complexity']['leaves']}")
+        print(f"  最大深度: {result['complexity']['max_depth']}")
+        print(f"  平均深度: {result['average_depth']:.2f}")
+        print(f"  叶子比例: {result['leaf_ratio']:.2f}")
+    else:
+        print(f"\n{test_file}: 分析失败 - {result['error']}")
+```
+
 ## 实验说明
 
 1. **anchors_and_aliases.yml**: 锚点与别名示例，展示基本锚点、嵌套锚点和多个锚点的使用
@@ -563,11 +1215,19 @@ test_security()
 5. **merge_keys.yml**: 合并键示例，展示单个映射合并、多个映射合并和合并顺序
 6. **conditional_and_loop.yml**: 条件与循环模拟示例，展示如何使用锚点和序列模拟编程逻辑
 7. **schema_example.yml**: YAML Schema验证示例，包含用户数据和产品数据
-8. **advanced_features.py**: Python验证代码，用于测试所有高级特性
+8. **syntax_analysis.yml**: 语法解析与锚点机制深度分析示例
+9. **document_parsing.yml**: 语法解析与多文档流处理示例
+10. **type_system_parsing.yml**: 语法解析与自定义类型系统示例
+11. **advanced_features.py**: 基础验证代码
+12. **syntax_parser.py**: 高级语法解析和验证代码
 
 运行验证代码：
 ```bash
+# 基础验证
 python advanced_features.py
+
+# 高级语法分析
+python syntax_parser.py
 ```
 
-这将验证所有YAML文件的高级特性，并展示它们的用法和效果。
+这将验证所有YAML文件的高级特性，进行深度语法分析，检测循环引用、语法错误，并分析文档结构和复杂度。

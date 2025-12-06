@@ -408,6 +408,371 @@ with open('data_types.yml', 'r', encoding='utf-8') as file:
     print(json_str)
 ```
 
+## 实验9：类型推断与转换示例
+
+```yaml
+# type_inference.yml
+# 类型推断与转换示例
+---
+# 自动类型推断
+auto_inference:
+  string_like_number: "123"        # 推断为字符串
+  number_like_string: 456           # 推断为整数
+  boolean_like_string: "true"       # 推断为字符串
+  date_like_string: "2023-05-15"    # 推断为字符串
+
+# 显式类型转换
+explicit_conversion:
+  string_to_int: !!int "789"        # 字符串转整数
+  int_to_string: !!str 123          # 整数转字符串
+  string_to_float: !!float "3.14"    # 字符串转浮点数
+  string_to_bool: !!bool "false"     # 字符串转布尔值
+
+# 复杂类型转换
+complex_conversion:
+  binary_data: !!binary "SGVsbG8gV29ybGQ="  # Base64编码
+  set_data: !!set
+    ? apple
+    ? banana
+    ? orange
+  ordered_map: !!omap
+    - first: value1
+    - second: value2
+    - third: value3
+
+# 边界情况
+edge_cases:
+  empty_string: ""
+  zero: 0
+  negative_zero: -0
+  infinity: .inf
+  negative_infinity: -.inf
+  not_a_number: .NaN
+```
+
+## 实验10：类型验证与错误处理示例
+
+```yaml
+# type_validation.yml
+# 类型验证与错误处理示例
+---
+# 有效类型定义
+valid_types:
+  required_string: !!str "required"
+  required_int: !!int 42
+  required_float: !!float 3.14
+  required_bool: !!bool true
+  required_date: 2023-05-15
+
+# 类型错误示例（这些会导致解析错误）
+type_errors:
+  invalid_int: !!int "not_a_number"
+  invalid_float: !!float "not_a_float"
+  invalid_bool: !!bool "not_a_boolean"
+  invalid_date: "not_a_date"
+
+# 自定义类型验证
+custom_validation:
+  email_pattern: "user@example.com"
+  phone_pattern: "+1-555-123-4567"
+  url_pattern: "https://example.com"
+  ip_address: "192.168.1.1"
+```
+
+## 实验11：语法解析与类型系统验证代码
+
+```python
+# type_system_parser.py
+import yaml
+import re
+from typing import Dict, List, Any, Union
+from datetime import datetime, date
+
+class YAMLTypeSystemParser:
+    """YAML类型系统解析器"""
+    
+    def __init__(self):
+        self.type_errors = []
+        self.warnings = []
+    
+    def analyze_type_inference(self, data: Any, path: str = "") -> Dict[str, Any]:
+        """分析类型推断结果"""
+        result = {
+            'path': path,
+            'type': type(data).__name__,
+            'value': data,
+            'children': []
+        }
+        
+        if isinstance(data, dict):
+            for key, value in data.items():
+                child_path = f"{path}.{key}" if path else key
+                result['children'].append(self.analyze_type_inference(value, child_path))
+        elif isinstance(data, list):
+            for i, item in enumerate(data):
+                child_path = f"{path}[{i}]"
+                result['children'].append(self.analyze_type_inference(item, child_path))
+        
+        return result
+    
+    def validate_explicit_types(self, data: Any, path: str = "") -> List[str]:
+        """验证显式类型指定"""
+        errors = []
+        
+        if isinstance(data, dict):
+            for key, value in data.items():
+                child_path = f"{path}.{key}" if path else key
+                
+                # 检查显式类型转换
+                if isinstance(value, str):
+                    # 检查字符串是否可以转换为其他类型
+                    if key.endswith('_to_int'):
+                        try:
+                            int(value)
+                        except ValueError:
+                            errors.append(f"{child_path}: 无法将字符串转换为整数")
+                    
+                    elif key.endswith('_to_float'):
+                        try:
+                            float(value)
+                        except ValueError:
+                            errors.append(f"{child_path}: 无法将字符串转换为浮点数")
+                    
+                    elif key.endswith('_to_bool'):
+                        if value.lower() not in ('true', 'false', 'yes', 'no', 'on', 'off'):
+                            errors.append(f"{child_path}: 无法将字符串转换为布尔值")
+                
+                # 递归检查子元素
+                errors.extend(self.validate_explicit_types(value, child_path))
+        
+        elif isinstance(data, list):
+            for i, item in enumerate(data):
+                child_path = f"{path}[{i}]"
+                errors.extend(self.validate_explicit_types(item, child_path))
+        
+        return errors
+    
+    def detect_type_anomalies(self, data: Any, path: str = "") -> List[str]:
+        """检测类型异常"""
+        anomalies = []
+        
+        if isinstance(data, dict):
+            for key, value in data.items():
+                child_path = f"{path}.{key}" if path else key
+                
+                # 检查混合类型
+                if isinstance(value, (list, dict)):
+                    child_types = set()
+                    if isinstance(value, list):
+                        for item in value:
+                            child_types.add(type(item).__name__)
+                    elif isinstance(value, dict):
+                        for v in value.values():
+                            child_types.add(type(v).__name__)
+                    
+                    if len(child_types) > 1:
+                        anomalies.append(f"{child_path}: 混合类型 {child_types}")
+                
+                # 递归检查子元素
+                anomalies.extend(self.detect_type_anomalies(value, child_path))
+        
+        elif isinstance(data, list):
+            # 检查列表元素类型一致性
+            if len(data) > 0:
+                first_type = type(data[0]).__name__
+                for i, item in enumerate(data[1:], 1):
+                    if type(item).__name__ != first_type:
+                        anomalies.append(f"{path}[{i}]: 类型不一致 ({first_type} vs {type(item).__name__})")
+            
+            for i, item in enumerate(data):
+                child_path = f"{path}[{i}]"
+                anomalies.extend(self.detect_type_anomalies(item, child_path))
+        
+        return anomalies
+    
+    def comprehensive_type_analysis(self, file_path: str) -> Dict[str, Any]:
+        """综合类型分析"""
+        try:
+            with open(file_path, 'r', encoding='utf-8') as file:
+                data = yaml.safe_load(file)
+            
+            analysis = {
+                'file': file_path,
+                'type_inference': self.analyze_type_inference(data),
+                'explicit_type_errors': self.validate_explicit_types(data),
+                'type_anomalies': self.detect_type_anomalies(data),
+                'raw_data': data
+            }
+            
+            return analysis
+            
+        except Exception as e:
+            return {'error': str(e)}
+    
+    def print_type_analysis(self, file_path: str):
+        """打印类型分析结果"""
+        print(f"\n类型分析: {file_path}")
+        print("=" * 60)
+        
+        analysis = self.comprehensive_type_analysis(file_path)
+        
+        if 'error' in analysis:
+            print(f"分析失败: {analysis['error']}")
+            return
+        
+        # 打印类型推断结果
+        print("\n类型推断结果:")
+        self._print_type_tree(analysis['type_inference'])
+        
+        # 打印显式类型错误
+        if analysis['explicit_type_errors']:
+            print("\n显式类型错误:")
+            for error in analysis['explicit_type_errors']:
+                print(f"  ✗ {error}")
+        else:
+            print("\n显式类型错误: ✓ 无错误")
+        
+        # 打印类型异常
+        if analysis['type_anomalies']:
+            print("\n类型异常:")
+            for anomaly in analysis['type_anomalies']:
+                print(f"  ⚠ {anomaly}")
+        else:
+            print("\n类型异常: ✓ 无异常")
+    
+    def _print_type_tree(self, node: Dict, indent: int = 0):
+        """打印类型树"""
+        prefix = "  " * indent
+        print(f"{prefix}{node['path']}: {node['type']} = {repr(node['value'])}")
+        
+        for child in node['children']:
+            self._print_type_tree(child, indent + 1)
+
+# 高级类型验证函数
+def validate_yaml_schema(file_path: str, schema: Dict[str, Any]) -> List[str]:
+    """根据模式验证YAML结构"""
+    errors = []
+    
+    try:
+        with open(file_path, 'r', encoding='utf-8') as file:
+            data = yaml.safe_load(file)
+        
+        def validate_recursive(actual: Any, expected: Any, path: str = "") -> List[str]:
+            local_errors = []
+            
+            if isinstance(expected, dict):
+                if not isinstance(actual, dict):
+                    local_errors.append(f"{path}: 期望映射，实际为 {type(actual).__name__}")
+                    return local_errors
+                
+                for key, expected_type in expected.items():
+                    if key not in actual:
+                        local_errors.append(f"{path}.{key}: 缺少必需字段")
+                    else:
+                        child_path = f"{path}.{key}" if path else key
+                        local_errors.extend(validate_recursive(actual[key], expected_type, child_path))
+            
+            elif isinstance(expected, list):
+                if not isinstance(actual, list):
+                    local_errors.append(f"{path}: 期望序列，实际为 {type(actual).__name__}")
+                    return local_errors
+                
+                if len(expected) > 0:
+                    expected_type = expected[0]
+                    for i, item in enumerate(actual):
+                        child_path = f"{path}[{i}]"
+                        local_errors.extend(validate_recursive(item, expected_type, child_path))
+            
+            elif callable(expected):
+                # 期望是类型检查函数
+                if not expected(actual):
+                    local_errors.append(f"{path}: 类型验证失败")
+            
+            return local_errors
+        
+        errors = validate_recursive(data, schema)
+        
+    except Exception as e:
+        errors.append(f"验证失败: {e}")
+    
+    return errors
+
+# 使用示例
+if __name__ == "__main__":
+    parser = YAMLTypeSystemParser()
+    
+    # 分析所有YAML文件
+    test_files = [
+        'data_types.yml',
+        'string_examples.yml',
+        'number_examples.yml',
+        'boolean_examples.yml',
+        'datetime_examples.yml',
+        'sequence_examples.yml',
+        'mapping_examples.yml',
+        'advanced_types.yml',
+        'type_inference.yml',
+        'type_validation.yml'
+    ]
+    
+    for test_file in test_files:
+        parser.print_type_analysis(test_file)
+        print("-" * 60)
+    
+    # 模式验证示例
+    schema = {
+        'users': [{
+            'name': str,
+            'age': lambda x: isinstance(x, int) and x > 0,
+            'hobbies': [str]
+        }],
+        'settings': {
+            'theme': lambda x: x in ['dark', 'light'],
+            'notifications': bool,
+            'language': str
+        }
+    }
+    
+    print("\n模式验证示例:")
+    errors = validate_yaml_schema('data_types.yml', schema)
+    if errors:
+        print("模式验证错误:")
+        for error in errors:
+            print(f"  ✗ {error}")
+    else:
+        print("✓ 模式验证通过")
+
+# 类型转换工具函数
+def convert_yaml_types(data: Any, conversion_rules: Dict[str, Any]) -> Any:
+    """根据规则转换YAML类型"""
+    if isinstance(data, dict):
+        return {k: convert_yaml_types(v, conversion_rules) for k, v in data.items()}
+    elif isinstance(data, list):
+        return [convert_yaml_types(item, conversion_rules) for item in data]
+    elif isinstance(data, str):
+        # 应用字符串转换规则
+        for pattern, converter in conversion_rules.items():
+            if re.match(pattern, data):
+                return converter(data)
+        return data
+    else:
+        return data
+
+# 运行类型转换示例
+with open('type_inference.yml', 'r', encoding='utf-8') as file:
+    data = yaml.safe_load(file)
+
+conversion_rules = {
+    r'^\\d+$': int,           # 数字字符串转整数
+    r'^\\d+\\.\\d+$': float,     # 浮点数字符串转浮点数
+    r'^(true|false)$': lambda x: x.lower() == 'true'  # 布尔字符串转布尔值
+}
+
+converted_data = convert_yaml_types(data, conversion_rules)
+print("\n类型转换结果:")
+print(yaml.dump(converted_data, allow_unicode=True, indent=2))
+```
+
 ## 实验说明
 
 1. **data_types.yml**: 包含各种数据类型的综合示例
@@ -418,11 +783,18 @@ with open('data_types.yml', 'r', encoding='utf-8') as file:
 6. **sequence_examples.yml**: 各种序列类型示例
 7. **mapping_examples.yml**: 各种映射类型示例
 8. **advanced_types.yml**: 高级数据类型示例，包括集合、有序映射、二进制数据等
-9. **validate_data_types.py**: Python验证代码，用于分析和验证YAML数据类型
+9. **type_inference.yml**: 类型推断与转换示例
+10. **type_validation.yml**: 类型验证与错误处理示例
+11. **validate_data_types.py**: 基础验证代码
+12. **type_system_parser.py**: 高级类型系统解析和验证代码
 
 运行验证代码：
 ```bash
+# 基础验证
 python validate_data_types.py
+
+# 高级类型系统分析
+python type_system_parser.py
 ```
 
-这将验证所有YAML文件的语法，分析它们的数据类型结构，并展示类型转换和特殊值的处理。
+这将验证所有YAML文件的语法，进行深度类型系统分析，检测类型异常，并支持模式验证和类型转换。

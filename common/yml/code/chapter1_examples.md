@@ -228,6 +228,271 @@ print("\nPython对象转换为YAML:")
 print_yaml_structure('python_to_yaml.yml')
 ```
 
+## 实验7：语法解析深度示例
+
+### 7.1 缩进与语法错误示例
+
+```yaml
+# syntax_errors.yml
+# 语法错误示例
+correct:
+  level1:
+    level2: value
+    level3: value  # 正确缩进
+
+incorrect:
+level1:            # 错误：没有缩进
+    level2: value
+  level3: value    # 错误：缩进不一致
+
+mixed_tabs:
+	level1: value    # 错误：使用制表符
+  level2: value
+```
+
+### 7.2 注释与特殊字符处理
+
+```yaml
+# comments_and_special_chars.yml
+# 注释和特殊字符处理
+basic_comment: value  # 这是行内注释
+
+# 这是块注释
+# 可以跨多行
+multiline_comment:
+  - item1  # 注释1
+  - item2  # 注释2
+
+special_chars:
+  colon_in_value: "value:with:colons"
+  hash_in_value: "value#with#hash"
+  quotes_in_value: "value with 'single' and \"double\" quotes"
+  newline_in_value: |
+    value with
+    multiple lines
+  
+  # 需要引号的情况
+  requires_quotes: "true"  # 避免被解析为布尔值
+  numeric_string: "123"    # 避免被解析为数字
+```
+
+### 7.3 多行字符串处理
+
+```yaml
+# multiline_strings.yml
+# 多行字符串示例
+literal_block: |
+  这是字面量块
+  保留所有换行符
+  和缩进
+
+folded_block: >
+  这是折叠块
+  将换行符转换为空格
+  适合长段落文本
+
+preserved_newlines: |-
+  去掉末尾换行符
+  但保留内部换行
+
+chomping_examples:
+  strip: |-
+    去掉末尾换行符
+  clip: |
+    保留末尾换行符（默认）
+  keep: |+
+    保留所有末尾换行符
+```
+
+## 实验8：语法解析验证代码
+
+```python
+# syntax_parser.py
+import yaml
+import re
+from typing import Dict, List, Any
+
+class YAMLSyntaxParser:
+    """YAML语法解析器"""
+    
+    def __init__(self):
+        self.errors = []
+        self.warnings = []
+    
+    def validate_indentation(self, content: str) -> List[str]:
+        """验证缩进语法"""
+        lines = content.split('\n')
+        errors = []
+        
+        for i, line in enumerate(lines, 1):
+            stripped = line.lstrip()
+            if not stripped or stripped.startswith('#'):
+                continue  # 跳过空行和注释
+            
+            # 检查制表符
+            if '\t' in line:
+                errors.append(f"第{i}行: 检测到制表符，YAML应使用空格缩进")
+            
+            # 检查缩进一致性
+            leading_spaces = len(line) - len(line.lstrip())
+            if leading_spaces % 2 != 0:
+                errors.append(f"第{i}行: 缩进应为偶数个空格")
+        
+        return errors
+    
+    def validate_special_chars(self, content: str) -> List[str]:
+        """验证特殊字符处理"""
+        errors = []
+        
+        # 检查未转义的特殊字符
+        pattern = r'^[^#\n]*[^\\]:[^\\s]'
+        matches = re.finditer(pattern, content, re.MULTILINE)
+        for match in matches:
+            line_num = content[:match.start()].count('\n') + 1
+            errors.append(f"第{line_num}行: 冒号后应有空格")
+        
+        return errors
+    
+    def validate_multiline_strings(self, content: str) -> List[str]:
+        """验证多行字符串语法"""
+        errors = []
+        lines = content.split('\n')
+        
+        in_multiline = False
+        multiline_indent = 0
+        
+        for i, line in enumerate(lines, 1):
+            stripped = line.lstrip()
+            
+            # 检测多行字符串开始
+            if stripped.startswith(('|', '>')):
+                in_multiline = True
+                multiline_indent = len(line) - len(stripped)
+                continue
+            
+            # 在多行字符串中检查缩进
+            if in_multiline and stripped:
+                current_indent = len(line) - len(stripped)
+                if current_indent <= multiline_indent and not stripped.startswith('#'):
+                    errors.append(f"第{i}行: 多行字符串内容缩进不足")
+                
+                # 检测多行字符串结束
+                if current_indent < multiline_indent:
+                    in_multiline = False
+        
+        return errors
+    
+    def comprehensive_validation(self, file_path: str) -> Dict[str, List[str]]:
+        """综合语法验证"""
+        try:
+            with open(file_path, 'r', encoding='utf-8') as file:
+                content = file.read()
+            
+            # 执行各种验证
+            results = {
+                'indentation_errors': self.validate_indentation(content),
+                'special_char_errors': self.validate_special_chars(content),
+                'multiline_errors': self.validate_multiline_strings(content),
+                'yaml_parse_errors': []
+            }
+            
+            # 使用PyYAML验证语法
+            try:
+                yaml.safe_load(content)
+            except yaml.YAMLError as e:
+                results['yaml_parse_errors'].append(str(e))
+            
+            return results
+            
+        except Exception as e:
+            return {'error': [f"文件读取失败: {e}"]}
+    
+    def print_validation_results(self, file_path: str):
+        """打印验证结果"""
+        print(f"\n验证文件: {file_path}")
+        print("=" * 50)
+        
+        results = self.comprehensive_validation(file_path)
+        
+        total_errors = 0
+        for category, errors in results.items():
+            if errors:
+                print(f"\n{category.replace('_', ' ').title()}:")
+                for error in errors:
+                    print(f"  ✗ {error}")
+                    total_errors += 1
+            else:
+                print(f"\n{category.replace('_', ' ').title()}: ✓ 通过")
+        
+        print(f"\n总计错误: {total_errors}")
+        if total_errors == 0:
+            print("✓ 语法验证通过")
+        else:
+            print("✗ 发现语法错误")
+
+# 使用示例
+if __name__ == "__main__":
+    parser = YAMLSyntaxParser()
+    
+    # 验证所有YAML文件
+    test_files = [
+        'experiment1.yml',
+        'json_to_yaml.yml',
+        'app_config.yml',
+        'docker-compose.yml',
+        'github-actions.yml',
+        'multi_document.yml',
+        'syntax_errors.yml',
+        'comments_and_special_chars.yml',
+        'multiline_strings.yml'
+    ]
+    
+    for test_file in test_files:
+        parser.print_validation_results(test_file)
+        print("-" * 50)
+
+# 高级语法分析函数
+def analyze_yaml_structure(file_path: str):
+    """分析YAML文件结构"""
+    try:
+        with open(file_path, 'r', encoding='utf-8') as file:
+            data = yaml.safe_load(file)
+        
+        def count_structure(obj, depth=0):
+            """递归统计结构信息"""
+            if isinstance(obj, dict):
+                return {
+                    'type': 'mapping',
+                    'count': len(obj),
+                    'depth': depth,
+                    'children': [count_structure(v, depth+1) for v in obj.values()]
+                }
+            elif isinstance(obj, list):
+                return {
+                    'type': 'sequence',
+                    'count': len(obj),
+                    'depth': depth,
+                    'children': [count_structure(item, depth+1) for item in obj]
+                }
+            else:
+                return {
+                    'type': 'scalar',
+                    'value_type': type(obj).__name__,
+                    'depth': depth
+                }
+        
+        structure = count_structure(data)
+        print(f"\n{file_path} 结构分析:")
+        print(yaml.dump(structure, allow_unicode=True, indent=2))
+        
+    except Exception as e:
+        print(f"分析失败: {e}")
+
+# 运行结构分析
+for test_file in test_files:
+    analyze_yaml_structure(test_file)
+```
+
 ## 实验说明
 
 1. **experiment1.yml**: 基本YAML结构示例，包含标量、映射和列表
@@ -236,11 +501,19 @@ print_yaml_structure('python_to_yaml.yml')
 4. **docker-compose.yml**: Docker Compose配置示例
 5. **github-actions.yml**: GitHub Actions工作流示例
 6. **multi_document.yml**: 多文档YAML示例
-7. **validate_yaml.py**: Python验证代码，用于验证和转换YAML文件
+7. **syntax_errors.yml**: 语法错误示例，用于测试验证器
+8. **comments_and_special_chars.yml**: 注释和特殊字符处理示例
+9. **multiline_strings.yml**: 多行字符串处理示例
+10. **validate_yaml.py**: 基础验证代码
+11. **syntax_parser.py**: 高级语法解析和验证代码
 
 运行验证代码：
 ```bash
+# 基础验证
 python validate_yaml.py
+
+# 高级语法解析
+python syntax_parser.py
 ```
 
-这将验证所有YAML文件的语法，并打印它们的结构。
+这将验证所有YAML文件的语法，进行深度结构分析，并检测各种语法错误。
