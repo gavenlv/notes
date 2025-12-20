@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana-chapter3
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin123
+      - GF_INSTALL_PLUGINS=grafana-clock-panel,grafana-piechart-panel
+    volumes:
+      - ./provisioning/:/etc/grafana/provisioning/
+      - ./dashboards/:/var/lib/grafana/dashboards/
+      - grafana_data:/var/lib/grafana
+    networks:
+      - grafana-net
+
+  # 测试数据生成器
+  testdata-generator:
+    image: python:3.9
+    container_name: testdata-generator-chapter3
+    volumes:
+      - ./testdata/:/app/
+    working_dir: /app
+    command: python generate_test_data.py
+    networks:
+      - grafana-net
+
+volumes:
+  grafana_data:
+    driver: local
+
+networks:
+  grafana-net:
+    driver: bridge

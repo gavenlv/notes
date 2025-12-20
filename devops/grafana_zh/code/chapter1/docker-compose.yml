@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana-chapter1
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin123
+      - GF_INSTALL_PLUGINS=grafana-clock-panel,grafana-simple-json-datasource
+    volumes:
+      - ./grafana.ini:/etc/grafana/grafana.ini
+      - grafana_data:/var/lib/grafana
+    networks:
+      - grafana-net
+
+  # 示例数据源 - 用于演示
+  testdata:
+    image: grafana/grafana:latest
+    container_name: testdata-generator
+    command: >
+      sh -c "
+      echo '启动测试数据生成器...' &&
+      while true; do
+        echo '生成测试数据: $(date)' &&
+        sleep 30
+      done
+      "
+    networks:
+      - grafana-net
+
+volumes:
+  grafana_data:
+    driver: local
+
+networks:
+  grafana-net:
+    driver: bridge
