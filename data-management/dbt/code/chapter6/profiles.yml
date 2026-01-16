@@ -1,0 +1,190 @@
+# 第6章：dbt最佳实践与项目结构 - 数据库连接配置
+# 演示多环境配置和连接管理最佳实践
+
+dbt_chapter6:
+  # 目标环境配置
+  target: development  # 默认目标环境
+  
+  # 输出配置（数据库连接）
+  outputs:
+    
+    # 开发环境配置
+    development:
+      type: postgres
+      host: "{{ env_var('DB_HOST', 'localhost') }}"
+      port: "{{ env_var('DB_PORT', '5432') }}"
+      user: "{{ env_var('DB_USER', 'dbt_user') }}"
+      pass: "{{ env_var('DB_PASSWORD', '') }}"
+      dbname: "{{ env_var('DB_NAME', 'dbt_chapter6_dev') }}"
+      schema: "{{ env_var('DB_SCHEMA', 'dbt_dev') }}"
+      
+      # 连接参数
+      threads: 4
+      keepalives_idle: 0
+      connect_timeout: 10
+      retries: 1
+      
+      # SSL配置
+      sslmode: "{{ env_var('DB_SSLMODE', 'prefer') }}"
+      
+      # 查询标签（用于监控）
+      query_comment: "dbt_chapter6 - development - {{ invocation_id }}"
+      
+      # 性能配置
+      search_path: "{{ env_var('DB_SEARCH_PATH', 'dbt_dev,public') }}"
+      
+    # 测试环境配置
+    test:
+      type: postgres
+      host: "{{ env_var('TEST_DB_HOST', 'test-db.example.com') }}"
+      port: "{{ env_var('TEST_DB_PORT', '5432') }}"
+      user: "{{ env_var('TEST_DB_USER', 'dbt_test_user') }}"
+      pass: "{{ env_var('TEST_DB_PASSWORD', '') }}"
+      dbname: "{{ env_var('TEST_DB_NAME', 'dbt_chapter6_test') }}"
+      schema: "{{ env_var('TEST_DB_SCHEMA', 'dbt_test') }}"
+      
+      # 连接参数
+      threads: 2
+      keepalives_idle: 0
+      connect_timeout: 30
+      retries: 3
+      
+      # SSL配置
+      sslmode: "{{ env_var('TEST_DB_SSLMODE', 'require') }}"
+      
+      # 查询标签
+      query_comment: "dbt_chapter6 - test - {{ invocation_id }}"
+      
+      # 性能配置
+      search_path: "{{ env_var('TEST_DB_SEARCH_PATH', 'dbt_test,public') }}"
+      
+    # 生产环境配置
+    production:
+      type: postgres
+      host: "{{ env_var('PROD_DB_HOST', 'prod-db.example.com') }}"
+      port: "{{ env_var('PROD_DB_PORT', '5432') }}"
+      user: "{{ env_var('PROD_DB_USER', 'dbt_prod_user') }}"
+      pass: "{{ env_var('PROD_DB_PASSWORD', '') }}"
+      dbname: "{{ env_var('PROD_DB_NAME', 'dbt_chapter6_prod') }}"
+      schema: "{{ env_var('PROD_DB_SCHEMA', 'dbt_prod') }}"
+      
+      # 连接参数
+      threads: 8
+      keepalives_idle: 0
+      connect_timeout: 60
+      retries: 5
+      
+      # SSL配置
+      sslmode: "{{ env_var('PROD_DB_SSLMODE', 'verify-full') }}"
+      
+      # 查询标签
+      query_comment: "dbt_chapter6 - production - {{ invocation_id }}"
+      
+      # 性能配置
+      search_path: "{{ env_var('PROD_DB_SEARCH_PATH', 'dbt_prod,public') }}"
+      
+    # 只读副本环境（用于BI查询）
+    read_replica:
+      type: postgres
+      host: "{{ env_var('REPLICA_DB_HOST', 'replica-db.example.com') }}"
+      port: "{{ env_var('REPLICA_DB_PORT', '5432') }}"
+      user: "{{ env_var('REPLICA_DB_USER', 'dbt_readonly_user') }}"
+      pass: "{{ env_var('REPLICA_DB_PASSWORD', '') }}"
+      dbname: "{{ env_var('REPLICA_DB_NAME', 'dbt_chapter6_replica') }}"
+      schema: "{{ env_var('REPLICA_DB_SCHEMA', 'dbt_readonly') }}"
+      
+      # 连接参数
+      threads: 16
+      keepalives_idle: 0
+      connect_timeout: 30
+      retries: 3
+      
+      # SSL配置
+      sslmode: "{{ env_var('REPLICA_DB_SSLMODE', 'require') }}"
+      
+      # 查询标签
+      query_comment: "dbt_chapter6 - read_replica - {{ invocation_id }}"
+      
+      # 只读模式配置
+      read_only: true
+      
+      # 性能配置
+      search_path: "{{ env_var('REPLICA_DB_SEARCH_PATH', 'dbt_readonly,public') }}"
+
+# 多数据库支持配置示例
+# Snowflake配置示例
+snowflake_example:
+  type: snowflake
+  account: "{{ env_var('SNOWFLAKE_ACCOUNT', '') }}"
+  user: "{{ env_var('SNOWFLAKE_USER', '') }}"
+  password: "{{ env_var('SNOWFLAKE_PASSWORD', '') }}"
+  role: "{{ env_var('SNOWFLAKE_ROLE', 'dbt_role') }}"
+  database: "{{ env_var('SNOWFLAKE_DATABASE', 'dbt_chapter6') }}"
+  warehouse: "{{ env_var('SNOWFLAKE_WAREHOUSE', 'dbt_wh') }}"
+  schema: "{{ env_var('SNOWFLAKE_SCHEMA', 'dbt') }}"
+  threads: 4
+  client_session_keep_alive: false
+  query_tag: "dbt_chapter6"
+
+# BigQuery配置示例
+bigquery_example:
+  type: bigquery
+  method: oauth
+  project: "{{ env_var('BIGQUERY_PROJECT', '') }}"
+  dataset: "{{ env_var('BIGQUERY_DATASET', 'dbt_chapter6') }}"
+  threads: 4
+  timeout_seconds: 300
+  priority: interactive
+  retries: 1
+
+# Redshift配置示例
+redshift_example:
+  type: redshift
+  host: "{{ env_var('REDSHIFT_HOST', '') }}"
+  port: "{{ env_var('REDSHIFT_PORT', '5439') }}"
+  user: "{{ env_var('REDSHIFT_USER', '') }}"
+  pass: "{{ env_var('REDSHIFT_PASSWORD', '') }}"
+  dbname: "{{ env_var('REDSHIFT_DBNAME', 'dbt_chapter6') }}"
+  schema: "{{ env_var('REDSHIFT_SCHEMA', 'dbt') }}"
+  threads: 4
+  keepalives_idle: 240
+  connect_timeout: 10
+
+# 环境变量映射说明
+# 使用环境变量管理敏感信息，避免硬编码
+# 设置示例（在系统环境变量中设置）：
+# DB_HOST=localhost
+# DB_USER=dbt_user
+# DB_PASSWORD=your_password
+# DB_NAME=dbt_chapter6_dev
+# DB_SCHEMA=dbt_dev
+
+# 安全最佳实践
+# 1. 使用环境变量存储敏感信息
+# 2. 为不同环境使用不同的凭证
+# 3. 生产环境使用更强的加密和认证
+# 4. 定期轮换数据库密码
+# 5. 使用最小权限原则
+
+# 性能优化建议
+# 1. 根据环境调整线程数
+# 2. 设置合理的超时和重试参数
+# 3. 使用连接池优化连接管理
+# 4. 监控数据库连接性能
+
+# 配置验证命令
+# dbt debug --config-dir          # 验证配置目录
+# dbt debug --target development  # 验证开发环境连接
+# dbt debug --target production   # 验证生产环境连接
+
+# 环境切换示例
+# dbt run --target development    # 开发环境运行
+# dbt run --target test          # 测试环境运行
+# dbt run --target production     # 生产环境运行
+# dbt run --target read_replica   # 只读副本运行
+
+# 注意事项
+# 1. 确保环境变量正确设置
+# 2. 验证数据库连接权限
+# 3. 测试环境切换功能
+# 4. 监控连接性能和稳定性

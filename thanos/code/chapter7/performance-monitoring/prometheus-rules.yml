@@ -1,0 +1,163 @@
+# Thanos性能监控告警规则
+groups:
+- name: thanos-performance
+  interval: 30s
+  rules:
+  
+  # 查询性能告警
+  - alert: HighQueryLatency
+    expr: histogram_quantile(0.95, rate(thanos_query_api_call_duration_seconds_bucket{handler="query"}[5m])) > 10
+    for: 2m
+    labels:
+      severity: warning
+      component: query
+    annotations:
+      summary: "Thanos查询延迟过高"
+      description: "查询组件95%分位的延迟超过10秒，当前值: {{ $value }}s"
+      
+  - alert: HighQueryErrorRate
+    expr: rate(thanos_query_api_call_duration_seconds_count{handler="query",code!~"2.."}[5m]) / rate(thanos_query_api_call_duration_seconds_count{handler="query"}[5m]) > 0.05
+    for: 3m
+    labels:
+      severity: warning
+      component: query
+    annotations:
+      summary: "Thanos查询错误率过高"
+      description: "查询错误率超过5%，当前值: {{ $value | humanizePercentage }}"
+
+  # 内存使用告警
+  - alert: HighMemoryUsage
+    expr: process_resident_memory_bytes{job=~"thanos.*"} / machine_memory_bytes > 0.8
+    for: 5m
+    labels:
+      severity: critical
+    annotations:
+      summary: "Thanos内存使用率过高"
+      description: "内存使用率超过80%，当前值: {{ $value | humanizePercentage }}"
+      
+  - alert: MemoryLeakDetected
+    expr: increase(process_resident_memory_bytes{job=~"thanos.*"}[1h]) > 1e9
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: "检测到内存泄漏"
+      description: "过去1小时内存增长超过1GB，当前增长: {{ $value | humanize }} bytes"
+
+  # 存储性能告警
+  - alert: HighStoreLatency
+    expr: histogram_quantile(0.95, rate(thanos_store_bucket_operations_duration_seconds_bucket[5m])) > 5
+    for: 2m
+    labels:
+      severity: warning
+      component: store
+    annotations:
+      summary: "Store组件延迟过高"
+      description: "Store操作95%分位延迟超过5秒，当前值: {{ $value }}s"
+      
+  - alert: StoreUnavailable
+    expr: up{job=~"thanos-store.*"} == 0
+    for: 1m
+    labels:
+      severity: critical
+      component: store
+    annotations:
+      summary: "Store组件不可用"
+      description: "Store组件 {{ $labels.instance }} 不可用"
+
+  # 缓存性能告警
+  - alert: LowCacheHitRate
+    expr: thanos_cache_hits_total / (thanos_cache_hits_total + thanos_cache_misses_total) < 0.7
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "缓存命中率过低"
+      description: "缓存命中率低于70%，当前值: {{ $value | humanizePercentage }}"
+      
+  - alert: CacheSizeExceeded
+    expr: thanos_cache_items_total / thanos_cache_max_items > 0.9
+    for: 3m
+    labels:
+      severity: warning
+    annotations:
+      summary: "缓存容量接近上限"
+      description: "缓存使用率超过90%，当前值: {{ $value | humanizePercentage }}"
+
+  # 网络性能告警
+  - alert: HighNetworkLatency
+    expr: rate(thanos_query_store_api_calls_duration_seconds_sum[5m]) / rate(thanos_query_store_api_calls_duration_seconds_count[5m]) > 2
+    for: 2m
+    labels:
+      severity: warning
+    annotations:
+      summary: "网络延迟过高"
+      description: "Store API调用平均延迟超过2秒，当前值: {{ $value }}s"
+
+  # 并发控制告警
+  - alert: HighConcurrentQueries
+    expr: thanos_query_concurrent_current > thanos_query_concurrent_max * 0.8
+    for: 2m
+    labels:
+      severity: warning
+      component: query
+    annotations:
+      summary: "并发查询数过高"
+      description: "并发查询数超过最大值的80%，当前: {{ $value }}/{{ thanos_query_concurrent_max }}"
+
+  # 磁盘IO告警
+  - alert: HighDiskIO
+    expr: rate(node_disk_io_time_seconds_total{device=~"sd.*|nvme.*"}[5m]) > 0.8
+    for: 3m
+    labels:
+      severity: warning
+    annotations:
+      summary: "磁盘IO使用率过高"
+      description: "磁盘IO使用率超过80%，当前值: {{ $value | humanizePercentage }}"
+
+  # 容量规划告警
+  - alert: StorageCapacityWarning
+    expr: (1 - (node_filesystem_avail_bytes{mountpoint="/data"} / node_filesystem_size_bytes{mountpoint="/data"})) > 0.8
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "存储容量警告"
+      description: "存储使用率超过80%，当前值: {{ $value | humanizePercentage }}"
+
+  # 性能指标趋势告警
+  - alert: QueryLatencyTrend
+    expr: predict_linear(histogram_quantile(0.95, rate(thanos_query_api_call_duration_seconds_bucket[1h]))[1h], 3600) > 20
+    for: 10m
+    labels:
+      severity: warning
+    annotations:
+      summary: "查询延迟趋势异常"
+      description: "预测1小时后查询延迟将超过20秒"
+
+# 性能优化建议规则
+groups:
+- name: thanos-optimization-suggestions
+  interval: 1h
+  rules:
+  - record: thanos:query:optimization_score
+    expr: |
+      (
+        # 缓存命中率得分 (权重: 0.3)
+        (thanos_cache_hits_total / (thanos_cache_hits_total + thanos_cache_misses_total)) * 0.3 +
+        # 查询延迟得分 (权重: 0.4)
+        (1 - (histogram_quantile(0.95, rate(thanos_query_api_call_duration_seconds_bucket[5m])) / 10)) * 0.4 +
+        # 资源使用率得分 (权重: 0.3)
+        (1 - (process_resident_memory_bytes / machine_memory_bytes)) * 0.3
+      ) * 100
+    labels:
+      type: optimization_score
+      
+  - alert: LowOptimizationScore
+    expr: thanos:query:optimization_score < 60
+    for: 1h
+    labels:
+      severity: info
+    annotations:
+      summary: "性能优化建议"
+      description: "当前优化得分较低({{ $value }}分)，建议检查缓存配置、查询优化和资源分配"

@@ -16,11 +16,11 @@
 ### 基础篇：微服务架构与 Service Mesh 概念
 - [01-微服务架构演进与挑战](01-微服务架构演进与挑战.md)
 - [02-Service-Mesh核心概念与架构](02-Service-Mesh核心概念与架构.md)
-- [03-主流Service-Mesh产品对比](03-主流Service-Mesh产品对比.md)
 
 ### 核心篇：Istio 深度解析与实践
-- [04-Istio架构与核心组件](04-Istio架构与核心组件.md)
-- [05-Istio安装与部署实践](05-Istio安装与部署实践.md)
+- [03-Istio架构深度解析](03-Istio架构深度解析.md)
+- [04-Envoy代理与数据平面](04-Envoy代理与数据平面.md)
+- [05-Java应用集成与最佳实践](05-Java应用集成与最佳实践.md)
 - [06-Istio流量管理详解](06-Istio流量管理详解.md)
 - [07-Istio安全机制与实践](07-Istio安全机制与实践.md)
 - [08-Istio可观测性配置](08-Istio可观测性配置.md)
@@ -34,13 +34,11 @@
 - [12-Java微服务与Service-Mesh集成](12-Java微服务与Service-Mesh集成.md)
 - [13-Spring-Cloud与Istio整合](13-Spring-Cloud与Istio整合.md)
 - [14-企业级Service-Mesh部署方案](14-企业级Service-Mesh部署方案.md)
-- [15-多集群Service-Mesh架构](15-多集群Service-Mesh架构.md)
 
 ### 专家篇：Service Mesh 性能优化与故障排查
-- [16-Service-Mesh性能调优](16-Service-Mesh性能调优.md)
-- [17-Service-Mesh故障排查与监控](17-Service-Mesh故障排查与监控.md)
-- [18-Service-Mesh安全最佳实践](18-Service-Mesh安全最佳实践.md)
-- [19-Service-Mesh未来发展趋势](19-Service-Mesh未来发展趋势.md)
+- [15-故障排查与诊断技巧](15-故障排查与诊断技巧.md)
+- [16-企业级Service-Mesh架构设计](16-企业级Service-Mesh架构设计.md)
+- [17-未来趋势与技术演进](17-未来趋势与技术演进.md)
 
 ## 🛠️ 技术栈
 

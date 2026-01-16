@@ -1,0 +1,47 @@
+apiVersion: 1
+
+apps:
+  # 时钟面板插件
+  - type: grafana-clock-panel
+    version: 2.1.2
+    
+  # 饼图面板插件
+  - type: grafana-piechart-panel
+    version: 1.6.4
+    
+  # 世界地图面板插件
+  - type: grafana-worldmap-panel
+    version: 0.3.5
+    
+  # 热图面板插件
+  - type: grafana-heatmap-panel
+    version: 0.5.0
+    
+  # 流程图插件
+  - type: grafana-flowcharting
+    version: 0.9.1
+    
+  # 状态面板插件
+  - type: grafana-status-panel
+    version: 1.0.9
+    
+  # 离散面板插件
+  - type: grafana-discrete-panel
+    version: 0.0.9
+    
+  # 雷达图插件
+  - type: grafana-radar-panel
+    version: 0.0.1
+
+plugins:
+  # 数据源插件
+  - name: redis-datasource
+    type: datasource
+    
+  # 应用插件
+  - name: grafana-simple-json-datasource
+    type: datasource
+    
+  # 面板插件
+  - name: grafana-polystat-panel
+    type: panel

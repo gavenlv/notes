@@ -1,0 +1,149 @@
+version: '3.8'
+
+services:
+  # MinIO对象存储（模拟S3）
+  minio:
+    image: minio/minio:latest
+    container_name: thanos-minio
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: thanos
+      MINIO_ROOT_PASSWORD: thanos123
+    ports:
+      - "9000:9000"  # API端口
+      - "9001:9001"  # 控制台端口
+    volumes:
+      - minio_data:/data
+    networks:
+      - thanos-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+
+  # Prometheus实例
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: thanos-prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--web.enable-lifecycle'
+      - '--storage.tsdb.retention.time=15d'
+      - '--storage.tsdb.retention.size=512MB'
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./config/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    networks:
+      - thanos-net
+    depends_on:
+      minio:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:9090/-/healthy"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Thanos Sidecar
+  thanos-sidecar:
+    image: thanosio/thanos:latest
+    container_name: thanos-sidecar
+    command:
+      - sidecar
+      - --http-address=0.0.0.0:19191
+      - --grpc-address=0.0.0.0:19090
+      - --prometheus.url=http://prometheus:9090
+      - --tsdb.path=/prometheus
+      - --objstore.config-file=/etc/thanos/minio-bucket.yaml
+      - --log.level=info
+      - --reloader.config-file=/etc/prometheus/prometheus.yml
+      - --reloader.rule-dir=/etc/prometheus/rules/
+    ports:
+      - "19191:19191"
+      - "19090:19090"
+    volumes:
+      - ./config/minio-bucket.yaml:/etc/thanos/minio-bucket.yaml:ro
+      - prometheus_data:/prometheus:ro
+    depends_on:
+      prometheus:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    networks:
+      - thanos-net
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:19191/-/healthy"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Thanos Query
+  thanos-query:
+    image: thanosio/thanos:latest
+    container_name: thanos-query
+    command:
+      - query
+      - --http-address=0.0.0.0:19192
+      - --grpc-address=0.0.0.0:19091
+      - --query.replica-label=replica
+      - --store=thanos-sidecar:19090
+      - --query.auto-downsampling
+      - --query.partial-response
+      - --log.level=info
+    ports:
+      - "19192:19192"
+    depends_on:
+      thanos-sidecar:
+        condition: service_healthy
+    networks:
+      - thanos-net
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:19192/-/healthy"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # 可选：Grafana（用于数据可视化）
+  grafana:
+    image: grafana/grafana:latest
+    container_name: thanos-grafana
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin123
+      - GF_USERS_ALLOW_SIGN_UP=false
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./config/grafana-datasources.yaml:/etc/grafana/provisioning/datasources/datasources.yaml:ro
+    depends_on:
+      thanos-query:
+        condition: service_healthy
+    networks:
+      - thanos-net
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  minio_data:
+    driver: local
+  prometheus_data:
+    driver: local
+  grafana_data:
+    driver: local
+
+networks:
+  thanos-net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16

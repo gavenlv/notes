@@ -1,0 +1,416 @@
+# 数据源测试配置 - 第5章：数据源与连接配置
+version: 2
+
+# 数据源级别测试
+sources:
+  - name: raw_data
+    description: "原始业务数据源测试"
+    
+    # 数据源级测试
+    tests:
+      # 数据新鲜度测试
+      - dbt_utils.recency:
+          datepart: day
+          field: _etl_loaded_at
+          interval: 2
+          config:
+            severity: warn
+            
+      # 数据完整性测试（跨表验证）
+      - dbt_utils.equal_rowcount:
+          compare_model: ref('stg_customers')
+          config:
+            severity: error
+    
+    # 客户表测试
+    tables:
+      - name: customers
+        description: "客户表数据质量测试"
+        
+        # 表级测试
+        tests:
+          # 数据新鲜度
+          - dbt_utils.recency:
+              datepart: hour
+              field: updated_at
+              interval: 24
+              config:
+                severity: warn
+                
+          # 数据量范围检查
+          - dbt_utils.accepted_range:
+              field: _row_count
+              min_value: 1000
+              max_value: 1000000
+              config:
+                severity: warn
+        
+        # 字段级测试
+        columns:
+          - name: customer_id
+            description: "客户ID字段测试"
+            tests:
+              # 非空测试
+              - not_null:
+                  config:
+                    severity: error
+                    
+              # 唯一性测试
+              - unique:
+                  config:
+                    severity: error
+                    
+              # 格式验证（UUID格式）
+              - dbt_utils.expression_is_true:
+                  expression: "customer_id ~ '^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$'"
+                  config:
+                    severity: warn
+          
+          - name: first_name
+            description: "名字字段测试"
+            tests:
+              - not_null:
+                  config:
+                    severity: error
+                    
+              - dbt_utils.string_length:
+                  min_length: 1
+                  max_length: 50
+                  config:
+                    severity: warn
+          
+          - name: last_name
+            description: "姓氏字段测试"
+            tests:
+              - not_null:
+                  config:
+                    severity: error
+                    
+              - dbt_utils.string_length:
+                  min_length: 1
+                  max_length: 50
+                  config:
+                    severity: warn
+          
+          - name: email
+            description: "邮箱字段测试"
+            tests:
+              - not_null:
+                  config:
+                    severity: error
+                    
+              # 邮箱格式验证
+              - dbt_utils.email_address:
+                  config:
+                    severity: error
+                    
+              # 邮箱域名验证
+              - dbt_utils.expression_is_true:
+                  expression: "email ~ '@.*\\.'"
+                  config:
+                    severity: warn
+          
+          - name: created_at
+            description: "创建时间字段测试"
+            tests:
+              - not_null:
+                  config:
+                    severity: error
+                    
+              # 时间范围验证
+              - dbt_utils.accepted_range:
+                  min_value: '2020-01-01'
+                  max_value: '2023-12-31'
+                  config:
+                    severity: warn
+          
+          - name: updated_at
+            description: "更新时间字段测试"
+            tests:
+              - not_null:
+                  config:
+                    severity: error
+                    
+              # 更新时间应该晚于创建时间
+              - dbt_utils.expression_is_true:
+                  expression: "updated_at >= created_at"
+                  config:
+                    severity: warn
+
+      # 订单表测试
+      - name: orders
+        description: "订单表数据质量测试"
+        
+        tests:
+          - dbt_utils.recency:
+              datepart: day
+              field: order_date
+              interval: 7
+              config:
+                severity: warn
+                
+          - dbt_utils.accepted_range:
+              field: total_amount
+              min_value: 0
+              max_value: 100000
+              config:
+                severity: error
+        
+        columns:
+          - name: order_id
+            description: "订单ID字段测试"
+            tests:
+              - not_null:
+                  config:
+                    severity: error
+                    
+              - unique:
+                  config:
+                    severity: error
+          
+          - name: customer_id
+            description: "客户ID字段测试"
+            tests:
+              - not_null:
+                  config:
+                    severity: error
+                    
+              # 外键关系测试（关联客户表）
+              - relationships:
+                  to: ref('stg_customers')
+                  field: customer_id
+                  config:
+                    severity: error
+          
+          - name: order_date
+            description: "订单日期字段测试"
+            tests:
+              - not_null:
+                  config:
+                    severity: error
+                    
+              - dbt_utils.accepted_range:
+                  min_value: '2020-01-01'
+                  max_value: '2023-12-31'
+                  config:
+                    severity: warn
+          
+          - name: total_amount
+            description: "订单金额字段测试"
+            tests:
+              - not_null:
+                  config:
+                    severity: error
+                    
+              - dbt_utils.accepted_range:
+                  min_value: 0
+                  max_value: 100000
+                  config:
+                    severity: error
+              
+              # 金额格式验证（小数点后最多2位）
+              - dbt_utils.expression_is_true:
+                  expression: "total_amount = round(total_amount, 2)"
+                  config:
+                    severity: warn
+          
+          - name: status
+            description: "订单状态字段测试"
+            tests:
+              - not_null:
+                  config:
+                    severity: error
+                    
+              # 状态值枚举验证
+              - dbt_utils.accepted_values:
+                  values: ['pending', 'processing', 'shipped', 'delivered', 'cancelled', 'refunded']
+                  config:
+                    severity: error
+
+# 外部系统数据源测试
+- name: external_system
+  description: "外部系统数据源测试"
+  
+  tables:
+    - name: product_catalog
+      description: "产品目录表测试"
+      
+      tests:
+        - dbt_utils.recency:
+            datepart: day
+            field: last_updated
+            interval: 30
+            config:
+              severity: warn
+      
+      columns:
+        - name: product_id
+          description: "产品ID字段测试"
+          tests:
+            - not_null:
+                config:
+                  severity: error
+                  
+            - unique:
+                config:
+                  severity: error
+        
+        - name: product_name
+          description: "产品名字段测试"
+          tests:
+            - not_null:
+                config:
+                  severity: error
+                  
+            - dbt_utils.string_length:
+                min_length: 1
+                max_length: 100
+                config:
+                  severity: warn
+        
+        - name: category
+          description: "产品分类字段测试"
+          tests:
+            - not_null:
+                config:
+                  severity: error
+                  
+            - dbt_utils.accepted_values:
+                values: ['electronics', 'clothing', 'home', 'sports', 'books']
+                config:
+                  severity: error
+        
+        - name: price
+          description: "产品价格字段测试"
+          tests:
+            - not_null:
+                config:
+                  severity: error
+                  
+            - dbt_utils.accepted_range:
+                min_value: 0
+                max_value: 10000
+                config:
+                  severity: error
+
+# 日志数据源测试
+- name: log_data
+  description: "日志数据源测试"
+  
+  freshness:
+    warn_after: {count: 1, period: hour}
+    error_after: {count: 4, period: hour}
+  
+  tables:
+    - name: user_activity
+      description: "用户活动日志测试"
+      
+      columns:
+        - name: event_id
+          description: "事件ID字段测试"
+          tests:
+            - not_null:
+                config:
+                  severity: error
+                  
+            - unique:
+                config:
+                  severity: error
+        
+        - name: user_id
+          description: "用户ID字段测试"
+          tests:
+            - not_null:
+                config:
+                  severity: error
+        
+        - name: event_type
+          description: "事件类型字段测试"
+          tests:
+            - not_null:
+                config:
+                  severity: error
+                  
+            - dbt_utils.accepted_values:
+                values: ['page_view', 'click', 'purchase', 'login', 'logout']
+                config:
+                  severity: error
+        
+        - name: event_timestamp
+          description: "事件时间字段测试"
+          tests:
+            - not_null:
+                config:
+                  severity: error
+
+# 自定义数据源测试宏（示例）
+tests:
+  - name: source_data_freshness
+    description: "数据源新鲜度综合测试"
+    
+    # 测试所有数据源的新鲜度
+    source_data_freshness:
+      - source: raw_data
+        table: customers
+        field: updated_at
+        warn_after_hours: 24
+        error_after_hours: 48
+        
+      - source: raw_data
+        table: orders
+        field: order_date
+        warn_after_hours: 168  # 7天
+        error_after_hours: 720 # 30天
+        
+      - source: external_system
+        table: product_catalog
+        field: last_updated
+        warn_after_hours: 720  # 30天
+        error_after_hours: 2160 # 90天
+
+  - name: source_data_consistency
+    description: "数据源一致性测试"
+    
+    # 测试数据源间的一致性
+    source_data_consistency:
+      - source1: raw_data
+        table1: customers
+        field1: customer_id
+        source2: raw_data
+        table2: orders
+        field2: customer_id
+        test_type: "referential_integrity"
+
+# 数据源监控测试（用于告警）
+- name: source_monitoring_checks
+  description: "数据源监控检查"
+  
+  source_monitoring_checks:
+    # 数据量监控
+    - check_type: "row_count"
+      source: raw_data
+      table: customers
+      min_threshold: 1000
+      max_threshold: 1000000
+      
+    # 数据增长监控
+    - check_type: "growth_rate"
+      source: raw_data
+      table: orders
+      max_daily_growth: 0.1  # 最大日增长率10%
+      
+    # 数据质量监控
+    - check_type: "quality_score"
+      source: raw_data
+      table: customers
+      min_quality_score: 0.95  # 最低质量分数95%
+
+# 测试配置说明
+# severity级别说明：
+# - error: 测试失败会阻止dbt运行
+# - warn: 测试失败会发出警告，但不会阻止运行
+# 
+# 测试执行命令：
+# dbt test --select source:*          # 测试所有数据源
+# dbt test --select source:raw_data   # 测试特定数据源
+# dbt test --select source:raw_data.customers  # 测试特定表

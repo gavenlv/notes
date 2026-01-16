@@ -1,0 +1,240 @@
+version: 2
+
+# 第6章：dbt最佳实践与项目结构
+# 模型测试配置 - 演示测试覆盖和验证的最佳实践
+
+models:
+  # staging层模型测试
+  - name: stg_customers
+    description: "客户数据清洗模型测试配置"
+    tests:
+      # 唯一性测试
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - customer_id
+            - created_at
+      
+      # 非空测试
+      - not_null:
+          column_name: customer_id
+      - not_null:
+          column_name: email
+          config:
+            where: "status != 'deleted'"
+      
+      # 关系测试
+      - relationships:
+          to: ref('stg_orders')
+          field: customer_id
+          config:
+            severity: warn
+      
+      # 接受值测试
+      - accepted_values:
+          column_name: status
+          values: ['active', 'inactive', 'suspended', 'deleted']
+      
+      # 自定义测试：邮箱格式验证
+      - email_format_validation:
+          column_name: email
+      
+      # 自定义测试：数据质量评分范围
+      - data_quality_range:
+          column_name: data_quality_score
+          min_value: 0
+          max_value: 100
+    
+    columns:
+      - name: customer_id
+        description: "客户唯一标识"
+        tests:
+          - unique
+          - not_null
+      
+      - name: email
+        description: "客户邮箱地址"
+        tests:
+          - not_null
+          - email_format_validation
+      
+      - name: data_quality_score
+        description: "数据质量评分"
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 100
+      
+      - name: final_validation_status
+        description: "最终验证状态"
+        tests:
+          - accepted_values:
+              values: ['passed', 'failed', 'warning']
+
+  # intermediate层模型测试
+  - name: int_customer_metrics
+    description: "客户指标计算模型测试配置"
+    tests:
+      # 唯一性测试
+      - unique:
+          column_name: customer_id
+      
+      # 完整性测试
+      - not_null:
+          column_name: customer_id
+      - not_null:
+          column_name: customer_value_score
+      
+      # 范围测试
+      - dbt_utils.accepted_range:
+          column_name: customer_value_score
+          min_value: 0
+          max_value: 100
+      
+      - dbt_utils.accepted_range:
+          column_name: customer_health_score
+          min_value: 0
+          max_value: 100
+      
+      # 一致性测试：订单数量不能为负数
+      - dbt_utils.expression_is_true:
+          expression: "total_orders >= 0"
+      
+      # 一致性测试：总金额不能为负数
+      - dbt_utils.expression_is_true:
+          expression: "total_spent >= 0"
+      
+      # 业务逻辑测试：成功订单率应在合理范围内
+      - dbt_utils.accepted_range:
+          column_name: order_success_rate
+          min_value: 0
+          max_value: 100
+    
+    columns:
+      - name: customer_id
+        description: "客户唯一标识"
+        tests:
+          - unique
+          - not_null
+      
+      - name: total_orders
+        description: "总订单数"
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+      
+      - name: total_spent
+        description: "总消费金额"
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+      
+      - name: customer_value_score
+        description: "客户价值评分"
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 100
+      
+      - name: customer_segment
+        description: "客户分群"
+        tests:
+          - accepted_values:
+              values: ['champion', 'high_value_new', 'loyal_high_value', 'needs_attention', 'at_risk', 'lost', 'regular']
+
+  # marts层模型测试
+  - name: dim_customers
+    description: "客户维度表测试配置"
+    tests:
+      # 唯一性测试
+      - unique:
+          column_name: customer_id
+      - unique:
+          column_name: customer_dim_key
+      
+      # 完整性测试
+      - not_null:
+          column_name: customer_id
+      - not_null:
+          column_name: customer_dim_key
+      - not_null:
+          column_name: full_name
+      
+      # 关系测试
+      - relationships:
+          to: ref('int_customer_metrics')
+          field: customer_id
+      
+      # 业务逻辑测试：活跃记录验证
+      - dbt_utils.expression_is_true:
+          expression: "is_active_record = (customer_health_score >= 50 AND customer_status != 'deleted')"
+      
+      # 数据一致性测试：维度键生成正确性
+      - dbt_utils.expression_is_true:
+          expression: "customer_dim_key IS NOT NULL"
+    
+    columns:
+      - name: customer_id
+        description: "客户唯一标识"
+        tests:
+          - unique
+          - not_null
+      
+      - name: customer_dim_key
+        description: "客户维度键"
+        tests:
+          - unique
+          - not_null
+      
+      - name: customer_value_score
+        description: "客户价值评分"
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 100
+      
+      - name: customer_health_score
+        description: "客户健康度评分"
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 100
+      
+      - name: is_active_record
+        description: "是否有效记录"
+        tests:
+          - accepted_values:
+              values: [true, false]
+      
+      - name: lifecycle_stage
+        description: "生命周期阶段"
+        tests:
+          - accepted_values:
+              values: ['prospect', 'new_customer', 'developing_customer', 'established_customer', 'loyal_customer', 'lost_customer', 'active_customer']
+      
+      - name: customer_value_tier
+        description: "客户价值层级"
+        tests:
+          - accepted_values:
+              values: ['strategic', 'core', 'growth', 'developing', 'exploratory']
+
+# 自定义测试定义
+tests:
+  # 邮箱格式验证测试
+  - name: email_format_validation
+    description: "验证邮箱地址格式是否正确"
+    
+  # 数据质量评分范围测试
+  - name: data_quality_range
+    description: "验证数据质量评分在指定范围内"
+    
+  # 业务规则验证测试
+  - name: business_rule_validation
+    description: "验证业务规则是否满足"
+
+# 测试配置说明
+# 1. 分层测试策略：staging层关注数据质量，intermediate层关注业务逻辑，marts层关注数据一致性
+# 2. 测试覆盖：唯一性、完整性、范围验证、业务逻辑验证
+# 3. 测试粒度：模型级测试和列级测试结合
+# 4. 测试优先级：关键业务字段优先测试
+# 5. 测试维护：定期更新测试规则以适应业务变化

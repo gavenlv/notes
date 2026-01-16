@@ -1,0 +1,73 @@
+# dbt_project.yml - 第2章示例项目配置
+name: 'chapter2_example'
+version: '1.0.0'
+
+profile: 'chapter2_example'
+
+# 配置目录路径
+model-paths: ["models"]
+analysis-paths: ["analyses"]
+test-paths: ["tests"]
+seed-paths: ["seeds"]
+macro-paths: ["macros"]
+snapshot-paths: ["snapshots"]
+
+# 输出目录配置
+target-path: "target"
+clean-targets:
+  - "target"
+  - "dbt_packages"
+
+# 模型配置 - 分层架构
+models:
+  chapter2_example:
+    # 默认配置
+    materialized: view
+    
+    # Staging层配置
+    staging:
+      materialized: view
+      +tags: ["staging"]
+      +schema: staging
+    
+    # Intermediate层配置
+    intermediate:
+      materialized: table
+      +tags: ["intermediate"]
+      +schema: intermediate
+    
+    # Marts层配置
+    marts:
+      materialized: table
+      +tags: ["marts"]
+      +schema: marts
+    
+    # 增量模型配置
+    incremental:
+      materialized: incremental
+      +tags: ["incremental"]
+      +schema: marts
+
+# 种子数据配置
+seeds:
+  chapter2_example:
+    +enabled: true
+    +quote_columns: false
+    +schema: seeds
+
+# 快照配置
+snapshots:
+  chapter2_example:
+    +target_schema: snapshots
+    +unique_key: id
+
+# 测试配置
+tests:
+  chapter2_example:
+    +severity: warn
+    
+    # 分层测试配置
+    staging:
+      +severity: error
+    marts:
+      +severity: warn

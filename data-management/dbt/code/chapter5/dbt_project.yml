@@ -1,0 +1,281 @@
+# dbt项目配置 - 第5章：数据源与连接配置
+name: 'dbt_sources_example'
+version: '1.0.0'
+
+# 项目配置
+config-version: 2
+profile: 'dbt_sources_example'
+
+# 模型配置
+model-paths: ["models"]
+seed-paths: ["data"]
+test-paths: ["tests"]
+analysis-paths: ["analyses"]
+macro-paths: ["macros"]
+snapshot-paths: ["snapshots"]
+
+target-path: "target"  # 编译输出目录
+clean-targets:         # 清理目录
+  - "target"
+  - "dbt_packages"
+
+# 模型分层配置
+models:
+  dbt_sources_example:
+    # staging层配置
+    staging:
+      +materialized: view
+      +tags: ["staging", "chapter5"]
+      +schema: staging
+      +persist_docs:
+        relation: true
+        columns: true
+    
+    # intermediate层配置  
+    intermediate:
+      +materialized: table
+      +tags: ["intermediate", "chapter5"]
+      +schema: intermediate
+      +persist_docs:
+        relation: true
+        columns: true
+    
+    # marts层配置
+    marts:
+      +materialized: table
+      +tags: ["marts", "chapter5"]
+      +schema: marts
+      +persist_docs:
+        relation: true
+        columns: true
+
+# 数据源配置
+sources:
+  - name: raw_data
+    description: "原始业务数据源"
+    database: "{{ target.database }}"
+    schema: raw
+    
+    # 数据新鲜度配置
+    freshness:
+      warn_after: {count: 24, period: hour}
+      error_after: {count: 48, period: hour}
+    
+    # 数据源表定义
+    tables:
+      - name: customers
+        description: "客户基本信息表"
+        loaded_at_field: updated_at
+        columns:
+          - name: customer_id
+            description: "客户唯一标识"
+            data_type: varchar
+            tests:
+              - not_null
+              - unique
+          
+          - name: first_name
+            description: "客户名"
+            data_type: varchar
+            tests:
+              - not_null
+          
+          - name: last_name
+            description: "客户姓"
+            data_type: varchar
+            tests:
+              - not_null
+          
+          - name: email
+            description: "邮箱地址"
+            data_type: varchar
+            tests:
+              - not_null
+              - dbt_utils.email_address
+          
+          - name: created_at
+            description: "创建时间"
+            data_type: timestamp
+            tests:
+              - not_null
+          
+          - name: updated_at
+            description: "更新时间"
+            data_type: timestamp
+            tests:
+              - not_null
+
+      - name: orders
+        description: "订单信息表"
+        loaded_at_field: order_date
+        columns:
+          - name: order_id
+            description: "订单唯一标识"
+            data_type: varchar
+            tests:
+              - not_null
+              - unique
+          
+          - name: customer_id
+            description: "客户ID"
+            data_type: varchar
+            tests:
+              - not_null
+              - relationships:
+                  to: ref('stg_customers')
+                  field: customer_id
+          
+          - name: order_date
+            description: "订单日期"
+            data_type: date
+            tests:
+              - not_null
+          
+          - name: total_amount
+            description: "订单总金额"
+            data_type: decimal
+            tests:
+              - not_null
+              - dbt_utils.accepted_range:
+                  min_value: 0
+                  max_value: 100000
+          
+          - name: status
+            description: "订单状态"
+            data_type: varchar
+            tests:
+              - not_null
+              - dbt_utils.accepted_values:
+                  values: ['pending', 'processing', 'shipped', 'delivered', 'cancelled']
+
+  # 第二个数据源示例
+  - name: external_system
+    description: "外部系统数据源"
+    database: external_db
+    schema: external
+    
+    tables:
+      - name: product_catalog
+        description: "产品目录信息"
+        columns:
+          - name: product_id
+            description: "产品ID"
+            tests:
+              - not_null
+              - unique
+          
+          - name: product_name
+            description: "产品名称"
+            tests:
+              - not_null
+
+# 测试配置
+tests:
+  dbt_sources_example:
+    # 数据源级别测试
+    sources:
+      - name: raw_data
+        tables:
+          - name: customers
+            tests:
+              - dbt_utils.equal_rowcount:
+                  compare_model: ref('stg_customers')
+              - dbt_utils.recency:
+                  datepart: day
+                  field: updated_at
+                  interval: 1
+
+# 种子数据配置
+seeds:
+  dbt_sources_example:
+    +enabled: true
+    +schema: seed_data
+    +tags: ["seed", "chapter5"]
+    country_codes:
+      +column_types:
+        country_code: varchar(2)
+        country_name: varchar(100)
+
+# 快照配置
+snapshots:
+  dbt_sources_example:
+    +target_schema: snapshots
+    +unique_key: id
+    +strategy: timestamp
+    +updated_at: updated_at
+    +tags: ["snapshot", "chapter5"]
+
+# 变量定义
+vars:
+  # 日期格式配置
+  date_format: 'YYYY-MM-DD'
+  datetime_format: 'YYYY-MM-DD HH24:MI:SS'
+  
+  # 货币配置
+  default_currency: 'USD'
+  currency_symbol: '$'
+  
+  # 业务配置
+  company_name: '示例公司'
+  data_retention_days: 365
+  
+  # 数据源配置变量
+  raw_database: '{{ target.database }}'
+  raw_schema: 'raw'
+  external_database: 'external_db'
+  external_schema: 'external'
+
+# 查询标签（用于监控和成本追踪）
+query-comment:
+  comment: 'dbt_sources_example - {{ target.name }} - {{ invocation_id }}'
+  
+# 宏配置
+on-run-start:
+  - "{{ log('开始运行dbt_sources_example项目', info=true) }}"
+  - "{{ log('目标环境: ' ~ target.name, info=true) }}"
+  - "{{ log('数据库: ' ~ target.database, info=true) }}"
+  - "{{ log('Schema: ' ~ target.schema, info=true) }}"
+
+on-run-end:
+  - "{{ log('dbt_sources_example项目运行完成', info=true) }}"
+  - "{{ log('运行ID: ' ~ invocation_id, info=true) }}"
+
+# 包依赖
+dependencies:
+  - package: dbt-labs/dbt_utils
+    version: 0.9.2
+
+# 项目元数据
+require-dbt-version: [">=1.0.0", "<2.0.0"]
+
+# 文档配置
+docs:
+  show: true
+  
+# 日志配置
+log-path: "logs"
+log-level: info
+
+# 性能配置
+threads: 4
+
+# 环境特定配置（使用Jinja条件）
+{% if target.name == 'prod' %}
+# 生产环境配置
+models:
+  dbt_sources_example:
+    staging:
+      +materialized: table
+      +persist_docs:
+        relation: true
+        columns: true
+{% elif target.name == 'dev' %}
+# 开发环境配置
+models:
+  dbt_sources_example:
+    staging:
+      +materialized: view
+      +persist_docs:
+        relation: false
+        columns: false
+{% endif %}

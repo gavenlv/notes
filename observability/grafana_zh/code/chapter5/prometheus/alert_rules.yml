@@ -1,0 +1,74 @@
+groups:
+  - name: node_exporter_alerts
+    rules:
+      - alert: HighCPUUsage
+        expr: 100 - (avg by (instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 80
+        for: 2m
+        labels:
+          severity: warning
+          team: infrastructure
+        annotations:
+          summary: "高CPU使用率 (instance {{ $labels.instance }})"
+          description: "CPU使用率超过80%已经持续2分钟。当前值: {{ $value }}%"
+
+      - alert: HighMemoryUsage
+        expr: (node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes) / node_memory_MemTotal_bytes * 100 > 85
+        for: 2m
+        labels:
+          severity: warning
+          team: infrastructure
+        annotations:
+          summary: "高内存使用率 (instance {{ $labels.instance }})"
+          description: "内存使用率超过85%已经持续2分钟。当前值: {{ $value }}%"
+
+      - alert: DiskSpaceLow
+        expr: (node_filesystem_size_bytes{fstype!="tmpfs"} - node_filesystem_free_bytes{fstype!="tmpfs"}) / node_filesystem_size_bytes{fstype!="tmpfs"} * 100 > 90
+        for: 5m
+        labels:
+          severity: critical
+          team: infrastructure
+        annotations:
+          summary: "磁盘空间不足 (instance {{ $labels.instance }}, mountpoint {{ $labels.mountpoint }})"
+          description: "磁盘使用率超过90%已经持续5分钟。当前值: {{ $value }}%"
+
+      - alert: NodeDown
+        expr: up == 0
+        for: 1m
+        labels:
+          severity: critical
+          team: infrastructure
+        annotations:
+          summary: "节点宕机 (instance {{ $labels.instance }})"
+          description: "节点已经宕机超过1分钟"
+
+      - alert: HighNetworkTraffic
+        expr: rate(node_network_receive_bytes_total[5m]) * 8 > 1000000000
+        for: 2m
+        labels:
+          severity: warning
+          team: infrastructure
+        annotations:
+          summary: "高网络流量 (instance {{ $labels.instance }}, interface {{ $labels.device }})"
+          description: "网络接收流量超过1Gbps已经持续2分钟。当前值: {{ $value }} bps"
+
+  - name: grafana_alerts
+    rules:
+      - alert: GrafanaDown
+        expr: up{job="grafana"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          team: monitoring
+        annotations:
+          summary: "Grafana服务宕机"
+          description: "Grafana服务已经宕机超过1分钟"
+
+      - alert: PrometheusDown
+        expr: up{job="prometheus"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          team: monitoring
+        annotations:
+          summary: "Prometheus服务宕机"
+          description: "Prometheus服务已经宕机超过1分钟"

@@ -1,0 +1,56 @@
+# profiles.yml - 数据库连接配置示例
+# 请将此文件复制为 profiles.yml 并根据您的环境修改配置
+
+chapter1_example:
+  target: dev
+  outputs:
+    dev:
+      type: postgres          # 数据库类型：postgres, snowflake, bigquery, redshift等
+      host: localhost         # 数据库主机
+      port: 5432             # 数据库端口
+      user: your_username     # 数据库用户名
+      pass: your_password     # 数据库密码
+      dbname: your_database   # 数据库名称
+      schema: dbt_dev         # 默认schema
+      threads: 4              # 并发线程数
+      keepalives_idle: 0      # 连接保持设置
+    
+    prod:
+      type: postgres
+      host: production-db.example.com
+      port: 5432
+      user: prod_user
+      pass: "{{ env_var('DB_PASSWORD') }}"  # 使用环境变量
+      dbname: production_db
+      schema: analytics
+      threads: 8
+      keepalives_idle: 0
+
+# 其他数据库配置示例
+# Snowflake配置示例
+# snowflake_example:
+#   target: dev
+#   outputs:
+#     dev:
+#       type: snowflake
+#       account: your_account
+#       user: your_username
+#       password: your_password
+#       role: your_role
+#       database: your_database
+#       warehouse: your_warehouse
+#       schema: your_schema
+#       threads: 4
+#       client_session_keep_alive: false
+
+# BigQuery配置示例
+# bigquery_example:
+#   target: dev
+#   outputs:
+#     dev:
+#       type: bigquery
+#       method: service-account
+#       project: your_project_id
+#       dataset: your_dataset
+#       threads: 4
+#       keyfile: /path/to/service-account-key.json

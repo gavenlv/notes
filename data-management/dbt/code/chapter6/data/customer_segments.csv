@@ -1,0 +1,11 @@
+segment_id,segment_name,segment_description,min_value_score,max_value_score,min_health_score,max_health_score,priority_level,marketing_budget,retention_strategy
+1,strategic,战略客户 - 高价值高活跃,90,100,85,100,1,10000,专属客户经理，优先服务
+2,core,核心客户 - 稳定贡献,75,89,70,84,2,5000,定期关怀，增值服务
+3,growth,成长客户 - 潜力巨大,60,74,60,69,3,3000,培养关系，引导消费
+4,developing,发展客户 - 初步建立,40,59,50,59,4,1000,基础服务，建立信任
+5,exploratory,探索客户 - 新客户或低活跃,0,39,0,49,5,500,引导体验，转化激活
+6,vip,VIP客户 - 超高价值,95,100,90,100,1,15000,专属VIP服务，定制方案
+7,at_risk,风险客户 - 可能流失,60,100,30,49,2,2000,挽回措施，价值提醒
+8,lost,流失客户 - 已停止活跃,0,100,0,29,3,500,重新激活，优惠吸引
+9,dormant,休眠客户 - 长期未活跃,0,100,30,49,4,300,唤醒活动，新品推荐
+10,new,新客户 - 首次购买,0,100,50,100,3,800,欢迎流程，使用指导

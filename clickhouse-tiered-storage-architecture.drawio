@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net" agent="5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36" version="24.5.6" etag="HZ3Xh8Dv6dOjH8pCw3jZ" type="device">
+  <diagram name="Page-1" id="Hl2b6lF2cH8x7vQw8V8H">
+    <mxGraphModel dx="1042" dy="578" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <!-- Title -->
+        <mxCell id="title" value="ClickHouse Tiered Storage Architecture" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=24;fontStyle=1;fontColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="300" y="40" width="400" height="40" as="geometry" />
+        </mxCell>
+        <!-- Subtitle -->
+        <mxCell id="subtitle" value="Cost Optimization with Hot, Warm, and Cold Storage Tiers" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=16;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="300" y="80" width="400" height="30" as="geometry" />
+        </mxCell>
+        <!-- User -->
+        <mxCell id="user" value="User" style="shape=ellipse;perimeter=ellipsePerimeter;whiteSpace=wrap;html=1;fontSize=16;fontColor=#000000;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="80" y="200" width="120" height="80" as="geometry" />
+        </mxCell>
+        <!-- Service -->
+        <mxCell id="service" value="Application Service" style="shape=rectangle;rounded=1;whiteSpace=wrap;html=1;fontSize=16;fontColor=#000000;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="250" y="190" width="160" height="100" as="geometry" />
+        </mxCell>
+        <!-- ClickHouse -->
+        <mxCell id="clickhouse" value="ClickHouse Cluster" style="shape=cylinder3;whiteSpace=wrap;html=1;fontSize=16;fontColor=#000000;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="460" y="180" width="180" height="120" as="geometry" />
+        </mxCell>
+        <!-- SSD Storage -->
+        <mxCell id="ssd" value="SSD (Hot Storage)&lt;br&gt;High Performance&lt;br&gt;Low Latency" style="shape=rectangle;whiteSpace=wrap;html=1;fontSize=14;fontColor=#000000;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1">
+          <mxGeometry x="700" y="100" width="180" height="80" as="geometry" />
+        </mxCell>
+        <!-- GCS Storage -->
+        <mxCell id="gcs" value="GCS (Warm Storage)&lt;br&gt;Standard Object Storage&lt;br&gt;Cost Effective" style="shape=rectangle;whiteSpace=wrap;html=1;fontSize=14;fontColor=#000000;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
+          <mxGeometry x="700" y="220" width="180" height="80" as="geometry" />
+        </mxCell>
+        <!-- GCS Archive Storage -->
+        <mxCell id="gcs_archive" value="GCS Archive (Cold Storage)&lt;br&gt;Low Cost Archive&lt;br&gt;Long-Term Retention" style="shape=rectangle;whiteSpace=wrap;html=1;fontSize=14;fontColor=#000000;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="700" y="340" width="180" height="80" as="geometry" />
+        </mxCell>
+        <!-- Arrow: User -> Service -->
+        <mxCell id="edge1" value="Query / Ingest" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;fontSize=14;endArrow=classic;endFill=1;" edge="1" parent="1" source="user" target="service">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <!-- Arrow: Service -> ClickHouse -->
+        <mxCell id="edge2" value="SQL / API" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;fontSize=14;endArrow=classic;endFill=1;" edge="1" parent="1" source="service" target="clickhouse">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <!-- Arrow: ClickHouse -> SSD (Hot) -->
+        <mxCell id="edge3" value="Frequent Access&lt;br&gt;(Hot Data)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;fontSize=12;endArrow=classic;endFill=1;dashed=1;" edge="1" parent="1" source="clickhouse" target="ssd">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <!-- Arrow: ClickHouse -> GCS (Warm) -->
+        <mxCell id="edge4" value="Infrequent Access&lt;br&gt;(Warm Data)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;fontSize=12;endArrow=classic;endFill=1;dashed=1;" edge="1" parent="1" source="clickhouse" target="gcs">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <!-- Arrow: ClickHouse -> GCS Archive (Cold) -->
+        <mxCell id="edge5" value="Rarely Accessed&lt;br&gt;(Cold Data)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;fontSize=12;endArrow=classic;endFill=1;dashed=1;" edge="1" parent="1" source="clickhouse" target="gcs_archive">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <!-- Cost Saving Annotation -->
+        <mxCell id="annotation" value="&lt;b&gt;Cost Optimization Strategy&lt;/b&gt;&lt;br&gt;• &lt;b&gt;Hot tier (SSD)&lt;/b&gt;: Recent/frequent data for performance&lt;br&gt;• &lt;b&gt;Warm tier (GCS)&lt;/b&gt;: Older data accessed occasionally&lt;br&gt;• &lt;b&gt;Cold tier (GCS Archive)&lt;/b&gt;: Historical data rarely accessed&lt;br&gt;• Automatic data movement based on policies&lt;br&gt;• Significant cost savings vs. all-SSD storage" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=14;fontColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="80" y="420" width="350" height="140" as="geometry" />
+        </mxCell>
+        <!-- Data Flow Legend -->
+        <mxCell id="legend" value="&lt;b&gt;Data Flow&lt;/b&gt;&lt;br&gt;───── Query/Request&lt;br&gt;- - - - Data Movement&lt;br&gt;(Based on access patterns)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=12;fontColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="80" y="580" width="250" height="80" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

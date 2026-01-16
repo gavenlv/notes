@@ -1,0 +1,199 @@
+# Thanos查询优化示例
+
+## 1. 基础查询优化
+
+### 1.1 避免全量扫描
+
+**不推荐的查询（性能差）：**
+```promql
+# 扫描所有指标
+up{job="prometheus"}
+
+# 扫描所有实例
+node_cpu_seconds_total{mode!="idle"}
+```
+
+**优化的查询（性能好）：**
+```promql
+# 使用具体标签过滤
+up{job="prometheus", instance=~"10.0.1.*"}
+
+# 使用正则表达式精确匹配
+node_cpu_seconds_total{mode!="idle", instance=~"node-(1|2|3)"}
+```
+
+### 1.2 时间范围优化
+
+**长时间范围查询：**
+```promql
+# 性能较差 - 扫描大量数据
+rate(http_requests_total[1h])
+
+# 性能较好 - 使用降采样
+rate(http_requests_total[5m])
+```
+
+**历史数据分析：**
+```promql
+# 优化历史查询 - 增加采样间隔
+avg_over_time(
+  rate(http_requests_total[5m])[1h:1m]
+)
+```
+
+## 2. 聚合查询优化
+
+### 2.1 聚合顺序优化
+
+**不推荐的聚合方式：**
+```promql
+# 先计算速率再聚合 - 性能差
+sum(rate(http_requests_total[5m])) by (job)
+```
+
+**推荐的聚合方式：**
+```promql
+# 先聚合再计算速率 - 性能好
+sum by (job) (rate(http_requests_total[5m]))
+```
+
+### 2.2 高效聚合函数
+
+**使用内置聚合函数：**
+```promql
+# 计算百分位数 - 使用内置函数
+histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m]))
+
+# 计算错误率
+sum(rate(http_requests_total{status=~"5.."}[5m])) by (job) / 
+sum(rate(http_requests_total[5m])) by (job)
+```
+
+## 3. 标签操作优化
+
+### 3.1 标签过滤优化
+
+**避免不必要的标签操作：**
+```promql
+# 不推荐 - 频繁标签操作
+label_replace(
+  up{job="prometheus"}, 
+  "region", "$1", "instance", "(.*)-.*"
+)
+
+# 推荐 - 预定义标签
+up{job="prometheus", region="us-east"}
+```
+
+### 3.2 标签匹配优化
+
+**使用精确匹配：**
+```promql
+# 精确匹配 - 性能好
+up{job=~"prometheus|thanos"}
+
+# 避免模糊匹配
+up{job=~".*etheus.*"}
+```
+
+## 4. 复杂查询分解
+
+### 4.1 查询分解策略
+
+**复杂查询分解：**
+```promql
+# 原始复杂查询
+(
+  sum(rate(http_requests_total{status=~"2.."}[5m])) by (job) /
+  sum(rate(http_requests_total[5m])) by (job)
+) * 100 > 95
+
+# 分解为多个简单查询
+# 步骤1: 计算成功请求率
+- record: job:http_success_rate:ratio
+  expr: sum(rate(http_requests_total{status=~"2.."}[5m])) by (job) / sum(rate(http_requests_total[5m])) by (job)
+
+# 步骤2: 应用告警条件
+- alert: HighErrorRate
+  expr: job:http_success_rate:ratio < 0.95
+```
+
+### 4.2 预聚合查询
+
+**使用Ruler预聚合：**
+```yaml
+# 预聚合规则
+groups:
+- name: pre-aggregation
+  interval: 1m
+  rules:
+  - record: job:http_requests:rate5m
+    expr: sum(rate(http_requests_total[5m])) by (job)
+    
+  - record: job:http_errors:rate5m
+    expr: sum(rate(http_requests_total{status=~"5.."}[5m])) by (job)
+    
+  - record: job:http_success_rate
+    expr: 1 - (job:http_errors:rate5m / job:http_requests:rate5m)
+```
+
+## 5. 时间序列操作优化
+
+### 5.1 避免重复计算
+
+**重复计算优化：**
+```promql
+# 不推荐 - 重复计算
+rate(http_requests_total[5m]) > 100 and rate(http_requests_total[5m]) < 1000
+
+# 推荐 - 使用变量
+http_rate = rate(http_requests_total[5m])
+http_rate > 100 and http_rate < 1000
+```
+
+### 5.2 向量匹配优化
+
+**正确的向量匹配：**
+```promql
+# 一对一匹配
+node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes
+
+# 多对一匹配
+sum by (job) (rate(http_requests_total[5m])) / ignoring(instance) group_left() 
+sum by (job) (up)
+```
+
+## 6. 查询性能分析工具
+
+### 6.1 查询执行计划分析
+
+使用Thanos Query的调试功能：
+```bash
+# 启用查询调试
+curl -s "http://thanos-query:10902/api/v1/query?query=up&debug=true"
+
+# 分析查询执行计划
+curl -s "http://thanos-query:10902/api/v1/query?query=up&explain=true"
+```
+
+### 6.2 性能对比测试
+
+```bash
+# 测试查询性能
+for query in "up" "rate(http_requests_total[5m])" "sum(up) by (job)"; do
+    echo "测试查询: $query"
+    time curl -s "http://thanos-query:10902/api/v1/query?query=$query" > /dev/null
+done
+```
+
+## 7. 最佳实践总结
+
+1. **使用标签过滤**：避免全量数据扫描
+2. **优化时间范围**：根据需求选择合适窗口
+3. **合理使用聚合**：减少数据传输量
+4. **预聚合数据**：使用Ruler组件
+5. **监控查询性能**：持续优化查询语句
+6. **使用缓存**：启用查询响应缓存
+7. **避免复杂操作**：分解复杂查询为简单步骤
+
+通过应用这些优化技巧，可以显著提升Thanos查询性能，特别是在大规模监控场景下。

@@ -1,0 +1,46 @@
+# dbt_project.yml - 第1章示例项目配置
+name: 'chapter1_example'
+version: '1.0.0'
+
+profile: 'chapter1_example'
+
+# 配置目录路径
+model-paths: ["models"]
+analysis-paths: ["analyses"]
+test-paths: ["tests"]
+seed-paths: ["seeds"]
+macro-paths: ["macros"]
+snapshot-paths: ["snapshots"]
+
+# 输出目录配置
+target-path: "target"
+clean-targets:
+  - "target"
+  - "dbt_packages"
+
+# 模型配置
+models:
+  chapter1_example:
+    # 默认物化方式
+    materialized: view
+    
+    # 分层配置
+    staging:
+      materialized: view
+      +tags: ["staging"]
+    
+    marts:
+      materialized: table
+      +tags: ["marts"]
+
+# 种子数据配置
+seeds:
+  chapter1_example:
+    +enabled: true
+    +quote_columns: false
+
+# 测试配置
+tests:
+  chapter1_example:
+    # 数据质量测试配置
+    +severity: warn

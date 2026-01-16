@@ -1,0 +1,246 @@
+# Thanos JVM优化配置
+# 针对Thanos组件（Query、Store、Ruler等）的Java虚拟机优化配置
+
+# 通用JVM优化配置
+common-jvm-options:
+  # 内存配置
+  - "-Xmx4G"           # 最大堆内存
+  - "-Xms4G"           # 初始堆内存
+  - "-XX:MaxMetaspaceSize=512M"  # 元空间最大大小
+  - "-XX:MaxDirectMemorySize=2G" # 堆外内存最大大小
+  
+  # 垃圾回收配置（G1GC）
+  - "-XX:+UseG1GC"                    # 启用G1垃圾回收器
+  - "-XX:MaxGCPauseMillis=200"        # 最大GC停顿时间目标
+  - "-XX:G1HeapRegionSize=16M"        # G1区域大小
+  - "-XX:InitiatingHeapOccupancyPercent=35"  # 堆占用触发GC的百分比
+  - "-XX:G1ReservePercent=15"         # 保留内存百分比
+  - "-XX:ParallelGCThreads=4"         # 并行GC线程数
+  - "-XX:ConcGCThreads=2"             # 并发GC线程数
+  
+  # JIT编译器优化
+  - "-XX:+UseStringDeduplication"     # 字符串去重
+  - "-XX:+UseCompressedOops"          # 压缩普通对象指针
+  - "-XX:+UseCompressedClassPointers" # 压缩类指针
+  - "-XX:+TieredCompilation"          # 分层编译
+  - "-XX:CICompilerCount=4"           # JIT编译器线程数
+  
+  # 性能监控和调试
+  - "-XX:+PrintGCDetails"             # 打印GC详细信息
+  - "-XX:+PrintGCDateStamps"          # 打印GC时间戳
+  - "-Xloggc:/var/log/thanos/gc.log"  # GC日志文件
+  - "-XX:+UseGCLogFileRotation"       # GC日志轮转
+  - "-XX:NumberOfGCLogFiles=5"        # 保留的GC日志文件数
+  - "-XX:GCLogFileSize=20M"           # 单个GC日志文件大小
+  
+  # 安全配置
+  - "-Djava.security.egd=file:/dev/./urandom"  # 随机数生成优化
+  - "-Dfile.encoding=UTF-8"           # 文件编码
+
+# Query组件专用优化
+query-jvm-options:
+  # 针对查询处理的优化
+  - "-Xmx8G"           # 更大的堆内存用于查询缓存
+  - "-Xms8G"           
+  - "-XX:MaxDirectMemorySize=4G"  # 更大的直接内存用于网络IO
+  
+  # 查询相关的GC优化
+  - "-XX:G1NewSizePercent=30"      # 年轻代初始大小百分比
+  - "-XX:G1MaxNewSizePercent=40"   # 年轻代最大大小百分比
+  - "-XX:G1HeapWastePercent=5"     # 堆浪费百分比
+  
+  # JIT优化
+  - "-XX:ReservedCodeCacheSize=512M"  # 代码缓存大小
+  - "-XX:InitialCodeCacheSize=64M"
+
+# Store组件专用优化
+store-jvm-options:
+  # 针对数据存储的优化
+  - "-Xmx12G"          # 更大的堆内存用于块缓存
+  - "-Xms12G"
+  - "-XX:MaxDirectMemorySize=8G"  # 更大的直接内存用于文件IO
+  
+  # 存储相关的GC优化
+  - "-XX:G1NewSizePercent=20"      # 较小的年轻代
+  - "-XX:G1MaxNewSizePercent=30"
+  - "-XX:G1MixedGCLiveThresholdPercent=85"  # 混合GC阈值
+  
+  # IO优化
+  - "-XX:MaxGCPauseMillis=500"     # 允许更长的GC停顿
+  - "-Dio.netty.leakDetectionLevel=disabled"  # 禁用Netty内存泄漏检测
+
+# Ruler组件专用优化
+ruler-jvm-options:
+  # 针对规则计算的优化
+  - "-Xmx2G"           # 适中的堆内存
+  - "-Xms2G"
+  - "-XX:MaxDirectMemorySize=1G"
+  
+  # 规则计算优化
+  - "-XX:MaxGCPauseMillis=100"     # 较短的GC停顿
+  - "-XX:G1NewSizePercent=40"      # 较大的年轻代
+  - "-XX:G1MaxNewSizePercent=50"
+
+# Compactor组件专用优化
+compactor-jvm-options:
+  # 针对数据压缩的优化
+  - "-Xmx6G"           # 较大的堆内存用于压缩操作
+  - "-Xms6G"
+  - "-XX:MaxDirectMemorySize=4G"
+  
+  # 压缩操作优化
+  - "-XX:MaxGCPauseMillis=1000"    # 允许较长的GC停顿
+  - "-XX:G1NewSizePercent=15"      # 较小的年轻代
+  - "-XX:G1MaxNewSizePercent=25"
+
+# 生产环境优化配置
+production-jvm-options:
+  # 生产环境专用优化
+  - "-XX:+UnlockExperimentalVMOptions"  # 解锁实验性选项
+  - "-XX:+UseContainerSupport"      # 容器支持
+  - "-XX:MaxRAMPercentage=75.0"     # 容器内存限制百分比
+  - "-XX:InitialRAMPercentage=50.0" # 初始内存百分比
+  
+  # 性能优化
+  - "-XX:+OptimizeStringConcat"     # 字符串连接优化
+  - "-XX:+DoEscapeAnalysis"         # 逃逸分析
+  - "-XX:+UseBiasedLocking"         # 偏向锁
+  - "-XX:+UseFastAccessorMethods"   # 快速访问方法
+  
+  # 安全优化
+  - "-Djava.awt.headless=true"      # 无头模式
+  - "-Duser.timezone=UTC"           # 时区设置
+
+# 开发/测试环境优化配置
+development-jvm-options:
+  # 开发环境专用优化
+  - "-Xmx2G"           # 较小的堆内存
+  - "-Xms1G"
+  - "-XX:MaxMetaspaceSize=256M"
+  
+  # 调试配置
+  - "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005"  # 远程调试
+  - "-XX:+HeapDumpOnOutOfMemoryError"  # 内存溢出时生成堆转储
+  - "-XX:HeapDumpPath=/tmp/thanos-heapdump.hprof"
+  
+  # 性能分析
+  - "-XX:+UnlockDiagnosticVMOptions"  # 诊断选项
+  - "-XX:+PrintCompilation"         # 打印编译信息
+
+# 监控和指标配置
+monitoring-jvm-options:
+  # JMX监控配置
+  - "-Dcom.sun.management.jmxremote"
+  - "-Dcom.sun.management.jmxremote.port=10903"
+  - "-Dcom.sun.management.jmxremote.authenticate=false"
+  - "-Dcom.sun.management.jmxremote.ssl=false"
+  - "-Dcom.sun.management.jmxremote.local.only=false"
+  
+  # 性能指标导出
+  - "-Dmicronaut.metrics.export.prometheus.enabled=true"
+  - "-Dmicronaut.metrics.export.prometheus.step=1m"
+
+# 操作系统优化配置
+os-optimization:
+  # 文件描述符限制
+  file-descriptors: 65536
+  
+  # 内存映射限制
+  vm.max_map_count: 262144
+  
+  # 网络优化
+  net.core.somaxconn: 1024
+  net.ipv4.tcp_max_syn_backlog: 1024
+  net.ipv4.tcp_tw_reuse: 1
+  
+  # 内存优化
+  vm.swappiness: 10
+  vm.dirty_ratio: 20
+  vm.dirty_background_ratio: 10
+
+# 容器环境优化
+container-optimization:
+  # 内存限制感知
+  - "-XX:+UseCGroupMemoryLimitForHeap"  # 使用cgroup内存限制
+  - "-XX:MaxRAMFraction=2"              # 堆内存占容器内存的比例
+  
+  # CPU限制感知
+  - "-XX:ParallelGCThreads=\${CPU_COUNT}"  # 根据CPU数量设置GC线程
+  - "-XX:CICompilerCount=\${CPU_COUNT}"    # 根据CPU数量设置JIT线程
+  
+  # 资源限制
+  resources:
+    requests:
+      memory: "4Gi"
+      cpu: "1"
+    limits:
+      memory: "8Gi"
+      cpu: "2"
+
+# 性能调优建议
+performance-tuning-recommendations:
+  # 内存调优
+  memory-tuning:
+    - "根据数据量调整堆内存大小"
+    - "监控GC日志，调整GC参数"
+    - "确保有足够的直接内存用于IO操作"
+    
+  # GC调优
+  gc-tuning:
+    - "根据应用特点选择合适的GC算法"
+    - "监控GC停顿时间，调整MaxGCPauseMillis"
+    - "调整年轻代和老年代的比例"
+    
+  # JIT调优
+  jit-tuning:
+    - "启用分层编译提高启动性能"
+    - "调整代码缓存大小避免JIT编译失败"
+    - "监控方法编译情况，优化热点代码"
+
+# 故障排除配置
+troubleshooting-options:
+  # 内存泄漏检测
+  - "-XX:+PrintClassHistogramBeforeFullGC"  # FullGC前打印类直方图
+  - "-XX:+PrintClassHistogramAfterFullGC"   # FullGC后打印类直方图
+  
+  # 线程分析
+  - "-XX:+PrintConcurrentLocks"             # 打印并发锁信息
+  - "-XX:+PrintSafepointStatistics"         # 打印安全点统计
+  - "-XX:PrintSafepointStatisticsCount=1"   # 安全点统计计数
+  
+  # 内存分析
+  - "-XX:+PrintTLAB"                        # 打印TLAB信息
+  - "-XX:+PrintTenuringDistribution"        # 打印年龄分布
+
+# 部署配置示例
+deployment-examples:
+  # Docker部署示例
+  docker:
+    command: |
+      thanos query \\
+        --http-address=0.0.0.0:10902 \\
+        --grpc-address=0.0.0.0:10901 \\
+        --query.timeout=2m \\
+        --query.max-concurrent=20 \\
+        -Xmx4G -Xms4G \\
+        -XX:+UseG1GC \\
+        -XX:MaxGCPauseMillis=200
+    
+  # Kubernetes部署示例
+  kubernetes:
+    args:
+      - "query"
+      - "--http-address=0.0.0.0:10902"
+      - "--grpc-address=0.0.0.0:10901"
+      - "--query.timeout=2m"
+      - "--query.max-concurrent=20"
+    env:
+      - name: "JAVA_OPTS"
+        value: "-Xmx4G -Xms4G -XX:+UseG1GC -XX:MaxGCPauseMillis=200"
+    resources:
+      requests:
+        memory: "6Gi"
+        cpu: "1"
+      limits:
+        memory: "8Gi"
+        cpu: "2"

@@ -1,0 +1,294 @@
+# Thanos Redis缓存配置示例
+# 用于配置Thanos Query和Store组件的Redis缓存
+
+# Redis集群配置
+redis:
+  # Redis集群地址
+  cluster:
+    enabled: true
+    addresses:
+      - redis-node-1:6379
+      - redis-node-2:6379
+      - redis-node-3:6379
+      - redis-node-4:6379
+      - redis-node-5:6379
+      - redis-node-6:6379
+  
+  # 连接池配置
+  pool:
+    size: 100
+    min-idle: 10
+    max-idle: 50
+    idle-timeout: 5m
+    max-active: 200
+    wait: true
+    
+  # 超时配置
+  timeout:
+    connect: 1s
+    read: 2s
+    write: 2s
+
+# Thanos Query响应缓存配置
+query:
+  response-cache-config: |
+    type: REDIS
+    config:
+      # Redis连接配置
+      addr: redis-cluster:6379
+      password: ""
+      db: 0
+      
+      # 缓存大小和有效期
+      max_size: 2GB
+      max_size_items: 0
+      validity: 1h
+      
+      # 连接池配置
+      pool_size: 100
+      min_idle_connections: 10
+      max_idle_connections: 50
+      idle_timeout: 240s
+      
+      # 超时配置
+      dial_timeout: 1s
+      read_timeout: 2s
+      write_timeout: 2s
+      
+      # 集群配置
+      max_redirects: 3
+      
+      # 压缩配置
+      compression: snappy
+      compression_level: 1
+
+# Thanos Store索引缓存配置
+store:
+  index-cache-config: |
+    type: REDIS
+    config:
+      # Redis连接配置
+      addr: redis-cluster:6379
+      password: ""
+      db: 1
+      
+      # 缓存配置
+      max_size: 4GB
+      max_item_size: 64MB
+      
+      # 连接池配置
+      pool_size: 50
+      min_idle_connections: 5
+      max_idle_connections: 25
+      idle_timeout: 300s
+      
+      # 超时配置
+      dial_timeout: 1s
+      read_timeout: 3s
+      write_timeout: 3s
+      
+      # 集群配置
+      max_redirects: 5
+      
+      # TTL配置
+      default_ttl: 24h
+      
+      # 批量操作配置
+      max_get_multi_concurrency: 20
+      max_get_multi_batch_size: 100
+
+# 缓存预热配置
+cache-warmup:
+  # 预热的查询列表
+  queries:
+    - "up"
+    - "rate(http_requests_total[5m])"
+    - "sum(up) by (job)"
+    - "node_memory_MemAvailable_bytes"
+    - "rate(node_cpu_seconds_total[5m])"
+    
+  # 预热时间范围
+  time-ranges:
+    - "5m"
+    - "1h"
+    - "6h"
+    
+  # 预热策略
+  strategy: "lazy"  # lazy | eager
+  concurrency: 5
+  
+  # 预热频率
+  interval: 30m
+  
+  # 错误处理
+  max-retries: 3
+  retry-delay: 10s
+
+# 监控和指标配置
+monitoring:
+  # Redis监控指标
+  redis-metrics:
+    - "used_memory"
+    - "used_memory_rss"
+    - "connected_clients"
+    - "blocked_clients"
+    - "keyspace_hits"
+    - "keyspace_misses"
+    - "evicted_keys"
+    - "expired_keys"
+    
+  # 缓存命中率监控
+  cache-metrics:
+    - "thanos_cache_hits_total"
+    - "thanos_cache_misses_total"
+    - "thanos_cache_items_total"
+    - "thanos_cache_max_items"
+    - "thanos_cache_requests_total"
+    
+  # 告警规则
+  alerts:
+    - name: "LowCacheHitRate"
+      expr: "thanos_cache_hits_total / (thanos_cache_hits_total + thanos_cache_misses_total) < 0.7"
+      duration: "5m"
+      severity: "warning"
+      
+    - name: "HighRedisMemoryUsage"
+      expr: "redis_memory_used_bytes / redis_memory_max_bytes > 0.8"
+      duration: "3m"
+      severity: "critical"
+
+# 性能优化配置
+performance:
+  # 序列化优化
+  serialization:
+    enabled: true
+    type: "protobuf"  # json | protobuf | msgpack
+    
+  # 压缩优化
+  compression:
+    enabled: true
+    algorithm: "snappy"  # gzip | lz4 | snappy
+    threshold: "1KB"
+    
+  # 批量操作优化
+  batch:
+    enabled: true
+    size: 100
+    timeout: "100ms"
+    
+  # 连接复用优化
+  connection-reuse:
+    enabled: true
+    max-idle: 300
+    idle-timeout: "5m"
+
+# 高可用配置
+high-availability:
+  # 故障转移配置
+  failover:
+    enabled: true
+    timeout: "30s"
+    max-retries: 3
+    
+  # 读写分离
+  read-write-splitting:
+    enabled: true
+    read-preference: "slave"  # master | slave | nearest
+    
+  # 数据持久化
+  persistence:
+    enabled: true
+    rdb-save-interval: "900s"
+    aof-enabled: true
+    
+  # 哨兵模式配置
+  sentinel:
+    enabled: false
+    master-name: "thanos-cache"
+    sentinel-addresses:
+      - "sentinel-1:26379"
+      - "sentinel-2:26379"
+      - "sentinel-3:26379"
+
+# 安全配置
+security:
+  # 认证配置
+  authentication:
+    enabled: false
+    password: ""
+    
+  # TLS配置
+  tls:
+    enabled: false
+    cert-file: ""
+    key-file: ""
+    ca-file: ""
+    
+  # 网络隔离
+  network:
+    bind: "127.0.0.1"
+    port: 6379
+    protected-mode: true
+
+# 运维配置
+operations:
+  # 备份配置
+  backup:
+    enabled: true
+    interval: "24h"
+    retention: "7d"
+    
+  # 监控配置
+  monitoring:
+    enabled: true
+    metrics-port: 9121
+    
+  # 日志配置
+  logging:
+    level: "info"
+    format: "json"
+    
+  # 性能调优
+  tuning:
+    maxmemory-policy: "allkeys-lru"
+    maxmemory-samples: 5
+    lazyfree-lazy-eviction: true
+    
+# 部署配置
+deployment:
+  # Kubernetes配置
+  kubernetes:
+    replicas: 3
+    resources:
+      requests:
+        memory: "2Gi"
+        cpu: "500m"
+      limits:
+        memory: "4Gi"
+        cpu: "2"
+    
+    # 持久化存储
+    persistence:
+      enabled: true
+      size: "100Gi"
+      storage-class: "fast-ssd"
+      
+    # 服务配置
+    service:
+      type: "ClusterIP"
+      port: 6379
+      
+  # Docker配置
+  docker:
+    image: "redis:7.0-alpine"
+    ports:
+      - "6379:6379"
+    volumes:
+      - "./data:/data"
+      - "./conf/redis.conf:/etc/redis/redis.conf"
+    
+    # 环境变量
+    environment:
+      - "REDIS_PASSWORD="
+      - "REDIS_PORT=6379"
+      - "REDIS_DATABASES=16"

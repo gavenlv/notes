@@ -1,0 +1,299 @@
+# 环境配置管理 - 第5章：数据源与连接配置
+# 多环境配置示例，支持开发、测试、生产环境
+
+# 开发环境配置
+development:
+  # 数据库连接配置
+  database: "dev_analytics_db"
+  schema: "dbt_dev"
+  warehouse: "dev_warehouse"
+  
+  # 数据源配置
+  sources:
+    raw_data:
+      database: "dev_raw_db"
+      schema: "raw"
+      
+    external_system:
+      database: "dev_external_db"
+      schema: "external"
+      
+    log_data:
+      database: "dev_logs_db"
+      schema: "logs"
+      
+    config_data:
+      database: "dev_config_db"
+      schema: "config"
+  
+  # 性能配置
+  performance:
+    query_timeout: 3600  # 1小时
+    max_concurrent_queries: 5
+    materialization_timeout: 7200  # 2小时
+    
+  # 数据保留策略
+  retention:
+    raw_data_days: 30
+    staging_data_days: 90
+    marts_data_days: 365
+    
+  # 调试配置
+  debug:
+    log_level: "debug"
+    show_full_sql: true
+    enable_profiling: true
+
+# 测试环境配置
+test:
+  # 数据库连接配置
+  database: "test_analytics_db"
+  schema: "dbt_test"
+  warehouse: "test_warehouse"
+  
+  # 数据源配置
+  sources:
+    raw_data:
+      database: "test_raw_db"
+      schema: "raw"
+      
+    external_system:
+      database: "test_external_db"
+      schema: "external"
+      
+    log_data:
+      database: "test_logs_db"
+      schema: "logs"
+      
+    config_data:
+      database: "test_config_db"
+      schema: "config"
+  
+  # 性能配置
+  performance:
+    query_timeout: 1800  # 30分钟
+    max_concurrent_queries: 3
+    materialization_timeout: 3600  # 1小时
+    
+  # 数据保留策略
+  retention:
+    raw_data_days: 7
+    staging_data_days: 30
+    marts_data_days: 90
+    
+  # 调试配置
+  debug:
+    log_level: "info"
+    show_full_sql: false
+    enable_profiling: false
+
+# 生产环境配置
+production:
+  # 数据库连接配置
+  database: "prod_analytics_db"
+  schema: "dbt_prod"
+  warehouse: "prod_warehouse"
+  
+  # 数据源配置
+  sources:
+    raw_data:
+      database: "prod_raw_db"
+      schema: "raw"
+      
+    external_system:
+      database: "prod_external_db"
+      schema: "external"
+      
+    log_data:
+      database: "prod_logs_db"
+      schema: "logs"
+      
+    config_data:
+      database: "prod_config_db"
+      schema: "config"
+  
+  # 性能配置
+  performance:
+    query_timeout: 7200  # 2小时
+    max_concurrent_queries: 10
+    materialization_timeout: 14400  # 4小时
+    
+  # 数据保留策略
+  retention:
+    raw_data_days: 365
+    staging_data_days: 730
+    marts_data_days: 1095  # 3年
+    
+  # 调试配置
+  debug:
+    log_level: "warn"
+    show_full_sql: false
+    enable_profiling: false
+
+# 只读副本环境配置（用于BI查询）
+read_replica:
+  # 数据库连接配置
+  database: "readonly_analytics_db"
+  schema: "dbt_readonly"
+  warehouse: "readonly_warehouse"
+  
+  # 数据源配置
+  sources:
+    raw_data:
+      database: "readonly_raw_db"
+      schema: "raw"
+      
+    external_system:
+      database: "readonly_external_db"
+      schema: "external"
+      
+    log_data:
+      database: "readonly_logs_db"
+      schema: "logs"
+      
+    config_data:
+      database: "readonly_config_db"
+      schema: "config"
+  
+  # 性能配置
+  performance:
+    query_timeout: 1800  # 30分钟
+    max_concurrent_queries: 20
+    materialization_timeout: 3600  # 1小时
+    
+  # 只读模式配置
+  readonly: true
+  
+  # 调试配置
+  debug:
+    log_level: "info"
+    show_full_sql: false
+    enable_profiling: false
+
+# 环境变量映射配置
+env_vars:
+  # 数据库连接变量
+  database_host: "DB_HOST"
+  database_port: "DB_PORT"
+  database_user: "DB_USER"
+  database_password: "DB_PASSWORD"
+  database_name: "DB_NAME"
+  
+  # 数据仓库变量
+  warehouse_name: "WAREHOUSE_NAME"
+  warehouse_size: "WAREHOUSE_SIZE"
+  
+  # 环境特定变量
+  environment: "ENVIRONMENT"
+  debug_mode: "DEBUG_MODE"
+  
+  # 安全变量
+  encryption_key: "ENCRYPTION_KEY"
+  ssl_mode: "SSL_MODE"
+
+# 环境切换配置
+environment_switching:
+  # 默认环境
+  default: "development"
+  
+  # 环境切换命令
+  commands:
+    development: "dbt run --target dev"
+    test: "dbt run --target test"
+    production: "dbt run --target prod"
+    read_replica: "dbt run --target read_replica"
+  
+  # 环境验证规则
+  validation:
+    # 开发环境允许所有操作
+    development:
+      allow_drop_tables: true
+      allow_truncate: true
+      allow_full_refresh: true
+      
+    # 测试环境限制操作
+    test:
+      allow_drop_tables: false
+      allow_truncate: true
+      allow_full_refresh: true
+      
+    # 生产环境严格限制
+    production:
+      allow_drop_tables: false
+      allow_truncate: false
+      allow_full_refresh: false
+      
+    # 只读副本环境只读
+    read_replica:
+      allow_drop_tables: false
+      allow_truncate: false
+      allow_full_refresh: false
+      allow_write: false
+
+# 环境特定宏配置
+macros:
+  # 开发环境宏
+  development:
+    enable_debug_macros: true
+    enable_test_data: true
+    enable_mock_data: true
+    
+  # 测试环境宏
+  test:
+    enable_debug_macros: false
+    enable_test_data: true
+    enable_mock_data: false
+    
+  # 生产环境宏
+  production:
+    enable_debug_macros: false
+    enable_test_data: false
+    enable_mock_data: false
+    
+  # 只读副本宏
+  read_replica:
+    enable_debug_macros: false
+    enable_test_data: false
+    enable_mock_data: false
+
+# 环境监控配置
+monitoring:
+  # 开发环境监控
+  development:
+    enable_query_logging: true
+    enable_performance_monitoring: true
+    enable_error_tracking: true
+    
+  # 测试环境监控
+  test:
+    enable_query_logging: true
+    enable_performance_monitoring: true
+    enable_error_tracking: true
+    
+  # 生产环境监控
+  production:
+    enable_query_logging: true
+    enable_performance_monitoring: true
+    enable_error_tracking: true
+    alert_threshold: 0.95  # 95%成功率阈值
+    
+  # 只读副本监控
+  read_replica:
+    enable_query_logging: true
+    enable_performance_monitoring: true
+    enable_error_tracking: false
+
+# 配置使用说明
+# 1. 环境切换：使用 --target 参数指定环境
+#    dbt run --target development
+#    dbt run --target production
+# 
+# 2. 环境变量设置：在系统环境变量中设置对应值
+#    export DB_HOST=localhost
+#    export DB_USER=myuser
+# 
+# 3. 配置验证：使用 dbt debug 验证连接配置
+#    dbt debug --target development
+# 
+# 4. 环境特定运行：使用环境变量控制行为
+#    ENVIRONMENT=production dbt run

@@ -1,0 +1,13 @@
+apiVersion: 1
+
+alerting:
+  - name: Alertmanager
+    type: alertmanager
+    orgId: 1
+    uid: alertmanager
+    access: proxy
+    url: http://alertmanager:9093
+    basicAuth: false
+    jsonData:
+      implementation: prometheus
+      handleGrafanaManagedAlerts: true

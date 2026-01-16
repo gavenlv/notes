@@ -1,0 +1,288 @@
+# 第7章：包管理与依赖配置
+# 演示dbt包管理的最佳实践和高级用法
+
+# 官方包依赖
+packages:
+  # 1. dbt核心工具包
+  - package: dbt-labs/dbt_utils
+    version: 1.1.1
+    
+  # 2. 审计和监控包
+  - package: dbt-labs/audit_helper
+    version: 0.9.0
+    
+  # 3. 代码质量包
+  - package: dbt-labs/codegen
+    version: 0.11.0
+    
+  # 4. 测试增强包
+  - package: dbt-labs/dbt_expectations
+    version: 0.10.0
+    
+  # 5. 数据质量包
+  - package: calogica/dbt_date
+    version: 0.9.0
+    
+  # 6. 日期处理包
+  - package: dbt-labs/dbt_date
+    version: 0.8.0
+    
+  # 7. 地理空间包
+  - package: dbt-labs/geo
+    version: 1.0.0
+    
+  # 8. 机器学习包
+  - package: dbt-labs/ml
+    version: 0.5.0
+
+# 自定义包依赖（内部开发）
+custom_packages:
+  # 1. 业务逻辑包
+  - package: internal/business_logic
+    version: 1.2.0
+    git: "git@github.com:company/business_logic.git"
+    
+  # 2. 数据治理包
+  - package: internal/data_governance
+    version: 0.8.0
+    git: "git@github.com:company/data_governance.git"
+    
+  # 3. 性能优化包
+  - package: internal/performance_tools
+    version: 1.0.0
+    git: "git@github.com:company/performance_tools.git"
+    
+  # 4. 安全包
+  - package: internal/security_framework
+    version: 0.7.0
+    git: "git@github.com:company/security_framework.git"
+
+# 环境特定包配置
+environment_specific:
+  # 开发环境
+  dev:
+    packages:
+      - package: dbt-labs/debug_tools
+        version: 0.6.0
+      - package: internal/dev_utilities
+        version: 1.0.0
+        
+  # 测试环境
+  test:
+    packages:
+      - package: dbt-labs/testing_framework
+        version: 0.8.0
+      - package: internal/test_helpers
+        version: 1.1.0
+        
+  # 生产环境
+  prod:
+    packages:
+      - package: dbt-labs/production_tools
+        version: 1.0.0
+      - package: internal/prod_monitoring
+        version: 1.2.0
+
+# 包配置选项
+package_config:
+  # 安装选项
+  install_options:
+    # 安装策略
+    strategy: sequential  # sequential/parallel
+    
+    # 重试配置
+    retry_count: 3
+    retry_delay: 10
+    
+    # 超时配置
+    timeout: 300
+    
+    # 缓存配置
+    cache_enabled: true
+    cache_ttl: 3600
+    
+  # 依赖解析
+  dependency_resolution:
+    # 版本冲突处理
+    conflict_resolution: highest  # highest/lowest/fail
+    
+    # 依赖图优化
+    optimize_dependencies: true
+    
+    # 循环依赖检测
+    detect_cycles: true
+    
+  # 安全配置
+  security:
+    # 包签名验证
+    verify_signatures: true
+    
+    # 来源验证
+    verify_sources: true
+    
+    # 漏洞扫描
+    vulnerability_scanning: true
+
+# 包使用配置
+package_usage:
+  # 宏使用配置
+  macros:
+    # dbt_utils宏配置
+    dbt_utils:
+      enabled: true
+      include: ["surrogate_key", "date_spine", "pivot"]
+      exclude: ["deprecated"]
+      
+    # audit_helper宏配置
+    audit_helper:
+      enabled: true
+      include: ["compare_relations", "compare_queries"]
+      
+  # 测试使用配置
+  tests:
+    dbt_expectations:
+      enabled: true
+      severity: error
+      
+  # 物料化使用配置
+  materializations:
+    custom:
+      enabled: true
+      include: ["incremental", "snapshot"]
+
+# 包版本管理策略
+version_management:
+  # 版本锁定策略
+  locking:
+    enabled: true
+    strategy: strict  # strict/loose/none
+    
+  # 自动更新配置
+  auto_update:
+    enabled: false
+    schedule: weekly
+    strategy: minor  # major/minor/patch
+    
+  # 版本兼容性检查
+  compatibility_check:
+    enabled: true
+    dbt_version: ">=1.0.0 <2.0.0"
+    
+  # 弃用警告处理
+  deprecation_handling:
+    enabled: true
+    action: warn  # warn/fail/ignore
+
+# 包性能优化
+performance_optimization:
+  # 并行安装
+  parallel_installation:
+    enabled: true
+    max_parallel: 4
+    
+  # 缓存优化
+  cache_optimization:
+    enabled: true
+    compression: true
+    
+  # 网络优化
+  network_optimization:
+    enabled: true
+    proxy: auto
+    timeout: 60
+
+# 包监控和审计
+monitoring_and_audit:
+  # 使用统计
+  usage_statistics:
+    enabled: true
+    track_macros: true
+    track_tests: true
+    track_materializations: true
+    
+  # 性能监控
+  performance_monitoring:
+    enabled: true
+    track_installation_time: true
+    track_load_time: true
+    
+  # 安全审计
+  security_audit:
+    enabled: true
+    track_dependencies: true
+    track_vulnerabilities: true
+
+# 包部署配置
+deployment_config:
+  # 部署策略
+  strategy:
+    type: blue_green  # blue_green/canary/rolling
+    validation: true
+    rollback: true
+    
+  # 环境配置
+  environments:
+    dev:
+      packages: all
+      validation: relaxed
+      
+    test:
+      packages: all
+      validation: strict
+      
+    prod:
+      packages: curated
+      validation: strict
+
+# 包文档和元数据
+documentation_and_metadata:
+  # 包文档
+  package_docs:
+    enabled: true
+    generate: true
+    publish: true
+    
+  # 元数据管理
+  metadata_management:
+    enabled: true
+    track_versions: true
+    track_dependencies: true
+
+# 包故障排除和调试
+troubleshooting_and_debugging:
+  # 调试工具
+  debugging_tools:
+    enabled: true
+    verbose_logging: true
+    dependency_graph: true
+    
+  # 故障排除指南
+  troubleshooting_guides:
+    enabled: true
+    common_issues: true
+    solutions: true
+
+# 配置说明文档
+_comment: |
+  此配置文件演示dbt包管理的高级特性和最佳实践。
+  
+  关键特性：
+  1. 多层包依赖管理（官方包、自定义包、环境特定包）
+  2. 高级包配置选项（安装策略、安全配置、性能优化）
+  3. 版本管理和兼容性检查
+  4. 包使用配置和监控
+  5. 部署和故障排除支持
+  
+  使用建议：
+  1. 根据项目需求选择合适的包组合
+  2. 实施严格的版本管理和安全控制
+  3. 监控包使用情况和性能影响
+  4. 定期更新和维护包依赖
+  5. 文档化包配置和使用规范
+  
+  最佳实践：
+  - 保持包依赖的最小化和可控性
+  - 实施版本锁定和兼容性检查
+  - 监控包的安全漏洞和更新
+  - 文档化包的使用场景和配置
+  - 定期审查和优化包配置

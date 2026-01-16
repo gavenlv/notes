@@ -1,0 +1,113 @@
+version: '3.8'
+
+services:
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana-chapter5
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin123
+      - GF_INSTALL_PLUGINS=grafana-clock-panel
+      - GF_SMTP_ENABLED=true
+      - GF_SMTP_HOST=smtp.gmail.com:587
+      - GF_SMTP_USER=your-email@gmail.com
+      - GF_SMTP_PASSWORD=your-app-password
+      - GF_SMTP_FROM_ADDRESS=your-email@gmail.com
+      - GF_SMTP_FROM_NAME=Grafana Alerts
+    volumes:
+      - ./provisioning/:/etc/grafana/provisioning/
+      - ./alert-rules/:/etc/grafana/alert-rules/
+      - grafana_data:/var/lib/grafana
+    depends_on:
+      - prometheus
+      - alertmanager
+    networks:
+      - alerting-net
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus-chapter5
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus/:/etc/prometheus/
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--storage.tsdb.retention.time=200h'
+      - '--web.enable-lifecycle'
+      - '--web.external-url=http://localhost:9090'
+    networks:
+      - alerting-net
+
+  alertmanager:
+    image: prom/alertmanager:latest
+    container_name: alertmanager-chapter5
+    ports:
+      - "9093:9093"
+    volumes:
+      - ./alertmanager/:/etc/alertmanager/
+      - alertmanager_data:/alertmanager
+    command:
+      - '--config.file=/etc/alertmanager/alertmanager.yml'
+      - '--storage.path=/alertmanager'
+      - '--web.external-url=http://localhost:9093'
+    networks:
+      - alerting-net
+
+  node-exporter:
+    image: prom/node-exporter:latest
+    container_name: node-exporter-chapter5
+    ports:
+      - "9100:9100"
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.rootfs=/rootfs'
+      - '--path.sysfs=/host/sys'
+      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
+    networks:
+      - alerting-net
+
+  # 模拟Webhook接收器，用于测试告警通知
+  webhook-receiver:
+    image: python:3.9
+    container_name: webhook-receiver-chapter5
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./webhook-receiver/:/app/
+    working_dir: /app
+    command: python webhook_server.py
+    networks:
+      - alerting-net
+
+  # Slack模拟器（用于测试Slack通知）
+  slack-simulator:
+    image: python:3.9
+    container_name: slack-simulator-chapter5
+    ports:
+      - "5001:5000"
+    volumes:
+      - ./slack-simulator/:/app/
+    working_dir: /app
+    command: python slack_simulator.py
+    networks:
+      - alerting-net
+
+volumes:
+  grafana_data:
+    driver: local
+  prometheus_data:
+    driver: local
+  alertmanager_data:
+    driver: local
+
+networks:
+  alerting-net:
+    driver: bridge

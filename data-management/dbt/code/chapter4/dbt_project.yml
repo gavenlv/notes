@@ -1,0 +1,90 @@
+# dbt_project.yml - 第4章：宏与Jinja模板
+name: 'dbt_macros_example'
+version: '1.0.0'
+config-version: 2
+
+profile: 'dbt_macros_example'
+
+model-paths: ["models"]
+macro-paths: ["macros"]
+analysis-paths: ["analyses"]
+test-paths: ["tests"]
+seed-paths: ["data"]
+analysis-paths: ["analyses"]
+snapshot-paths: ["snapshots"]
+
+target-path: "target"  # directory which will store compiled SQL files
+clean-targets:         # directories to be removed by `dbt clean`
+  - "target"
+  - "dbt_packages"
+
+# 模型配置
+models:
+  dbt_macros_example:
+    # 分层配置
+    staging:
+      +materialized: view
+      +tags: ["staging", "chapter4"]
+      +schema: staging
+      
+    intermediate:
+      +materialized: table
+      +tags: ["intermediate", "chapter4"]
+      +schema: intermediate
+      
+    marts:
+      +materialized: table
+      +tags: ["marts", "chapter4"]
+      +schema: marts
+      
+    # 宏相关配置
+    +post-hook:
+      - "{{ log('模型 ' ~ this.name ~ ' 执行完成', info=true) }}"
+
+# 宏配置
+macros:
+  dbt_macros_example:
+    +enabled: true
+    +tags: ["macros", "chapter4"]
+
+# 测试配置
+tests:
+  dbt_macros_example:
+    +severity: warn
+    +store_failures: false
+
+# 种子数据配置
+seeds:
+  dbt_macros_example:
+    +enabled: true
+    +quote_columns: false
+    +tags: ["seeds", "chapter4"]
+
+# 快照配置
+snapshots:
+  dbt_macros_example:
+    +enabled: true
+    +target_schema: snapshots
+    +tags: ["snapshots", "chapter4"]
+
+# 变量定义
+vars:
+  # 日期格式配置
+  date_format: 'YYYY-MM-DD'
+  timestamp_format: 'YYYY-MM-DD HH24:MI:SS'
+  
+  # 货币配置
+  default_currency: 'USD'
+  supported_currencies: ['USD', 'EUR', 'GBP', 'CNY']
+  
+  # 业务配置
+  min_order_amount: 10.0
+  max_order_amount: 10000.0
+  
+  # 宏配置
+  enable_debug_logging: false
+  
+# 查询标签
+query-comment:
+  comment: 'Chapter 4: Macros and Jinja Templates'
+  append: false

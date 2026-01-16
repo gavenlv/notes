@@ -1,0 +1,259 @@
+version: 2
+
+# 第6章：dbt最佳实践与项目结构
+# 项目文档配置 - 演示文档化最佳实践
+
+# 项目级文档
+project:
+  name: "电商数据平台 - 最佳实践示例"
+  description: |
+    这是一个演示dbt最佳实践和标准化项目结构的示例项目。
+    项目展示了如何构建可维护、可扩展的数据转换管道。
+  
+  # 项目元数据
+  metadata:
+    version: "1.0.0"
+    environment: "development"
+    owner: "数据平台团队"
+    contact: "data-platform@company.com"
+    repository: "https://github.com/company/dbt-best-practices"
+    
+  # 业务领域定义
+  business_domains:
+    - name: "客户管理"
+      description: "客户数据整合、分析和分群"
+      owner: "客户成功团队"
+      
+    - name: "订单管理"  
+      description: "订单数据处理、分析和报告"
+      owner: "运营团队"
+      
+    - name: "产品管理"
+      description: "产品目录和库存管理"
+      owner: "产品团队"
+
+# 数据源文档
+sources:
+  - name: raw_data
+    description: "原始业务数据源"
+    meta:
+      type: "operational"
+      freshness: "daily"
+      owner: "业务系统团队"
+    
+    tables:
+      - name: customers
+        description: "客户基础信息表"
+        columns:
+          - name: customer_id
+            description: "客户唯一标识符"
+          - name: email
+            description: "客户邮箱地址"
+          - name: status
+            description: "客户状态（active/inactive/suspended/deleted）"
+          - name: created_at
+            description: "客户创建时间"
+            
+      - name: orders
+        description: "订单信息表"
+        columns:
+          - name: order_id
+            description: "订单唯一标识符"
+          - name: customer_id
+            description: "客户标识符"
+          - name: total_amount
+            description: "订单总金额"
+          - name: status
+            description: "订单状态（completed/cancelled/pending）"
+
+# 模型文档
+models:
+  # staging层模型文档
+  - name: stg_customers
+    description: "客户数据清洗和标准化模型"
+    meta:
+      layer: "staging"
+      business_domain: "客户管理"
+      freshness: "daily"
+      sla: "2小时"
+    
+    columns:
+      - name: customer_id
+        description: "客户唯一标识符（清洗后）"
+      - name: full_name
+        description: "客户全名（标准化格式）"
+      - name: email
+        description: "客户邮箱地址（格式验证）"
+      - name: data_quality_score
+        description: "数据质量评分（0-100）"
+      - name: final_validation_status
+        description: "最终验证状态（passed/failed/warning）"
+    
+    tests:
+      - description: "客户ID唯一性验证"
+      - description: "邮箱格式验证"
+      - description: "数据质量评分范围验证"
+
+  # intermediate层模型文档
+  - name: int_customer_metrics
+    description: "客户指标计算和业务逻辑实现"
+    meta:
+      layer: "intermediate"
+      business_domain: "客户管理"
+      freshness: "daily"
+      sla: "4小时"
+      
+    columns:
+      - name: customer_id
+        description: "客户唯一标识符"
+      - name: total_orders
+        description: "总订单数量"
+      - name: total_spent
+        description: "总消费金额"
+      - name: customer_value_score
+        description: "客户价值评分（0-100）"
+      - name: customer_health_score
+        description: "客户健康度评分（0-100）"
+      - name: customer_segment
+        description: "客户分群（基于RFM分析）"
+      - name: days_since_last_order
+        description: "距离上次购买天数"
+      
+    tests:
+      - description: "客户指标计算逻辑验证"
+      - description: "评分范围验证"
+      - description: "业务规则一致性验证"
+
+  # marts层模型文档
+  - name: dim_customers
+    description: "客户维度表，支持业务分析和报告"
+    meta:
+      layer: "marts"
+      business_domain: "客户管理"
+      freshness: "daily"
+      sla: "6小时"
+      consumer: "业务分析师、数据科学家、营销团队"
+      
+    columns:
+      - name: customer_dim_key
+        description: "客户维度键（代理键）"
+      - name: customer_id
+        description: "客户业务键"
+      - name: lifecycle_stage
+        description: "客户生命周期阶段"
+      - name: customer_value_tier
+        description: "客户价值层级"
+      - name: marketing_campaign_target
+        description: "营销活动目标标签"
+      - name: predicted_lifetime_value
+        description: "预测生命周期价值"
+      - name: is_active_record
+        description: "是否有效记录标识"
+      
+    tests:
+      - description: "维度键唯一性验证"
+      - description: "业务逻辑一致性验证"
+      - description: "数据完整性验证"
+
+  # 种子数据模型文档
+  - name: seed_customer_segments
+    description: "客户分群配置参考数据"
+    meta:
+      layer: "seeds"
+      business_domain: "客户管理"
+      freshness: "手动更新"
+      owner: "业务策略团队"
+      
+    columns:
+      - name: segment_id
+        description: "分群唯一标识"
+      - name: segment_name
+        description: "分群名称"
+      - name: priority_level
+        description: "优先级等级（1-5）"
+      - name: marketing_budget
+        description: "营销预算分配"
+      - name: retention_strategy
+        description: "客户保留策略"
+
+# 宏文档
+macros:
+  - name: date_diff
+    description: "计算两个日期之间的差值"
+    arguments:
+      - name: date_part
+        description: "时间单位（year/month/day等）"
+      - name: start_date
+        description: "开始日期"
+      - name: end_date
+        description: "结束日期"
+    
+  - name: date_trunc
+    description: "日期截断函数"
+    arguments:
+      - name: date_part
+        description: "时间单位"
+      - name: date_column
+        description: "日期字段"
+
+# 测试文档
+tests:
+  - name: email_format_validation
+    description: "邮箱格式验证测试"
+    arguments:
+      - name: column_name
+        description: "需要验证的邮箱字段名"
+    
+  - name: data_quality_range
+    description: "数据质量评分范围验证测试"
+    arguments:
+      - name: column_name
+        description: "需要验证的评分字段名"
+      - name: min_value
+        description: "最小值（默认0）"
+      - name: max_value
+        description: "最大值（默认100）"
+
+# 数据血缘关系说明
+lineage:
+  - from: "raw_data.customers"
+    to: "stg_customers"
+    transformation: "数据清洗和标准化"
+    
+  - from: "stg_customers"
+    to: "int_customer_metrics"
+    transformation: "指标计算和业务逻辑"
+    
+  - from: "int_customer_metrics"
+    to: "dim_customers"
+    transformation: "维度建模和业务分群"
+
+# 业务术语表
+glossary:
+  - term: "客户价值评分"
+    definition: "基于客户消费行为计算的综合评分，反映客户对业务的贡献价值"
+    
+  - term: "客户健康度评分"
+    definition: "评估客户活跃度和数据质量的综合评分，用于客户状态监控"
+    
+  - term: "RFM分析"
+    definition: "基于最近购买时间（Recency）、购买频率（Frequency）、购买金额（Monetary）的客户分群方法"
+    
+  - term: "客户生命周期"
+    definition: "客户从首次接触到最后流失的完整过程，包括不同阶段的特征和行为"
+
+# 变更日志
+changelog:
+  - version: "1.0.0"
+    date: "2024-01-15"
+    changes:
+      - "初始版本发布"
+      - "包含完整的客户数据管道"
+      - "实现标准化项目结构"
+      
+  - version: "1.1.0"
+    date: "2024-02-01"
+    changes:
+      - "新增客户分群配置"
+      - "优化性能配置"
+      - "完善文档和测试覆盖"

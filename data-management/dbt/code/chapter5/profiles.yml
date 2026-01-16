@@ -1,0 +1,213 @@
+# dbt数据库连接配置示例 - 第5章：数据源与连接配置
+# 注意：此文件包含敏感信息，请勿提交到版本控制系统
+# 建议使用环境变量管理密码和敏感配置
+
+# 项目配置
+dbt_sources_example:
+  # 默认目标环境
+  target: dev
+  
+  # 输出配置（不同环境的连接信息）
+  outputs:
+    
+    # 开发环境配置
+    dev:
+      type: postgres
+      host: "{{ env_var('DB_HOST', 'localhost') }}"
+      port: "{{ env_var('DB_PORT', '5432') }}"
+      user: "{{ env_var('DB_USER', 'dbt_user') }}"
+      pass: "{{ env_var('DB_PASSWORD', '') }}"
+      dbname: "{{ env_var('DB_NAME', 'dbt_dev') }}"
+      schema: "{{ env_var('DB_SCHEMA', 'dbt_dev') }}"
+      
+      # 连接池配置
+      threads: 4
+      keepalives_idle: 0
+      
+      # SSL配置（开发环境通常禁用）
+      sslmode: prefer
+      
+      # 超时配置
+      connect_timeout: 10
+      retries: 1
+      
+      # 日志配置
+      log_level: info
+      log_connections: false
+      log_disconnections: false
+    
+    # 测试环境配置
+    test:
+      type: postgres
+      host: "{{ env_var('TEST_DB_HOST', 'test-db.company.com') }}"
+      port: "{{ env_var('TEST_DB_PORT', '5432') }}"
+      user: "{{ env_var('TEST_DB_USER', 'dbt_test') }}"
+      pass: "{{ env_var('TEST_DB_PASSWORD', '') }}"
+      dbname: "{{ env_var('TEST_DB_NAME', 'dbt_test') }}"
+      schema: "{{ env_var('TEST_DB_SCHEMA', 'dbt_test') }}"
+      
+      # 连接池配置
+      threads: 2
+      keepalives_idle: 0
+      
+      # SSL配置
+      sslmode: require
+      
+      # 超时配置
+      connect_timeout: 15
+      retries: 2
+    
+    # 生产环境配置
+    prod:
+      type: postgres
+      host: "{{ env_var('PROD_DB_HOST', 'prod-db.company.com') }}"
+      port: "{{ env_var('PROD_DB_PORT', '5432') }}"
+      user: "{{ env_var('PROD_DB_USER', 'dbt_prod') }}"
+      pass: "{{ env_var('PROD_DB_PASSWORD', '') }}"
+      dbname: "{{ env_var('PROD_DB_NAME', 'dbt_prod') }}"
+      schema: "{{ env_var('PROD_DB_SCHEMA', 'analytics') }}"
+      
+      # 连接池配置
+      threads: 8
+      keepalives_idle: 30
+      
+      # SSL配置（生产环境强制SSL）
+      sslmode: verify-full
+      sslrootcert: "{{ env_var('SSL_ROOT_CERT', '/etc/ssl/certs/ca-certificates.crt') }}"
+      
+      # 超时配置
+      connect_timeout: 30
+      retries: 3
+      
+      # 生产环境日志配置
+      log_level: warning
+      log_connections: true
+      log_disconnections: true
+    
+    # 只读副本配置（用于查询）
+    read_replica:
+      type: postgres
+      host: "{{ env_var('READ_REPLICA_HOST', 'read-replica.company.com') }}"
+      port: "{{ env_var('READ_REPLICA_PORT', '5432') }}"
+      user: "{{ env_var('READ_REPLICA_USER', 'dbt_readonly') }}"
+      pass: "{{ env_var('READ_REPLICA_PASSWORD', '') }}"
+      dbname: "{{ env_var('READ_REPLICA_DB_NAME', 'dbt_prod') }}"
+      schema: "{{ env_var('READ_REPLICA_SCHEMA', 'analytics') }}"
+      
+      # 只读连接配置
+      threads: 4
+      sslmode: verify-full
+      
+      # 查询超时配置
+      statement_timeout: 300000  # 5分钟
+      
+      # 只读模式
+      options: "-c default_transaction_read_only=on"
+
+# Snowflake数据库配置示例
+snowflake_example:
+  target: dev
+  outputs:
+    dev:
+      type: snowflake
+      account: "{{ env_var('SNOWFLAKE_ACCOUNT', 'myaccount') }}"
+      user: "{{ env_var('SNOWFLAKE_USER', 'dbt_user') }}"
+      password: "{{ env_var('SNOWFLAKE_PASSWORD', '') }}"
+      role: "{{ env_var('SNOWFLAKE_ROLE', 'transform') }}"
+      database: "{{ env_var('SNOWFLAKE_DATABASE', 'analytics') }}"
+      warehouse: "{{ env_var('SNOWFLAKE_WAREHOUSE', 'transform_wh') }}"
+      schema: "{{ env_var('SNOWFLAKE_SCHEMA', 'dev') }}"
+      threads: 4
+      client_session_keep_alive: false
+
+# BigQuery数据库配置示例
+bigquery_example:
+  target: dev
+  outputs:
+    dev:
+      type: bigquery
+      method: service-account
+      project: "{{ env_var('BIGQUERY_PROJECT', 'my-project') }}"
+      dataset: "{{ env_var('BIGQUERY_DATASET', 'analytics') }}"
+      keyfile: "{{ env_var('BIGQUERY_KEYFILE', '/path/to/service-account-key.json') }}"
+      threads: 4
+      timeout_seconds: 300
+      retries: 1
+
+# Redshift数据库配置示例
+redshift_example:
+  target: dev
+  outputs:
+    dev:
+      type: redshift
+      host: "{{ env_var('REDSHIFT_HOST', 'my-cluster.region.redshift.amazonaws.com') }}"
+      port: 5439
+      user: "{{ env_var('REDSHIFT_USER', 'dbt_user') }}"
+      pass: "{{ env_var('REDSHIFT_PASSWORD', '') }}"
+      dbname: "{{ env_var('REDSHIFT_DBNAME', 'analytics') }}"
+      schema: "{{ env_var('REDSHIFT_SCHEMA', 'dev') }}"
+      threads: 4
+      keepalives_idle: 0
+      sslmode: require
+
+# Databricks配置示例
+databricks_example:
+  target: dev
+  outputs:
+    dev:
+      type: databricks
+      catalog: "{{ env_var('DATABRICKS_CATALOG', 'main') }}"
+      schema: "{{ env_var('DATABRICKS_SCHEMA', 'dev') }}"
+      host: "{{ env_var('DATABRICKS_HOST', 'your-workspace.cloud.databricks.com') }}"
+      http_path: "{{ env_var('DATABRICKS_HTTP_PATH', '/sql/1.0/warehouses/your-warehouse-id') }}"
+      token: "{{ env_var('DATABRICKS_TOKEN', '') }}"
+      threads: 4
+
+# 多数据库配置示例（跨数据库查询）
+multi_database_example:
+  target: dev
+  outputs:
+    # 数据仓库连接
+    dw:
+      type: snowflake
+      account: "{{ env_var('DW_ACCOUNT', 'dw-account') }}"
+      user: "{{ env_var('DW_USER', 'dbt_user') }}"
+      password: "{{ env_var('DW_PASSWORD', '') }}"
+      database: "{{ env_var('DW_DATABASE', 'data_warehouse') }}"
+      warehouse: "{{ env_var('DW_WAREHOUSE', 'transform_wh') }}"
+      schema: "{{ env_var('DW_SCHEMA', 'analytics') }}"
+    
+    # 运营数据库连接
+    operational:
+      type: postgres
+      host: "{{ env_var('OPS_DB_HOST', 'ops-db.company.com') }}"
+      port: "{{ env_var('OPS_DB_PORT', '5432') }}"
+      user: "{{ env_var('OPS_DB_USER', 'dbt_user') }}"
+      pass: "{{ env_var('OPS_DB_PASSWORD', '') }}"
+      dbname: "{{ env_var('OPS_DB_NAME', 'operational') }}"
+      schema: "{{ env_var('OPS_DB_SCHEMA', 'public') }}"
+
+# 环境变量使用说明
+# 建议设置以下环境变量：
+# export DB_HOST=localhost
+# export DB_PORT=5432
+# export DB_USER=dbt_user
+# export DB_PASSWORD=your_password
+# export DB_NAME=dbt_dev
+# export DB_SCHEMA=dbt_dev
+
+# 或者使用.env文件（需要安装python-dotenv）
+# 在项目根目录创建.env文件：
+# DB_HOST=localhost
+# DB_PORT=5432
+# DB_USER=dbt_user
+# DB_PASSWORD=your_password
+# DB_NAME=dbt_dev
+# DB_SCHEMA=dbt_dev
+
+# 安全最佳实践：
+# 1. 使用环境变量管理敏感信息
+# 2. 不要将密码硬编码在配置文件中
+# 3. 使用密钥管理服务（如AWS Secrets Manager）
+# 4. 为不同环境使用不同的凭据
+# 5. 定期轮换密码和访问密钥

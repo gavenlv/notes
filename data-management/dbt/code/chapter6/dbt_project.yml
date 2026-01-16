@@ -1,0 +1,290 @@
+# 第6章：dbt最佳实践与项目结构 - 项目配置文件
+# 演示标准化的dbt项目配置和最佳实践
+
+name: 'dbt_chapter6'
+version: '1.0.0'
+profile: 'dbt_chapter6'
+
+# 项目级配置
+config-version: 2
+
+# 项目描述和元数据
+description: "第6章：dbt最佳实践与项目结构演示项目"
+
+# 项目标签（用于分类和筛选）
+project-tags:
+  - "best-practices"
+  - "project-structure"
+  - "chapter6"
+  - "demonstration"
+
+# 模型配置
+models:
+  dbt_chapter6:
+    # 项目级模型配置
+    +materialized: table
+    +persist_docs:
+      relation: true
+      columns: true
+    
+    # staging层配置
+    staging:
+      +materialized: view
+      +tags: ["staging", "data-cleaning"]
+      +persist_docs:
+        relation: true
+        columns: true
+      
+      # staging层特定配置
+      +pre-hook: "{{ log('开始处理staging层数据: ' ~ this.name, info=true) }}"
+      +post-hook: "{{ log('完成处理staging层数据: ' ~ this.name, info=true) }}"
+    
+    # intermediate层配置
+    intermediate:
+      +materialized: table
+      +tags: ["intermediate", "business-logic"]
+      +persist_docs:
+        relation: true
+        columns: true
+      
+      # intermediate层特定配置
+      +pre-hook: "{{ log('开始处理intermediate层数据: ' ~ this.name, info=true) }}"
+      +post-hook: "{{ log('完成处理intermediate层数据: ' ~ this.name, info=true) }}"
+    
+    # marts层配置
+    marts:
+      +materialized: table
+      +tags: ["marts", "business-ready"]
+      +persist_docs:
+        relation: true
+        columns: true
+      
+      # marts层特定配置
+      +pre-hook: "{{ log('开始处理marts层数据: ' ~ this.name, info=true) }}"
+      +post-hook: "{{ log('完成处理marts层数据: ' ~ this.name, info=true) }}"
+    
+    # utils层配置（工具模型）
+    utils:
+      +materialized: table
+      +tags: ["utils", "shared"]
+      +persist_docs:
+        relation: true
+        columns: true
+
+# 数据源配置
+sources:
+  - name: raw_data
+    description: "原始业务数据源"
+    
+    # 数据源级配置
+    +tags: ["raw", "source"]
+    
+    # 数据新鲜度配置
+    freshness:
+      warn_after: {count: 24, period: hour}
+      error_after: {count: 48, period: hour}
+    
+    tables:
+      - name: customers
+        description: "客户主数据表"
+        +tags: ["customers", "master-data"]
+        
+      - name: orders
+        description: "订单交易数据表"
+        +tags: ["orders", "transaction-data"]
+        
+      - name: products
+        description: "产品目录数据表"
+        +tags: ["products", "catalog-data"]
+
+# 种子数据配置
+seeds:
+  dbt_chapter6:
+    +tags: ["seed", "reference-data"]
+    +materialized: table
+    +quote_columns: true
+    
+    # 种子数据特定配置
+    dim_date:
+      +tags: ["date-dimension", "calendar"]
+      
+    product_categories:
+      +tags: ["categories", "classification"]
+      
+    country_codes:
+      +tags: ["countries", "geography"]
+
+# 快照配置
+snapshots:
+  dbt_chapter6:
+    +tags: ["snapshot", "historical-data"]
+    +target_schema: "snapshots"
+    +unique_key: "id"
+    +strategy: "timestamp"
+    +updated_at: "updated_at"
+
+# 测试配置
+tests:
+  dbt_chapter6:
+    # 项目级测试配置
+    +severity: warn
+    +store_failures: true
+    
+    # 数据源测试配置
+    sources:
+      +tags: ["source-test", "data-quality"]
+      
+    # 模型测试配置
+    models:
+      +tags: ["model-test", "data-validation"]
+
+# 变量定义（可在模型中使用）
+vars:
+  # 业务变量
+  company_name: "示例公司"
+  default_currency: "USD"
+  fiscal_year_start: "2023-01-01"
+  
+  # 技术变量
+  batch_size: 10000
+  max_retries: 3
+  timeout_seconds: 3600
+  
+  # 环境特定变量（可在命令行覆盖）
+  env: "development"
+  debug_mode: true
+  enable_profiling: false
+
+# 查询标签配置（用于监控和成本追踪）
+query-comment:
+  comment: "dbt_chapter6 - {{ env }} - {{ invocation_id }}"
+  
+# 宏配置
+macro-paths: ["macros"]
+
+# 测试路径配置
+test-paths: ["tests"]
+
+# 数据源路径配置
+source-paths: ["models"]
+
+# 分析路径配置
+analysis-paths: ["analyses"]
+
+# 种子数据路径配置
+seed-paths: ["seeds"]
+
+# 快照路径配置
+snapshot-paths: ["snapshots"]
+
+# 目标路径配置
+target-path: "target"
+
+# 日志路径配置
+log-path: "logs"
+
+# 包依赖配置（如果需要使用外部包）
+# packages:
+#   - package: dbt-labs/dbt_utils
+#     version: 0.8.0
+
+# 环境特定配置（通过--target参数选择）
+target-paths:
+  development: "target/dev"
+  test: "target/test"
+  production: "target/prod"
+
+# 模型选择配置（用于选择性运行）
+select:
+  - "tag:staging"
+  - "tag:intermediate"
+  - "tag:marts"
+  - "tag:utils"
+
+# 排除配置（排除不需要运行的模型）
+exclude:
+  - "tag:deprecated"
+  - "tag:experimental"
+
+# 模型依赖配置（显式声明依赖关系）
+# dependencies:
+#   - ref('stg_customers')
+#   - ref('stg_orders')
+
+# 钩子配置（在模型运行前后执行）
+on-run-start:
+  - "{{ log('开始运行dbt_chapter6项目', info=true) }}"
+  - "{{ log('环境: ' ~ env, info=true) }}"
+  - "{{ log('目标: ' ~ target.name, info=true) }}"
+
+on-run-end:
+  - "{{ log('完成运行dbt_chapter6项目', info=true) }}"
+  - "{{ log('运行统计信息', info=true) }}"
+  - "{{ log('成功模型数量: ' ~ results | selectattr('status', 'equalto', 'success') | list | length, info=true) }}"
+
+# 文档配置
+docs:
+  +show: true
+  +persist_docs: true
+
+# 性能优化配置
+performance:
+  # 查询优化
+  +use_index: true
+  +use_partitions: true
+  
+  # 资源限制
+  +max_parallelism: 5
+  +query_timeout: 3600
+  
+  # 缓存配置
+  +use_cache: true
+  +cache_ttl: 3600
+
+# 安全配置
+security:
+  # 数据脱敏
+  +mask_sensitive_data: true
+  
+  # 访问控制
+  +row_level_security: false
+  
+  # 审计日志
+  +enable_audit_logging: true
+
+# 监控配置
+monitoring:
+  # 性能监控
+  +enable_performance_monitoring: true
+  
+  # 数据质量监控
+  +enable_data_quality_monitoring: true
+  
+  # 告警配置
+  +enable_alerts: true
+  +alert_threshold: 0.95
+
+# 部署配置
+deployment:
+  # 环境切换
+  +allow_environment_switching: true
+  
+  # 回滚机制
+  +enable_rollback: true
+  
+  # 版本控制
+  +use_version_control: true
+
+# 配置验证规则
+# 确保配置的完整性和正确性
+require-configs:
+  - materialized
+  - tags
+  - persist_docs
+
+# 配置使用说明
+# 1. 环境切换: dbt run --target development
+# 2. 变量覆盖: dbt run --vars '{"env": "production"}'
+# 3. 选择性运行: dbt run --select tag:staging
+# 4. 排除运行: dbt run --exclude tag:deprecated
+# 5. 测试运行: dbt test --select source:*

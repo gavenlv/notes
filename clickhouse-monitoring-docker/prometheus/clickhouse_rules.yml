@@ -1,0 +1,126 @@
+groups:
+- name: clickhouse
+  rules:
+  
+  # ClickHouse 系统资源告警
+  - alert: ClickHouseHighCPUUsage
+    expr: rate(clickhouse_events_Total{event="Query"}[5m]) > 100
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "ClickHouse CPU使用率过高"
+      description: "ClickHouse查询频率过高，当前值为 {{ $value }} 查询/秒"
+
+  - alert: ClickHouseHighMemoryUsage
+    expr: clickhouse_metrics_MemoryUsage > 8589934592  # 8GB
+    for: 3m
+    labels:
+      severity: critical
+    annotations:
+      summary: "ClickHouse内存使用过高"
+      description: "ClickHouse内存使用量超过8GB，当前值为 {{ $value }} bytes"
+
+  - alert: ClickHouseQueryQueueFull
+    expr: clickhouse_metrics_QueryQueueSize > 50
+    for: 2m
+    labels:
+      severity: warning
+    annotations:
+      summary: "ClickHouse查询队列堆积"
+      description: "ClickHouse查询队列中有超过50个查询等待处理，当前队列大小: {{ $value }}"
+
+  # ClickHouse 性能告警
+  - alert: ClickHouseSlowQueries
+    expr: histogram_quantile(0.95, rate(clickhouse_metrics_QueryDurationMicroseconds_bucket[5m])) / 1000000 > 10
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "ClickHouse慢查询检测"
+      description: "95%的查询响应时间超过10秒，当前P95为 {{ $value }} 秒"
+
+  - alert: ClickHouseFailedQueries
+    expr: rate(clickhouse_events_QueryFailed[5m]) > 0.1
+    for: 3m
+    labels:
+      severity: critical
+    annotations:
+      summary: "ClickHouse查询失败率过高"
+      description: "查询失败率超过10%，当前失败率为 {{ $value }}"
+
+  # ClickHouse 存储告警
+  - alert: ClickHouseDiskSpaceLow
+    expr: clickhouse_metrics_DiskSpaceUsed / clickhouse_metrics_DiskSpaceTotal > 0.9
+    for: 2m
+    labels:
+      severity: critical
+    annotations:
+      summary: "ClickHouse磁盘空间不足"
+      description: "磁盘使用率超过90%，当前使用率为 {{ $value | humanizePercentage }}"
+
+  - alert: ClickHouseTableSizeTooLarge
+    expr: clickhouse_metrics_TableSizeBytes > 107374182400  # 100GB
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "ClickHouse表大小过大"
+      description: "表大小超过100GB，当前大小为 {{ $value | humanize }} bytes"
+
+  # ClickHouse 连接告警
+  - alert: ClickHouseTooManyConnections
+    expr: clickhouse_metrics_TCPConnection > 1000
+    for: 2m
+    labels:
+      severity: warning
+    annotations:
+      summary: "ClickHouse连接数过多"
+      description: "TCP连接数超过1000，当前连接数为 {{ $value }}"
+
+  - alert: ClickHouseConnectionRefused
+    expr: rate(clickhouse_events_ConnectionRefused[5m]) > 1
+    for: 1m
+    labels:
+      severity: critical
+    annotations:
+      summary: "ClickHouse连接被拒绝"
+      description: "连接拒绝率过高，当前拒绝率为 {{ $value }}/秒"
+
+  # ClickHouse 副本同步告警
+  - alert: ClickHouseReplicaLag
+    expr: clickhouse_metrics_ReplicasDelay > 30
+    for: 3m
+    labels:
+      severity: warning
+    annotations:
+      summary: "ClickHouse副本同步延迟"
+      description: "副本同步延迟超过30秒，当前延迟为 {{ $value }} 秒"
+
+  # 系统资源告警
+  - alert: NodeHighCPUUsage
+    expr: 100 - (avg by(instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 80
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "节点CPU使用率过高"
+      description: "节点CPU使用率超过80%，当前使用率为 {{ $value }}%"
+
+  - alert: NodeHighMemoryUsage
+    expr: (node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes) / node_memory_MemTotal_bytes > 0.9
+    for: 3m
+    labels:
+      severity: critical
+    annotations:
+      summary: "节点内存使用率过高"
+      description: "节点内存使用率超过90%，当前使用率为 {{ $value | humanizePercentage }}"
+
+  - alert: NodeDiskSpaceLow
+    expr: (node_filesystem_size_bytes - node_filesystem_free_bytes) / node_filesystem_size_bytes > 0.9
+    for: 2m
+    labels:
+      severity: critical
+    annotations:
+      summary: "节点磁盘空间不足"
+      description: "节点磁盘使用率超过90%，当前使用率为 {{ $value | humanizePercentage }}"
